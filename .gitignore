@@ -1,3 +1,11 @@
+# MBFF custom files and folders to ignore
+ExperimentalDatasets
+ExperimentalRuns
+dataset_rcv1v2
+
+# Vim swap files
+*.swp
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
