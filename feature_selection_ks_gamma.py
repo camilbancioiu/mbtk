@@ -17,9 +17,12 @@ import sys
 def load_ks_gamma_tables(folder, targets):
     folder += '/ks'
     gamma_tables = {}
-    for i in targets:
-        gamma_table = scipy.io.mmread(folder + '/ks-gamma-{0}.mtx'.format(i))
-        gamma_tables[i] = gamma_table
+    try:
+        for i in targets:
+            gamma_table = scipy.io.mmread(folder + '/ks-gamma-{0}.mtx'.format(i))
+            gamma_tables[i] = gamma_table
+    except:
+        raise Exception("Gamma tables could not be read from the folder {}. Please make sure you have generated them using the command './exds build-ks-gamma [dataset]'.".format(folder))
     return gamma_tables
 
 def build_ks_gamma_tables(dest_folder, exds, targets, optimization='full_sharing'):
