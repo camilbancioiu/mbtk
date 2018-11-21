@@ -3,7 +3,7 @@ Experimental framework containing an original implementation of an old, yet cano
 
 This implementation provides a few efficiency optimizations of the KS algorithm. They can be enabled or disabled at will. The framework also defines a specific set of experiments to evaluate the efficiency gains of these optimizations.
 
-*Please submit any comments, improvement suggestions and bugs as Issues of this repository. 
+*Please submit any comments, improvement suggestions and bugs as Issues of this repository.*
 
 ## Documentation
 Will follow soon.
