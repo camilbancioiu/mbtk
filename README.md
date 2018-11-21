@@ -11,5 +11,5 @@ Will follow soon.
 ## Requirements
 1. The framework is written in Python 3. Make sure you have it installed. 
 1. The Python 3 module `sklearn` is required. Please install it according to the instructions here: https://scikit-learn.org/stable/install.html.
-1. The LYRL2004 version of the Reuters Corpus Volume 1 is required, which will be downloaded and prepared by the `prepare` script, bundled with the framework. Please run `./prepare` before attempting anything else. A download of approximately 150 MB will start.
+1. The LYRL2004 version of the Reuters Corpus Volume 1 is required, which will be downloaded by the `prepare` script, bundled with the framework. Please run `./prepare` before attempting anything else. A download of approximately 150 MB will start.
 
