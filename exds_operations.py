@@ -1,3 +1,9 @@
+"""
+Each ExDs operation is represented by a callback with the conventional name
+``op_[OperationName]``. Each such callback receives a list of ExDs definition
+names, representing the ExDs to act on.
+"""
+
 import multiprocessing
 import itertools
 import utilities as util
@@ -12,6 +18,7 @@ import feature_selection as FS
 from mpprint import mpprint
 import experimental_dataset
 
+from exds_operations_utilities import *
 import exds_operations_custom
 
 arguments = None
@@ -20,6 +27,11 @@ parallelism = 1
 
 ### ExDs operation "list"
 def op_list(exds_names):
+    """
+    Print a table of the ExDs definitions known to MBFF.
+
+    See :doc:`/infrastructure/datasets/index` on how to write ExDs definitions.
+    """
     definitions = get_from_definitions(ExperimentalDatasets, exds_names)
     print(exds_definition_table_header())
     for definition in definitions:
@@ -28,6 +40,21 @@ def op_list(exds_names):
 
 ### ExDs operation "build"
 def op_build(exds_names):
+    """
+    Build the specified ExDs, if they haven't been previously built.
+
+    Building a dataset implies creating a corresponding folder in the
+    ExperimentalDatasets folder, then processing the source information,
+    aggregating it and saving it in the format specified by the ExDs
+    definition.
+
+    The difference between ``build`` and ``rebuild`` is that ``build`` will
+    *not* overwrite an existing ExDs, whereas ``rebuild`` will never create an
+    ExDs - it will only rebuild it *if it already exists*. These two separate
+    commands exist mainly to prevent accidental overwriting of existing ExDs.
+
+    See :py:func:`experimental_dataset.build_experimental_dataset`.
+    """
     if parallelism > 1:
         map_over_exds_definitions_parallel(exds_names, 'Build', op_build_single, print_status=True)
     else:
@@ -43,6 +70,20 @@ def op_build_single(definition):
 
 ### ExDs operation "build"
 def op_rebuild(exds_names):
+    """
+    Rebuilds the specified ExDs, if the ExDs have been already built and are not locked.
+
+    If the ExDs haven't yet been built, do nothing. Useful when building the
+    ExDs is an operation involving randomness or when the ExDs must be saved in
+    a new format, during development.
+
+    The difference between ``build`` and ``rebuild`` is that ``build`` will
+    *not* overwrite an existing ExDs, whereas ``rebuild`` will never create an
+    ExDs - it will only rebuild it *if it already exists*. These two separate
+    commands exist mainly to prevent accidental overwriting of existing ExDs.
+
+    See :py:func:`experimental_dataset.build_experimental_dataset`.
+    """
     if parallelism > 1:
         map_over_exds_definitions_parallel(exds_names, 'Rebuild', op_rebuild_single, print_status=True)
     else:
@@ -58,6 +99,13 @@ def op_rebuild_single(definition):
 
 ### ExDs operation "resave"
 def op_resave(exds_names):
+    """
+    Load already built ExDs from their folders, then immediately save them.
+
+    This operation is useful during development, when an existing ExDs must be
+    converted from an older format into a newer one, without having to rebuild
+    it.
+    """
     if parallelism > 1:
         map_over_exds_definitions_parallel(exds_names, 'Resave', op_resave_single)
     else:
@@ -73,6 +121,13 @@ def op_resave_single(definition):
 
 ### ExDs operation "delete"
 def op_delete(exds_names):
+    """
+    Completely delete built ExDs by deleting their folder, if they are not locked.
+
+    A deleted ExDs must be built again from its definition if it is to be used
+    again.
+    """
+
     map_over_exds_definitions(exds_names, 'Delete', op_delete_single, print_status=True)
 
 def op_delete_single(definition):
@@ -83,6 +138,18 @@ def op_delete_single(definition):
 
 ### ExDs operation "lock"
 def op_lock(exds_names):
+    """
+    Lock the specified ExDs, thus preventing any writing operation to them.
+
+    A locked ExDs must first be unlocked before rebuilding, resaving or
+    deleting it.
+
+    An alternative locking operation is locking the already-built KS gamma
+    tables. This is performed by adding the flag ``--lock-ks-gamma`` to the
+    ``lock`` operation. Note that locking the KS gamma tables will **not** lock
+    the entire ExDs. The two operations are separate.
+    """
+
     map_over_exds_definitions(exds_names, 'Lock', op_lock_single, print_status=False)
 
 def op_lock_single(definition):
@@ -93,6 +160,18 @@ def op_lock_single(definition):
 
 ### ExDs operation "unlock"
 def op_unlock(exds_names):
+    """
+    Unlock the specified ExDs, thus allowing any writing operation to them.
+
+    A locked ExDs must first be unlocked before rebuilding, resaving or
+    deleting it.
+
+    An alternative unlocking operation is unlocking the already-built KS gamma
+    tables, if they were previously locked. This is performed by adding the
+    flag ``--lock-ks-gamma`` to the ``unlock`` operation. Note that unlocking
+    the KS gamma tables will *not* unlock the entire ExDs. The two operations
+    are separate.
+    """
     map_over_exds_definitions(exds_names, 'Unlock', op_unlock_single, print_status=False)
 
 def op_unlock_single(definition):
@@ -103,6 +182,9 @@ def op_unlock_single(definition):
 
 ### ExDs operation "stats --print"
 def op_stats_print(exds_names):
+    """
+    Deprecated, will be moved to the entry-point ``analysis_exds``.
+    """
     map_over_exds_definitions(exds_names, 'Stats', op_stats_print_single)
 
 def op_stats_print_single(definition):
@@ -121,6 +203,9 @@ def op_stats_print_single(definition):
 
 ### ExDs operation "stats --regenerate"
 def op_stats_regenerate(exds_names):
+    """
+    Deprecated, will be moved to the entry-point ``analysis_exds``.
+    """
     if parallelism > 1:
         map_over_exds_definitions_parallel(exds_names, 'Stats resave', op_stats_regenerate_single)
     else:
@@ -136,10 +221,13 @@ def op_stats_regenerate_single(definition):
         except Exception as e:
             print(e)
     return definition
-    
+
 
 ### ExDs operation "stats --print-to-csv"
 def op_stats_print_to_csv(exds_names):
+    """
+    Deprecated, will be moved to the entry-point ``analysis_exds``.
+    """
     rows = map_over_exds_definitions(exds_names, '', op_stats_print_to_csv__stats_to_csv_dict)
     w = csv.DictWriter(sys.stdout, fieldnames=ExperimentalDatasetStats.csv_keys(), lineterminator='\n')
     w.writeheader()
@@ -151,9 +239,18 @@ def op_stats_print_to_csv__stats_to_csv_dict(definition):
 
 ### ExDs operation "build-ks-gamma"
 def op_build_ks_gamma(exds_names):
+    """
+    Build the KS gamma tables for the specified ExDs.
+
+    By default, this operation builds the gamma tables for all the objective
+    variables in the ExDs. An explicit objective variable can be specified
+    using the option ``--build-ks-gamma-table-for-target=T``, where T is a
+    number, which means that only the gamma table for the objective variable T
+    will be built.
+    """
     if parallelism > 1:
         map_over_exds_definitions_parallel(exds_names, 'Build KS gamma tables', op_build_ks_gamma_single, print_status=True)
-    else: 
+    else:
         map_over_exds_definitions(exds_names, 'Build KS gamma tables', op_build_ks_gamma_single, print_status=True)
 
 def op_build_ks_gamma_single(definition):
@@ -173,53 +270,9 @@ def op_build_ks_gamma_single(definition):
 
 ### ExDs operation "build-ks-gamma"
 def op_custom(exds_names, arguments):
+    """
+    Invoke a custom operation.
+
+    See :py:mod:`exds_operations_custom`.
+    """
     exds_operations_custom.op_custom(exds_names, arguments)
-    
-
-####################
-### Helper functions
-
-def map_over_exds_definitions(exds_names, opname, op, print_status=True):
-    i = 1
-    definitions = list(get_from_definitions(ExperimentalDatasets, exds_names))
-    results = []
-    for definition in definitions:
-        if opname != '' and print_status == True:
-            mpprint('{} ExDs {} ({} / {})'.format(opname, definition.name, i, len(definitions)))
-        results.append(op(definition))
-        i += 1
-    return results
-
-def map_over_exds_definitions_parallel(exds_names, opname, op, print_status=True):
-    definitions = list(get_from_definitions(ExperimentalDatasets, exds_names))
-    parallel_arguments = zip(
-        definitions, 
-        range(1, len(definitions) + 1), 
-        itertools.repeat(op),
-        itertools.repeat(opname),
-        itertools.repeat(print_status),
-        itertools.repeat(len(definitions))
-        )
-    results = []
-    with multiprocessing.Pool(parallelism) as pool:
-        results = pool.map(map_over_exds_definitions_single, parallel_arguments)
-    return results
-
-def map_over_exds_definitions_single(args):
-    (definition, index, op, opname, print_status, len_definitions) = args
-    if opname != '' and print_status == True:
-        mpprint('{} ExDs {} ({} / {})'.format(opname, definition.name, index, len_definitions))
-    return op(definition)
-
-def exds_definition_table_format_string():
-    return '{0:<30}\t{1:<12}\t{2:<12}\t{3!s:<10}\t{4:<12}\t{5:<18}\t{6}'
-
-def exds_definition_table_header():
-    return exds_definition_table_format_string().format('ExDs name', 'Industry', 'Train rows', 'Trim freqs', 'Folder', 'Tags', 'Locks')
-
-def exds_definition_to_table_string(definition):
-    locks = filter(definition.folder_is_locked, experimental_dataset.lock_types)
-    return exds_definition_table_format_string().format(
-            definition.name, definition.industry, definition.train_rows_proportion, 
-            definition.trim_freqs, str(definition.folder_exists()), ', '.join(definition.tags), ', '.join(locks))
-

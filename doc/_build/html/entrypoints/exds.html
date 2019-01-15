@@ -1,0 +1,482 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>exds &#8212; MBFF 0.3 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/style.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="experiment" href="experiment.html" />
+    <link rel="prev" title="analysis_exprun" href="analysis_exprun.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="experiment.html" title="experiment"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="analysis_exprun.html" title="analysis_exprun"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">MBFF 0.3 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Entry points</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-exds">
+<span id="exds"></span><h1>exds<a class="headerlink" href="#module-exds" title="Permalink to this headline">¶</a></h1>
+<p>Entry point for manipulating ExperimentalDatasets (ExDs). Provides the following operations:</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">exds_operations.op_list</span></code>(exds_names)</td>
+<td>Print a table of the ExDs definitions known to MBFF.</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">exds_operations.op_build</span></code>(exds_names)</td>
+<td>Build the specified ExDs, if they haven’t been previously built.</td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">exds_operations.op_rebuild</span></code>(exds_names)</td>
+<td>Rebuilds the specified ExDs, if the ExDs have been already built and are not locked.</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">exds_operations.op_resave</span></code>(exds_names)</td>
+<td>Load already built ExDs from their folders, then immediately save them.</td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">exds_operations.op_delete</span></code>(exds_names)</td>
+<td>Completely delete built ExDs by deleting their folder, if they are not locked.</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">exds_operations.op_lock</span></code>(exds_names)</td>
+<td>Lock the specified ExDs, thus preventing any writing operation to them.</td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">exds_operations.op_unlock</span></code>(exds_names)</td>
+<td>Unlock the specified ExDs, thus allowing any writing operation to them.</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">exds_operations.op_stats_print</span></code>(exds_names)</td>
+<td>Deprecated, will be moved to the entry-point <code class="docutils literal notranslate"><span class="pre">analysis_exds</span></code>.</td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">exds_operations.op_stats_regenerate</span></code>(exds_names)</td>
+<td>Deprecated, will be moved to the entry-point <code class="docutils literal notranslate"><span class="pre">analysis_exds</span></code>.</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">exds_operations.op_stats_print_to_csv</span></code>(exds_names)</td>
+<td>Deprecated, will be moved to the entry-point <code class="docutils literal notranslate"><span class="pre">analysis_exds</span></code>.</td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">exds_operations.op_build_ks_gamma</span></code>(exds_names)</td>
+<td>Build the KS gamma tables for the specified ExDs.</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">exds_operations.op_custom</span></code>(exds_names,&nbsp;arguments)</td>
+<td>Invoke a custom operation.</td>
+</tr>
+</tbody>
+</table>
+<p>More detailed descriptions of these operations are found in <a class="reference internal" href="#defined-operations-exds"><span class="std std-ref">Defined operations</span></a>.</p>
+<p>Examples:</p>
+<blockquote>
+<div><ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">./exds.py</span> <span class="pre">list</span> <span class="pre">all</span></code> prints a table with all known ExDs definitions.</li>
+<li><code class="docutils literal notranslate"><span class="pre">./exds.py</span> <span class="pre">build</span> <span class="pre">-et</span> <span class="pre">TextProcessingDS</span> <span class="pre">GeneticDS</span></code> will build all ExDs which have the tags <code class="docutils literal notranslate"><span class="pre">TextProcessing</span></code> or <code class="docutils literal notranslate"><span class="pre">GeneticDS</span></code>.</li>
+<li><code class="docutils literal notranslate"><span class="pre">./exds.py</span> <span class="pre">lock</span> <span class="pre">reuters_large_200</span></code> will lock the folder of the ExDs named <code class="docutils literal notranslate"><span class="pre">reuters_large_200</span></code>, preventing it from being rebuilt or deleted.</li>
+<li><code class="docutils literal notranslate"><span class="pre">./exds.py</span> <span class="pre">build_ks_gamma</span> <span class="pre">--build-ks-gamma-table-for-target=2</span> <span class="pre">--build-ks-gamma-optimization=off</span> <span class="pre">genetic_100_B</span></code> will will build the KS
+gamma table for the objective variable <code class="docutils literal notranslate"><span class="pre">2</span></code>, without optimization, for the dataset <code class="docutils literal notranslate"><span class="pre">genetic_100_B</span></code>.</li>
+</ul>
+</div></blockquote>
+<dl class="function">
+<dt id="exds.create_argument_parser">
+<code class="descclassname">exds.</code><code class="descname">create_argument_parser</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/exds.html#create_argument_parser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#exds.create_argument_parser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Instantiates and configures an ArgumentParser.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="exds.get_exds_names_from_arguments">
+<code class="descclassname">exds.</code><code class="descname">get_exds_names_from_arguments</code><span class="sig-paren">(</span><em>arguments</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/exds.html#get_exds_names_from_arguments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#exds.get_exds_names_from_arguments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resolve the <code class="docutils literal notranslate"><span class="pre">targets</span></code> argument to actual ExDs definition names,
+based on <code class="docutils literal notranslate"><span class="pre">targets_type</span></code>.</p>
+<p>See <a class="reference internal" href="#cli-usage-exds"><span class="std std-ref">Command-line usage</span></a>.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="exds.entry_point_exds">
+<code class="descclassname">exds.</code><code class="descname">entry_point_exds</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/exds.html#entry_point_exds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#exds.entry_point_exds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Main function of the entry-point <code class="docutils literal notranslate"><span class="pre">exds</span></code>.</p>
+<p>Invokes the corresponding <code class="docutils literal notranslate"><span class="pre">operation</span></code> on the ExDs specified as
+<code class="docutils literal notranslate"><span class="pre">targets</span></code>. See <a class="reference internal" href="#defined-operations-exds"><span class="std std-ref">Defined operations</span></a>.</p>
+</dd></dl>
+
+<div class="section" id="command-line-usage">
+<span id="cli-usage-exds"></span><h2>Command-line usage<a class="headerlink" href="#command-line-usage" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">exds</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">n</span> <span class="n">PARALLELISM</span><span class="p">]</span>
+            <span class="p">[</span><span class="o">--</span><span class="n">build</span><span class="o">-</span><span class="n">ks</span><span class="o">-</span><span class="n">gamma</span><span class="o">-</span><span class="n">optimization</span> <span class="n">BUILD_KS_GAMMA_OPTIMIZATION</span><span class="p">]</span>
+            <span class="p">[</span><span class="o">--</span><span class="n">build</span><span class="o">-</span><span class="n">ks</span><span class="o">-</span><span class="n">gamma</span><span class="o">-</span><span class="n">table</span><span class="o">-</span><span class="k">for</span><span class="o">-</span><span class="n">target</span> <span class="n">BUILD_KS_GAMMA_TABLE_FOR_TARGET</span><span class="p">]</span>
+            <span class="p">[</span><span class="o">-</span><span class="n">e</span> <span class="o">|</span> <span class="o">-</span><span class="n">el</span> <span class="o">|</span> <span class="o">-</span><span class="n">elf</span> <span class="o">|</span> <span class="o">-</span><span class="n">et</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">lock</span><span class="o">-</span><span class="n">exds</span> <span class="o">|</span> <span class="o">--</span><span class="n">lock</span><span class="o">-</span><span class="n">ks</span><span class="o">-</span><span class="n">gamma</span><span class="p">]</span>
+            <span class="p">[</span><span class="o">-</span><span class="n">p</span> <span class="o">|</span> <span class="o">-</span><span class="n">r</span> <span class="o">|</span> <span class="o">-</span><span class="n">c</span><span class="p">]</span>
+            <span class="p">{</span><span class="nb">list</span><span class="p">,</span><span class="n">build</span><span class="p">,</span><span class="n">rebuild</span><span class="p">,</span><span class="n">resave</span><span class="p">,</span><span class="n">delete</span><span class="p">,</span><span class="n">lock</span><span class="p">,</span><span class="n">unlock</span><span class="p">,</span><span class="n">stats</span><span class="p">,</span><span class="n">build</span><span class="o">-</span><span class="n">ks</span><span class="o">-</span><span class="n">gamma</span><span class="p">,</span><span class="n">custom</span><span class="p">}</span>
+            <span class="n">targets</span> <span class="p">[</span><span class="n">targets</span> <span class="o">...</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="section" id="Positional Arguments">
+<h3>Positional Arguments<a class="headerlink" href="#Positional Arguments" title="Permalink to this headline">¶</a></h3>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd>operation</kbd></td>
+<td><p class="first">Possible choices: list, build, rebuild, resave, delete, lock, unlock, stats, build-ks-gamma, custom</p>
+<p>The operation to be performed on the targets.</p>
+<p class="last">Default: “list”</p>
+</td></tr>
+<tr><td class="option-group">
+<kbd>targets</kbd></td>
+<td><p class="first">The targets of the operation. What these targets are is controlled by the flags that affect the <code class="docutils literal notranslate"><span class="pre">targets_type</span></code> setting.</p>
+<p class="last">Default: [‘all’]</p>
+</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="Named Arguments">
+<h3>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this headline">¶</a></h3>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group" colspan="2">
+<kbd>-n, --parallelism</kbd></td>
+</tr>
+<tr><td>&#160;</td><td>Default: 1</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd>--build-ks-gamma-optimization</kbd></td>
+</tr>
+<tr><td>&#160;</td><td>Default: “full_sharing”</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd>--build-ks-gamma-table-for-target</kbd></td>
+</tr>
+<tr><td>&#160;</td><td>Default: -1</td></tr>
+<tr><td class="option-group">
+<kbd>-e, --as_names</kbd></td>
+<td><p class="first">Indicates that the targets are ExDs names. This sets <code class="docutils literal notranslate"><span class="pre">targets_type=names</span></code>.</p>
+<p class="last">Default: “names”</p>
+</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd>-el, --as_exds_lists</kbd></td>
+</tr>
+<tr><td>&#160;</td><td><p class="first">Indicates that the targets are the ExDs from the specified ExDs lists. This sets <code class="docutils literal notranslate"><span class="pre">targets_type=exds_lists</span></code>.</p>
+<p class="last">Default: “names”</p>
+</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd>-elf, --as_exds_list_files</kbd></td>
+</tr>
+<tr><td>&#160;</td><td><p class="first">Indicates that the targets are the ExDs from the specified exdslist files. This sets <code class="docutils literal notranslate"><span class="pre">targets_type=exds_list_files</span></code>.</p>
+<p class="last">Default: “names”</p>
+</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd>-et, --as_exds_tags</kbd></td>
+</tr>
+<tr><td>&#160;</td><td><p class="first">Indicates that the targets are the ExDs with the given tags. This sets <code class="docutils literal notranslate"><span class="pre">targets_type=exds_tags</span></code>.</p>
+<p class="last">Default: “names”</p>
+</td></tr>
+<tr><td class="option-group">
+<kbd>--lock-exds</kbd></td>
+<td>Default: “exds”</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd>--lock-ks-gamma</kbd></td>
+</tr>
+<tr><td>&#160;</td><td>Default: “exds”</td></tr>
+<tr><td class="option-group">
+<kbd>-p, --print</kbd></td>
+<td><p class="first">Print stats.</p>
+<p class="last">Default: “print”</p>
+</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd>-r, --regenerate</kbd></td>
+</tr>
+<tr><td>&#160;</td><td><p class="first">Load the ExDs, recalculate stats and resave them to their own folders.</p>
+<p class="last">Default: “print”</p>
+</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd>-c, --print-to-csv</kbd></td>
+</tr>
+<tr><td>&#160;</td><td><p class="first">Load ExDs stats and convert them to CSV.</p>
+<p class="last">Default: “print”</p>
+</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="module-exds_operations">
+<span id="defined-operations"></span><span id="defined-operations-exds"></span><h2>Defined operations<a class="headerlink" href="#module-exds_operations" title="Permalink to this headline">¶</a></h2>
+<p>Each ExDs operation is represented by a callback with the conventional name
+<code class="docutils literal notranslate"><span class="pre">op_[OperationName]</span></code>. Each such callback receives a list of ExDs definition
+names, representing the ExDs to act on.</p>
+<dl class="function">
+<dt id="exds_operations.op_list">
+<code class="descclassname">exds_operations.</code><code class="descname">op_list</code><span class="sig-paren">(</span><em>exds_names</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/exds_operations.html#op_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#exds_operations.op_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print a table of the ExDs definitions known to MBFF.</p>
+<p>See <a class="reference internal" href="../infrastructure/datasets/index.html"><span class="doc">Dataset infrastructure</span></a> on how to write ExDs definitions.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="exds_operations.op_build">
+<code class="descclassname">exds_operations.</code><code class="descname">op_build</code><span class="sig-paren">(</span><em>exds_names</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/exds_operations.html#op_build"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#exds_operations.op_build" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build the specified ExDs, if they haven’t been previously built.</p>
+<p>Building a dataset implies creating a corresponding folder in the
+ExperimentalDatasets folder, then processing the source information,
+aggregating it and saving it in the format specified by the ExDs
+definition.</p>
+<p>The difference between <code class="docutils literal notranslate"><span class="pre">build</span></code> and <code class="docutils literal notranslate"><span class="pre">rebuild</span></code> is that <code class="docutils literal notranslate"><span class="pre">build</span></code> will
+<em>not</em> overwrite an existing ExDs, whereas <code class="docutils literal notranslate"><span class="pre">rebuild</span></code> will never create an
+ExDs - it will only rebuild it <em>if it already exists</em>. These two separate
+commands exist mainly to prevent accidental overwriting of existing ExDs.</p>
+<p>See <code class="xref py py-func docutils literal notranslate"><span class="pre">experimental_dataset.build_experimental_dataset()</span></code>.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="exds_operations.op_rebuild">
+<code class="descclassname">exds_operations.</code><code class="descname">op_rebuild</code><span class="sig-paren">(</span><em>exds_names</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/exds_operations.html#op_rebuild"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#exds_operations.op_rebuild" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rebuilds the specified ExDs, if the ExDs have been already built and are not locked.</p>
+<p>If the ExDs haven’t yet been built, do nothing. Useful when building the
+ExDs is an operation involving randomness or when the ExDs must be saved in
+a new format, during development.</p>
+<p>The difference between <code class="docutils literal notranslate"><span class="pre">build</span></code> and <code class="docutils literal notranslate"><span class="pre">rebuild</span></code> is that <code class="docutils literal notranslate"><span class="pre">build</span></code> will
+<em>not</em> overwrite an existing ExDs, whereas <code class="docutils literal notranslate"><span class="pre">rebuild</span></code> will never create an
+ExDs - it will only rebuild it <em>if it already exists</em>. These two separate
+commands exist mainly to prevent accidental overwriting of existing ExDs.</p>
+<p>See <code class="xref py py-func docutils literal notranslate"><span class="pre">experimental_dataset.build_experimental_dataset()</span></code>.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="exds_operations.op_resave">
+<code class="descclassname">exds_operations.</code><code class="descname">op_resave</code><span class="sig-paren">(</span><em>exds_names</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/exds_operations.html#op_resave"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#exds_operations.op_resave" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load already built ExDs from their folders, then immediately save them.</p>
+<p>This operation is useful during development, when an existing ExDs must be
+converted from an older format into a newer one, without having to rebuild
+it.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="exds_operations.op_delete">
+<code class="descclassname">exds_operations.</code><code class="descname">op_delete</code><span class="sig-paren">(</span><em>exds_names</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/exds_operations.html#op_delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#exds_operations.op_delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Completely delete built ExDs by deleting their folder, if they are not locked.</p>
+<p>A deleted ExDs must be built again from its definition if it is to be used
+again.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="exds_operations.op_lock">
+<code class="descclassname">exds_operations.</code><code class="descname">op_lock</code><span class="sig-paren">(</span><em>exds_names</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/exds_operations.html#op_lock"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#exds_operations.op_lock" title="Permalink to this definition">¶</a></dt>
+<dd><p>Lock the specified ExDs, thus preventing any writing operation to them.</p>
+<p>A locked ExDs must first be unlocked before rebuilding, resaving or
+deleting it.</p>
+<p>An alternative locking operation is locking the already-built KS gamma
+tables. This is performed by adding the flag <code class="docutils literal notranslate"><span class="pre">--lock-ks-gamma</span></code> to the
+<code class="docutils literal notranslate"><span class="pre">lock</span></code> operation. Note that locking the KS gamma tables will <strong>not</strong> lock
+the entire ExDs. The two operations are separate.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="exds_operations.op_unlock">
+<code class="descclassname">exds_operations.</code><code class="descname">op_unlock</code><span class="sig-paren">(</span><em>exds_names</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/exds_operations.html#op_unlock"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#exds_operations.op_unlock" title="Permalink to this definition">¶</a></dt>
+<dd><p>Unlock the specified ExDs, thus allowing any writing operation to them.</p>
+<p>A locked ExDs must first be unlocked before rebuilding, resaving or
+deleting it.</p>
+<p>An alternative unlocking operation is unlocking the already-built KS gamma
+tables, if they were previously locked. This is performed by adding the
+flag <code class="docutils literal notranslate"><span class="pre">--lock-ks-gamma</span></code> to the <code class="docutils literal notranslate"><span class="pre">unlock</span></code> operation. Note that unlocking
+the KS gamma tables will <em>not</em> unlock the entire ExDs. The two operations
+are separate.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="exds_operations.op_stats_print">
+<code class="descclassname">exds_operations.</code><code class="descname">op_stats_print</code><span class="sig-paren">(</span><em>exds_names</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/exds_operations.html#op_stats_print"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#exds_operations.op_stats_print" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deprecated, will be moved to the entry-point <code class="docutils literal notranslate"><span class="pre">analysis_exds</span></code>.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="exds_operations.op_stats_regenerate">
+<code class="descclassname">exds_operations.</code><code class="descname">op_stats_regenerate</code><span class="sig-paren">(</span><em>exds_names</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/exds_operations.html#op_stats_regenerate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#exds_operations.op_stats_regenerate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deprecated, will be moved to the entry-point <code class="docutils literal notranslate"><span class="pre">analysis_exds</span></code>.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="exds_operations.op_stats_print_to_csv">
+<code class="descclassname">exds_operations.</code><code class="descname">op_stats_print_to_csv</code><span class="sig-paren">(</span><em>exds_names</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/exds_operations.html#op_stats_print_to_csv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#exds_operations.op_stats_print_to_csv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deprecated, will be moved to the entry-point <code class="docutils literal notranslate"><span class="pre">analysis_exds</span></code>.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="exds_operations.op_build_ks_gamma">
+<code class="descclassname">exds_operations.</code><code class="descname">op_build_ks_gamma</code><span class="sig-paren">(</span><em>exds_names</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/exds_operations.html#op_build_ks_gamma"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#exds_operations.op_build_ks_gamma" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build the KS gamma tables for the specified ExDs.</p>
+<p>By default, this operation builds the gamma tables for all the objective
+variables in the ExDs. An explicit objective variable can be specified
+using the option <code class="docutils literal notranslate"><span class="pre">--build-ks-gamma-table-for-target=T</span></code>, where T is a
+number, which means that only the gamma table for the objective variable T
+will be built.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="exds_operations.op_custom">
+<code class="descclassname">exds_operations.</code><code class="descname">op_custom</code><span class="sig-paren">(</span><em>exds_names</em>, <em>arguments</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/exds_operations.html#op_custom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#exds_operations.op_custom" title="Permalink to this definition">¶</a></dt>
+<dd><p>Invoke a custom operation.</p>
+<p>See <a class="reference internal" href="#module-exds_operations_custom" title="exds_operations_custom"><code class="xref py py-mod docutils literal notranslate"><span class="pre">exds_operations_custom</span></code></a>.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-exds_operations_custom">
+<span id="custom-operations"></span><h2>Custom operations<a class="headerlink" href="#module-exds_operations_custom" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-exds_operations_utilities">
+<span id="utility-functions"></span><h2>Utility functions<a class="headerlink" href="#module-exds_operations_utilities" title="Permalink to this headline">¶</a></h2>
+<p>A collection of functions required by multiple operations defined in the
+<a class="reference internal" href="#module-exds_operations" title="exds_operations"><code class="xref py py-mod docutils literal notranslate"><span class="pre">exds_operations</span></code></a> module.</p>
+<dl class="function">
+<dt id="exds_operations_utilities.map_over_exds_definitions">
+<code class="descclassname">exds_operations_utilities.</code><code class="descname">map_over_exds_definitions</code><span class="sig-paren">(</span><em>exds_names</em>, <em>opname</em>, <em>op</em>, <em>print_status=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/exds_operations_utilities.html#map_over_exds_definitions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#exds_operations_utilities.map_over_exds_definitions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply the callback <code class="docutils literal notranslate"><span class="pre">op</span></code> on the specified ExDs.</p>
+<p>This function collects the definitions of the ExDs specified in
+<code class="docutils literal notranslate"><span class="pre">exds_names</span></code>, then calls <code class="docutils literal notranslate"><span class="pre">op(definition)</span></code> for all of them, while collecting
+the return values of each call.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="exds_operations_utilities.map_over_exds_definitions_parallel">
+<code class="descclassname">exds_operations_utilities.</code><code class="descname">map_over_exds_definitions_parallel</code><span class="sig-paren">(</span><em>exds_names</em>, <em>opname</em>, <em>op</em>, <em>print_status=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/exds_operations_utilities.html#map_over_exds_definitions_parallel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#exds_operations_utilities.map_over_exds_definitions_parallel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply the callback <code class="docutils literal notranslate"><span class="pre">op</span></code> on the specified ExDs <em>in parallel</em>.</p>
+<p>This function collects the definitions of the ExDs specified in
+<code class="docutils literal notranslate"><span class="pre">exds_names</span></code>, then calls <code class="docutils literal notranslate"><span class="pre">op(definition)</span></code> for all of them, while collecting
+the return values of each call. The individual calls of <code class="docutils literal notranslate"><span class="pre">op(definition)</span></code>
+are performed by worker-processes. Process handling is done using
+<code class="xref py py-class docutils literal notranslate"><span class="pre">multiprocessing.Pool</span></code>.</p>
+<p>The actual function run by the worker-processes is
+<a class="reference internal" href="#exds_operations_utilities.map_over_exds_definitions_single" title="exds_operations_utilities.map_over_exds_definitions_single"><code class="xref py py-func docutils literal notranslate"><span class="pre">map_over_exds_definitions_single()</span></code></a>.</p>
+<p>The number of worker-processes spawned is controlled by the option
+<code class="docutils literal notranslate"><span class="pre">--parallelism</span></code>.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="exds_operations_utilities.map_over_exds_definitions_single">
+<code class="descclassname">exds_operations_utilities.</code><code class="descname">map_over_exds_definitions_single</code><span class="sig-paren">(</span><em>args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/exds_operations_utilities.html#map_over_exds_definitions_single"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#exds_operations_utilities.map_over_exds_definitions_single" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply an ExDs operation callback on a single ExDs definition.</p>
+<p>This is the function run by the worker-processes spawned by
+<a class="reference internal" href="#exds_operations_utilities.map_over_exds_definitions_parallel" title="exds_operations_utilities.map_over_exds_definitions_parallel"><code class="xref py py-func docutils literal notranslate"><span class="pre">map_over_exds_definitions_parallel()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="exds_operations_utilities.exds_definition_table_format_string">
+<code class="descclassname">exds_operations_utilities.</code><code class="descname">exds_definition_table_format_string</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/exds_operations_utilities.html#exds_definition_table_format_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#exds_operations_utilities.exds_definition_table_format_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a format string for a single row of the table printed by <a class="reference internal" href="#exds_operations.op_list" title="exds_operations.op_list"><code class="xref py py-func docutils literal notranslate"><span class="pre">exds_operations.op_list()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="exds_operations_utilities.exds_definition_table_header">
+<code class="descclassname">exds_operations_utilities.</code><code class="descname">exds_definition_table_header</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/exds_operations_utilities.html#exds_definition_table_header"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#exds_operations_utilities.exds_definition_table_header" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a formatted string containing the header of the table printed by <a class="reference internal" href="#exds_operations.op_list" title="exds_operations.op_list"><code class="xref py py-func docutils literal notranslate"><span class="pre">exds_operations.op_list()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="exds_operations_utilities.exds_definition_to_table_string">
+<code class="descclassname">exds_operations_utilities.</code><code class="descname">exds_definition_to_table_string</code><span class="sig-paren">(</span><em>definition</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/exds_operations_utilities.html#exds_definition_to_table_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#exds_operations_utilities.exds_definition_to_table_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a row representing the ExDs <code class="docutils literal notranslate"><span class="pre">definition</span></code> in the table printed by <a class="reference internal" href="#exds_operations.op_list" title="exds_operations.op_list"><code class="xref py py-func docutils literal notranslate"><span class="pre">exds_operations.op_list()</span></code></a>.</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">exds</a><ul>
+<li><a class="reference internal" href="#command-line-usage">Command-line usage</a><ul>
+<li><a class="reference internal" href="#Positional Arguments">Positional Arguments</a></li>
+<li><a class="reference internal" href="#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-exds_operations">Defined operations</a></li>
+<li><a class="reference internal" href="#module-exds_operations_custom">Custom operations</a></li>
+<li><a class="reference internal" href="#module-exds_operations_utilities">Utility functions</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="analysis_exprun.html"
+                        title="previous chapter">analysis_exprun</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="experiment.html"
+                        title="next chapter">experiment</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/entrypoints/exds.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="experiment.html" title="experiment"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="analysis_exprun.html" title="analysis_exprun"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">MBFF 0.3 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Entry points</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, Camil Băncioiu.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.5.
+    </div>
+  </body>
+</html>

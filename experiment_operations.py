@@ -1,3 +1,9 @@
+"""
+Each Experiment operation is represented by a callback with the conventional name
+``op_[OperationName]``. Each such callback receives a list of Experiment definition
+names, representing the Experiments to act on.
+"""
+
 import itertools
 import functools as F
 import utilities as util
@@ -10,7 +16,6 @@ from experimental_dataset import ExperimentalDataset
 from experimental_dataset_stats import ExperimentalDatasetStats
 from experimental_pipeline import Experiment, AlgorithmRun
 import feature_selection as FS
-
 
 
 ### Experiment operation "list"
