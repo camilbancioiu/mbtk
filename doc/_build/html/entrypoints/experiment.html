@@ -54,8 +54,43 @@
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">experiment_operations.op_list</span></code>(experiment_names)</td>
+<td>Print a table of the ExDs definitions known to MBFF.</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">experiment_operations.op_run</span></code>(experiment_names)</td>
+<td>Run the Experiments.</td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">experiment_operations.op_lock</span></code>(experiment_names)</td>
+<td>Lock the Experiments.</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">experiment_operations.op_unlock</span></code>(experiment_names)</td>
+<td>Unlock the Experiments.</td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">experiment_operations.op_desc</span></code>(experiment_names)</td>
+<td>Print a description of the Experiments.</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">experiment_operations.op_alg_runs_print_to_csv</span></code>(…)</td>
+<td>Deprecated.</td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">experiment_operations.op_alg_runs_delete</span></code>(…)</td>
+<td>Deprecated.</td>
+</tr>
 </tbody>
 </table>
+<dl class="function">
+<dt id="experiment.create_argument_parser">
+<code class="descclassname">experiment.</code><code class="descname">create_argument_parser</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/experiment.html#create_argument_parser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#experiment.create_argument_parser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Instantiates and configures an ArgumentParser.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="experiment.entry_point_experiment">
+<code class="descclassname">experiment.</code><code class="descname">entry_point_experiment</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/experiment.html#entry_point_experiment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#experiment.entry_point_experiment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Main function of the entry-point <code class="docutils literal notranslate"><span class="pre">experiment</span></code>.</p>
+<p>Invokes the corresponding <code class="docutils literal notranslate"><span class="pre">operation</span></code> on the Experiments specified as
+<code class="docutils literal notranslate"><span class="pre">targets</span></code>. See <a class="reference internal" href="#defined-operations-experiment"><span class="std std-ref">Defined operations</span></a>.</p>
+</dd></dl>
+
 <div class="section" id="command-line-usage">
 <span id="cli-usage-experiment"></span><h2>Command-line usage<a class="headerlink" href="#command-line-usage" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">experiment</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">c</span> <span class="o">|</span> <span class="o">-</span><span class="n">d</span><span class="p">]</span>
@@ -109,6 +144,54 @@
 <p>Each Experiment operation is represented by a callback with the conventional name
 <code class="docutils literal notranslate"><span class="pre">op_[OperationName]</span></code>. Each such callback receives a list of Experiment definition
 names, representing the Experiments to act on.</p>
+<dl class="function">
+<dt id="experiment_operations.op_list">
+<code class="descclassname">experiment_operations.</code><code class="descname">op_list</code><span class="sig-paren">(</span><em>experiment_names</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/experiment_operations.html#op_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#experiment_operations.op_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print a table of the ExDs definitions known to MBFF.</p>
+<p>See <a class="reference internal" href="../infrastructure/experiments/index.html"><span class="doc">Experimental infrastructure</span></a> on how to write Experiment definitions.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="experiment_operations.op_run">
+<code class="descclassname">experiment_operations.</code><code class="descname">op_run</code><span class="sig-paren">(</span><em>experiment_names</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/experiment_operations.html#op_run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#experiment_operations.op_run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run the Experiments.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="experiment_operations.op_lock">
+<code class="descclassname">experiment_operations.</code><code class="descname">op_lock</code><span class="sig-paren">(</span><em>experiment_names</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/experiment_operations.html#op_lock"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#experiment_operations.op_lock" title="Permalink to this definition">¶</a></dt>
+<dd><p>Lock the Experiments.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="experiment_operations.op_unlock">
+<code class="descclassname">experiment_operations.</code><code class="descname">op_unlock</code><span class="sig-paren">(</span><em>experiment_names</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/experiment_operations.html#op_unlock"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#experiment_operations.op_unlock" title="Permalink to this definition">¶</a></dt>
+<dd><p>Unlock the Experiments.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="experiment_operations.op_desc">
+<code class="descclassname">experiment_operations.</code><code class="descname">op_desc</code><span class="sig-paren">(</span><em>experiment_names</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/experiment_operations.html#op_desc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#experiment_operations.op_desc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print a description of the Experiments.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="experiment_operations.op_alg_runs_print_to_csv">
+<code class="descclassname">experiment_operations.</code><code class="descname">op_alg_runs_print_to_csv</code><span class="sig-paren">(</span><em>experiment_names</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/experiment_operations.html#op_alg_runs_print_to_csv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#experiment_operations.op_alg_runs_print_to_csv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deprecated. To be moved to the entry point <code class="docutils literal notranslate"><span class="pre">analysis_exprun</span></code>.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="experiment_operations.op_alg_runs_delete">
+<code class="descclassname">experiment_operations.</code><code class="descname">op_alg_runs_delete</code><span class="sig-paren">(</span><em>experiment_names</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/experiment_operations.html#op_alg_runs_delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#experiment_operations.op_alg_runs_delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deprecated. To be moved to the entry point <code class="docutils literal notranslate"><span class="pre">analysis_exprun</span></code>.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-experiment_operations_utilities">
+<span id="utility-functions"></span><h2>Utility functions<a class="headerlink" href="#module-experiment_operations_utilities" title="Permalink to this headline">¶</a></h2>
+<p>A collection of functions required by multiple operations defined in the
+<a class="reference internal" href="#module-experiment_operations" title="experiment_operations"><code class="xref py py-mod docutils literal notranslate"><span class="pre">experiment_operations</span></code></a> module.</p>
 </div>
 </div>
 
@@ -127,6 +210,7 @@ names, representing the Experiments to act on.</p>
 </ul>
 </li>
 <li><a class="reference internal" href="#module-experiment_operations">Defined operations</a></li>
+<li><a class="reference internal" href="#module-experiment_operations_utilities">Utility functions</a></li>
 </ul>
 </li>
 </ul>

@@ -126,6 +126,7 @@ def get_exds_names_from_arguments(arguments):
             exds_names = itertools.chain(exds_names, exds_names_by_tag)
     return sorted(exds_names)
 
+
 def entry_point_exds():
     """
     Main function of the entry-point ``exds``.
@@ -133,7 +134,6 @@ def entry_point_exds():
     Invokes the corresponding ``operation`` on the ExDs specified as
     ``targets``. See :ref:`defined_operations_exds`.
     """
-
     parser = create_argument_parser()
     arguments = parser.parse_args()
 

@@ -17,9 +17,16 @@ from experimental_dataset_stats import ExperimentalDatasetStats
 from experimental_pipeline import Experiment, AlgorithmRun
 import feature_selection as FS
 
+from experiment_operations_utilities import *
+
 
 ### Experiment operation "list"
 def op_list(experiment_names):
+    """
+    Print a table of the ExDs definitions known to MBFF.
+
+    See :doc:`/infrastructure/experiments/index` on how to write Experiment definitions.
+    """
     definitions = get_from_definitions(Experiments, experiment_names)
     print(experiment_definition_table_header())
     for definition in definitions:
@@ -28,6 +35,9 @@ def op_list(experiment_names):
 
 ### Experiment operation "run"
 def op_run(experiment_names):
+    """
+    Run the Experiments.
+    """
     map_over_experiment_definitions(experiment_names, 'Run experiment', op_run_single)
 
 def op_run_single(definition):
@@ -38,6 +48,9 @@ def op_run_single(definition):
 
 ### Experiment operation "lock"
 def op_lock(experiment_names):
+    """
+    Lock the Experiments.
+    """
     map_over_experiment_definitions(experiment_names, 'Lock', op_lock_single)
 
 def op_lock_single(definition):
@@ -47,6 +60,9 @@ def op_lock_single(definition):
 
 ### Experiment operation "unlock"
 def op_unlock(experiment_names):
+    """
+    Unlock the Experiments.
+    """
     map_over_experiment_definitions(experiment_names, 'Unlock', op_unlock_single)
 
 def op_unlock_single(definition):
@@ -56,6 +72,9 @@ def op_unlock_single(definition):
 
 ### Experiment operation "desc"
 def op_desc(experiment_names):
+    """
+    Print a description of the Experiments.
+    """
     map_over_experiment_definitions(experiment_names, 'Description', op_desc_single) 
 
 def op_desc_single(definition):
@@ -66,7 +85,7 @@ def op_desc_single(definition):
         exds_stats = 'n/a'
     output = desc.format(
         definition.name,
-        definition.folder, 
+        definition.folder,
         pformat(definition.parameters, width=70, indent=4),
         pformat(definition.config, width=70, indent=4),
         exds_stats
@@ -77,6 +96,9 @@ def op_desc_single(definition):
 
 ### Experiment operation "alg-runs --print-to-csv"
 def op_alg_runs_print_to_csv(experiment_names):
+    """
+    Deprecated. To be moved to the entry point ``analysis_exprun``.
+    """
     map_over_experiment_definitions(experiment_names, '', op_alg_runs_print_to_csv_single)
 
 def op_alg_runs_print_to_csv_single(definition):
@@ -84,7 +106,7 @@ def op_alg_runs_print_to_csv_single(definition):
     algorithm_runs = experiment.load_saved_runs()
     convert_to_dict = F.partial(AlgorithmRun.todict, add_selected_features=False)
     rows = map(convert_to_dict, algorithm_runs)
-    w = csv.DictWriter(sys.stdout, 
+    w = csv.DictWriter(sys.stdout,
             fieldnames=AlgorithmRun.csv_keys(definition.parameters.keys(), False), 
             lineterminator='\n')
     w.writeheader()
@@ -94,6 +116,9 @@ def op_alg_runs_print_to_csv_single(definition):
 
 ### Experiment operation
 def op_alg_runs_delete(experiment_names):
+    """
+    Deprecated. To be moved to the entry point ``analysis_exprun``.
+    """
     map_over_experiment_definitions(experiment_names, 'Delete alg-runs', op_alg_runs_delete)
 
 def op_alg_runs_delete_single(definition):
@@ -115,39 +140,3 @@ def op_build_ks_gamma_single(definition):
         FS.build_ks_gamma_tables(exds.definition.folder, exds, definition.parameters['target'])
     return definition
 
-####################
-### Helper functions
-
-def map_over_experiment_definitions(experiment_names, opname, op, print_status=True):
-    i = 1
-    definitions = list(get_from_definitions(Experiments, experiment_names))
-    results = []
-    for definition in definitions:
-        if opname != '' and print_status == True:
-            print('{} Experiment {} ({} / {})'.format(opname, definition.name, i, len(definitions)))
-        results.append(op(definition))
-        i += 1
-    return results
-
-
-experiment_definition_table_format = '{:<30}\t{:<20}\t{:40}\t{:20}'
-
-def experiment_definition_table_header():
-    output = experiment_definition_table_format.format(
-            'Experiment name', 'ExDs name', 'Parameters', 'Config')
-    output += '\n' + experiment_definition_table_format.format(*(['--------------------']*4))
-    return output
-
-def experiment_definition_to_table_string(definition):
-    parameters_description = ', '.join([
-            '{}:{}'.format(pn, len(pv))
-            for pn, pv in definition.parameters.items()
-            ])
-    config_description = ', '.join(sorted([
-        '{}={}'.format(cn, cv)
-        for cn, cv in definition.config.items()
-        ]))
-
-    return experiment_definition_table_format.format(
-            definition.name, definition.exds_definition.name, parameters_description, config_description
-            )

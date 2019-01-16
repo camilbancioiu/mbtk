@@ -22,3 +22,7 @@ Defined operations
 .. automodule:: experiment_operations
   :members:
 
+Utility functions
+=================
+.. automodule:: experiment_operations_utilities
+  :members:

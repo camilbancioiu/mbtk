@@ -5,6 +5,13 @@ Entry point for manipulating Experiments. Provides the following operations:
 
 .. autosummary::
 
+    experiment_operations.op_list
+    experiment_operations.op_run
+    experiment_operations.op_lock
+    experiment_operations.op_unlock
+    experiment_operations.op_desc
+    experiment_operations.op_alg_runs_print_to_csv
+    experiment_operations.op_alg_runs_delete
 
 """
 
@@ -37,12 +44,19 @@ def create_argument_parser():
     # Help strings for the arguments defined above:
     arg_operation.help ='The operation to be performed on the targets.'
     arg_targets.help = 'The experiment to perform the operation on.'
-    arg_alg_runs_action__print_to_csv.help = 'Load saved AlgorithmRun instances and convert them to CSV.',
+    arg_alg_runs_action__print_to_csv.help = 'Load saved AlgorithmRun instances and convert them to CSV.'
     arg_alg_runs_action__delete.help = 'Delete saved AlgorithmRun instances.'
 
     return parser
 
-if __name__ == '__main__':
+
+def entry_point_experiment():
+    """
+    Main function of the entry-point ``experiment``.
+
+    Invokes the corresponding ``operation`` on the Experiments specified as
+    ``targets``. See :ref:`defined_operations_experiment`.
+    """
     parser = create_argument_parser()
     arguments = parser.parse_args()
 
@@ -70,3 +84,7 @@ if __name__ == '__main__':
         experiment_operations.op_build_ks_gamma(experiment_names)
     else:
         raise Exception('Operation not recognised: {}'.format(op))
+
+
+if __name__ == '__main__':
+    entry_point_experiment()

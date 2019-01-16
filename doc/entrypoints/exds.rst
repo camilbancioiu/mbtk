@@ -26,7 +26,3 @@ Custom operations
 =================
 .. automodule:: exds_operations_custom
 
-Utility functions
-=================
-.. automodule:: exds_operations_utilities
-  :members:

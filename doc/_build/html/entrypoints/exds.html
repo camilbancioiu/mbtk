@@ -348,61 +348,6 @@ will be built.</p>
 <div class="section" id="module-exds_operations_custom">
 <span id="custom-operations"></span><h2>Custom operations<a class="headerlink" href="#module-exds_operations_custom" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-exds_operations_utilities">
-<span id="utility-functions"></span><h2>Utility functions<a class="headerlink" href="#module-exds_operations_utilities" title="Permalink to this headline">¶</a></h2>
-<p>A collection of functions required by multiple operations defined in the
-<a class="reference internal" href="#module-exds_operations" title="exds_operations"><code class="xref py py-mod docutils literal notranslate"><span class="pre">exds_operations</span></code></a> module.</p>
-<dl class="function">
-<dt id="exds_operations_utilities.map_over_exds_definitions">
-<code class="descclassname">exds_operations_utilities.</code><code class="descname">map_over_exds_definitions</code><span class="sig-paren">(</span><em>exds_names</em>, <em>opname</em>, <em>op</em>, <em>print_status=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/exds_operations_utilities.html#map_over_exds_definitions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#exds_operations_utilities.map_over_exds_definitions" title="Permalink to this definition">¶</a></dt>
-<dd><p>Apply the callback <code class="docutils literal notranslate"><span class="pre">op</span></code> on the specified ExDs.</p>
-<p>This function collects the definitions of the ExDs specified in
-<code class="docutils literal notranslate"><span class="pre">exds_names</span></code>, then calls <code class="docutils literal notranslate"><span class="pre">op(definition)</span></code> for all of them, while collecting
-the return values of each call.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="exds_operations_utilities.map_over_exds_definitions_parallel">
-<code class="descclassname">exds_operations_utilities.</code><code class="descname">map_over_exds_definitions_parallel</code><span class="sig-paren">(</span><em>exds_names</em>, <em>opname</em>, <em>op</em>, <em>print_status=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/exds_operations_utilities.html#map_over_exds_definitions_parallel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#exds_operations_utilities.map_over_exds_definitions_parallel" title="Permalink to this definition">¶</a></dt>
-<dd><p>Apply the callback <code class="docutils literal notranslate"><span class="pre">op</span></code> on the specified ExDs <em>in parallel</em>.</p>
-<p>This function collects the definitions of the ExDs specified in
-<code class="docutils literal notranslate"><span class="pre">exds_names</span></code>, then calls <code class="docutils literal notranslate"><span class="pre">op(definition)</span></code> for all of them, while collecting
-the return values of each call. The individual calls of <code class="docutils literal notranslate"><span class="pre">op(definition)</span></code>
-are performed by worker-processes. Process handling is done using
-<code class="xref py py-class docutils literal notranslate"><span class="pre">multiprocessing.Pool</span></code>.</p>
-<p>The actual function run by the worker-processes is
-<a class="reference internal" href="#exds_operations_utilities.map_over_exds_definitions_single" title="exds_operations_utilities.map_over_exds_definitions_single"><code class="xref py py-func docutils literal notranslate"><span class="pre">map_over_exds_definitions_single()</span></code></a>.</p>
-<p>The number of worker-processes spawned is controlled by the option
-<code class="docutils literal notranslate"><span class="pre">--parallelism</span></code>.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="exds_operations_utilities.map_over_exds_definitions_single">
-<code class="descclassname">exds_operations_utilities.</code><code class="descname">map_over_exds_definitions_single</code><span class="sig-paren">(</span><em>args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/exds_operations_utilities.html#map_over_exds_definitions_single"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#exds_operations_utilities.map_over_exds_definitions_single" title="Permalink to this definition">¶</a></dt>
-<dd><p>Apply an ExDs operation callback on a single ExDs definition.</p>
-<p>This is the function run by the worker-processes spawned by
-<a class="reference internal" href="#exds_operations_utilities.map_over_exds_definitions_parallel" title="exds_operations_utilities.map_over_exds_definitions_parallel"><code class="xref py py-func docutils literal notranslate"><span class="pre">map_over_exds_definitions_parallel()</span></code></a>.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="exds_operations_utilities.exds_definition_table_format_string">
-<code class="descclassname">exds_operations_utilities.</code><code class="descname">exds_definition_table_format_string</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/exds_operations_utilities.html#exds_definition_table_format_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#exds_operations_utilities.exds_definition_table_format_string" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a format string for a single row of the table printed by <a class="reference internal" href="#exds_operations.op_list" title="exds_operations.op_list"><code class="xref py py-func docutils literal notranslate"><span class="pre">exds_operations.op_list()</span></code></a>.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="exds_operations_utilities.exds_definition_table_header">
-<code class="descclassname">exds_operations_utilities.</code><code class="descname">exds_definition_table_header</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/exds_operations_utilities.html#exds_definition_table_header"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#exds_operations_utilities.exds_definition_table_header" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a formatted string containing the header of the table printed by <a class="reference internal" href="#exds_operations.op_list" title="exds_operations.op_list"><code class="xref py py-func docutils literal notranslate"><span class="pre">exds_operations.op_list()</span></code></a>.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="exds_operations_utilities.exds_definition_to_table_string">
-<code class="descclassname">exds_operations_utilities.</code><code class="descname">exds_definition_to_table_string</code><span class="sig-paren">(</span><em>definition</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/exds_operations_utilities.html#exds_definition_to_table_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#exds_operations_utilities.exds_definition_to_table_string" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a row representing the ExDs <code class="docutils literal notranslate"><span class="pre">definition</span></code> in the table printed by <a class="reference internal" href="#exds_operations.op_list" title="exds_operations.op_list"><code class="xref py py-func docutils literal notranslate"><span class="pre">exds_operations.op_list()</span></code></a>.</p>
-</dd></dl>
-
-</div>
 </div>
 
 
@@ -421,7 +366,6 @@ are performed by worker-processes. Process handling is done using
 </li>
 <li><a class="reference internal" href="#module-exds_operations">Defined operations</a></li>
 <li><a class="reference internal" href="#module-exds_operations_custom">Custom operations</a></li>
-<li><a class="reference internal" href="#module-exds_operations_utilities">Utility functions</a></li>
 </ul>
 </li>
 </ul>
