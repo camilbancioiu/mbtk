@@ -11,6 +11,10 @@ import sys
 
 autoListFolders = []
 
+def ensure_folder(folder):
+    path = Path(folder)
+    path.mkdir(parents=True, exist_ok=True)
+
 def consume(iterator):
     collections.deque(iterator, maxlen=0)
 
@@ -57,7 +61,7 @@ def load_matrix(folder, matrix_name):
         return matrix
     if isinstance(matrix, numpy.ndarray):
         matrix = numpy.matrix(matrix)
-    else:    
+    else:
         try:
             matrix = matrix.tocsr()
         except AttributeError:

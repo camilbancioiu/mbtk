@@ -49,7 +49,7 @@ class ExperimentalDatasetDefinition():
         self.trim_freqs = trim_freqs
         self.tags = []
         self.random_seed = 42
-    
+
     def __str__(self):
         return 'ExDs {}, Folder {}, Industry {}, Tags {}'.format(self.name, self.folder, self.industry, self.tags)
 
@@ -193,7 +193,7 @@ class ExperimentalDataset():
     def get_Y_count(self):
         return self.Y.get_shape()[1]
 
-        
+
 class ExperimentalDatasetError(Exception):
     def __init__(self, exds_definition, message):
         self.exds_definition = exds_definition
