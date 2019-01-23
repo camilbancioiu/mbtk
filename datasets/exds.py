@@ -2,7 +2,7 @@ import random
 import os
 import shutil
 from pathlib import Path
-from dataset_matrix import DatasetMatrix
+from datasetmatrix import DatasetMatrix
 
 class ExperimentalDatasetDefinition():
     """
