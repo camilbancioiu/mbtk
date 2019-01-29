@@ -1,7 +1,6 @@
 # MBFF custom files and folders to ignore
-ExperimentalDatasets
-ExperimentalRuns
-dataset_rcv1v2
+.project
+testfiles/tmp
 
 # Vim swap files
 *.swp
