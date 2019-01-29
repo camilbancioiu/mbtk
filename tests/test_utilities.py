@@ -1,5 +1,8 @@
 import os
+import shutil
+from pathlib import Path
 
+TestFilesRootFolder = 'testfiles/tmp'
 
 class cd:
     """Context manager for changing the current working directory"""
@@ -15,7 +18,16 @@ class cd:
 
 
 def ensure_tmp_subfolder(subfolder):
-    path = Path('tmp/' + subfolder)
+    path = Path(TestFilesRootFolder + '/' + subfolder)
     path.mkdir(parents=True, exist_ok=True)
     return path
 
+
+def ensure_empty_tmp_subfolder(subfolder):
+    try:
+        shutil.rmtree(TestFilesRootFolder + '/' + subfolder)
+    except FileNotFoundError:
+        pass
+    path = Path(TestFilesRootFolder + '/' + subfolder)
+    path.mkdir(parents=True, exist_ok=True)
+    return path

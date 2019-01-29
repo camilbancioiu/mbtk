@@ -54,21 +54,27 @@ class ExperimentalDatasetDefinition():
         self.auto_lock_after_build = True
         self.tags = []
 
+
     def setup(self):
         self.folder = self.exds_folder + '/' + self.name
         self.validate()
 
+
     def validate(self):
         pass
+
 
     def get_lock_filename(self, lock_type='exds'):
         return '{}/locked_{}'.format(self.folder, lock_type)
 
+
     def folder_is_locked(self, lock_type='exds'):
         return bool(Path(self.get_lock_filename(lock_type)).exists())
 
+
     def folder_exists(self):
         return bool(Path(self.folder).exists())
+
 
     def lock_folder(self, lock_type='exds'):
         folder = self.folder
@@ -79,6 +85,7 @@ class ExperimentalDatasetDefinition():
                 f.write('locked')
                 print('{}: Folder has been locked ({}).'.format(self.name, lock_type))
 
+
     def delete_folder(self):
         if not self.folder_exists():
             print('{}: ExDs folder does not exist.'.format(self.name))
@@ -88,6 +95,7 @@ class ExperimentalDatasetDefinition():
             return
         shutil.rmtree(self.folder)
         print('{}: ExDs folder deleted.'.format(self.name))
+
 
     def unlock_folder(self, lock_type='exds'):
         folder = self.folder
@@ -113,4 +121,5 @@ class ExperimentalDatasetError(Exception):
     def __init__(self, exds_definition, message):
         self.exds_definition = exds_definition
         self.message = message
+        super().__init__(self.message)
 

@@ -5,7 +5,7 @@ import scipy
 import time
 import datetime
 import scipy.io
-from mpprint import mpprint
+from mbff.mpprint import mpprint
 from pathlib import Path
 import sys
 
