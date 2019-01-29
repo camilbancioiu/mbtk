@@ -6,7 +6,7 @@ import shutil
 import os
 
 import mbff.tests.test_utilities as util
-from mbff.datasets.datasetmatrix import DatasetMatrix, DatasetMatrixNotFinalizedError
+from mbff.datasets.DatasetMatrix import DatasetMatrix, DatasetMatrixNotFinalizedError
 
 class TestDatasetMatrix(unittest.TestCase):
 
@@ -17,6 +17,7 @@ class TestDatasetMatrix(unittest.TestCase):
 
         folder = str(util.ensure_empty_tmp_subfolder('test_datasetmatrix__save_load'))
         self.check_saving_and_loading(dm, folder)
+
 
     def test_removing_rows(self):
         # Set up a simple DatasetMatrix
