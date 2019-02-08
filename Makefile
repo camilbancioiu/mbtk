@@ -17,5 +17,5 @@ help:
 doc: Makefile
 	@$(SPHINXBUILD) -M html "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
-test_exds: Makefile
-	python3 -m unittest tests/test_exds.py
+test: Makefile
+	python3 test.py
