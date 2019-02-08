@@ -2,6 +2,14 @@
 Dataset infrastructure
 ===========================
 
-.. automodule:: datasets.DatasetMatrix
+.. toctree::
+  :maxdepth: 2
+  :caption: Contents:
 
-.. automodule:: datasets.ExDs
+  sources/index.rst
+
+.. automodule:: mbff.datasets.DatasetMatrix
+  :members:
+
+.. automodule:: mbff.datasets.ExDs
+  :members:

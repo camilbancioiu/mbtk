@@ -17,7 +17,7 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Algorithms" href="../../algorithms/index.html" />
+    <link rel="next" title="Dataset sources" href="sources/index.html" />
     <link rel="prev" title="Experimental infrastructure" href="../experiments/index.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
@@ -27,7 +27,10 @@
           <a href="../../genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="../../algorithms/index.html" title="Algorithms"
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="sources/index.html" title="Dataset sources"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="../experiments/index.html" title="Experimental infrastructure"
@@ -44,6 +47,73 @@
             
   <div class="section" id="dataset-infrastructure">
 <h1>Dataset infrastructure<a class="headerlink" href="#dataset-infrastructure" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="sources/index.html">Dataset sources</a></li>
+</ul>
+</div>
+<span class="target" id="module-mbff.datasets.DatasetMatrix"></span><dl class="exception">
+<dt id="mbff.datasets.DatasetMatrix.DatasetMatrixNotFinalizedError">
+<em class="property">exception </em><code class="descclassname">mbff.datasets.DatasetMatrix.</code><code class="descname">DatasetMatrixNotFinalizedError</code><span class="sig-paren">(</span><em>datasetmatrix</em>, <em>attempt</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mbff/datasets/DatasetMatrix.html#DatasetMatrixNotFinalizedError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mbff.datasets.DatasetMatrix.DatasetMatrixNotFinalizedError" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="exception">
+<dt id="mbff.datasets.DatasetMatrix.DatasetMatrixFinalizedError">
+<em class="property">exception </em><code class="descclassname">mbff.datasets.DatasetMatrix.</code><code class="descname">DatasetMatrixFinalizedError</code><span class="sig-paren">(</span><em>datasetmatrix</em>, <em>attempt</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mbff/datasets/DatasetMatrix.html#DatasetMatrixFinalizedError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mbff.datasets.DatasetMatrix.DatasetMatrixFinalizedError" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<span class="target" id="module-mbff.datasets.ExDs"></span><dl class="class">
+<dt id="mbff.datasets.ExDs.ExperimentalDatasetDefinition">
+<em class="property">class </em><code class="descclassname">mbff.datasets.ExDs.</code><code class="descname">ExperimentalDatasetDefinition</code><a class="reference internal" href="../../_modules/mbff/datasets/ExDs.html#ExperimentalDatasetDefinition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mbff.datasets.ExDs.ExperimentalDatasetDefinition" title="Permalink to this definition">¶</a></dt>
+<dd><p>The definition of an ExperimentalDataset, which contains the information needed
+to build an experimental dataset (exds) from external source data, split it into
+training and testing samplesets, save it and analyze it later.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> – The unique machine-name identifier of the exds.</li>
+<li><strong>source</strong> – A class inheriting the DatasetSource class which has a
+.build() method that returns an annotated DatasetMatrix
+object created from external source data.</li>
+<li><strong>source_args</strong> – A dictionary object which configures the DatasetSource class
+provided as the <code class="docutils literal notranslate"><span class="pre">source</span></code> property.</li>
+<li><strong>training_subset_size</strong> – A real value representing the proportion of dataset
+rows allocated to training a model. By specifying a value less than 1.0,
+the dataset will be randomly split into two non-overlapping subsets of rows,
+one for training, the other for testing the model.</li>
+<li><strong>trim_prob__feature</strong> – A tuple of two real values between 0.0 and 1.0,
+representing the minimum and maximum thresholds of allowed probability
+of a value within a feature of the dataset. Namely, if a value appears
+too few times in a feature (or too many times), then the feature is deemed
+uninformative and it is removed from the dataset.</li>
+<li><strong>trim_prob__objective</strong> – A tuple of two real values between 0.0 and 1.0,
+representing the minimum and maximum thresholds of allowed probability
+of a value within an objective variable of the dataset. Namely, if too
+few or too many samples have a single value for an objective variable,
+then the objective variable is deemed uninformative and it is removed
+from the dataset.</li>
+<li><strong>random_seed</strong> – An integer chosen arbitrarily, which controls the random
+selection of training/testing rows. Should be set once per exds definition
+and never changed (unless you know what you are doing).</li>
+<li><strong>auto_lock_after_build</strong> – Determines whether the folder of the exds is
+automatically locked after building. Locking the folder of an exds will
+prevent accidental rebuilding or deleting.</li>
+<li><strong>tags</strong> – A list of arbitrary strings, used to categorize this exds.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="exception">
+<dt id="mbff.datasets.ExDs.ExperimentalDatasetError">
+<em class="property">exception </em><code class="descclassname">mbff.datasets.ExDs.</code><code class="descname">ExperimentalDatasetError</code><span class="sig-paren">(</span><em>exds_definition</em>, <em>message</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mbff/datasets/ExDs.html#ExperimentalDatasetError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mbff.datasets.ExDs.ExperimentalDatasetError" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </div>
 
 
@@ -56,8 +126,8 @@
   <p class="topless"><a href="../experiments/index.html"
                         title="previous chapter">Experimental infrastructure</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="../../algorithms/index.html"
-                        title="next chapter">Algorithms</a></p>
+  <p class="topless"><a href="sources/index.html"
+                        title="next chapter">Dataset sources</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -88,7 +158,10 @@
           <a href="../../genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="../../algorithms/index.html" title="Algorithms"
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="sources/index.html" title="Dataset sources"
              >next</a> |</li>
         <li class="right" >
           <a href="../experiments/index.html" title="Experimental infrastructure"

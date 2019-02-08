@@ -1,0 +1,277 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>mbff.datasets.sources.RCV1v2DatasetSource &#8212; MBFF 0.3 documentation</title>
+    <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/style.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MBFF 0.3 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for mbff.datasets.sources.RCV1v2DatasetSource</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">import</span> <span class="nn">scipy</span>
+
+<span class="kn">from</span> <span class="nn">mbff.datasets.DatasetMatrix</span> <span class="k">import</span> <span class="n">DatasetMatrix</span>
+<span class="kn">import</span> <span class="nn">mbff.utilities</span> <span class="k">as</span> <span class="nn">util</span>
+
+<div class="viewcode-block" id="RCV1v2DatasetSource"><a class="viewcode-back" href="../../../../infrastructure/datasets/sources/index.html#mbff.datasets.sources.RCV1v2DatasetSource.RCV1v2DatasetSource">[docs]</a><span class="k">class</span> <span class="nc">RCV1v2DatasetSource</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class which reads the RCV1v2 dataset files, as published by LYRL2004.</span>
+
+<span class="sd">    :var sourcefolder: The folder where the downloaded RCV1v2 files are located.</span>
+<span class="sd">    :var sourcefile_documentIDs: The name of the file containing the list of all document IDs.</span>
+<span class="sd">    :var sourcefile_document_tokens: The name of the file containing all the documents of the dataset, in token form.</span>
+<span class="sd">    :var sourcefile_topic_assignments: The name of the file containing assignments of document IDs to topics.</span>
+<span class="sd">    :var sourcefile_industry_assignments: The name of the file containing assignments of document IDs to industries.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">configuration</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">configuration</span> <span class="o">=</span> <span class="n">configuration</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sourcefolder</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">configuration</span><span class="p">[</span><span class="s1">&#39;sourcefolder&#39;</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">sourcefile_documentIDs</span>         <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">/oa7.rcv1v2-ids.txt&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sourcefolder</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sourcefile_document_tokens</span>      <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">/token/lyrl2004_tokens_all.dat&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sourcefolder</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sourcefile_topic_assignments</span>    <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">/oa8.rcv1-v2.topics.qrels.txt&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sourcefolder</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sourcefile_industry_assignments</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">/oa9.rcv1-v2.industries.qrels.txt&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sourcefolder</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">create_dataset_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;rcv1v2&#39;</span><span class="p">):</span>
+        <span class="n">documentIDs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="s1">&#39;industry&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">configuration</span><span class="p">[</span><span class="s1">&#39;filters&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">documentIDs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_documentIDs_in_industry</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">configuration</span><span class="p">[</span><span class="s1">&#39;filters&#39;</span><span class="p">][</span><span class="s1">&#39;industry&#39;</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">configuration</span><span class="p">[</span><span class="s1">&#39;filters&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">documentIDs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_all_documentIDs</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unsupported RCV1v2 document filter specified. Either specify </span><span class="se">\</span>
+<span class="s2">                    the &#39;industry&#39; filter or no filter at all.&quot;</span><span class="p">)</span>
+
+        <span class="n">documents</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_documents</span><span class="p">(</span><span class="n">documentIDs</span><span class="p">)</span>
+        <span class="n">words</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gather_complete_word_list</span><span class="p">(</span><span class="n">documents</span><span class="p">)</span>
+        <span class="n">topics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gather_complete_topic_list</span><span class="p">(</span><span class="n">documents</span><span class="p">)</span>
+
+        <span class="n">dok_matrix_words</span><span class="p">,</span> <span class="n">dok_matrix_topics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_dok_matrices</span><span class="p">(</span><span class="n">documents</span><span class="p">,</span> <span class="n">documentIDs</span><span class="p">,</span> <span class="n">words</span><span class="p">,</span> <span class="n">topics</span><span class="p">)</span>
+
+        <span class="n">datasetmatrix</span> <span class="o">=</span> <span class="n">DatasetMatrix</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+        <span class="n">datasetmatrix</span><span class="o">.</span><span class="n">X</span> <span class="o">=</span> <span class="n">dok_matrix_words</span><span class="o">.</span><span class="n">tocsr</span><span class="p">()</span>
+        <span class="n">datasetmatrix</span><span class="o">.</span><span class="n">Y</span> <span class="o">=</span> <span class="n">dok_matrix_topics</span><span class="o">.</span><span class="n">tocsr</span><span class="p">()</span>
+        <span class="n">datasetmatrix</span><span class="o">.</span><span class="n">row_labels</span> <span class="o">=</span> <span class="n">documentIDs</span>
+        <span class="n">datasetmatrix</span><span class="o">.</span><span class="n">column_labels_X</span> <span class="o">=</span> <span class="n">words</span>
+        <span class="n">datasetmatrix</span><span class="o">.</span><span class="n">column_labels_Y</span> <span class="o">=</span> <span class="n">topics</span>
+
+        <span class="k">return</span> <span class="n">datasetmatrix</span>
+
+
+    <span class="k">def</span> <span class="nf">read_all_documentIDs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">documentIDs</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sourcefile_documentIDs</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;uint32&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">documentIDs</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">read_documentIDs_in_industry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">industry</span><span class="p">):</span>
+        <span class="n">documentIDs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sourcefile_industry_assignments</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">sourcefile</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">sourcefile</span><span class="p">:</span>
+                <span class="n">industry_assignment</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">industry_assignment</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">industry</span><span class="p">:</span>
+                    <span class="n">documentIDs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">industry_assignment</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">documentIDs</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">gather_complete_word_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">documents</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">([</span><span class="n">word</span> <span class="k">for</span> <span class="n">document</span> <span class="ow">in</span> <span class="n">documents</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">document</span><span class="o">.</span><span class="n">words</span><span class="p">])))</span>
+
+
+    <span class="k">def</span> <span class="nf">gather_complete_topic_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">documents</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">([</span><span class="n">topic</span> <span class="k">for</span> <span class="n">document</span> <span class="ow">in</span> <span class="n">documents</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">for</span> <span class="n">topic</span> <span class="ow">in</span> <span class="n">document</span><span class="o">.</span><span class="n">topics</span><span class="p">])))</span>
+
+
+    <span class="k">def</span> <span class="nf">create_dok_matrices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">documents</span><span class="p">,</span> <span class="n">documentIDs</span><span class="p">,</span> <span class="n">words</span><span class="p">,</span> <span class="n">topics</span><span class="p">):</span>
+        <span class="n">words_index</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">create_index</span><span class="p">(</span><span class="n">words</span><span class="p">)</span>
+        <span class="n">topics_index</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">create_index</span><span class="p">(</span><span class="n">topics</span><span class="p">)</span>
+
+        <span class="n">dok_matrix_words</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">dok_matrix</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">documents</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">words</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+        <span class="n">dok_matrix_topics</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">dok_matrix</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">documents</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">topics</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">documentIDs</span><span class="p">)):</span>
+            <span class="n">documentID</span> <span class="o">=</span> <span class="n">documentIDs</span><span class="p">[</span><span class="n">row</span><span class="p">]</span>
+            <span class="n">document</span> <span class="o">=</span> <span class="n">documents</span><span class="p">[</span><span class="n">documentID</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">document</span><span class="o">.</span><span class="n">words</span><span class="p">:</span>
+                <span class="n">column</span> <span class="o">=</span> <span class="n">words_index</span><span class="p">[</span><span class="n">word</span><span class="p">]</span>
+                <span class="n">dok_matrix_words</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">column</span><span class="p">]</span> <span class="o">=</span> <span class="n">document</span><span class="o">.</span><span class="n">word_frequencies</span><span class="p">[</span><span class="n">word</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">topic</span> <span class="ow">in</span> <span class="n">document</span><span class="o">.</span><span class="n">topics</span><span class="p">:</span>
+                <span class="n">column</span> <span class="o">=</span> <span class="n">topics_index</span><span class="p">[</span><span class="n">topic</span><span class="p">]</span>
+                <span class="n">dok_matrix_topics</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">column</span><span class="p">]</span> <span class="o">=</span> <span class="n">document</span><span class="o">.</span><span class="n">topic_values</span><span class="p">[</span><span class="n">topic</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="p">(</span><span class="n">dok_matrix_words</span><span class="p">,</span> <span class="n">dok_matrix_topics</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">read_documents</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">requested_documentIDs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">requested_documentIDs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{}</span>
+
+        <span class="n">documents</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">sourcefile_tokens</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sourcefile_document_tokens</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+
+        <span class="n">document</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">sourcefile_tokens</span><span class="o">.</span><span class="n">readlines</span><span class="p">():</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+            <span class="c1"># A line of the form &#39;.I 000&#39; marks the beginning of a new document</span>
+            <span class="c1"># in the file, with the ID &#39;000&#39;.  If a previous document was being</span>
+            <span class="c1"># read, it means we have reached its end, so we must save it to the</span>
+            <span class="c1"># ``documents`` dictionary and start reading a new document.</span>
+            <span class="k">if</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;.I &#39;</span><span class="p">:</span>
+                <span class="c1"># If a previous document was being read, save it to ``documents``.</span>
+                <span class="k">if</span> <span class="n">document</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">documents</span><span class="p">[</span><span class="n">document</span><span class="o">.</span><span class="n">did</span><span class="p">]</span> <span class="o">=</span> <span class="n">document</span>
+
+                <span class="c1"># Read the document ID from &#39;.I 000&#39; (extract the 000) and see</span>
+                <span class="c1"># if we are interested in it (i.e. is it in the argument</span>
+                <span class="c1"># ``requested_documentIDs``). If we are interested in this new document ID,</span>
+                <span class="c1"># then instantiate a new RCV1v2Document and set it to receive</span>
+                <span class="c1"># the upcoming lines.</span>
+                <span class="n">documentID</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">3</span><span class="p">:]</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+                <span class="k">if</span> <span class="n">documentID</span> <span class="ow">in</span> <span class="n">requested_documentIDs</span><span class="p">:</span>
+                    <span class="n">document</span> <span class="o">=</span> <span class="n">RCV1v2Document</span><span class="p">()</span>
+                    <span class="n">document</span><span class="o">.</span><span class="n">did</span> <span class="o">=</span> <span class="n">documentID</span>
+                    <span class="n">document</span><span class="o">.</span><span class="n">source</span> <span class="o">=</span> <span class="bp">self</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">document</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="c1"># A line of the form &#39;.W&#39; does not interest us and is skipped.</span>
+            <span class="c1"># Empty lines are also skipped.</span>
+            <span class="k">elif</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;.W&#39;</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">elif</span> <span class="n">line</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="c1"># If the current line in the token file is neither of the form &#39;.I 000&#39;,</span>
+            <span class="c1"># nor &#39;.W&#39;, nor an empty line, then it contains the actual</span>
+            <span class="c1"># tokenized words of the current document. Feed this line to the</span>
+            <span class="c1"># current document.</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">document</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">document</span><span class="o">.</span><span class="n">read_line_with_tokens</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+
+        <span class="c1"># At the end of the file, add the last document to ``documents``.</span>
+        <span class="k">if</span> <span class="n">document</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">documents</span><span class="p">[</span><span class="n">document</span><span class="o">.</span><span class="n">did</span><span class="p">]</span> <span class="o">=</span> <span class="n">document</span>
+
+        <span class="n">sourcefile_tokens</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assign_topics_to_documents</span><span class="p">(</span><span class="n">documents</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">documents</span>
+
+
+    <span class="k">def</span> <span class="nf">assign_topics_to_documents</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">documents</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sourcefile_topic_assignments</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">sourcefile</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">sourcefile</span><span class="p">:</span>
+                <span class="n">assignment</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+                <span class="n">documentID</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">assignment</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">topic</span> <span class="o">=</span> <span class="n">assignment</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">documents</span><span class="p">[</span><span class="n">documentID</span><span class="p">]</span><span class="o">.</span><span class="n">add_topic</span><span class="p">(</span><span class="n">topic</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                    <span class="k">pass</span></div>
+
+
+
+<span class="k">class</span> <span class="nc">RCV1v2Document</span><span class="p">():</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">did</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">words</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">word_frequencies</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">topics</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">topic_values</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">source</span> <span class="o">=</span> <span class="kc">None</span>
+
+
+    <span class="k">def</span> <span class="nf">read_line_with_tokens</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add a new line of words to this document, updating the word frequencies</span>
+<span class="sd">        and the current list of unique words in the document.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">line_words</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">line_words</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">word_frequencies</span><span class="p">[</span><span class="n">word</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">word_frequencies</span><span class="p">[</span><span class="n">word</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">words</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">word_frequencies</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+
+    <span class="k">def</span> <span class="nf">add_topic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">topic</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">topics</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">topic</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">topic_values</span><span class="p">[</span><span class="n">topic</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">MBFF 0.3 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, Camil Băncioiu.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.5.
+    </div>
+  </body>
+</html>
