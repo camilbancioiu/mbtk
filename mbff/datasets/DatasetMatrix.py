@@ -2,7 +2,7 @@ import numpy
 import scipy
 import scipy.io
 import pickle
-from .. import utilities as util
+import mbff.utilities as util
 
 class DatasetMatrix:
 
