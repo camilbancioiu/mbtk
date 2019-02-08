@@ -1,0 +1,166 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Class ExperimentalDatasetDefinition &#8212; MBFF 0.3 documentation</title>
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/style.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Class ExperimentalDataset" href="ExperimentalDataset.html" />
+    <link rel="prev" title="Class DatasetMatrix" href="DatasetMatrix.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="ExperimentalDataset.html" title="Class ExperimentalDataset"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="DatasetMatrix.html" title="Class DatasetMatrix"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">MBFF 0.3 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Infrastructure</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" accesskey="U">Dataset infrastructure</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-mbff.datasets.ExperimentalDatasetDefinition">
+<span id="class-experimentaldatasetdefinition"></span><h1>Class <code class="docutils literal notranslate"><span class="pre">ExperimentalDatasetDefinition</span></code><a class="headerlink" href="#module-mbff.datasets.ExperimentalDatasetDefinition" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="mbff.datasets.ExperimentalDatasetDefinition.ExperimentalDatasetDefinition">
+<em class="property">class </em><code class="descclassname">mbff.datasets.ExperimentalDatasetDefinition.</code><code class="descname">ExperimentalDatasetDefinition</code><a class="reference internal" href="../../_modules/mbff/datasets/ExperimentalDatasetDefinition.html#ExperimentalDatasetDefinition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mbff.datasets.ExperimentalDatasetDefinition.ExperimentalDatasetDefinition" title="Permalink to this definition">¶</a></dt>
+<dd><p>This class represents the definition of an <code class="docutils literal notranslate"><span class="pre">ExperimentalDataset</span></code>, which
+contains the information needed to build an experimental dataset (exds)
+from external source data, split it into training and testing samplesets,
+save it and analyze it later. This would result in a proper
+<code class="docutils literal notranslate"><span class="pre">ExperimentalDataset</span></code> instance.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> – The unique machine-name identifier of the exds.</li>
+<li><strong>source</strong> – A class inheriting the DatasetSource class which has a
+.build() method that returns an annotated DatasetMatrix
+object created from external source data.</li>
+<li><strong>source_args</strong> – A dictionary object which configures the DatasetSource class
+provided as the <code class="docutils literal notranslate"><span class="pre">source</span></code> property.</li>
+<li><strong>training_subset_size</strong> – A real value representing the proportion of dataset
+rows allocated to training a model. By specifying a value less than 1.0,
+the dataset will be randomly split into two non-overlapping subsets of rows,
+one for training, the other for testing the model.</li>
+<li><strong>trim_prob__feature</strong> – A tuple of two real values between 0.0 and 1.0,
+representing the minimum and maximum thresholds of allowed probability
+of a value within a feature of the dataset. Namely, if a value appears
+too few times in a feature (or too many times), then the feature is deemed
+uninformative and it is removed from the dataset.</li>
+<li><strong>trim_prob__objective</strong> – A tuple of two real values between 0.0 and 1.0,
+representing the minimum and maximum thresholds of allowed probability
+of a value within an objective variable of the dataset. Namely, if too
+few or too many samples have a single value for an objective variable,
+then the objective variable is deemed uninformative and it is removed
+from the dataset.</li>
+<li><strong>random_seed</strong> – An integer chosen arbitrarily, which controls the random
+selection of training/testing rows. Should be set once per exds definition
+and never changed (unless you know what you are doing).</li>
+<li><strong>auto_lock_after_build</strong> – Determines whether the folder of the exds is
+automatically locked after building. Locking the folder of an exds will
+prevent accidental rebuilding or deleting.</li>
+<li><strong>tags</strong> – A list of arbitrary strings, used to categorize this exds.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="exception">
+<dt id="mbff.datasets.ExperimentalDatasetDefinition.ExperimentalDatasetError">
+<em class="property">exception </em><code class="descclassname">mbff.datasets.ExperimentalDatasetDefinition.</code><code class="descname">ExperimentalDatasetError</code><span class="sig-paren">(</span><em>exds_definition</em>, <em>message</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mbff/datasets/ExperimentalDatasetDefinition.html#ExperimentalDatasetError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mbff.datasets.ExperimentalDatasetDefinition.ExperimentalDatasetError" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="DatasetMatrix.html"
+                        title="previous chapter">Class <code class="docutils literal notranslate"><span class="pre">DatasetMatrix</span></code></a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="ExperimentalDataset.html"
+                        title="next chapter">Class <code class="docutils literal notranslate"><span class="pre">ExperimentalDataset</span></code></a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/infrastructure/datasets/ExperimentalDatasetDefinition.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="ExperimentalDataset.html" title="Class ExperimentalDataset"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="DatasetMatrix.html" title="Class DatasetMatrix"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">MBFF 0.3 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Infrastructure</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="index.html" >Dataset infrastructure</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, Camil Băncioiu.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.5.
+    </div>
+  </body>
+</html>

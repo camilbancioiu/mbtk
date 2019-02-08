@@ -6,9 +6,11 @@ from mbff.datasets.DatasetMatrix import DatasetMatrix
 
 class ExperimentalDatasetDefinition():
     """
-    The definition of an ExperimentalDataset, which contains the information needed
-    to build an experimental dataset (exds) from external source data, split it into
-    training and testing samplesets, save it and analyze it later.
+    This class represents the definition of an ``ExperimentalDataset``, which
+    contains the information needed to build an experimental dataset (exds)
+    from external source data, split it into training and testing samplesets,
+    save it and analyze it later. This would result in a proper
+    ``ExperimentalDataset`` instance.
 
     :var name: The unique machine-name identifier of the exds.
     :var source: A class inheriting the DatasetSource class which has a

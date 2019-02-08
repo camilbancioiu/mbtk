@@ -6,10 +6,8 @@ Dataset infrastructure
   :maxdepth: 2
   :caption: Contents:
 
+  DatasetMatrix.rst
+  ExperimentalDatasetDefinition.rst
+  ExperimentalDataset.rst
   sources/index.rst
 
-.. automodule:: mbff.datasets.DatasetMatrix
-  :members:
-
-.. automodule:: mbff.datasets.ExDs
-  :members:
