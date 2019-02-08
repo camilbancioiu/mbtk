@@ -5,7 +5,7 @@ import shutil
 
 import os
 
-import mbff.tests.test_utilities as util
+import mbff_tests.test_utilities as util
 from mbff.datasets.DatasetMatrix import DatasetMatrix, DatasetMatrixNotFinalizedError
 
 
