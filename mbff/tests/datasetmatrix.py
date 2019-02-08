@@ -8,6 +8,7 @@ import os
 import mbff.tests.test_utilities as util
 from mbff.datasets.DatasetMatrix import DatasetMatrix, DatasetMatrixNotFinalizedError
 
+
 class TestDatasetMatrix(unittest.TestCase):
 
     def test_saving_and_loading(self):

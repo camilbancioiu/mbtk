@@ -5,6 +5,7 @@ import numpy
 from mbff.datasets.sources.RCV1v2DatasetSource import RCV1v2DatasetSource
 from mbff.datasets.DatasetMatrix import DatasetMatrix
 
+
 class TestRCV1v2DatasetSource(unittest.TestCase):
 
     def test_read_all_documentIDs(self):
