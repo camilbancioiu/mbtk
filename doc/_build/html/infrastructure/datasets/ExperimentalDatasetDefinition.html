@@ -54,19 +54,25 @@
 <dd><p>This class represents the definition of an <code class="docutils literal notranslate"><span class="pre">ExperimentalDataset</span></code>, which
 contains the information needed to build an experimental dataset (exds)
 from external source data, split it into training and testing samplesets,
-save it and analyze it later. This would result in a proper
-<code class="docutils literal notranslate"><span class="pre">ExperimentalDataset</span></code> instance.</p>
+save it to a specified folder and analyze it later. This would result in a
+proper <code class="docutils literal notranslate"><span class="pre">ExperimentalDataset</span></code> instance.</p>
+<p>Also provided are methods to “lock” and “unlock” the folder of an
+experimental dataset. Locking will prevent accidental overwriting or
+deleting of the folder of an exds.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
 <li><strong>name</strong> – The unique machine-name identifier of the exds.</li>
-<li><strong>source</strong> – A class inheriting the DatasetSource class which has a
-.build() method that returns an annotated DatasetMatrix
-object created from external source data.</li>
-<li><strong>source_args</strong> – A dictionary object which configures the DatasetSource class
-provided as the <code class="docutils literal notranslate"><span class="pre">source</span></code> property.</li>
+<li><strong>source</strong> – A class inheriting <code class="docutils literal notranslate"><span class="pre">DatasetSource</span></code>, to be instantiated,
+configured and used to generate a <code class="docutils literal notranslate"><span class="pre">DatasetMatrix</span></code> from an external
+source of data.</li>
+<li><strong>source_configuration</strong> – A dictionary object which configures the
+DatasetSource class provided as the <code class="docutils literal notranslate"><span class="pre">source</span></code> property.</li>
+<li><strong>exds_folder</strong> – The folder where the exds should create its own subfolder
+to save itself to, or where to load itself from. Can be thought of as
+the “experimental dataset repository”.</li>
 <li><strong>training_subset_size</strong> – A real value representing the proportion of dataset
 rows allocated to training a model. By specifying a value less than 1.0,
 the dataset will be randomly split into two non-overlapping subsets of rows,
@@ -95,11 +101,6 @@ prevent accidental rebuilding or deleting.</li>
 </tbody>
 </table>
 </dd></dl>
-
-<dl class="exception">
-<dt id="mbff.datasets.ExperimentalDatasetDefinition.ExperimentalDatasetError">
-<em class="property">exception </em><code class="descclassname">mbff.datasets.ExperimentalDatasetDefinition.</code><code class="descname">ExperimentalDatasetError</code><span class="sig-paren">(</span><em>exds_definition</em>, <em>message</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mbff/datasets/ExperimentalDatasetDefinition.html#ExperimentalDatasetError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mbff.datasets.ExperimentalDatasetDefinition.ExperimentalDatasetError" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
 
 </div>
 

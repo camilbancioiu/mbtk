@@ -2,5 +2,10 @@
 Dataset sources
 =====================
 
-.. automodule:: mbff.datasets.sources.RCV1v2DatasetSource
-  :members:
+.. toctree::
+  :maxdepth: 2
+  :caption: Contents:
+
+  DatasetSource.rst
+  RCV1v2DatasetSource.rst
+

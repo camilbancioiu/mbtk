@@ -49,15 +49,22 @@
 <span class="sd">    This class represents the definition of an ``ExperimentalDataset``, which</span>
 <span class="sd">    contains the information needed to build an experimental dataset (exds)</span>
 <span class="sd">    from external source data, split it into training and testing samplesets,</span>
-<span class="sd">    save it and analyze it later. This would result in a proper</span>
-<span class="sd">    ``ExperimentalDataset`` instance.</span>
+<span class="sd">    save it to a specified folder and analyze it later. This would result in a</span>
+<span class="sd">    proper ``ExperimentalDataset`` instance.</span>
+
+<span class="sd">    Also provided are methods to &quot;lock&quot; and &quot;unlock&quot; the folder of an</span>
+<span class="sd">    experimental dataset. Locking will prevent accidental overwriting or</span>
+<span class="sd">    deleting of the folder of an exds.</span>
 
 <span class="sd">    :var name: The unique machine-name identifier of the exds.</span>
-<span class="sd">    :var source: A class inheriting the DatasetSource class which has a</span>
-<span class="sd">        .build() method that returns an annotated DatasetMatrix</span>
-<span class="sd">        object created from external source data.</span>
-<span class="sd">    :var source_args: A dictionary object which configures the DatasetSource class</span>
-<span class="sd">        provided as the ``source`` property.</span>
+<span class="sd">    :var source: A class inheriting ``DatasetSource``, to be instantiated,</span>
+<span class="sd">        configured and used to generate a ``DatasetMatrix`` from an external</span>
+<span class="sd">        source of data.</span>
+<span class="sd">    :var source_configuration: A dictionary object which configures the</span>
+<span class="sd">        DatasetSource class provided as the ``source`` property.</span>
+<span class="sd">    :var exds_folder: The folder where the exds should create its own subfolder</span>
+<span class="sd">        to save itself to, or where to load itself from. Can be thought of as</span>
+<span class="sd">        the &quot;experimental dataset repository&quot;.</span>
 <span class="sd">    :var training_subset_size: A real value representing the proportion of dataset</span>
 <span class="sd">        rows allocated to training a model. By specifying a value less than 1.0,</span>
 <span class="sd">        the dataset will be randomly split into two non-overlapping subsets of rows,</span>
@@ -86,7 +93,7 @@
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">source</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">source_args</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">source_configuration</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">exds_folder</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">folder</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">training_subset_size</span> <span class="o">=</span> <span class="mf">1.0</span>
@@ -147,23 +154,6 @@
             <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_lock_filename</span><span class="p">(</span><span class="n">lock_type</span><span class="p">))</span>
             <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">: Folder </span><span class="si">{}</span><span class="s1"> has been unlocked (</span><span class="si">{}</span><span class="s1">).&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">folder</span><span class="p">,</span> <span class="n">lock_type</span><span class="p">))</span></div>
 
-
-<span class="k">class</span> <span class="nc">ExperimentalDataset</span><span class="p">():</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">definition</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">definition</span> <span class="o">=</span> <span class="n">definition</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">matrix</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">matrix_train</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">matrix_test</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">total_row_count</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">train_rows</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">test_rows</span> <span class="o">=</span> <span class="kc">None</span>
-
-
-<div class="viewcode-block" id="ExperimentalDatasetError"><a class="viewcode-back" href="../../../infrastructure/datasets/ExperimentalDatasetDefinition.html#mbff.datasets.ExperimentalDatasetDefinition.ExperimentalDatasetError">[docs]</a><span class="k">class</span> <span class="nc">ExperimentalDatasetError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exds_definition</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">exds_definition</span> <span class="o">=</span> <span class="n">exds_definition</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">)</span></div>
 
 </pre></div>
 

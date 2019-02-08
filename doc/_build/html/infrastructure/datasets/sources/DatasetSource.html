@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Dataset sources &#8212; MBFF 0.3 documentation</title>
+    <title>Class DatasetSource &#8212; MBFF 0.3 documentation</title>
     <link rel="stylesheet" href="../../../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/style.css" type="text/css" />
@@ -17,8 +17,8 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
-    <link rel="next" title="Class DatasetSource" href="DatasetSource.html" />
-    <link rel="prev" title="Class ExperimentalDataset" href="../ExperimentalDataset.html" /> 
+    <link rel="next" title="Class RCV1v2DatasetSource" href="RCV1v2DatasetSource.html" />
+    <link rel="prev" title="Dataset sources" href="index.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
@@ -30,14 +30,15 @@
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="DatasetSource.html" title="Class DatasetSource"
+          <a href="RCV1v2DatasetSource.html" title="Class RCV1v2DatasetSource"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="../ExperimentalDataset.html" title="Class ExperimentalDataset"
+          <a href="index.html" title="Dataset sources"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../index.html">MBFF 0.3 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Infrastructure</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="../index.html" accesskey="U">Dataset infrastructure</a> &#187;</li> 
+          <li class="nav-item nav-item-2"><a href="../index.html" >Dataset infrastructure</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="index.html" accesskey="U">Dataset sources</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -46,15 +47,25 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="dataset-sources">
-<h1>Dataset sources<a class="headerlink" href="#dataset-sources" title="Permalink to this headline">¶</a></h1>
-<div class="toctree-wrapper compound">
-<p class="caption"><span class="caption-text">Contents:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="DatasetSource.html">Class <code class="docutils literal notranslate"><span class="pre">DatasetSource</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="RCV1v2DatasetSource.html">Class <code class="docutils literal notranslate"><span class="pre">RCV1v2DatasetSource</span></code></a></li>
-</ul>
-</div>
+  <div class="section" id="module-mbff.datasets.sources.DatasetSource">
+<span id="class-datasetsource"></span><h1>Class <code class="docutils literal notranslate"><span class="pre">DatasetSource</span></code><a class="headerlink" href="#module-mbff.datasets.sources.DatasetSource" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="mbff.datasets.sources.DatasetSource.DatasetSource">
+<em class="property">class </em><code class="descclassname">mbff.datasets.sources.DatasetSource.</code><code class="descname">DatasetSource</code><span class="sig-paren">(</span><em>configuration</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/mbff/datasets/sources/DatasetSource.html#DatasetSource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mbff.datasets.sources.DatasetSource.DatasetSource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base class for all dataset sources. It doesn’t provide any useful
+functionality, but exists for illustrative purposes and as a starting point
+for creating new DatasetSource classes.</p>
+<dl class="method">
+<dt id="mbff.datasets.sources.DatasetSource.DatasetSource.create_dataset_matrix">
+<code class="descname">create_dataset_matrix</code><span class="sig-paren">(</span><em>label='datasetsource'</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/mbff/datasets/sources/DatasetSource.html#DatasetSource.create_dataset_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mbff.datasets.sources.DatasetSource.DatasetSource.create_dataset_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>The required method of a <code class="docutils literal notranslate"><span class="pre">DatasetSource</span></code> class. This method reads an
+external source of data and produces a <code class="docutils literal notranslate"><span class="pre">DatasetMatrix</span></code> instance based
+on <code class="docutils literal notranslate"><span class="pre">configuration</span></code>. The newly created <code class="docutils literal notranslate"><span class="pre">DatasetMatrix</span></code> instance is
+then returned.</p>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 
 
@@ -64,15 +75,15 @@
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
-  <p class="topless"><a href="../ExperimentalDataset.html"
-                        title="previous chapter">Class <code class="docutils literal notranslate"><span class="pre">ExperimentalDataset</span></code></a></p>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Dataset sources</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="DatasetSource.html"
-                        title="next chapter">Class <code class="docutils literal notranslate"><span class="pre">DatasetSource</span></code></a></p>
+  <p class="topless"><a href="RCV1v2DatasetSource.html"
+                        title="next chapter">Class <code class="docutils literal notranslate"><span class="pre">RCV1v2DatasetSource</span></code></a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="../../../_sources/infrastructure/datasets/sources/index.rst.txt"
+      <li><a href="../../../_sources/infrastructure/datasets/sources/DatasetSource.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
@@ -102,14 +113,15 @@
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="DatasetSource.html" title="Class DatasetSource"
+          <a href="RCV1v2DatasetSource.html" title="Class RCV1v2DatasetSource"
              >next</a> |</li>
         <li class="right" >
-          <a href="../ExperimentalDataset.html" title="Class ExperimentalDataset"
+          <a href="index.html" title="Dataset sources"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../../index.html">MBFF 0.3 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Infrastructure</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="../index.html" >Dataset infrastructure</a> &#187;</li> 
+          <li class="nav-item nav-item-2"><a href="../index.html" >Dataset infrastructure</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="index.html" >Dataset sources</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
