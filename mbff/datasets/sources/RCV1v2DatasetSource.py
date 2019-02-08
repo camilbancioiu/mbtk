@@ -1,10 +1,11 @@
 import numpy
 import scipy
 
+from mbff.datasets.sources.DatasetSource import DatasetSource
 from mbff.datasets.DatasetMatrix import DatasetMatrix
 import mbff.utilities as util
 
-class RCV1v2DatasetSource:
+class RCV1v2DatasetSource(DatasetSource):
     """
     A class which reads the RCV1v2 dataset files, as published by LYRL2004.
 

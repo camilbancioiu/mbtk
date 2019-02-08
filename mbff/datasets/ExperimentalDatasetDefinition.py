@@ -9,15 +9,22 @@ class ExperimentalDatasetDefinition():
     This class represents the definition of an ``ExperimentalDataset``, which
     contains the information needed to build an experimental dataset (exds)
     from external source data, split it into training and testing samplesets,
-    save it and analyze it later. This would result in a proper
-    ``ExperimentalDataset`` instance.
+    save it to a specified folder and analyze it later. This would result in a
+    proper ``ExperimentalDataset`` instance.
+
+    Also provided are methods to "lock" and "unlock" the folder of an
+    experimental dataset. Locking will prevent accidental overwriting or
+    deleting of the folder of an exds.
 
     :var name: The unique machine-name identifier of the exds.
-    :var source: A class inheriting the DatasetSource class which has a
-        .build() method that returns an annotated DatasetMatrix
-        object created from external source data.
-    :var source_args: A dictionary object which configures the DatasetSource class
-        provided as the ``source`` property.
+    :var source: A class inheriting ``DatasetSource``, to be instantiated,
+        configured and used to generate a ``DatasetMatrix`` from an external
+        source of data.
+    :var source_configuration: A dictionary object which configures the
+        DatasetSource class provided as the ``source`` property.
+    :var exds_folder: The folder where the exds should create its own subfolder
+        to save itself to, or where to load itself from. Can be thought of as
+        the "experimental dataset repository".
     :var training_subset_size: A real value representing the proportion of dataset
         rows allocated to training a model. By specifying a value less than 1.0,
         the dataset will be randomly split into two non-overlapping subsets of rows,
@@ -46,7 +53,7 @@ class ExperimentalDatasetDefinition():
     def __init__(self):
         self.name = ""
         self.source = None
-        self.source_args = {}
+        self.source_configuration = {}
         self.exds_folder = ""
         self.folder = ""
         self.training_subset_size = 1.0
