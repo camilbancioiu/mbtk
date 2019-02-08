@@ -1,5 +1,5 @@
 # MBFF
-Experimental framework containing an original implementation of an old, yet canonical, Markov blanket feature filter: Koller and Sahami's algorithm (KS). The basic Information Gain Thresholding algorithm is implemented as well.
+This is an experimental framework for studying **M**arkov **B**lanket **F**eature **F**ilters. It contains an original implementation of an old, yet canonical feature selection algorithm, based on Markov blankets: Koller and Sahami's algorithm (KS). The trivial Information Gain Thresholding algorithm is implemented as well, as a baseline, even if it doesn't use Markov blankets.
 
 This implementation provides a few efficiency optimizations of the KS algorithm. They can be enabled or disabled at will. The framework also defines a specific set of experiments to evaluate the efficiency gains of these optimizations.
 
