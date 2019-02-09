@@ -72,6 +72,8 @@ class ExperimentalDataset():
         self.train_rows = shuffled_rows[0:train_rows_count]
         self.test_rows = shuffled_rows[train_rows_count:]
 
+        # Create self.matrix_train and self.matrix_test from self.matrix
+
 
 
 class ExperimentalDatasetError(Exception):

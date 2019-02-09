@@ -221,6 +221,7 @@ class DatasetMatrix:
 
 
     # Utility static methods.
+    ########################
 
     def sparse_equal(m1, m2):
         if m1.get_shape() != m2.get_shape():
