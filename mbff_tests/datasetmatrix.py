@@ -62,6 +62,66 @@ class TestDatasetMatrix(unittest.TestCase):
         folder = str(util.ensure_empty_tmp_subfolder('test_datasetmatrix__removing_rows'))
         self.check_saving_and_loading(dm, folder)
 
+        dm.unfinalize()
+
+        # Remove both remaining rows.
+        dm.delete_row(0)
+        dm.delete_row(0)
+        expected_X = scipy.sparse.csr_matrix((0, 4))
+        expected_Y = scipy.sparse.csr_matrix((0, 2))
+
+        self.assertTrue(DatasetMatrix.sparse_equal(expected_X, dm.X))
+        self.assertTrue(DatasetMatrix.sparse_equal(expected_Y, dm.Y))
+        self.assertEqual([], dm.row_labels)
+        self.assertEqual(self.default_column_labels_X(), dm.column_labels_X)
+        self.assertEqual(self.default_column_labels_Y(), dm.column_labels_Y)
+
+        folder = str(util.ensure_empty_tmp_subfolder('test_datasetmatrix__removing_rows'))
+        self.check_saving_and_loading(dm, folder)
+
+
+    def test_keeping_rows(self):
+        # Set up a simple DatasetMatrix
+        dm = DatasetMatrix('testmatrix')
+        self.configure_default_datasetmatrix(dm)
+
+        # Empty lists are not allowed.
+        with self.assertRaises(ValueError):
+            dm.keep_rows([])
+
+        # Keep rows 1 and 3.
+        dm.keep_rows([1, 3])
+        expected_X = scipy.sparse.csr_matrix(numpy.matrix([
+                [ 5,  6,  7,  8],
+                [13, 14, 15, 16]]))
+
+        expected_Y = scipy.sparse.csr_matrix(numpy.matrix([
+                [201, 202],
+                [401, 402]]))
+
+        self.assertTrue(DatasetMatrix.sparse_equal(expected_X, dm.X))
+        self.assertTrue(DatasetMatrix.sparse_equal(expected_Y, dm.Y))
+        self.assertEqual(['row1', 'row3'], dm.row_labels)
+        self.assertEqual(self.default_column_labels_X(), dm.column_labels_X)
+        self.assertEqual(self.default_column_labels_Y(), dm.column_labels_Y)
+
+        # Keep row 0 of the remaining 2 (labeled 'row1').
+        dm.keep_rows([0])
+        expected_X = scipy.sparse.csr_matrix(numpy.matrix([
+                [ 5,  6,  7,  8]]))
+
+        expected_Y = scipy.sparse.csr_matrix(numpy.matrix([
+                [201, 202]]))
+
+        self.assertTrue(DatasetMatrix.sparse_equal(expected_X, dm.X))
+        self.assertTrue(DatasetMatrix.sparse_equal(expected_Y, dm.Y))
+        self.assertEqual(['row1'], dm.row_labels)
+        self.assertEqual(self.default_column_labels_X(), dm.column_labels_X)
+        self.assertEqual(self.default_column_labels_Y(), dm.column_labels_Y)
+
+        folder = str(util.ensure_empty_tmp_subfolder('test_datasetmatrix__keeping_rows'))
+        self.check_saving_and_loading(dm, folder)
+
 
     def test_removing_columns_X(self):
         # Set up a simple DatasetMatrix
@@ -127,7 +187,7 @@ class TestDatasetMatrix(unittest.TestCase):
         # Remove the last remaining column from the Y matrix.
         dm.delete_column_Y(0)
         expected_X = self.default_matrix_X()
-        expected_Y = scipy.sparse.csr_matrix(numpy.matrix([ [],[],[],[] ]))
+        expected_Y = scipy.sparse.csr_matrix((4, 0))
 
         self.assertTrue(DatasetMatrix.sparse_equal(expected_X, dm.X))
         self.assertTrue(DatasetMatrix.sparse_equal(expected_Y, dm.Y))
