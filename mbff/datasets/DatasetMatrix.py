@@ -182,6 +182,27 @@ class DatasetMatrix:
         del self.row_labels[r]
 
 
+    def keep_rows(self, rows_to_keep):
+        """
+        Keep only the rows specified by the indices in ``rows_to_keep``, deleting all
+        the other rows from both ``X`` and ``Y``. This affects the ``row_labels`` as well.
+        """
+        if self.final == True:
+            raise DatasetMatrixFinalizedError(self, "Cannot delete any row.")
+        if not isinstance(rows_to_keep, list):
+            raise TypeError("Argument 'rows_to_keep' must be a non-empty list")
+        if len(rows_to_keep) == 0:
+            raise ValueError("Argument 'rows_to_keep' must be a non-empty list")
+
+        all_rows = range(self.X.get_shape()[0])
+        rows_to_delete = list(set(all_rows) - set(rows_to_keep))
+        self.X = DatasetMatrix.delete_rows_cols(self.X, row_indices=rows_to_delete).tocsr()
+        self.Y = DatasetMatrix.delete_rows_cols(self.Y, row_indices=rows_to_delete).tocsr()
+        row_labels_to_keep = [self.row_labels[r] for r in rows_to_keep]
+        self.row_labels = row_labels_to_keep
+
+
+
     def delete_column_X(self, c):
         """ Delete the column at index ``c`` from the ``X`` matrix. Also deletes the corresponding label from ``column_labels_X``. """
         if self.final == True:
