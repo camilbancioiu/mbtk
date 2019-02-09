@@ -71,6 +71,18 @@ class DatasetMatrix:
         self.final = True
 
 
+    def unfinalize(self):
+        """
+        Reset the ``self.final`` flag and converts ``X`` and ``Y`` back to CSR
+        format. This method should not really be used unless for development or
+        testing purposes.
+        """
+        self.X = self.X.tocsr()
+        self.Y = self.Y.tocsr()
+
+        self.final = False
+
+
     def save(self, folder):
         """
         Save ``X``, ``Y``, row labels and column labels as files in the
