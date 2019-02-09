@@ -52,9 +52,10 @@ class TestRCV1v2DatasetSource(unittest.TestCase):
         self.assertEqual(5, document.word_frequencies['sonata'])
 
 
-    def test_generating_the_datasetmatrix(self):
+    def test_generating_the_datasetmatrix__wordcount(self):
         configuration = self.default_configuration()
-        source = RCV1v2DatasetSource(self.default_configuration())
+
+        source = RCV1v2DatasetSource(configuration)
         datasetmatrix = source.create_dataset_matrix('rcv1v2_test')
 
         expected_X = self.default_document_term_matrix()
@@ -70,10 +71,31 @@ class TestRCV1v2DatasetSource(unittest.TestCase):
         self.assertEqual(self.default_topics(), datasetmatrix.column_labels_Y)
 
 
+    def test_generating_the_datasetmatrix__binary(self):
+        configuration = self.default_configuration()
+        configuration['feature_type'] = 'binary'
+
+        source = RCV1v2DatasetSource(configuration)
+        datasetmatrix = source.create_dataset_matrix('rcv1v2_test')
+
+        expected_X = self.default_binary_document_term_matrix()
+        calculated_X = datasetmatrix.X
+        self.assertTrue(DatasetMatrix.sparse_equal(expected_X, calculated_X))
+
+        expected_Y = self.default_document_topic_matrix()
+        calculated_Y = datasetmatrix.Y
+        self.assertTrue(DatasetMatrix.sparse_equal(expected_Y, calculated_Y))
+
+        self.assertEqual(self.default_all_documentIDs(), datasetmatrix.row_labels)
+        self.assertEqual(self.default_words(), datasetmatrix.column_labels_X)
+        self.assertEqual(self.default_topics(), datasetmatrix.column_labels_Y)
+
+
     def default_configuration(self):
         configuration = {
                 'sourcefolder': 'testfiles/rcv1v2_test_dataset',
-                'filters': {}
+                'filters': {},
+                'feature_type': 'wordcount'
                 }
         return configuration
 
@@ -133,6 +155,30 @@ class TestRCV1v2DatasetSource(unittest.TestCase):
             [ 2,  0,  0,  8,  8,  0,  0,  0,  0,  0,  0,  0,  6,  0,  6,  0]  # 404
             ]))
 
+
+    def default_binary_document_term_matrix(self):
+        # The columns are:
+        # 0      1      2            3      4         5        6       7      8     9      10         11     12       13     14      15
+        # almond ascend carbohydrate cloud difference dopamine firefly galaxy night oxygen polyrhythm python rhapsody rocket session sonata
+        return scipy.sparse.csr_matrix(numpy.matrix([
+            # 0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15
+            [ 1,  0,  0,  0,  0,  0,  0,  1,  0,  0,  0,  1,  0,  1,  1,  0], # 101
+            [ 1,  0,  0,  0,  0,  0,  0,  1,  1,  0,  0,  1,  0,  1,  0,  0], # 102
+            [ 1,  0,  0,  0,  0,  0,  0,  1,  1,  0,  0,  1,  0,  1,  0,  0], # 103
+            [ 1,  0,  0,  0,  0,  1,  0,  1,  0,  0,  0,  1,  0,  1,  0,  0], # 104
+            [ 1,  0,  0,  0,  0,  0,  0,  1,  0,  0,  1,  1,  0,  1,  0,  0], # 105
+            [ 1,  0,  0,  0,  0,  0,  0,  1,  0,  1,  0,  1,  0,  1,  0,  0], # 106
+            [ 1,  0,  0,  0,  0,  0,  0,  1,  0,  0,  0,  1,  1,  1,  0,  0], # 107
+            [ 1,  0,  0,  0,  0,  0,  0,  1,  1,  0,  0,  1,  0,  1,  0,  0], # 108
+            [ 0,  0,  1,  0,  1,  0,  1,  0,  0,  1,  1,  0,  0,  0,  0,  0], # 201
+            [ 0,  0,  1,  0,  0,  1,  1,  0,  0,  1,  1,  0,  0,  0,  0,  0], # 202
+            [ 0,  1,  0,  0,  0,  1,  0,  0,  1,  0,  0,  0,  0,  1,  0,  1], # 301
+            [ 0,  1,  0,  0,  0,  1,  0,  1,  1,  0,  0,  0,  0,  0,  0,  1], # 302
+            [ 0,  0,  0,  1,  1,  0,  0,  0,  0,  1,  0,  0,  1,  0,  1,  0], # 401
+            [ 0,  0,  0,  1,  1,  1,  0,  0,  0,  0,  0,  0,  1,  0,  1,  0], # 402
+            [ 0,  0,  0,  1,  1,  1,  0,  0,  0,  0,  0,  0,  1,  0,  1,  0], # 403
+            [ 1,  0,  0,  1,  1,  0,  0,  0,  0,  0,  0,  0,  1,  0,  1,  0]  # 404
+            ]))
 
     def default_document_topic_matrix(self):
         # The columns are:

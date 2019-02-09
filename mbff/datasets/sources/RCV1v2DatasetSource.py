@@ -85,9 +85,17 @@ class RCV1v2DatasetSource(DatasetSource):
         for row in range(0, len(documentIDs)):
             documentID = documentIDs[row]
             document = documents[documentID]
-            for word in document.words:
-                column = words_index[word]
-                dok_matrix_words[row, column] = document.word_frequencies[word]
+
+            if self.configuration['feature_type'] == 'wordcount':
+                for word in document.words:
+                    column = words_index[word]
+                    dok_matrix_words[row, column] = document.word_frequencies[word]
+
+            if self.configuration['feature_type'] == 'binary':
+                for word in document.words:
+                    column = words_index[word]
+                    dok_matrix_words[row, column] = 1
+
             for topic in document.topics:
                 column = topics_index[topic]
                 dok_matrix_topics[row, column] = document.topic_values[topic]
