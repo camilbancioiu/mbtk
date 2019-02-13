@@ -288,16 +288,16 @@ class TestDatasetMatrix(unittest.TestCase):
         # Saving must fail, because dm.finalize() has not yet been called.
         with self.assertRaises(DatasetMatrixNotFinalizedError):
             dm.save(folder)
-        self.check_no_datamatrix_files(folder, 'testmatrix')
+        self.check_no_datamatrix_files(folder, dm.label)
 
         # Finalize the DatasetMatrix and save it.
         dm.finalize()
         dm.save(folder)
-        self.check_datamatrix_files(folder, 'testmatrix')
+        self.check_datamatrix_files(folder, dm.label)
 
         # Load the saved data into a fresh DatasetMatrix with the same label
         # and compare with the old one.
-        dm2 = DatasetMatrix('testmatrix')
+        dm2 = DatasetMatrix(dm.label)
         dm2.load(folder)
         self.assertEqual(dm, dm2)
 
