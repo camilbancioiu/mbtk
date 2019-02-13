@@ -56,6 +56,13 @@ class ExperimentalDataset():
         self.matrix = datasetsource.create_dataset_matrix("original")
         self.total_row_count = self.matrix.X.get_shape()[0]
 
+        (self.train_rows, self.test_rows) = self.perform_random_dataset_split()
+
+        # Create self.matrix_train and self.matrix_test from self.matrix
+        self.matrix_train = self.matrix.select_rows(self.train_rows, self.matrix.label + "_train")
+        self.matrix_test = self.matrix.select_rows(self.test_rows, self.matrix.label + "_test")
+
+
     def perform_random_dataset_split(self):
         # Determine how many rows will be designated as *training rows*.
         train_rows_count = int(self.total_row_count * self.definition.training_subset_size)
@@ -69,10 +76,11 @@ class ExperimentalDataset():
         # Slice ``shuffled_rows`` into two parts: the first part will contain
         # the indices of the *training rows*, while the second part will
         # contain the indices of the *test rows*.
-        self.train_rows = shuffled_rows[0:train_rows_count]
-        self.test_rows = shuffled_rows[train_rows_count:]
+        train_rows = sorted(shuffled_rows[0:train_rows_count])
+        test_rows = sorted(shuffled_rows[train_rows_count:])
 
-        # Create self.matrix_train and self.matrix_test from self.matrix
+        return train_rows, test_rows
+
 
 
 
