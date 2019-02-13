@@ -123,6 +123,49 @@ class TestDatasetMatrix(unittest.TestCase):
         self.check_saving_and_loading(dm, folder)
 
 
+    def test_selecting_rows(self):
+        # Set up a simple DatasetMatrix
+        dm = DatasetMatrix('testmatrix')
+        self.configure_default_datasetmatrix(dm)
+
+        # Empty lists are not allowed.
+        with self.assertRaises(ValueError):
+            dm.keep_rows([])
+
+        # Create new matrix by selecting rows 1 and 3.
+        dm = dm.select_rows([1, 3], "test_matrix_selected_rows")
+        expected_X = scipy.sparse.csr_matrix(numpy.matrix([
+                [ 5,  6,  7,  8],
+                [13, 14, 15, 16]]))
+
+        expected_Y = scipy.sparse.csr_matrix(numpy.matrix([
+                [201, 202],
+                [401, 402]]))
+
+        self.assertTrue(DatasetMatrix.sparse_equal(expected_X, dm.X))
+        self.assertTrue(DatasetMatrix.sparse_equal(expected_Y, dm.Y))
+        self.assertEqual(['row1', 'row3'], dm.row_labels)
+        self.assertEqual(self.default_column_labels_X(), dm.column_labels_X)
+        self.assertEqual(self.default_column_labels_Y(), dm.column_labels_Y)
+
+        # Keep row 0 of the remaining 2 (labeled 'row1').
+        dm = dm.select_rows([0], "test_matrix_selected_rows_2")
+        expected_X = scipy.sparse.csr_matrix(numpy.matrix([
+                [ 5,  6,  7,  8]]))
+
+        expected_Y = scipy.sparse.csr_matrix(numpy.matrix([
+                [201, 202]]))
+
+        self.assertTrue(DatasetMatrix.sparse_equal(expected_X, dm.X))
+        self.assertTrue(DatasetMatrix.sparse_equal(expected_Y, dm.Y))
+        self.assertEqual(['row1'], dm.row_labels)
+        self.assertEqual(self.default_column_labels_X(), dm.column_labels_X)
+        self.assertEqual(self.default_column_labels_Y(), dm.column_labels_Y)
+
+        folder = str(util.ensure_empty_tmp_subfolder('test_datasetmatrix__selecting_rows'))
+        self.check_saving_and_loading(dm, folder)
+
+
     def test_removing_columns_X(self):
         # Set up a simple DatasetMatrix
         dm = DatasetMatrix('testmatrix')

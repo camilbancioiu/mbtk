@@ -198,8 +198,37 @@ class DatasetMatrix:
         rows_to_delete = list(set(all_rows) - set(rows_to_keep))
         self.X = DatasetMatrix.delete_rows_cols(self.X, row_indices=rows_to_delete).tocsr()
         self.Y = DatasetMatrix.delete_rows_cols(self.Y, row_indices=rows_to_delete).tocsr()
+
         row_labels_to_keep = [self.row_labels[r] for r in rows_to_keep]
         self.row_labels = row_labels_to_keep
+
+
+    def select_rows(self, rows_to_keep, new_label=""):
+        """
+        Create a new DatasetMatrix instance, which only contains the requested
+        rows of both ``X`` and ``Y``. Affects ``row_labels`` as well. Does not
+        raise ``DatasetMatrixFinalizedError``, because it doesn't try to modify
+        the original matrices.
+        """
+        if not isinstance(rows_to_keep, list):
+            raise TypeError("Argument 'rows_to_keep' must be a non-empty list")
+        if len(rows_to_keep) == 0:
+            raise ValueError("Argument 'rows_to_keep' must be a non-empty list")
+
+        rows_to_keep = sorted(rows_to_keep)
+        if new_label == "":
+            new_label = self.label
+
+        new_dataset_matrix = DatasetMatrix(new_label)
+
+        all_rows = range(self.X.get_shape()[0])
+        new_dataset_matrix.X = self.X[rows_to_keep,]
+        new_dataset_matrix.Y = self.Y[rows_to_keep,]
+        new_dataset_matrix.row_labels = [self.row_labels[i] for i in rows_to_keep]
+        new_dataset_matrix.column_labels_X = self.column_labels_X.copy()
+        new_dataset_matrix.column_labels_Y = self.column_labels_Y.copy()
+
+        return new_dataset_matrix
 
 
 
