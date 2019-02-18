@@ -45,7 +45,7 @@ class RCV1v2DatasetSource(DatasetSource):
         datasetmatrix = DatasetMatrix(label)
         datasetmatrix.X = dok_matrix_words.tocsr()
         datasetmatrix.Y = dok_matrix_topics.tocsr()
-        datasetmatrix.row_labels = documentIDs
+        datasetmatrix.row_labels = list(map(str, documentIDs))
         datasetmatrix.column_labels_X = words
         datasetmatrix.column_labels_Y = topics
 

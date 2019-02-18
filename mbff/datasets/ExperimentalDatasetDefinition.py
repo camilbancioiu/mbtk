@@ -3,6 +3,7 @@ import os
 import shutil
 from pathlib import Path
 from mbff.datasets.DatasetMatrix import DatasetMatrix
+from mbff.datasets.Exceptions import ExperimentalDatasetFolderException
 
 class ExperimentalDatasetDefinition():
     """
@@ -47,7 +48,6 @@ class ExperimentalDatasetDefinition():
         automatically locked after building. Locking the folder of an exds will
         prevent accidental rebuilding or deleting.
     :var tags: A list of arbitrary strings, used to categorize this exds.
-
     """
 
     def __init__(self):
@@ -88,19 +88,17 @@ class ExperimentalDatasetDefinition():
     def lock_folder(self, lock_type='exds'):
         folder = self.folder
         if self.folder_is_locked(lock_type):
-            print('{}: Folder {} is already locked ({}).'.format(self.name, folder, lock_type))
+            pass
         else:
             with open(self.get_lock_filename(lock_type), 'w') as f:
                 f.write('locked')
-                print('{}: Folder has been locked ({}).'.format(self.name, lock_type))
 
 
     def delete_folder(self):
         if not self.folder_exists():
-            print('{}: ExDs folder does not exist.'.format(self.name))
-            return
+            raise ExperimentalDatasetFolderException(self, self.folder, 'Folder {} does not exist, cannot delete it.'.format(self.name))
         if self.folder_is_locked():
-            print('{}: ExDs folder is locked, cannot delete.'.format(self.name))
+            raise ExperimentalDatasetFolderException(self, self.folder, 'Folder {} is locked, cannot delete it.'.format(self.name))
             return
         shutil.rmtree(self.folder)
         print('{}: ExDs folder deleted.'.format(self.name))
@@ -109,9 +107,8 @@ class ExperimentalDatasetDefinition():
     def unlock_folder(self, lock_type='exds'):
         folder = self.folder
         if not self.folder_is_locked(lock_type):
-            print('{}: Folder {} is not locked ({}).'.format(self.name, folder, lock_type))
+            pass
         else:
             os.remove(self.get_lock_filename(lock_type))
-            print('{}: Folder {} has been unlocked ({}).'.format(self.name, folder, lock_type))
 
 

@@ -10,10 +10,11 @@ from mbff.datasets.sources.RCV1v2DatasetSource import RCV1v2DatasetSource
 class TestExperimentalDataset(unittest.TestCase):
 
     def test_exds_build(self):
-        definition = self.default_exds_definition()
+        folder = str(util.ensure_empty_tmp_subfolder('test_exds_repository__test_build'))
+        definition = self.default_exds_definition(folder)
         exds = ExperimentalDataset(definition)
 
-        exds.build()
+        exds.build(finalize_and_save=False)
 
         # Make sure 'training_set_size = 0.25' has been properly taken into
         # account.
@@ -59,10 +60,36 @@ class TestExperimentalDataset(unittest.TestCase):
 
 
     def test_exds_saving_and_loading(self):
-        pass
+        folder = str(util.ensure_empty_tmp_subfolder('test_exds_repository__test_saving_and_loading'))
+        definition = self.default_exds_definition(folder)
+        exds = ExperimentalDataset(definition)
+
+        # Due to the definition provided by self.default_exds_definition(), the
+        # exds will be saved after building.
+        exds.build()
+
+        # Verify if the matrices have been finalized.
+        self.assertTrue(exds.matrix.final)
+        self.assertTrue(exds.matrix_train.final)
+        self.assertTrue(exds.matrix_test.final)
+
+        # Verify if the matrices can be loaded individually from the saved
+        # ExperimentalDataset.
+        # - The original matrix:
+        loadedMatrix_original = DatasetMatrix("dataset_original")
+        loadedMatrix_original.load(exds.definition.folder)
+        self.assertEqual(exds.matrix, loadedMatrix_original)
+        # - The training matrix:
+        loadedMatrix_train = DatasetMatrix("dataset_train")
+        loadedMatrix_train.load(exds.definition.folder)
+        self.assertEqual(exds.matrix_train, loadedMatrix_train)
+        # - The test matrix:
+        loadedMatrix_test = DatasetMatrix("dataset_test")
+        loadedMatrix_test.load(exds.definition.folder)
+        self.assertEqual(exds.matrix_test, loadedMatrix_test)
 
 
-    def default_exds_definition(self):
+    def default_exds_definition(self, exds_folder):
         definition = ExperimentalDatasetDefinition()
         definition.name = "test_exds_reuters"
         definition.source = RCV1v2DatasetSource
@@ -71,7 +98,7 @@ class TestExperimentalDataset(unittest.TestCase):
                 'filters': {},
                 'feature_type': 'binary'
                 }
-        definition.exds_folder = str(util.ensure_empty_tmp_subfolder('test_exds_repository'))
+        definition.exds_folder = exds_folder
         definition.training_subset_size = 0.25
         definition.trim_prob__feature = (0.0, 1.0)
         definition.trim_prob__objective = (0.0, 1.0)

@@ -11,13 +11,13 @@ class TestRCV1v2DatasetSource(unittest.TestCase):
     def test_read_all_documentIDs(self):
         source = RCV1v2DatasetSource(self.default_configuration())
         all_documentIDs = source.read_all_documentIDs()
-        self.assertEqual(self.default_all_documentIDs(), all_documentIDs)
+        self.assertEqual(self.default_all_documentIDs__as_int(), all_documentIDs)
 
 
     def test_read_documentIDs_in_industry(self):
         source = RCV1v2DatasetSource(self.default_configuration())
         for industry in ['FNG', 'ART', 'ASTRO', 'ENGN', 'MYTH']:
-            expected = self.default_documentIDs_industry(industry)
+            expected = self.default_documentIDs_industry__as_int(industry)
             calculated = source.read_documentIDs_in_industry(industry)
             self.assertEqual(expected, calculated, "Industry: {}".format(industry))
 
@@ -29,7 +29,7 @@ class TestRCV1v2DatasetSource(unittest.TestCase):
         documents = source.read_documents(documentIDs)
         self.assertEqual(16, len(documents))
         self.assertEqual(
-                self.default_all_documentIDs(),
+                self.default_all_documentIDs__as_int(),
                 sorted([document.did for document in documents.values()])
                 )
 
@@ -66,7 +66,7 @@ class TestRCV1v2DatasetSource(unittest.TestCase):
         calculated_Y = datasetmatrix.Y
         self.assertTrue(DatasetMatrix.sparse_equal(expected_Y, calculated_Y))
 
-        self.assertEqual(self.default_all_documentIDs(), datasetmatrix.row_labels)
+        self.assertEqual(self.default_all_documentIDs__as_row_labels(), datasetmatrix.row_labels)
         self.assertEqual(self.default_words(), datasetmatrix.column_labels_X)
         self.assertEqual(self.default_topics(), datasetmatrix.column_labels_Y)
 
@@ -86,7 +86,7 @@ class TestRCV1v2DatasetSource(unittest.TestCase):
         calculated_Y = datasetmatrix.Y
         self.assertTrue(DatasetMatrix.sparse_equal(expected_Y, calculated_Y))
 
-        self.assertEqual(self.default_all_documentIDs(), datasetmatrix.row_labels)
+        self.assertEqual(self.default_all_documentIDs__as_row_labels(), datasetmatrix.row_labels)
         self.assertEqual(self.default_words(), datasetmatrix.column_labels_X)
         self.assertEqual(self.default_topics(), datasetmatrix.column_labels_Y)
 
@@ -100,24 +100,52 @@ class TestRCV1v2DatasetSource(unittest.TestCase):
         return configuration
 
 
-    def default_all_documentIDs(self):
-        return [101, 102, 103, 104,
+    def default_all_documentIDs__as_int(self):
+        documentIDs = [
+                101, 102, 103, 104,
                 105, 106, 107, 108,
                 201, 202,
                 301, 302,
                 401, 402, 403, 404]
+        return documentIDs
 
 
-    def default_documentIDs_industry(self, industry):
+    def default_all_documentIDs__as_row_labels(self):
+        documentIDs = [
+                101, 102, 103, 104,
+                105, 106, 107, 108,
+                201, 202,
+                301, 302,
+                401, 402, 403, 404]
+        return list(map(str, documentIDs))
+
+
+    def default_documentIDs_industry__as_int(self, industry):
+        documentIDs = []
         if industry == 'FNG':
-            return [101, 102, 104, 106, 301, 302, 403]
+            documentIDs = [101, 102, 104, 106, 301, 302, 403]
         if industry == 'ASTRO':
-            return [102, 104, 107, 202, 401]
+            documentIDs = [102, 104, 107, 202, 401]
         if industry == 'ART':
-            return [101, 103, 104, 107, 108, 201, 202, 401, 404]
+            documentIDs = [101, 103, 104, 107, 108, 201, 202, 401, 404]
         if industry == 'ENGN':
-            return [105, 201, 301, 401, 402, 403, 404]
-        return []
+            documentIDs = [105, 201, 301, 401, 402, 403, 404]
+
+        return documentIDs
+
+
+    def default_documentIDs_industry__as_row_labels(self, industry):
+        documentIDs = []
+        if industry == 'FNG':
+            documentIDs = [101, 102, 104, 106, 301, 302, 403]
+        if industry == 'ASTRO':
+            documentIDs = [102, 104, 107, 202, 401]
+        if industry == 'ART':
+            documentIDs = [101, 103, 104, 107, 108, 201, 202, 401, 404]
+        if industry == 'ENGN':
+            documentIDs = [105, 201, 301, 401, 402, 403, 404]
+
+        return list(map(str, documentIDs))
 
 
     def default_words(self):

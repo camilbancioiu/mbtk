@@ -6,7 +6,8 @@ import shutil
 import os
 
 import mbff_tests.test_utilities as util
-from mbff.datasets.DatasetMatrix import DatasetMatrix, DatasetMatrixNotFinalizedError
+from mbff.datasets.DatasetMatrix import DatasetMatrix
+from mbff.datasets.Exceptions import DatasetMatrixNotFinalizedError, DatasetMatrixFinalizedError
 
 
 class TestDatasetMatrix(unittest.TestCase):

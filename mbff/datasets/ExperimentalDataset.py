@@ -3,6 +3,7 @@ import os
 import shutil
 from pathlib import Path
 
+import mbff.utilities as util
 from mbff.datasets.ExperimentalDatasetDefinition import ExperimentalDatasetDefinition
 from mbff.datasets.DatasetMatrix import DatasetMatrix
 
@@ -47,20 +48,27 @@ class ExperimentalDataset():
         self.test_rows = None
 
 
-    def build(self):
+    def build(self, finalize_and_save=True):
         """
         Build an ExperimentalDataset from an external source, as dictated by
         ``definition``.
         """
         datasetsource = self.definition.source(self.definition.source_configuration)
-        self.matrix = datasetsource.create_dataset_matrix("original")
+        self.matrix = datasetsource.create_dataset_matrix("dataset_original")
         self.total_row_count = self.matrix.X.get_shape()[0]
 
         (self.train_rows, self.test_rows) = self.perform_random_dataset_split()
 
         # Create self.matrix_train and self.matrix_test from self.matrix
-        self.matrix_train = self.matrix.select_rows(self.train_rows, self.matrix.label + "_train")
-        self.matrix_test = self.matrix.select_rows(self.test_rows, self.matrix.label + "_test")
+        self.matrix_train = self.matrix.select_rows(self.train_rows, "dataset_train")
+        self.matrix_test = self.matrix.select_rows(self.test_rows, "dataset_test")
+
+        # TODO remove features and objectives which fall outside of the
+        # intervals specified by definition.trim_prob__feature and
+        # definition.trim_prob__objective in self.matrix_train.
+
+        if finalize_and_save:
+            self.finalize_and_save()
 
 
     def perform_random_dataset_split(self):
@@ -81,6 +89,42 @@ class ExperimentalDataset():
 
         return train_rows, test_rows
 
+
+    def finalize_and_save(self):
+        # Finalize all 3 matrices.
+        self.matrix.finalize()
+        self.matrix_train.finalize()
+        self.matrix_test.finalize()
+
+        # Save and optionally lock this dataset
+        self.save()
+        if self.definition.auto_lock_after_build:
+            self.definition.lock_folder()
+
+
+    def save(self):
+        util.ensure_folder(self.definition.folder)
+
+        if not self.definition.folder_is_locked():
+            self.matrix.save(self.definition.folder)
+            self.matrix_train.save(self.definition.folder)
+            self.matrix_test.save(self.definition.folder)
+        else:
+            raise ExperimentalDatasetError(self.definition, "Cannot save - ExDs is folder locked.")
+
+
+    def load(self):
+        if self.matrix is None:
+            self.matrix = DatasetMatrix("dataset_original")
+        self.matrix.load(self.definition.folder)
+
+        if self.matrix_train is None:
+            self.matrix_train = DatasetMatrix("dataset_train")
+        self.matrix_train.load(self.definition.folder)
+
+        if self.matrix_test is None:
+            self.matrix_test = DatasetMatrix("dataset_test")
+        self.matrix_test.load(self.definition.folder)
 
 
 

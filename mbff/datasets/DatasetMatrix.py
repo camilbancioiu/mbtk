@@ -3,6 +3,7 @@ import scipy
 import scipy.io
 import pickle
 import mbff.utilities as util
+from mbff.datasets.Exceptions import DatasetMatrixNotFinalizedError, DatasetMatrixFinalizedError
 
 class DatasetMatrix:
     """
@@ -295,15 +296,3 @@ class DatasetMatrix:
             return mat
 
 
-class DatasetMatrixNotFinalizedError(Exception):
-    def __init__(self, datasetmatrix, attempt):
-        self.datasetmatrix = datasetmatrix
-        self.message = "DatasetMatrix not finalized. " + attempt
-        super().__init__(self.message)
-
-
-class DatasetMatrixFinalizedError(Exception):
-    def __init__(self, datasetmatrix, attempt):
-        self.datasetmatrix = datasetmatrix
-        self.message = "DatasetMatrix already finalized. " + attempt
-        super().__init__(self.message)
