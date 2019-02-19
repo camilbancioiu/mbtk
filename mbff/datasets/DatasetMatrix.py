@@ -84,6 +84,26 @@ class DatasetMatrix:
         self.final = False
 
 
+    def get_column_X(self, column):
+        """
+        Get a column from the ``X`` matrix as a simple 1-dimensional Numpy
+        array. It is recommended to call DatasetMatrix.finalize() first,
+        because finalizing will convert ``X`` to a CSC matrix and CSC matrices
+        are optimized for column slicing and retrieval.
+        """
+        return self.X.getcol(column).transpose().toarray().ravel()
+
+
+    def get_column_Y(self, column):
+        """
+        Get a column from the ``Y`` matrix as a simple 1-dimensional Numpy
+        array. It is recommended to call DatasetMatrix.finalize() first,
+        because finalizing will convert ``Y`` to a CSC matrix and CSC matrices
+        are optimized for column slicing and retrieval.
+        """
+        return self.Y.getcol(column).transpose().toarray().ravel()
+
+
     def save(self, folder):
         """
         Save ``X``, ``Y``, row labels and column labels as files in the
