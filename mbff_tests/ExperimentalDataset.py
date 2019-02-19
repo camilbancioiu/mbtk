@@ -76,7 +76,7 @@ class TestExperimentalDataset(unittest.TestCase):
         # Verify if the matrices can be loaded individually from the saved
         # ExperimentalDataset.
         # - The original matrix:
-        loadedMatrix_original = DatasetMatrix("dataset_original")
+        loadedMatrix_original = DatasetMatrix("dataset_full")
         loadedMatrix_original.load(exds.definition.folder)
         self.assertEqual(exds.matrix, loadedMatrix_original)
         # - The training matrix:

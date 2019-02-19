@@ -54,7 +54,7 @@ class ExperimentalDataset():
         ``definition``.
         """
         datasetsource = self.definition.source(self.definition.source_configuration)
-        self.matrix = datasetsource.create_dataset_matrix("dataset_original")
+        self.matrix = datasetsource.create_dataset_matrix("dataset_full")
         self.total_row_count = self.matrix.X.get_shape()[0]
 
         (self.train_rows, self.test_rows) = self.perform_random_dataset_split()
@@ -115,7 +115,7 @@ class ExperimentalDataset():
 
     def load(self):
         if self.matrix is None:
-            self.matrix = DatasetMatrix("dataset_original")
+            self.matrix = DatasetMatrix("dataset_full")
         self.matrix.load(self.definition.folder)
 
         if self.matrix_train is None:
