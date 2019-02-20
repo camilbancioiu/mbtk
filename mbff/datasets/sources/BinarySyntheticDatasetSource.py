@@ -41,12 +41,13 @@ class BinarySyntheticDatasetSource(DatasetSource):
         column_count = len(probabilities_per_column)
         column_labels = []
         columns = []
-        for column_label, p_one in probabilities_per_column.items():
+        for column_label in sorted(probabilities_per_column.keys()):
+            p_one = probabilities_per_column[column_label]
             column = self.create_shuffled_binary_column(row_count, p_one)
             columns.append(column)
             column_labels.append(column_label)
 
-        matrix = scipy.sparse.hstack(columns)
+        matrix = scipy.sparse.hstack(columns, dtype=numpy.int16)
         return (matrix, column_labels)
 
 
@@ -54,6 +55,6 @@ class BinarySyntheticDatasetSource(DatasetSource):
         n_ones = int(row_count * p_one)
         binary_list = [1] * n_ones + [0] * (row_count - n_ones)
         random.shuffle(binary_list)
-        column = scipy.sparse.coo_matrix([binary_list], dtype=numpy.dtype('B')).transpose()
+        column = scipy.sparse.coo_matrix([binary_list], dtype=numpy.int16).transpose()
         return column
 

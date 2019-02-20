@@ -38,11 +38,18 @@ class TestBinarySyntheticDatasetSource(unittest.TestCase):
         # equality with an expected sorted list of 0 and 1. For example, pick
         # column 3.
         test_column = sorted(datasetmatrix.get_column_X(3).tolist())
-        expected_column = [0] * 90 + [1] * 10;
+        expected_column = [0] * 95 + [1] * 5;
         self.assertListEqual(expected_column, test_column)
+
+        # Ensure that the features and objectives have been put in the matrix
+        # in alphabetical order.
+        self.assertListEqual(datasetmatrix.column_labels_X, sorted(datasetmatrix.column_labels_X))
+        self.assertListEqual(datasetmatrix.column_labels_Y, sorted(datasetmatrix.column_labels_Y))
 
 
     def default_expected_sample_counts__per_feature(self):
+        # Sorted:
+        # almond carbohydrate firefly galaxy oxygen polyrhythm python rocket
         probabilities = {
                     'galaxy':       5,
                     'almond':       20,
