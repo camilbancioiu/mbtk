@@ -4,7 +4,6 @@ import shutil
 from pathlib import Path
 
 import mbff.utilities as util
-from mbff.datasets.ExperimentalDatasetDefinition import ExperimentalDatasetDefinition
 from mbff.datasets.DatasetMatrix import DatasetMatrix
 
 class ExperimentalDataset():

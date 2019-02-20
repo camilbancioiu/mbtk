@@ -1,7 +1,6 @@
 import unittest
 import numpy
 
-from mbff.datasets.sources.DatasetSource import DatasetSource
 from mbff.datasets.sources.BinarySyntheticDatasetSource import BinarySyntheticDatasetSource
 
 class TestBinarySyntheticDatasetSource(unittest.TestCase):
