@@ -100,8 +100,6 @@ class TestExperimentalDataset(unittest.TestCase):
                 }
         definition.exds_folder = exds_folder
         definition.training_subset_size = 0.25
-        definition.trim_prob__feature = (0.0, 1.0)
-        definition.trim_prob__objective = (0.0, 1.0)
         definition.random_seed = 42
         definition.auto_lock_after_build = True
         definition.tags = []

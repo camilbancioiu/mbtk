@@ -56,17 +56,17 @@ class ExperimentalDataset():
         self.matrix = datasetsource.create_dataset_matrix("dataset_full")
         self.total_row_count = self.matrix.X.get_shape()[0]
 
-        (self.train_rows, self.test_rows) = self.perform_random_dataset_split()
+        self.process_before_split()
 
         # Create self.matrix_train and self.matrix_test from self.matrix
+        (self.train_rows, self.test_rows) = self.perform_random_dataset_split()
         self.matrix_train = self.matrix.select_rows(self.train_rows, "dataset_train")
         self.matrix_test = self.matrix.select_rows(self.test_rows, "dataset_test")
 
-        # TODO remove features and objectives which fall outside of the
-        # intervals specified by definition.trim_prob__feature and
-        # definition.trim_prob__objective in self.matrix_train.
+        self.process_after_split()
 
         if finalize_and_save:
+            self.process_before_finalize_and_save()
             self.finalize_and_save()
 
 
@@ -79,6 +79,18 @@ class ExperimentalDataset():
             return self.matrix_test
         else:
             raise ValueError("Unknown DatasetMartix label. Only 'full', 'train' and 'test' are allowed.")
+
+
+    def process_before_split(self):
+        pass
+
+
+    def process_after_split(self):
+        pass
+
+
+    def process_before_finalize_and_save(self):
+        pass
 
 
     def perform_random_dataset_split(self):

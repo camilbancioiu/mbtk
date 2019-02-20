@@ -57,8 +57,7 @@ class ExperimentalDatasetDefinition():
         self.exds_folder = ""
         self.folder = ""
         self.training_subset_size = 1.0
-        self.trim_prob__feature = (0.0, 1.0)
-        self.trim_prob__objective = (0.0, 1.0)
+        self.options = { }
         self.random_seed = 42
         self.auto_lock_after_build = True
         self.tags = []
