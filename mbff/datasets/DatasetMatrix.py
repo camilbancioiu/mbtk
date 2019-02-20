@@ -84,6 +84,33 @@ class DatasetMatrix:
         self.final = False
 
 
+    def get_matrix(self, matrix_label):
+        if matrix_label == 'X':
+            return self.X
+        elif matrix_label == 'Y':
+            return self.Y
+        else:
+            raise ValueError('Unknown matrix label. Only X and Y are allowed.')
+
+
+    def get_column(self, matrix_label, column):
+        if matrix_label == 'X':
+            return self.get_column_X(column)
+        elif matrix_label == 'Y':
+            return self.get_column_Y(column)
+        else:
+            raise ValueError('Unknown matrix label. Only X and Y are allowed.')
+
+
+    def get_column_labels(self, matrix_label):
+        if matrix_label == 'X':
+            return self.column_labels_X
+        elif matrix_label == 'Y':
+            return self.column_labels_Y
+        else:
+            raise ValueError('Unknown matrix label. Only X and Y are allowed.')
+
+
     def get_column_X(self, column):
         """
         Get a column from the ``X`` matrix as a simple 1-dimensional Numpy
@@ -251,6 +278,21 @@ class DatasetMatrix:
 
         return new_dataset_matrix
 
+
+    def delete_columns_X(self, columns_to_delete):
+        if self.final == True:
+            raise DatasetMatrixFinalizedError(self, "Cannot delete any X column.")
+        columns_to_delete = sorted(columns_to_delete)
+        self.X = DatasetMatrix.delete_rows_cols(self.X, col_indices=columns_to_delete).tocsr()
+        self.column_labels_X = [self.column_labels_X[c] for c in range(len(self.column_labels_X)) if c not in columns_to_delete]
+
+
+    def delete_columns_Y(self, columns_to_delete):
+        if self.final == True:
+            raise DatasetMatrixFinalizedError(self, "Cannot delete any Y column.")
+        columns_to_delete = sorted(columns_to_delete)
+        self.Y = DatasetMatrix.delete_rows_cols(self.Y, col_indices=columns_to_delete).tocsr()
+        self.column_labels_Y = [self.column_labels_Y[c] for c in range(len(self.column_labels_Y)) if c not in columns_to_delete]
 
 
     def delete_column_X(self, c):
