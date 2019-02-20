@@ -70,6 +70,17 @@ class ExperimentalDataset():
             self.finalize_and_save()
 
 
+    def get_datasetmatrix(self, label):
+        if label == 'full':
+            return self.matrix
+        elif label == 'train':
+            return self.matrix_train
+        elif label == 'test':
+            return self.matrix_test
+        else:
+            raise ValueError("Unknown DatasetMartix label. Only 'full', 'train' and 'test' are allowed.")
+
+
     def perform_random_dataset_split(self):
         # Determine how many rows will be designated as *training rows*.
         train_rows_count = int(self.total_row_count * self.definition.training_subset_size)
