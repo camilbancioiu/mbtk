@@ -12,10 +12,16 @@ BUILDDIR      = doc/_build
 help:
 	@$(SPHINXBUILD) -M help "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
-.PHONY: help Makefile
+.PHONY: help Makefile doc doc-clean doc-rebuild test
 
 doc: Makefile
 	@$(SPHINXBUILD) -M html "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
+
+doc-clean: Makefile
+	rm -rf "$(BUILDDIR)/doctrees"
+	rm -rf "$(BUILDDIR)/html"
+
+doc-rebuild: doc-clean doc
 
 test: Makefile
 	python3 test.py
