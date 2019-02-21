@@ -197,13 +197,18 @@ class ExperimentalDataset():
 
 
     def finalize(self):
-        # Finalize all 3 matrices.
+        """
+        Finalize the 3 matrices.
+        """
         self.matrix.finalize()
         self.matrix_train.finalize()
         self.matrix_test.finalize()
 
 
     def save(self):
+        """
+        Save this ExperimentalDataset to ``self.definition.folder``.
+        """
         util.ensure_folder(self.definition.folder)
 
         if not self.definition.folder_is_locked():
@@ -215,6 +220,9 @@ class ExperimentalDataset():
 
 
     def load(self):
+        """
+        Load the ExperimentalDataset from ``self.definition.folder``.
+        """
         if self.matrix is None:
             self.matrix = DatasetMatrix("dataset_full")
         self.matrix.load(self.definition.folder)
