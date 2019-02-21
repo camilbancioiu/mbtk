@@ -9,12 +9,14 @@
     <title>mbff.datasets.ExperimentalDataset &#8212; MBFF 0.3 documentation</title>
     <link rel="stylesheet" href="../../../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/style.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/style.css" />
+    
     <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
   </head><body>
@@ -43,7 +45,7 @@
 <span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="k">import</span> <span class="n">Path</span>
 
-<span class="kn">from</span> <span class="nn">mbff.datasets.ExperimentalDatasetDefinition</span> <span class="k">import</span> <span class="n">ExperimentalDatasetDefinition</span>
+<span class="kn">import</span> <span class="nn">mbff.utilities</span> <span class="k">as</span> <span class="nn">util</span>
 <span class="kn">from</span> <span class="nn">mbff.datasets.DatasetMatrix</span> <span class="k">import</span> <span class="n">DatasetMatrix</span>
 
 <div class="viewcode-block" id="ExperimentalDataset"><a class="viewcode-back" href="../../../infrastructure/datasets/ExperimentalDataset.html#mbff.datasets.ExperimentalDataset.ExperimentalDataset">[docs]</a><span class="k">class</span> <span class="nc">ExperimentalDataset</span><span class="p">():</span>
@@ -87,24 +89,193 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">test_rows</span> <span class="o">=</span> <span class="kc">None</span>
 
 
-<div class="viewcode-block" id="ExperimentalDataset.build"><a class="viewcode-back" href="../../../infrastructure/datasets/ExperimentalDataset.html#mbff.datasets.ExperimentalDataset.ExperimentalDataset.build">[docs]</a>    <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="ExperimentalDataset.build"><a class="viewcode-back" href="../../../infrastructure/datasets/ExperimentalDataset.html#mbff.datasets.ExperimentalDataset.ExperimentalDataset.build">[docs]</a>    <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">finalize_and_save</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Build an ExperimentalDataset from an external source, as dictated by</span>
-<span class="sd">        ``definition``.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">datasetsource</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">definition</span><span class="o">.</span><span class="n">source</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">definition</span><span class="o">.</span><span class="n">source_configuration</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">matrix</span> <span class="o">=</span> <span class="n">datasetsource</span><span class="o">.</span><span class="n">create_dataset_matrix</span><span class="p">(</span><span class="s2">&quot;original&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">total_row_count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">get_shape</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span></div>
+<span class="sd">        ``definition``. This is where we instantiate the class that will read</span>
+<span class="sd">        an external source of data for us, and give back a DatasetMatrix</span>
+<span class="sd">        instance containing the samples as rows, features as columns of its</span>
+<span class="sd">        ``X`` matrix and objective variables as its ``Y`` matrix. The class</span>
+<span class="sd">        that is to be instantiated as the dataset source is specified by</span>
+<span class="sd">        ``self.definition.source``, and its __init__() parameters are provided</span>
+<span class="sd">        in ``self.definition.source_configuration``. After retrieval, the</span>
+<span class="sd">        DatasetMatrix containing the full dataset will be stored in</span>
+<span class="sd">        ``self.matrix``. The Feature Selection algorithms will only require</span>
+<span class="sd">        this DatasetMatrix.</span>
 
-    <span class="k">def</span> <span class="nf">perform_random_dataset_split</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="sd">        After retrieving the full dataset from the external source, we perform</span>
+<span class="sd">        a random split of the samples into two subsets: the training set and</span>
+<span class="sd">        the testing (evaluation) set, which will later be used to train and</span>
+<span class="sd">        evaluate learning algorithm (usually a classifier). They will be stored</span>
+<span class="sd">        as two separate DatasetMatrix instances, in ``self.matrix_train`` and</span>
+<span class="sd">        ``self.matrix_test``. Together, they can rebuild the original full</span>
+<span class="sd">        dataset from ``self.matrix``. The Feature Selection algorithms will not</span>
+<span class="sd">        normally be interested in these two submatrices.</span>
+
+<span class="sd">        Classes that inherit ExperimentalDataset may also intervene in the</span>
+<span class="sd">        build process, by overriding the following methods:</span>
+
+<span class="sd">        * process_before_split</span>
+<span class="sd">        * process_after_split</span>
+<span class="sd">        * process_before_finalize_and_save</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Retrieve the full dataset from the external data source, which is</span>
+        <span class="c1"># done by instantiating the class provided as ``source`` in</span>
+        <span class="c1"># self.definition. This class should be inheriting the</span>
+        <span class="c1"># mbff.datasets.sources.DatasetSource class, or at least implement the</span>
+        <span class="c1"># ``create_dataset_matrix(label)`` method.</span>
+        <span class="n">datasetsource_class</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">definition</span><span class="o">.</span><span class="n">source</span>
+        <span class="n">datasetsource</span> <span class="o">=</span> <span class="n">datasetsource_class</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">definition</span><span class="o">.</span><span class="n">source_configuration</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">matrix</span> <span class="o">=</span> <span class="n">datasetsource</span><span class="o">.</span><span class="n">create_dataset_matrix</span><span class="p">(</span><span class="s2">&quot;dataset_full&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">total_row_count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">get_shape</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># Allow inheriting classes to intervene before the full dataset is</span>
+        <span class="c1"># about to be split into training and testing samples, yet immediately</span>
+        <span class="c1"># after the full dataset has been built from the external source.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">process_before_split</span><span class="p">()</span>
+
+        <span class="c1"># Create self.matrix_train and self.matrix_test from self.matrix</span>
+        <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_rows</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_rows</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">perform_random_dataset_split</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">matrix_train</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">select_rows</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_rows</span><span class="p">,</span> <span class="s2">&quot;dataset_train&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">matrix_test</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">select_rows</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_rows</span><span class="p">,</span> <span class="s2">&quot;dataset_test&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">process_after_split</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">finalize_and_save</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">process_before_finalize_and_save</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">finalize</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">definition</span><span class="o">.</span><span class="n">auto_lock_after_build</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">definition</span><span class="o">.</span><span class="n">lock_folder</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="ExperimentalDataset.get_datasetmatrix"><a class="viewcode-back" href="../../../infrastructure/datasets/ExperimentalDataset.html#mbff.datasets.ExperimentalDataset.ExperimentalDataset.get_datasetmatrix">[docs]</a>    <span class="k">def</span> <span class="nf">get_datasetmatrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the DatasetMatrix matrix specified by ``label``.</span>
+
+<span class="sd">        The only allowed values for ``label`` are ``&quot;full&quot;``, ``&quot;train&quot;`` and</span>
+<span class="sd">        ``&quot;test&quot;``, which return the full dataset, the training dataset and the</span>
+<span class="sd">        test dataset respectively. A ValueError is raised for other values.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">label</span> <span class="o">==</span> <span class="s1">&#39;full&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix</span>
+        <span class="k">elif</span> <span class="n">label</span> <span class="o">==</span> <span class="s1">&#39;train&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix_train</span>
+        <span class="k">elif</span> <span class="n">label</span> <span class="o">==</span> <span class="s1">&#39;test&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix_test</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unknown DatasetMartix label. Only &#39;full&#39;, &#39;train&#39; and &#39;test&#39; are allowed.&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ExperimentalDataset.process_before_split"><a class="viewcode-back" href="../../../infrastructure/datasets/ExperimentalDataset.html#mbff.datasets.ExperimentalDataset.ExperimentalDataset.process_before_split">[docs]</a>    <span class="k">def</span> <span class="nf">process_before_split</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Called after retrieving data from a dataset source, but before</span>
+<span class="sd">        splitting the dataset into training and testing subsets.</span>
+
+<span class="sd">        Classes inheriting ``ExperimentalDataset`` may implement this method to</span>
+<span class="sd">        intervene at that point.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ExperimentalDataset.process_after_split"><a class="viewcode-back" href="../../../infrastructure/datasets/ExperimentalDataset.html#mbff.datasets.ExperimentalDataset.ExperimentalDataset.process_after_split">[docs]</a>    <span class="k">def</span> <span class="nf">process_after_split</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Called after splitting the dataset into training and testing subsets,</span>
+<span class="sd">        but before finalizing and saving the ExperimentalDataset. This method</span>
+<span class="sd">        is called regardless of the value of the argument</span>
+<span class="sd">        ``finalize_and_save``, received by the ``build()`` method.</span>
+
+<span class="sd">        Classes inheriting ``ExperimentalDataset`` may implement this method to</span>
+<span class="sd">        intervene at that point.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ExperimentalDataset.process_before_finalize_and_save"><a class="viewcode-back" href="../../../infrastructure/datasets/ExperimentalDataset.html#mbff.datasets.ExperimentalDataset.ExperimentalDataset.process_before_finalize_and_save">[docs]</a>    <span class="k">def</span> <span class="nf">process_before_finalize_and_save</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Called just before finalizing and saving the ExperimentalDataset. Only</span>
+<span class="sd">        called if the argument ``finalize_and_save`` received by the</span>
+<span class="sd">        ``build()`` method evaluates to ``True``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ExperimentalDataset.perform_random_dataset_split"><a class="viewcode-back" href="../../../infrastructure/datasets/ExperimentalDataset.html#mbff.datasets.ExperimentalDataset.ExperimentalDataset.perform_random_dataset_split">[docs]</a>    <span class="k">def</span> <span class="nf">perform_random_dataset_split</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Decide which rows of the full dataset ``self.matrix`` will be selected</span>
+<span class="sd">        for the training dataset and which rows for the testing dataset.</span>
+
+<span class="sd">        All rows of ``self.matrix`` will be decided on, which means that the</span>
+<span class="sd">        union between the training rows and the testing rows will result in the</span>
+<span class="sd">        original dataset.</span>
+
+<span class="sd">        The selection is performed randomly, but the seed of the randomness is</span>
+<span class="sd">        controlled by ``self.definition.random_seed``, which makes this</span>
+<span class="sd">        selection predictable. This means that for the same seed value, all</span>
+<span class="sd">        calls to ``self.perform_random_dataset_split()`` will return the same</span>
+<span class="sd">        selection of training and testing rows.</span>
+
+<span class="sd">        Returns a tuple which contains</span>
+<span class="sd">        * the list of indices of the training rows</span>
+<span class="sd">        * the list of indices of the testing rows</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Determine how many rows will be designated as *training rows*.</span>
         <span class="n">train_rows_count</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">total_row_count</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">definition</span><span class="o">.</span><span class="n">training_subset_size</span><span class="p">)</span>
+
+        <span class="c1"># Create the ``shuffled_rows`` list, which contains the indices of all</span>
+        <span class="c1"># the rows from ``self.matrix``, but randomly ordered.</span>
         <span class="n">rows</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">total_row_count</span><span class="p">)</span>
         <span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">definition</span><span class="o">.</span><span class="n">random_seed</span><span class="p">)</span>
         <span class="n">shuffled_rows</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">rows</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">rows</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">train_rows</span> <span class="o">=</span> <span class="n">shuffled_rows</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">train_rows_count</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">test_rows</span> <span class="o">=</span> <span class="n">shuffled_rows</span><span class="p">[</span><span class="n">train_rows_count</span><span class="p">:]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">update_dataset_split</span><span class="p">()</span></div>
+
+        <span class="c1"># Slice ``shuffled_rows`` into two parts: the first part will contain</span>
+        <span class="c1"># the indices of the *training rows*, while the second part will</span>
+        <span class="c1"># contain the indices of the *test rows*.</span>
+        <span class="n">train_rows</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">shuffled_rows</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">train_rows_count</span><span class="p">])</span>
+        <span class="n">test_rows</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">shuffled_rows</span><span class="p">[</span><span class="n">train_rows_count</span><span class="p">:])</span>
+
+        <span class="k">return</span> <span class="n">train_rows</span><span class="p">,</span> <span class="n">test_rows</span></div>
+
+
+<div class="viewcode-block" id="ExperimentalDataset.finalize"><a class="viewcode-back" href="../../../infrastructure/datasets/ExperimentalDataset.html#mbff.datasets.ExperimentalDataset.ExperimentalDataset.finalize">[docs]</a>    <span class="k">def</span> <span class="nf">finalize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Finalize the 3 matrices.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">finalize</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">matrix_train</span><span class="o">.</span><span class="n">finalize</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">matrix_test</span><span class="o">.</span><span class="n">finalize</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="ExperimentalDataset.save"><a class="viewcode-back" href="../../../infrastructure/datasets/ExperimentalDataset.html#mbff.datasets.ExperimentalDataset.ExperimentalDataset.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Save this ExperimentalDataset to ``self.definition.folder``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">util</span><span class="o">.</span><span class="n">ensure_folder</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">definition</span><span class="o">.</span><span class="n">folder</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">definition</span><span class="o">.</span><span class="n">folder_is_locked</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">definition</span><span class="o">.</span><span class="n">folder</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">matrix_train</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">definition</span><span class="o">.</span><span class="n">folder</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">matrix_test</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">definition</span><span class="o">.</span><span class="n">folder</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ExperimentalDatasetError</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">definition</span><span class="p">,</span> <span class="s2">&quot;Cannot save - ExDs is folder locked.&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ExperimentalDataset.load"><a class="viewcode-back" href="../../../infrastructure/datasets/ExperimentalDataset.html#mbff.datasets.ExperimentalDataset.ExperimentalDataset.load">[docs]</a>    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Load the ExperimentalDataset from ``self.definition.folder``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">matrix</span> <span class="o">=</span> <span class="n">DatasetMatrix</span><span class="p">(</span><span class="s2">&quot;dataset_full&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">definition</span><span class="o">.</span><span class="n">folder</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix_train</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">matrix_train</span> <span class="o">=</span> <span class="n">DatasetMatrix</span><span class="p">(</span><span class="s2">&quot;dataset_train&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">matrix_train</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">definition</span><span class="o">.</span><span class="n">folder</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix_test</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">matrix_test</span> <span class="o">=</span> <span class="n">DatasetMatrix</span><span class="p">(</span><span class="s2">&quot;dataset_test&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">matrix_test</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">definition</span><span class="o">.</span><span class="n">folder</span><span class="p">)</span></div></div>
 
 
 
@@ -153,7 +324,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2019, Camil Băncioiu.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.5.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.4.
     </div>
   </body>
 </html>

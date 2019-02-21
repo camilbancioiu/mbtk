@@ -10,7 +10,7 @@ Markov Blanket Feature Filters: Framework documentation
 (Add description of the framework. Include motivation, structure, contents etc)
 
 .. toctree::
-  :maxdepth: 2
+  :maxdepth: 5
   :caption: Contents:
 
   infrastructure/index.rst

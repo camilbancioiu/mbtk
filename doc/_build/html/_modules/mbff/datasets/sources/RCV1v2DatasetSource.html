@@ -9,12 +9,14 @@
     <title>mbff.datasets.sources.RCV1v2DatasetSource &#8212; MBFF 0.3 documentation</title>
     <link rel="stylesheet" href="../../../../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../../../_static/style.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/style.css" />
+    
     <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
   </head><body>
@@ -85,37 +87,37 @@
         <span class="n">datasetmatrix</span> <span class="o">=</span> <span class="n">DatasetMatrix</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
         <span class="n">datasetmatrix</span><span class="o">.</span><span class="n">X</span> <span class="o">=</span> <span class="n">dok_matrix_words</span><span class="o">.</span><span class="n">tocsr</span><span class="p">()</span>
         <span class="n">datasetmatrix</span><span class="o">.</span><span class="n">Y</span> <span class="o">=</span> <span class="n">dok_matrix_topics</span><span class="o">.</span><span class="n">tocsr</span><span class="p">()</span>
-        <span class="n">datasetmatrix</span><span class="o">.</span><span class="n">row_labels</span> <span class="o">=</span> <span class="n">documentIDs</span>
+        <span class="n">datasetmatrix</span><span class="o">.</span><span class="n">row_labels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">documentIDs</span><span class="p">))</span>
         <span class="n">datasetmatrix</span><span class="o">.</span><span class="n">column_labels_X</span> <span class="o">=</span> <span class="n">words</span>
         <span class="n">datasetmatrix</span><span class="o">.</span><span class="n">column_labels_Y</span> <span class="o">=</span> <span class="n">topics</span>
 
         <span class="k">return</span> <span class="n">datasetmatrix</span></div>
 
 
-    <span class="k">def</span> <span class="nf">read_all_documentIDs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="RCV1v2DatasetSource.read_all_documentIDs"><a class="viewcode-back" href="../../../../infrastructure/datasets/sources/RCV1v2DatasetSource.html#mbff.datasets.sources.RCV1v2DatasetSource.RCV1v2DatasetSource.read_all_documentIDs">[docs]</a>    <span class="k">def</span> <span class="nf">read_all_documentIDs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">documentIDs</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sourcefile_documentIDs</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;uint32&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
-        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">documentIDs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">documentIDs</span><span class="p">)</span></div>
 
 
-    <span class="k">def</span> <span class="nf">read_documentIDs_in_industry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">industry</span><span class="p">):</span>
+<div class="viewcode-block" id="RCV1v2DatasetSource.read_documentIDs_in_industry"><a class="viewcode-back" href="../../../../infrastructure/datasets/sources/RCV1v2DatasetSource.html#mbff.datasets.sources.RCV1v2DatasetSource.RCV1v2DatasetSource.read_documentIDs_in_industry">[docs]</a>    <span class="k">def</span> <span class="nf">read_documentIDs_in_industry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">industry</span><span class="p">):</span>
         <span class="n">documentIDs</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sourcefile_industry_assignments</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">sourcefile</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">sourcefile</span><span class="p">:</span>
                 <span class="n">industry_assignment</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
                 <span class="k">if</span> <span class="n">industry_assignment</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">industry</span><span class="p">:</span>
                     <span class="n">documentIDs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">industry_assignment</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
-        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">documentIDs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">documentIDs</span><span class="p">)</span></div>
 
 
-    <span class="k">def</span> <span class="nf">gather_complete_word_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">documents</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">([</span><span class="n">word</span> <span class="k">for</span> <span class="n">document</span> <span class="ow">in</span> <span class="n">documents</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">document</span><span class="o">.</span><span class="n">words</span><span class="p">])))</span>
+<div class="viewcode-block" id="RCV1v2DatasetSource.gather_complete_word_list"><a class="viewcode-back" href="../../../../infrastructure/datasets/sources/RCV1v2DatasetSource.html#mbff.datasets.sources.RCV1v2DatasetSource.RCV1v2DatasetSource.gather_complete_word_list">[docs]</a>    <span class="k">def</span> <span class="nf">gather_complete_word_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">documents</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">([</span><span class="n">word</span> <span class="k">for</span> <span class="n">document</span> <span class="ow">in</span> <span class="n">documents</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">document</span><span class="o">.</span><span class="n">words</span><span class="p">])))</span></div>
 
 
-    <span class="k">def</span> <span class="nf">gather_complete_topic_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">documents</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">([</span><span class="n">topic</span> <span class="k">for</span> <span class="n">document</span> <span class="ow">in</span> <span class="n">documents</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">for</span> <span class="n">topic</span> <span class="ow">in</span> <span class="n">document</span><span class="o">.</span><span class="n">topics</span><span class="p">])))</span>
+<div class="viewcode-block" id="RCV1v2DatasetSource.gather_complete_topic_list"><a class="viewcode-back" href="../../../../infrastructure/datasets/sources/RCV1v2DatasetSource.html#mbff.datasets.sources.RCV1v2DatasetSource.RCV1v2DatasetSource.gather_complete_topic_list">[docs]</a>    <span class="k">def</span> <span class="nf">gather_complete_topic_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">documents</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">([</span><span class="n">topic</span> <span class="k">for</span> <span class="n">document</span> <span class="ow">in</span> <span class="n">documents</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">for</span> <span class="n">topic</span> <span class="ow">in</span> <span class="n">document</span><span class="o">.</span><span class="n">topics</span><span class="p">])))</span></div>
 
 
-    <span class="k">def</span> <span class="nf">create_dok_matrices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">documents</span><span class="p">,</span> <span class="n">documentIDs</span><span class="p">,</span> <span class="n">words</span><span class="p">,</span> <span class="n">topics</span><span class="p">):</span>
+<div class="viewcode-block" id="RCV1v2DatasetSource.create_dok_matrices"><a class="viewcode-back" href="../../../../infrastructure/datasets/sources/RCV1v2DatasetSource.html#mbff.datasets.sources.RCV1v2DatasetSource.RCV1v2DatasetSource.create_dok_matrices">[docs]</a>    <span class="k">def</span> <span class="nf">create_dok_matrices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">documents</span><span class="p">,</span> <span class="n">documentIDs</span><span class="p">,</span> <span class="n">words</span><span class="p">,</span> <span class="n">topics</span><span class="p">):</span>
         <span class="n">words_index</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">create_index</span><span class="p">(</span><span class="n">words</span><span class="p">)</span>
         <span class="n">topics_index</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">create_index</span><span class="p">(</span><span class="n">topics</span><span class="p">)</span>
 
@@ -125,17 +127,25 @@
         <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">documentIDs</span><span class="p">)):</span>
             <span class="n">documentID</span> <span class="o">=</span> <span class="n">documentIDs</span><span class="p">[</span><span class="n">row</span><span class="p">]</span>
             <span class="n">document</span> <span class="o">=</span> <span class="n">documents</span><span class="p">[</span><span class="n">documentID</span><span class="p">]</span>
-            <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">document</span><span class="o">.</span><span class="n">words</span><span class="p">:</span>
-                <span class="n">column</span> <span class="o">=</span> <span class="n">words_index</span><span class="p">[</span><span class="n">word</span><span class="p">]</span>
-                <span class="n">dok_matrix_words</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">column</span><span class="p">]</span> <span class="o">=</span> <span class="n">document</span><span class="o">.</span><span class="n">word_frequencies</span><span class="p">[</span><span class="n">word</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">configuration</span><span class="p">[</span><span class="s1">&#39;feature_type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;wordcount&#39;</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">document</span><span class="o">.</span><span class="n">words</span><span class="p">:</span>
+                    <span class="n">column</span> <span class="o">=</span> <span class="n">words_index</span><span class="p">[</span><span class="n">word</span><span class="p">]</span>
+                    <span class="n">dok_matrix_words</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">column</span><span class="p">]</span> <span class="o">=</span> <span class="n">document</span><span class="o">.</span><span class="n">word_frequencies</span><span class="p">[</span><span class="n">word</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">configuration</span><span class="p">[</span><span class="s1">&#39;feature_type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;binary&#39;</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">document</span><span class="o">.</span><span class="n">words</span><span class="p">:</span>
+                    <span class="n">column</span> <span class="o">=</span> <span class="n">words_index</span><span class="p">[</span><span class="n">word</span><span class="p">]</span>
+                    <span class="n">dok_matrix_words</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">column</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
             <span class="k">for</span> <span class="n">topic</span> <span class="ow">in</span> <span class="n">document</span><span class="o">.</span><span class="n">topics</span><span class="p">:</span>
                 <span class="n">column</span> <span class="o">=</span> <span class="n">topics_index</span><span class="p">[</span><span class="n">topic</span><span class="p">]</span>
                 <span class="n">dok_matrix_topics</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">column</span><span class="p">]</span> <span class="o">=</span> <span class="n">document</span><span class="o">.</span><span class="n">topic_values</span><span class="p">[</span><span class="n">topic</span><span class="p">]</span>
 
-        <span class="k">return</span> <span class="p">(</span><span class="n">dok_matrix_words</span><span class="p">,</span> <span class="n">dok_matrix_topics</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">dok_matrix_words</span><span class="p">,</span> <span class="n">dok_matrix_topics</span><span class="p">)</span></div>
 
 
-    <span class="k">def</span> <span class="nf">read_documents</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">requested_documentIDs</span><span class="p">):</span>
+<div class="viewcode-block" id="RCV1v2DatasetSource.read_documents"><a class="viewcode-back" href="../../../../infrastructure/datasets/sources/RCV1v2DatasetSource.html#mbff.datasets.sources.RCV1v2DatasetSource.RCV1v2DatasetSource.read_documents">[docs]</a>    <span class="k">def</span> <span class="nf">read_documents</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">requested_documentIDs</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">requested_documentIDs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">{}</span>
 
@@ -189,10 +199,10 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">assign_topics_to_documents</span><span class="p">(</span><span class="n">documents</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">documents</span>
+        <span class="k">return</span> <span class="n">documents</span></div>
 
 
-    <span class="k">def</span> <span class="nf">assign_topics_to_documents</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">documents</span><span class="p">):</span>
+<div class="viewcode-block" id="RCV1v2DatasetSource.assign_topics_to_documents"><a class="viewcode-back" href="../../../../infrastructure/datasets/sources/RCV1v2DatasetSource.html#mbff.datasets.sources.RCV1v2DatasetSource.RCV1v2DatasetSource.assign_topics_to_documents">[docs]</a>    <span class="k">def</span> <span class="nf">assign_topics_to_documents</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">documents</span><span class="p">):</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sourcefile_topic_assignments</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">sourcefile</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">sourcefile</span><span class="p">:</span>
                 <span class="n">assignment</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
@@ -201,11 +211,11 @@
                 <span class="k">try</span><span class="p">:</span>
                     <span class="n">documents</span><span class="p">[</span><span class="n">documentID</span><span class="p">]</span><span class="o">.</span><span class="n">add_topic</span><span class="p">(</span><span class="n">topic</span><span class="p">)</span>
                 <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-                    <span class="k">pass</span></div>
+                    <span class="k">pass</span></div></div>
 
 
 
-<span class="k">class</span> <span class="nc">RCV1v2Document</span><span class="p">():</span>
+<div class="viewcode-block" id="RCV1v2Document"><a class="viewcode-back" href="../../../../infrastructure/datasets/sources/RCV1v2DatasetSource.html#mbff.datasets.sources.RCV1v2DatasetSource.RCV1v2Document">[docs]</a><span class="k">class</span> <span class="nc">RCV1v2Document</span><span class="p">():</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">did</span> <span class="o">=</span> <span class="mi">0</span>
@@ -216,7 +226,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">source</span> <span class="o">=</span> <span class="kc">None</span>
 
 
-    <span class="k">def</span> <span class="nf">read_line_with_tokens</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
+<div class="viewcode-block" id="RCV1v2Document.read_line_with_tokens"><a class="viewcode-back" href="../../../../infrastructure/datasets/sources/RCV1v2DatasetSource.html#mbff.datasets.sources.RCV1v2DatasetSource.RCV1v2Document.read_line_with_tokens">[docs]</a>    <span class="k">def</span> <span class="nf">read_line_with_tokens</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Add a new line of words to this document, updating the word frequencies</span>
 <span class="sd">        and the current list of unique words in the document.</span>
@@ -227,12 +237,12 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">word_frequencies</span><span class="p">[</span><span class="n">word</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
             <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">word_frequencies</span><span class="p">[</span><span class="n">word</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">words</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">word_frequencies</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">words</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">word_frequencies</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span></div>
 
 
-    <span class="k">def</span> <span class="nf">add_topic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">topic</span><span class="p">):</span>
+<div class="viewcode-block" id="RCV1v2Document.add_topic"><a class="viewcode-back" href="../../../../infrastructure/datasets/sources/RCV1v2DatasetSource.html#mbff.datasets.sources.RCV1v2DatasetSource.RCV1v2Document.add_topic">[docs]</a>    <span class="k">def</span> <span class="nf">add_topic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">topic</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">topics</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">topic</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">topic_values</span><span class="p">[</span><span class="n">topic</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">topic_values</span><span class="p">[</span><span class="n">topic</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span></div></div>
 
 </pre></div>
 
@@ -272,7 +282,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2019, Camil Băncioiu.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.5.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.4.
     </div>
   </body>
 </html>

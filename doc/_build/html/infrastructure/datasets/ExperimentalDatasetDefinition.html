@@ -9,12 +9,14 @@
     <title>Class ExperimentalDatasetDefinition &#8212; MBFF 0.3 documentation</title>
     <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/style.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/style.css" />
+    
     <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Class ExperimentalDataset" href="ExperimentalDataset.html" />
@@ -51,7 +53,8 @@
 <dl class="class">
 <dt id="mbff.datasets.ExperimentalDatasetDefinition.ExperimentalDatasetDefinition">
 <em class="property">class </em><code class="descclassname">mbff.datasets.ExperimentalDatasetDefinition.</code><code class="descname">ExperimentalDatasetDefinition</code><a class="reference internal" href="../../_modules/mbff/datasets/ExperimentalDatasetDefinition.html#ExperimentalDatasetDefinition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mbff.datasets.ExperimentalDatasetDefinition.ExperimentalDatasetDefinition" title="Permalink to this definition">¶</a></dt>
-<dd><p>This class represents the definition of an <code class="docutils literal notranslate"><span class="pre">ExperimentalDataset</span></code>, which
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>This class represents the definition of an <code class="docutils literal notranslate"><span class="pre">ExperimentalDataset</span></code>, which
 contains the information needed to build an experimental dataset (exds)
 from external source data, split it into training and testing samplesets,
 save it to a specified folder and analyze it later. This would result in a
@@ -100,6 +103,46 @@ prevent accidental rebuilding or deleting.</li>
 </tr>
 </tbody>
 </table>
+<dl class="method">
+<dt id="mbff.datasets.ExperimentalDatasetDefinition.ExperimentalDatasetDefinition.setup">
+<code class="descname">setup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mbff/datasets/ExperimentalDatasetDefinition.html#ExperimentalDatasetDefinition.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mbff.datasets.ExperimentalDatasetDefinition.ExperimentalDatasetDefinition.setup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="mbff.datasets.ExperimentalDatasetDefinition.ExperimentalDatasetDefinition.validate">
+<code class="descname">validate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mbff/datasets/ExperimentalDatasetDefinition.html#ExperimentalDatasetDefinition.validate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mbff.datasets.ExperimentalDatasetDefinition.ExperimentalDatasetDefinition.validate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="mbff.datasets.ExperimentalDatasetDefinition.ExperimentalDatasetDefinition.get_lock_filename">
+<code class="descname">get_lock_filename</code><span class="sig-paren">(</span><em>lock_type='exds'</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mbff/datasets/ExperimentalDatasetDefinition.html#ExperimentalDatasetDefinition.get_lock_filename"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mbff.datasets.ExperimentalDatasetDefinition.ExperimentalDatasetDefinition.get_lock_filename" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="mbff.datasets.ExperimentalDatasetDefinition.ExperimentalDatasetDefinition.folder_is_locked">
+<code class="descname">folder_is_locked</code><span class="sig-paren">(</span><em>lock_type='exds'</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mbff/datasets/ExperimentalDatasetDefinition.html#ExperimentalDatasetDefinition.folder_is_locked"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mbff.datasets.ExperimentalDatasetDefinition.ExperimentalDatasetDefinition.folder_is_locked" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="mbff.datasets.ExperimentalDatasetDefinition.ExperimentalDatasetDefinition.folder_exists">
+<code class="descname">folder_exists</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mbff/datasets/ExperimentalDatasetDefinition.html#ExperimentalDatasetDefinition.folder_exists"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mbff.datasets.ExperimentalDatasetDefinition.ExperimentalDatasetDefinition.folder_exists" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="mbff.datasets.ExperimentalDatasetDefinition.ExperimentalDatasetDefinition.lock_folder">
+<code class="descname">lock_folder</code><span class="sig-paren">(</span><em>lock_type='exds'</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mbff/datasets/ExperimentalDatasetDefinition.html#ExperimentalDatasetDefinition.lock_folder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mbff.datasets.ExperimentalDatasetDefinition.ExperimentalDatasetDefinition.lock_folder" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="mbff.datasets.ExperimentalDatasetDefinition.ExperimentalDatasetDefinition.delete_folder">
+<code class="descname">delete_folder</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mbff/datasets/ExperimentalDatasetDefinition.html#ExperimentalDatasetDefinition.delete_folder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mbff.datasets.ExperimentalDatasetDefinition.ExperimentalDatasetDefinition.delete_folder" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="mbff.datasets.ExperimentalDatasetDefinition.ExperimentalDatasetDefinition.unlock_folder">
+<code class="descname">unlock_folder</code><span class="sig-paren">(</span><em>lock_type='exds'</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mbff/datasets/ExperimentalDatasetDefinition.html#ExperimentalDatasetDefinition.unlock_folder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mbff.datasets.ExperimentalDatasetDefinition.ExperimentalDatasetDefinition.unlock_folder" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 </div>
@@ -161,7 +204,7 @@ prevent accidental rebuilding or deleting.</li>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2019, Camil Băncioiu.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.5.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.4.
     </div>
   </body>
 </html>

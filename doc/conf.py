@@ -180,4 +180,10 @@ def setup(app):
     app.add_stylesheet('style.css')
 
 autodoc_member_order = 'bysource'
+autodoc_default_options = {
+        'members': None,
+        'inherited-members': None,
+        'undoc-members': None,
+        'show-inheritance': True
+        }
 
