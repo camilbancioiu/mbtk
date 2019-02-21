@@ -102,7 +102,10 @@ class ExperimentalDataset():
 
         if finalize_and_save:
             self.process_before_finalize_and_save()
-            self.finalize_and_save()
+            self.finalize()
+            self.save()
+            if self.definition.auto_lock_after_build:
+                self.definition.lock_folder()
 
 
     def get_datasetmatrix(self, label):
@@ -193,16 +196,11 @@ class ExperimentalDataset():
         return train_rows, test_rows
 
 
-    def finalize_and_save(self):
+    def finalize(self):
         # Finalize all 3 matrices.
         self.matrix.finalize()
         self.matrix_train.finalize()
         self.matrix_test.finalize()
-
-        # Save and optionally lock this dataset
-        self.save()
-        if self.definition.auto_lock_after_build:
-            self.definition.lock_folder()
 
 
     def save(self):
