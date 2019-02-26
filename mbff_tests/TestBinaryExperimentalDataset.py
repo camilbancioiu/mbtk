@@ -3,10 +3,10 @@ import numpy
 
 from mbff_tests.TestBase import TestBase
 
-from mbff.datasets.DatasetMatrix import DatasetMatrix
-from mbff.datasets.ExperimentalDatasetDefinition import ExperimentalDatasetDefinition
-from mbff.datasets.BinaryExperimentalDataset import BinaryExperimentalDataset
-from mbff.datasets.sources.BinarySyntheticDatasetSource import BinarySyntheticDatasetSource
+from mbff.dataset.DatasetMatrix import DatasetMatrix
+from mbff.dataset.ExperimentalDatasetDefinition import ExperimentalDatasetDefinition
+from mbff.dataset.BinaryExperimentalDataset import BinaryExperimentalDataset
+from mbff.dataset.sources.BinarySyntheticDatasetSource import BinarySyntheticDatasetSource
 
 class TestBinaryExperimentalDataset(TestBase):
 

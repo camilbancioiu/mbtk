@@ -29,9 +29,6 @@
           <a href="../../genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
           <a href="ExperimentalDataset.html" title="Class ExperimentalDataset"
              accesskey="N">next</a> |</li>
         <li class="right" >
@@ -48,103 +45,8 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="module-mbff.datasets.ExperimentalDatasetDefinition">
-<span id="class-experimentaldatasetdefinition"></span><h1>Class <code class="docutils literal notranslate"><span class="pre">ExperimentalDatasetDefinition</span></code><a class="headerlink" href="#module-mbff.datasets.ExperimentalDatasetDefinition" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
-<dt id="mbff.datasets.ExperimentalDatasetDefinition.ExperimentalDatasetDefinition">
-<em class="property">class </em><code class="descclassname">mbff.datasets.ExperimentalDatasetDefinition.</code><code class="descname">ExperimentalDatasetDefinition</code><a class="reference internal" href="../../_modules/mbff/datasets/ExperimentalDatasetDefinition.html#ExperimentalDatasetDefinition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mbff.datasets.ExperimentalDatasetDefinition.ExperimentalDatasetDefinition" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
-<p>This class represents the definition of an <code class="docutils literal notranslate"><span class="pre">ExperimentalDataset</span></code>, which
-contains the information needed to build an experimental dataset (exds)
-from external source data, split it into training and testing samplesets,
-save it to a specified folder and analyze it later. This would result in a
-proper <code class="docutils literal notranslate"><span class="pre">ExperimentalDataset</span></code> instance.</p>
-<p>Also provided are methods to “lock” and “unlock” the folder of an
-experimental dataset. Locking will prevent accidental overwriting or
-deleting of the folder of an exds.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
-<li><strong>name</strong> – The unique machine-name identifier of the exds.</li>
-<li><strong>source</strong> – A class inheriting <code class="docutils literal notranslate"><span class="pre">DatasetSource</span></code>, to be instantiated,
-configured and used to generate a <code class="docutils literal notranslate"><span class="pre">DatasetMatrix</span></code> from an external
-source of data.</li>
-<li><strong>source_configuration</strong> – A dictionary object which configures the
-DatasetSource class provided as the <code class="docutils literal notranslate"><span class="pre">source</span></code> property.</li>
-<li><strong>exds_folder</strong> – The folder where the exds should create its own subfolder
-to save itself to, or where to load itself from. Can be thought of as
-the “experimental dataset repository”.</li>
-<li><strong>training_subset_size</strong> – A real value representing the proportion of dataset
-rows allocated to training a model. By specifying a value less than 1.0,
-the dataset will be randomly split into two non-overlapping subsets of rows,
-one for training, the other for testing the model.</li>
-<li><strong>trim_prob__feature</strong> – A tuple of two real values between 0.0 and 1.0,
-representing the minimum and maximum thresholds of allowed probability
-of a value within a feature of the dataset. Namely, if a value appears
-too few times in a feature (or too many times), then the feature is deemed
-uninformative and it is removed from the dataset.</li>
-<li><strong>trim_prob__objective</strong> – A tuple of two real values between 0.0 and 1.0,
-representing the minimum and maximum thresholds of allowed probability
-of a value within an objective variable of the dataset. Namely, if too
-few or too many samples have a single value for an objective variable,
-then the objective variable is deemed uninformative and it is removed
-from the dataset.</li>
-<li><strong>random_seed</strong> – An integer chosen arbitrarily, which controls the random
-selection of training/testing rows. Should be set once per exds definition
-and never changed (unless you know what you are doing).</li>
-<li><strong>auto_lock_after_build</strong> – Determines whether the folder of the exds is
-automatically locked after building. Locking the folder of an exds will
-prevent accidental rebuilding or deleting.</li>
-<li><strong>tags</strong> – A list of arbitrary strings, used to categorize this exds.</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-<dl class="method">
-<dt id="mbff.datasets.ExperimentalDatasetDefinition.ExperimentalDatasetDefinition.setup">
-<code class="descname">setup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mbff/datasets/ExperimentalDatasetDefinition.html#ExperimentalDatasetDefinition.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mbff.datasets.ExperimentalDatasetDefinition.ExperimentalDatasetDefinition.setup" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="mbff.datasets.ExperimentalDatasetDefinition.ExperimentalDatasetDefinition.validate">
-<code class="descname">validate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mbff/datasets/ExperimentalDatasetDefinition.html#ExperimentalDatasetDefinition.validate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mbff.datasets.ExperimentalDatasetDefinition.ExperimentalDatasetDefinition.validate" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="mbff.datasets.ExperimentalDatasetDefinition.ExperimentalDatasetDefinition.get_lock_filename">
-<code class="descname">get_lock_filename</code><span class="sig-paren">(</span><em>lock_type='exds'</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mbff/datasets/ExperimentalDatasetDefinition.html#ExperimentalDatasetDefinition.get_lock_filename"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mbff.datasets.ExperimentalDatasetDefinition.ExperimentalDatasetDefinition.get_lock_filename" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="mbff.datasets.ExperimentalDatasetDefinition.ExperimentalDatasetDefinition.folder_is_locked">
-<code class="descname">folder_is_locked</code><span class="sig-paren">(</span><em>lock_type='exds'</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mbff/datasets/ExperimentalDatasetDefinition.html#ExperimentalDatasetDefinition.folder_is_locked"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mbff.datasets.ExperimentalDatasetDefinition.ExperimentalDatasetDefinition.folder_is_locked" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="mbff.datasets.ExperimentalDatasetDefinition.ExperimentalDatasetDefinition.folder_exists">
-<code class="descname">folder_exists</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mbff/datasets/ExperimentalDatasetDefinition.html#ExperimentalDatasetDefinition.folder_exists"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mbff.datasets.ExperimentalDatasetDefinition.ExperimentalDatasetDefinition.folder_exists" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="mbff.datasets.ExperimentalDatasetDefinition.ExperimentalDatasetDefinition.lock_folder">
-<code class="descname">lock_folder</code><span class="sig-paren">(</span><em>lock_type='exds'</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mbff/datasets/ExperimentalDatasetDefinition.html#ExperimentalDatasetDefinition.lock_folder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mbff.datasets.ExperimentalDatasetDefinition.ExperimentalDatasetDefinition.lock_folder" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="mbff.datasets.ExperimentalDatasetDefinition.ExperimentalDatasetDefinition.delete_folder">
-<code class="descname">delete_folder</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mbff/datasets/ExperimentalDatasetDefinition.html#ExperimentalDatasetDefinition.delete_folder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mbff.datasets.ExperimentalDatasetDefinition.ExperimentalDatasetDefinition.delete_folder" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="mbff.datasets.ExperimentalDatasetDefinition.ExperimentalDatasetDefinition.unlock_folder">
-<code class="descname">unlock_folder</code><span class="sig-paren">(</span><em>lock_type='exds'</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mbff/datasets/ExperimentalDatasetDefinition.html#ExperimentalDatasetDefinition.unlock_folder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mbff.datasets.ExperimentalDatasetDefinition.ExperimentalDatasetDefinition.unlock_folder" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
+  <div class="section" id="class-experimentaldatasetdefinition">
+<h1>Class <code class="docutils literal notranslate"><span class="pre">ExperimentalDatasetDefinition</span></code><a class="headerlink" href="#class-experimentaldatasetdefinition" title="Permalink to this headline">¶</a></h1>
 </div>
 
 
@@ -188,9 +90,6 @@ prevent accidental rebuilding or deleting.</li>
         <li class="right" style="margin-right: 10px">
           <a href="../../genindex.html" title="General Index"
              >index</a></li>
-        <li class="right" >
-          <a href="../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
         <li class="right" >
           <a href="ExperimentalDataset.html" title="Class ExperimentalDataset"
              >next</a> |</li>

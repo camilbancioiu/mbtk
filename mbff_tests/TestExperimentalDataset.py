@@ -2,10 +2,10 @@ import unittest
 
 from mbff_tests.TestBase import TestBase
 
-from mbff.datasets.DatasetMatrix import DatasetMatrix
-from mbff.datasets.ExperimentalDatasetDefinition import ExperimentalDatasetDefinition
-from mbff.datasets.ExperimentalDataset import ExperimentalDataset
-from mbff.datasets.sources.RCV1v2DatasetSource import RCV1v2DatasetSource
+from mbff.dataset.DatasetMatrix import DatasetMatrix
+from mbff.dataset.ExperimentalDatasetDefinition import ExperimentalDatasetDefinition
+from mbff.dataset.ExperimentalDataset import ExperimentalDataset
+from mbff.dataset.sources.RCV1v2DatasetSource import RCV1v2DatasetSource
 
 class TestExperimentalDataset(TestBase):
 

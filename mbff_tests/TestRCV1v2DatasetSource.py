@@ -1,11 +1,11 @@
-import unittest
-import scipy
 import numpy
+import scipy
+import unittest
 
 from mbff_tests.TestBase import TestBase
 
-from mbff.datasets.sources.RCV1v2DatasetSource import RCV1v2DatasetSource
-from mbff.datasets.DatasetMatrix import DatasetMatrix
+from mbff.dataset.sources.RCV1v2DatasetSource import RCV1v2DatasetSource
+from mbff.dataset.DatasetMatrix import DatasetMatrix
 
 
 class TestRCV1v2DatasetSource(TestBase):

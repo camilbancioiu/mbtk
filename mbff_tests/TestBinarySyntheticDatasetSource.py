@@ -3,7 +3,7 @@ import numpy
 
 from mbff_tests.TestBase import TestBase
 
-from mbff.datasets.sources.BinarySyntheticDatasetSource import BinarySyntheticDatasetSource
+from mbff.dataset.sources.BinarySyntheticDatasetSource import BinarySyntheticDatasetSource
 
 class TestBinarySyntheticDatasetSource(TestBase):
 

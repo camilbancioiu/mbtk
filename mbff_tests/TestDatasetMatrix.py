@@ -1,14 +1,13 @@
-import unittest
 import numpy
+import os
 import scipy
 import shutil
-
-import os
+import unittest
 
 from mbff_tests.TestBase import TestBase
 
-from mbff.datasets.DatasetMatrix import DatasetMatrix
-from mbff.datasets.Exceptions import DatasetMatrixNotFinalizedError, DatasetMatrixFinalizedError
+from mbff.dataset.DatasetMatrix import DatasetMatrix
+from mbff.dataset.Exceptions import DatasetMatrixNotFinalizedError, DatasetMatrixFinalizedError
 
 
 class TestDatasetMatrix(TestBase):

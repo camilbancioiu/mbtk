@@ -13,7 +13,8 @@ Markov Blanket Feature Filters: Framework documentation
   :maxdepth: 5
   :caption: Contents:
 
-  infrastructure/index.rst
+  dataset/index.rst
+  experiment/index.rst
   algorithms/index.rst
   utilities/index.rst
 
