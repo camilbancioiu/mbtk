@@ -1,17 +1,17 @@
 import unittest
 import numpy
 
-import mbff_tests.test_utilities as util
+from mbff_tests.TestBase import TestBase
 
 from mbff.datasets.DatasetMatrix import DatasetMatrix
 from mbff.datasets.ExperimentalDatasetDefinition import ExperimentalDatasetDefinition
 from mbff.datasets.BinaryExperimentalDataset import BinaryExperimentalDataset
 from mbff.datasets.sources.BinarySyntheticDatasetSource import BinarySyntheticDatasetSource
 
-class TestBinaryExperimentalDataset(unittest.TestCase):
+class TestBinaryExperimentalDataset(TestBase):
 
     def test_feature_removal__no_thresholds(self):
-        folder = str(util.ensure_empty_tmp_subfolder('test_binary_exds_repository__test_feature_removal__no_thresholds'))
+        folder = str(self.ensure_empty_tmp_subfolder('test_binary_exds_repository__test_feature_removal__no_thresholds'))
         definition = self.default_exds_definition(folder)
 
         definition.options['remove_features_by_p_thresholds'] = True
@@ -31,7 +31,7 @@ class TestBinaryExperimentalDataset(unittest.TestCase):
 
 
     def test_feature_removal__thresholds_on_full(self):
-        folder = str(util.ensure_empty_tmp_subfolder('test_binary_exds_repository__test_feature_removal__full'))
+        folder = str(self.ensure_empty_tmp_subfolder('test_binary_exds_repository__test_feature_removal__full'))
         definition = self.default_exds_definition(folder)
 
         # First, build the exds WITHOUT removing features. We will inspect what features
@@ -61,7 +61,7 @@ class TestBinaryExperimentalDataset(unittest.TestCase):
         self.assertThresholdedObjectivesToRemove(exds, {}, [])
 
         # Now we rebuild the exds, but with feature removal enabled.
-        folder = str(util.ensure_empty_tmp_subfolder('test_binary_exds_repository__test_feature_removal__full'))
+        folder = str(self.ensure_empty_tmp_subfolder('test_binary_exds_repository__test_feature_removal__full'))
         definition = self.default_exds_definition(folder)
         definition.options['probability_thresholds__features'] = {
                 'full': (0.1, 0.8)
@@ -76,7 +76,7 @@ class TestBinaryExperimentalDataset(unittest.TestCase):
 
 
     def test_feature_removal__thresholds_on_train(self):
-        folder = str(util.ensure_empty_tmp_subfolder('test_binary_exds_repository__test_feature_removal__train'))
+        folder = str(self.ensure_empty_tmp_subfolder('test_binary_exds_repository__test_feature_removal__train'))
         definition = self.default_exds_definition(folder)
 
         # First, build the exds WITHOUT removing features. We will inspect what features
@@ -107,7 +107,7 @@ class TestBinaryExperimentalDataset(unittest.TestCase):
         self.assertThresholdedObjectivesToRemove(exds, {}, [])
 
         # Now we rebuild the exds, but with feature removal enabled.
-        folder = str(util.ensure_empty_tmp_subfolder('test_binary_exds_repository__test_feature_removal__train'))
+        folder = str(self.ensure_empty_tmp_subfolder('test_binary_exds_repository__test_feature_removal__train'))
         definition = self.default_exds_definition(folder)
         definition.options['probability_thresholds__features'] = {
                 'train': (0.1, 0.8)
@@ -122,7 +122,7 @@ class TestBinaryExperimentalDataset(unittest.TestCase):
 
 
     def test_feature_removal__thresholds_on_test(self):
-        folder = str(util.ensure_empty_tmp_subfolder('test_binary_exds_repository__test_feature_removal__test'))
+        folder = str(self.ensure_empty_tmp_subfolder('test_binary_exds_repository__test_feature_removal__test'))
         definition = self.default_exds_definition(folder)
 
         # First, build the exds WITHOUT removing features. We will inspect what features
@@ -151,7 +151,7 @@ class TestBinaryExperimentalDataset(unittest.TestCase):
         self.assertThresholdedObjectivesToRemove(exds, {}, [])
 
         # Now we rebuild the exds, but with feature removal enabled.
-        folder = str(util.ensure_empty_tmp_subfolder('test_binary_exds_repository__test_feature_removal__test'))
+        folder = str(self.ensure_empty_tmp_subfolder('test_binary_exds_repository__test_feature_removal__test'))
         definition = self.default_exds_definition(folder)
         definition.options['probability_thresholds__features'] = {
                 'test': (0.1, 0.9)
@@ -167,7 +167,7 @@ class TestBinaryExperimentalDataset(unittest.TestCase):
 
 
     def test_objective_removal__thresholds_on_full(self):
-        folder = str(util.ensure_empty_tmp_subfolder('test_binary_exds_repository__test_objective_removal__full'))
+        folder = str(self.ensure_empty_tmp_subfolder('test_binary_exds_repository__test_objective_removal__full'))
         definition = self.default_exds_definition(folder)
 
         # First, build the exds WITHOUT removing objectives. We will inspect what objectives
@@ -195,7 +195,7 @@ class TestBinaryExperimentalDataset(unittest.TestCase):
         self.assertThresholdedObjectivesToRemove(exds, expected_objectives_to_remove, ['full'])
 
         # Now we rebuild the exds, but with feature removal enabled.
-        folder = str(util.ensure_empty_tmp_subfolder('test_binary_exds_repository__test_objective_removal__full'))
+        folder = str(self.ensure_empty_tmp_subfolder('test_binary_exds_repository__test_objective_removal__full'))
         definition = self.default_exds_definition(folder)
         definition.options['probability_thresholds__features'] = { }
         definition.options['probability_thresholds__objectives'] = {
@@ -210,7 +210,7 @@ class TestBinaryExperimentalDataset(unittest.TestCase):
 
 
     def test_objective_removal__thresholds_on_train(self):
-        folder = str(util.ensure_empty_tmp_subfolder('test_binary_exds_repository__test_objective_removal__train'))
+        folder = str(self.ensure_empty_tmp_subfolder('test_binary_exds_repository__test_objective_removal__train'))
         definition = self.default_exds_definition(folder)
 
         # First, build the exds WITHOUT removing objectives. We will inspect what objectives
@@ -239,7 +239,7 @@ class TestBinaryExperimentalDataset(unittest.TestCase):
         self.assertThresholdedObjectivesToRemove(exds, expected_objectives_to_remove, ['train'])
 
         # Now we rebuild the exds, but with feature removal enabled.
-        folder = str(util.ensure_empty_tmp_subfolder('test_binary_exds_repository__test_objective_removal__train'))
+        folder = str(self.ensure_empty_tmp_subfolder('test_binary_exds_repository__test_objective_removal__train'))
         definition = self.default_exds_definition(folder)
         definition.options['probability_thresholds__features'] = { }
         definition.options['probability_thresholds__objectives'] = {
@@ -254,7 +254,7 @@ class TestBinaryExperimentalDataset(unittest.TestCase):
 
 
     def test_objective_removal__thresholds_on_test(self):
-        folder = str(util.ensure_empty_tmp_subfolder('test_binary_exds_repository__test_objective_removal__test'))
+        folder = str(self.ensure_empty_tmp_subfolder('test_binary_exds_repository__test_objective_removal__test'))
         definition = self.default_exds_definition(folder)
 
         # First, build the exds WITHOUT removing objectives. We will inspect what objectives
@@ -281,7 +281,7 @@ class TestBinaryExperimentalDataset(unittest.TestCase):
         self.assertThresholdedObjectivesToRemove(exds, expected_objectives_to_remove, ['test'])
 
         # Now we rebuild the exds, but with feature removal enabled.
-        folder = str(util.ensure_empty_tmp_subfolder('test_binary_exds_repository__test_objective_removal__test'))
+        folder = str(self.ensure_empty_tmp_subfolder('test_binary_exds_repository__test_objective_removal__test'))
         definition = self.default_exds_definition(folder)
         definition.options['probability_thresholds__features'] = { }
         definition.options['probability_thresholds__objectives'] = {

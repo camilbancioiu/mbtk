@@ -1,10 +1,10 @@
 import unittest
 
-from mbff_tests.DatasetMatrix import TestDatasetMatrix
-from mbff_tests.RCV1v2DatasetSource import TestRCV1v2DatasetSource
-from mbff_tests.BinarySyntheticDatasetSource import TestBinarySyntheticDatasetSource
-from mbff_tests.BinaryExperimentalDataset import TestBinaryExperimentalDataset
-from mbff_tests.ExperimentalDataset import TestExperimentalDataset
+from mbff_tests.TestDatasetMatrix import TestDatasetMatrix
+from mbff_tests.TestRCV1v2DatasetSource import TestRCV1v2DatasetSource
+from mbff_tests.TestBinarySyntheticDatasetSource import TestBinarySyntheticDatasetSource
+from mbff_tests.TestBinaryExperimentalDataset import TestBinaryExperimentalDataset
+from mbff_tests.TestExperimentalDataset import TestExperimentalDataset
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

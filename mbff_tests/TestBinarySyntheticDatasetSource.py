@@ -1,9 +1,11 @@
 import unittest
 import numpy
 
+from mbff_tests.TestBase import TestBase
+
 from mbff.datasets.sources.BinarySyntheticDatasetSource import BinarySyntheticDatasetSource
 
-class TestBinarySyntheticDatasetSource(unittest.TestCase):
+class TestBinarySyntheticDatasetSource(TestBase):
 
     def test_generating_the_datasetmatrix(self):
         configuration = self.default_configuration()

@@ -1,16 +1,16 @@
 import unittest
 
-import mbff_tests.test_utilities as util
+from mbff_tests.TestBase import TestBase
 
 from mbff.datasets.DatasetMatrix import DatasetMatrix
 from mbff.datasets.ExperimentalDatasetDefinition import ExperimentalDatasetDefinition
 from mbff.datasets.ExperimentalDataset import ExperimentalDataset
 from mbff.datasets.sources.RCV1v2DatasetSource import RCV1v2DatasetSource
 
-class TestExperimentalDataset(unittest.TestCase):
+class TestExperimentalDataset(TestBase):
 
     def test_exds_build(self):
-        folder = str(util.ensure_empty_tmp_subfolder('test_exds_repository__test_build'))
+        folder = str(self.ensure_empty_tmp_subfolder('test_exds_repository__test_build'))
         definition = self.default_exds_definition(folder)
         exds = ExperimentalDataset(definition)
 
@@ -60,7 +60,7 @@ class TestExperimentalDataset(unittest.TestCase):
 
 
     def test_exds_saving_and_loading(self):
-        folder = str(util.ensure_empty_tmp_subfolder('test_exds_repository__test_saving_and_loading'))
+        folder = str(self.ensure_empty_tmp_subfolder('test_exds_repository__test_saving_and_loading'))
         definition = self.default_exds_definition(folder)
         exds = ExperimentalDataset(definition)
 

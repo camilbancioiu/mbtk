@@ -2,11 +2,13 @@ import unittest
 import scipy
 import numpy
 
+from mbff_tests.TestBase import TestBase
+
 from mbff.datasets.sources.RCV1v2DatasetSource import RCV1v2DatasetSource
 from mbff.datasets.DatasetMatrix import DatasetMatrix
 
 
-class TestRCV1v2DatasetSource(unittest.TestCase):
+class TestRCV1v2DatasetSource(TestBase):
 
     def test_read_all_documentIDs(self):
         source = RCV1v2DatasetSource(self.default_configuration())

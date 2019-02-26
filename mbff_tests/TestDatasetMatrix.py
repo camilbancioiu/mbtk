@@ -5,19 +5,20 @@ import shutil
 
 import os
 
-import mbff_tests.test_utilities as util
+from mbff_tests.TestBase import TestBase
+
 from mbff.datasets.DatasetMatrix import DatasetMatrix
 from mbff.datasets.Exceptions import DatasetMatrixNotFinalizedError, DatasetMatrixFinalizedError
 
 
-class TestDatasetMatrix(unittest.TestCase):
+class TestDatasetMatrix(TestBase):
 
     def test_saving_and_loading(self):
         # Set up a simple DatasetMatrix
         dm = DatasetMatrix('testmatrix')
         self.configure_default_datasetmatrix(dm)
 
-        folder = str(util.ensure_empty_tmp_subfolder('test_datasetmatrix__save_load'))
+        folder = str(self.ensure_empty_tmp_subfolder('test_datasetmatrix__save_load'))
         self.check_saving_and_loading(dm, folder)
 
 
@@ -60,7 +61,7 @@ class TestDatasetMatrix(unittest.TestCase):
         self.assertEqual(self.default_column_labels_X(), dm.column_labels_X)
         self.assertEqual(self.default_column_labels_Y(), dm.column_labels_Y)
 
-        folder = str(util.ensure_empty_tmp_subfolder('test_datasetmatrix__removing_rows'))
+        folder = str(self.ensure_empty_tmp_subfolder('test_datasetmatrix__removing_rows'))
         self.check_saving_and_loading(dm, folder)
 
         dm.unfinalize()
@@ -77,7 +78,7 @@ class TestDatasetMatrix(unittest.TestCase):
         self.assertEqual(self.default_column_labels_X(), dm.column_labels_X)
         self.assertEqual(self.default_column_labels_Y(), dm.column_labels_Y)
 
-        folder = str(util.ensure_empty_tmp_subfolder('test_datasetmatrix__removing_rows'))
+        folder = str(self.ensure_empty_tmp_subfolder('test_datasetmatrix__removing_rows'))
         self.check_saving_and_loading(dm, folder)
 
 
@@ -120,7 +121,7 @@ class TestDatasetMatrix(unittest.TestCase):
         self.assertEqual(self.default_column_labels_X(), dm.column_labels_X)
         self.assertEqual(self.default_column_labels_Y(), dm.column_labels_Y)
 
-        folder = str(util.ensure_empty_tmp_subfolder('test_datasetmatrix__keeping_rows'))
+        folder = str(self.ensure_empty_tmp_subfolder('test_datasetmatrix__keeping_rows'))
         self.check_saving_and_loading(dm, folder)
 
 
@@ -163,7 +164,7 @@ class TestDatasetMatrix(unittest.TestCase):
         self.assertEqual(self.default_column_labels_X(), dm.column_labels_X)
         self.assertEqual(self.default_column_labels_Y(), dm.column_labels_Y)
 
-        folder = str(util.ensure_empty_tmp_subfolder('test_datasetmatrix__selecting_rows'))
+        folder = str(self.ensure_empty_tmp_subfolder('test_datasetmatrix__selecting_rows'))
         self.check_saving_and_loading(dm, folder)
 
 
@@ -204,7 +205,7 @@ class TestDatasetMatrix(unittest.TestCase):
         self.assertEqual(['colx0', 'colx1'], dm.column_labels_X)
         self.assertEqual(self.default_column_labels_Y(), dm.column_labels_Y)
 
-        folder = str(util.ensure_empty_tmp_subfolder('test_datasetmatrix__removing_columns_X'))
+        folder = str(self.ensure_empty_tmp_subfolder('test_datasetmatrix__removing_columns_X'))
         self.check_saving_and_loading(dm, folder)
 
 
@@ -239,7 +240,7 @@ class TestDatasetMatrix(unittest.TestCase):
         self.assertEqual(self.default_column_labels_X(), dm.column_labels_X)
         self.assertEqual([], dm.column_labels_Y)
 
-        folder = str(util.ensure_empty_tmp_subfolder('test_datasetmatrix__removing_columns_Y'))
+        folder = str(self.ensure_empty_tmp_subfolder('test_datasetmatrix__removing_columns_Y'))
         self.check_saving_and_loading(dm, folder)
 
 
