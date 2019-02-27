@@ -131,7 +131,7 @@ class TestDatasetMatrix(TestBase):
 
         # Empty lists are not allowed.
         with self.assertRaises(ValueError):
-            dm.keep_rows([])
+            dm.select_rows([])
 
         # Create new matrix by selecting rows 1 and 3.
         dm = dm.select_rows([1, 3], "test_matrix_selected_rows")
@@ -164,6 +164,47 @@ class TestDatasetMatrix(TestBase):
         self.assertEqual(self.default_column_labels_Y(), dm.column_labels_Y)
 
         folder = str(self.ensure_empty_tmp_subfolder('test_datasetmatrix__selecting_rows'))
+        self.check_saving_and_loading(dm, folder)
+
+
+    def test_selecting_columns_X(self):
+        # Set up a simple DatasetMatrix
+        dm = DatasetMatrix('testmatrix')
+        self.configure_default_datasetmatrix(dm)
+
+        # Empty lists are not allowed.
+        with self.assertRaises(ValueError):
+            dm.select_columns_X([])
+
+        # Create new datasetmatrix where X has only columns 1 and 2.
+        dm = dm.select_columns_X([1, 2], 'test_matrix_selected_colsX')
+        expected_X = scipy.sparse.csr_matrix(numpy.matrix([
+                [ 2,  3],
+                [ 6,  7],
+                [10, 11],
+                [14, 15]]))
+        expected_Y = self.default_matrix_Y()
+        self.assertTrue(DatasetMatrix.sparse_equal(expected_X, dm.X))
+        self.assertTrue(DatasetMatrix.sparse_equal(expected_Y, dm.Y))
+        self.assertListEqual(self.default_row_labels(), dm.row_labels)
+        self.assertListEqual(['colx1', 'colx2'], dm.column_labels_X)
+        self.assertListEqual(self.default_column_labels_Y(), dm.column_labels_Y)
+
+        # Select X column 0 from the resulting datasetmatrix.
+        dm = dm.select_columns_X([0], 'test_matrix_selected_colsX_2')
+        expected_X = scipy.sparse.csr_matrix(numpy.matrix([
+                [ 2],
+                [ 6],
+                [10],
+                [14]]))
+        expected_Y = self.default_matrix_Y()
+        self.assertTrue(DatasetMatrix.sparse_equal(expected_X, dm.X))
+        self.assertTrue(DatasetMatrix.sparse_equal(expected_Y, dm.Y))
+        self.assertListEqual(self.default_row_labels(), dm.row_labels)
+        self.assertListEqual(['colx1'], dm.column_labels_X)
+        self.assertListEqual(self.default_column_labels_Y(), dm.column_labels_Y)
+
+        folder = str(self.ensure_empty_tmp_subfolder('test_datasetmatrix__selecting_colsX'))
         self.check_saving_and_loading(dm, folder)
 
 

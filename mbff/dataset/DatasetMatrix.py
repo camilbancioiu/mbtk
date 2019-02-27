@@ -215,11 +215,48 @@ class DatasetMatrix:
 
         new_dataset_matrix = DatasetMatrix(new_label)
 
-        all_rows = range(self.X.get_shape()[0])
         new_dataset_matrix.X = self.X[rows_to_keep,]
         new_dataset_matrix.Y = self.Y[rows_to_keep,]
         new_dataset_matrix.row_labels = [self.row_labels[i] for i in rows_to_keep]
         new_dataset_matrix.column_labels_X = self.column_labels_X.copy()
+        new_dataset_matrix.column_labels_Y = self.column_labels_Y.copy()
+
+        return new_dataset_matrix
+
+
+    def select_columns_X(self, columns_to_keep, new_label=""):
+        """
+        Create a new :py:class:`DatasetMatrix` instance, which only contains the requested
+        columns in ``X``. Affects ``column_labels_X`` as well. The ``Y`` matrix
+        will be copied over to the new instance, as will ``column_labels_Y``. Does not
+        raise ``DatasetMatrixFinalizedError``, because it doesn't try to modify
+        the original matrices.
+
+        :param list(int) columns_to_keep: A list of 0-based integer indices of
+            the columns of ``X`` which must be kept in the new instance.
+        :param str new_label: Optional label for the new instance. If ``""``,
+            then ``self.label`` is used.
+        :return: A new :py:class:`DatasetMatrix` instance, with ``X``
+            containing only the requested columns, and a copy of the original
+            ``Y``.
+        :rtype: :py:class:`DatasetMatrix`
+        """
+
+        if not isinstance(columns_to_keep, list):
+            raise TypeError("Argument 'columns_to_keep' must be a non-empty list")
+        if len(columns_to_keep) == 0:
+            raise ValueError("Argument 'columns_to_keep' must be a non-empty list")
+
+        columns_to_keep = sorted(columns_to_keep)
+        if new_label == "":
+            new_label = self.label
+
+        new_dataset_matrix = DatasetMatrix(new_label)
+
+        new_dataset_matrix.X = self.X[:,columns_to_keep]
+        new_dataset_matrix.Y = self.Y.copy()
+        new_dataset_matrix.row_labels = self.row_labels.copy()
+        new_dataset_matrix.column_labels_X = [self.column_labels_X[i] for i in columns_to_keep]
         new_dataset_matrix.column_labels_Y = self.column_labels_Y.copy()
 
         return new_dataset_matrix
