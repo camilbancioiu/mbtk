@@ -1,4 +1,5 @@
 import math
+import numpy
 
 def MI__binary(X, Y):
     pX = calculate_pmf__binary(X)
@@ -19,8 +20,8 @@ def MI__binary(X, Y):
 def calculate_pmf__binary(X):
     size = len(X)
     p = {}
-    p[0] = numpy.sum(numpy.logical_not(X)) / size
     p[1] = numpy.sum(X) / size
+    p[0] = 1 - p[1]
     return p
 
 
