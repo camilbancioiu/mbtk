@@ -3,7 +3,7 @@ import numpy
 
 from mbff_tests.TestBase import TestBase
 
-from mbff.algorithms.basic.igt import algorithm_IGt__binary
+from mbff.algorithms.basic.IGt import algorithm_IGt__binary
 
 from mbff.dataset.DatasetMatrix import DatasetMatrix
 
