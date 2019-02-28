@@ -7,6 +7,7 @@ from mbff_tests.TestBinaryExperimentalDataset import TestBinaryExperimentalDatas
 from mbff_tests.TestExperimentalDataset import TestExperimentalDataset
 from mbff_tests.TestInfoTheory import TestInfoTheory
 from mbff_tests.TestAlgorithmIGt import TestAlgorithmIGt
+from mbff_tests.TestAlgorithmRun import TestAlgorithmRun
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

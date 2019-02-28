@@ -1,3 +1,6 @@
+import time
+import numpy
+
 class AlgorithmRun:
 
     def __init__(self, label, exds, parameters):
@@ -13,6 +16,15 @@ class AlgorithmRun:
         self.classifier_class = self.parameters['classifier_class']
         self.classifier_evaluation = {}
 
+        self.datasetmatrix_train = None
+        self.datasetmatrix_test = None
+        self.samples_train = None
+        self.samples_test = None
+        self.objective_index = -1
+        self.objective_train = None
+        self.objective_test = None
+        self.predictions = {}
+
 
     def run(self):
         self.start_time = time.time()
@@ -24,25 +36,25 @@ class AlgorithmRun:
 
 
     def evaluate_classifier(self):
-        datasetmatrix_train = self.exds.matrix_train.select_columns_X(self.selected_features)
-        datasetmatrix_test = self.exds.matrix_test.select_columns_X(self.selected_features)
-        objective_index = self.parameters['objective_index']
+        self.datasetmatrix_train = self.exds.matrix_train.select_columns_X(self.selected_features)
+        self.datasetmatrix_test = self.exds.matrix_test.select_columns_X(self.selected_features)
+        self.objective_index = self.parameters['objective_index']
 
-        samples_train = datasetmatrix_train.X
-        samples_test = datasetmatrix_test.X
-        objective_train = datasetmatrix_train.get_column_Y(objective_index)
-        objective_test = datasetmatrix_test.get_column_Y(objective_index)
+        self.samples_train = self.datasetmatrix_train.X
+        self.samples_test = self.datasetmatrix_test.X
+        self.objective_train = self.datasetmatrix_train.get_column_Y(self.objective_index)
+        self.objective_test = self.datasetmatrix_test.get_column_Y(self.objective_index)
 
         self.classifier = self.classifier_class()
-        self.classifier.fit(samples_train, objective_train)
-        predictions = self.classifier.predict(samples_test)
-        return self.evaluate_classifier_predictions(objective_test, predictions)
+        self.classifier.fit(self.samples_train, self.objective_train)
+        self.predictions = self.classifier.predict(self.samples_test)
+        return self.evaluate_classifier_predictions(self.objective_test, self.predictions)
 
 
     def evaluate_classifier_predictions(self, expected, predictions):
         n_expected = numpy.logical_not(expected)
         n_predictions = numpy.logical_not(predictions)
-        evaluation = collections.OrderedDict()
+        evaluation = {}
         evaluation['TP'] = numpy.asscalar(numpy.sum(numpy.logical_and(expected, predictions)))
         evaluation['TN'] = numpy.asscalar(numpy.sum(numpy.logical_and(n_expected, n_predictions)))
         evaluation['FP'] = numpy.asscalar(numpy.sum(numpy.logical_and(n_expected, predictions)))
