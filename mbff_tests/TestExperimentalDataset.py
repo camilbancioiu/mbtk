@@ -12,7 +12,7 @@ class TestExperimentalDataset(TestBase):
     def test_exds_build(self):
         folder = str(self.ensure_empty_tmp_subfolder('test_exds_repository__test_build'))
         definition = self.default_exds_definition(folder)
-        exds = ExperimentalDataset(definition)
+        exds = definition.create_exds()
 
         exds.build(finalize_and_save=False)
 
@@ -62,7 +62,7 @@ class TestExperimentalDataset(TestBase):
     def test_exds_saving_and_loading(self):
         folder = str(self.ensure_empty_tmp_subfolder('test_exds_repository__test_saving_and_loading'))
         definition = self.default_exds_definition(folder)
-        exds = ExperimentalDataset(definition)
+        exds = definition.create_exds()
 
         # Due to the definition provided by self.default_exds_definition(), the
         # exds will be saved after building.
@@ -92,6 +92,7 @@ class TestExperimentalDataset(TestBase):
     def default_exds_definition(self, exds_folder):
         definition = ExperimentalDatasetDefinition()
         definition.name = "test_exds_reuters"
+        definition.exds_class = ExperimentalDataset
         definition.source = RCV1v2DatasetSource
         definition.source_configuration = {
                 'sourcefolder': 'testfiles/rcv1v2_test_dataset',
@@ -103,8 +104,6 @@ class TestExperimentalDataset(TestBase):
         definition.random_seed = 42
         definition.auto_lock_after_build = True
         definition.tags = []
-
-        definition.setup()
 
         return definition
 

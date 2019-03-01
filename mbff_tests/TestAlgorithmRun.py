@@ -17,21 +17,21 @@ class TestAlgorithmRun(TestBase):
 
         # Prepare an ExperimentalDataset to perform the test on.
         definition = self.default_exds_definition(folder)
-        exds = ExperimentalDataset(definition)
+        exds = definition.create_exds()
         exds.build()
 
         # Because definition.random_seed = 42, the 'randomly' selected training
         # rows in the ExperimentalDataset will always be [0, 1, 5].
 
         # Prepare an AlgorithmRun instance.
-        label = 'test_algrun'
         parameters = {
+                'label': 'test_algrun',
                 'classifier_class': MockBernouliClassifier,
                 'algorithm': algorithm_IGt__binary,
                 'Q': 4,
                 'objective_index': 0
                 }
-        algrun = AlgorithmRun(label, exds, parameters)
+        algrun = AlgorithmRun(exds, parameters)
 
         # We run the algorithm at the specified parameters, on the specified
         # ExDs.
@@ -53,6 +53,7 @@ class TestAlgorithmRun(TestBase):
     def default_exds_definition(self, exds_folder):
         definition = ExperimentalDatasetDefinition()
         definition.name = "test_exds_algorithmrun"
+        definition.exds_class = ExperimentalDataset
         definition.source = MockDatasetSource
         definition.source_configuration = {}
         definition.exds_folder = exds_folder
@@ -60,7 +61,6 @@ class TestAlgorithmRun(TestBase):
         definition.random_seed = 42
         definition.auto_lock_after_build = True
         definition.tags = []
-        definition.setup()
         return definition
 
 

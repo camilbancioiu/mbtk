@@ -18,7 +18,7 @@ class TestBinaryExperimentalDataset(TestBase):
         definition.options['remove_objectives_by_p_thresholds'] = True
         definition.options['probability_thresholds__features'] = { }
         definition.options['probability_thresholds__objectives'] = { }
-        exds = BinaryExperimentalDataset(definition)
+        exds = definition.create_exds()
 
         # There should be no change made to exds.matrix, exds.matrix_train and
         # exds.matrix_test because we specified no thresholds, in spite of the
@@ -45,7 +45,7 @@ class TestBinaryExperimentalDataset(TestBase):
                 'full': (0.1, 0.8)
                 }
         definition.options['probability_thresholds__objectives'] = { }
-        exds = BinaryExperimentalDataset(definition)
+        exds = definition.create_exds()
         exds.build()
         self.assertExDsDimensions(exds, 25, 75, 8, 4)
 
@@ -69,7 +69,7 @@ class TestBinaryExperimentalDataset(TestBase):
         definition.options['probability_thresholds__objectives'] = { }
         definition.options['remove_features_by_p_thresholds'] = True
         definition.options['remove_objectives_by_p_thresholds'] = True
-        exds = BinaryExperimentalDataset(definition)
+        exds = definition.create_exds()
         exds.build()
         self.assertExDsDimensions(exds, 25, 75, 4, 4)
         self.assertFeaturesNotInExDs(exds, expected_features_to_remove.keys())
@@ -90,7 +90,7 @@ class TestBinaryExperimentalDataset(TestBase):
                 'train': (0.1, 0.8)
                 }
         definition.options['probability_thresholds__objectives'] = { }
-        exds = BinaryExperimentalDataset(definition)
+        exds = definition.create_exds()
         exds.build()
         self.assertExDsDimensions(exds, 25, 75, 8, 4)
 
@@ -115,7 +115,7 @@ class TestBinaryExperimentalDataset(TestBase):
         definition.options['probability_thresholds__objectives'] = { }
         definition.options['remove_features_by_p_thresholds'] = True
         definition.options['remove_objectives_by_p_thresholds'] = True
-        exds = BinaryExperimentalDataset(definition)
+        exds = definition.create_exds()
         exds.build()
         self.assertExDsDimensions(exds, 25, 75, 3, 4)
         self.assertFeaturesNotInExDs(exds, expected_features_to_remove.keys())
@@ -136,7 +136,7 @@ class TestBinaryExperimentalDataset(TestBase):
                 'test': (0.1, 0.9)
                 }
         definition.options['probability_thresholds__objectives'] = { }
-        exds = BinaryExperimentalDataset(definition)
+        exds = definition.create_exds()
         exds.build()
         self.assertExDsDimensions(exds, 25, 75, 8, 4)
 
@@ -159,7 +159,7 @@ class TestBinaryExperimentalDataset(TestBase):
         definition.options['probability_thresholds__objectives'] = { }
         definition.options['remove_features_by_p_thresholds'] = True
         definition.options['remove_objectives_by_p_thresholds'] = True
-        exds = BinaryExperimentalDataset(definition)
+        exds = definition.create_exds()
         exds.build()
         self.assertExDsDimensions(exds, 25, 75, 5, 4)
         self.assertFeaturesNotInExDs(exds, expected_features_to_remove.keys())
@@ -181,7 +181,7 @@ class TestBinaryExperimentalDataset(TestBase):
         definition.options['probability_thresholds__objectives'] = {
                 'full': (0.1, 0.9)
                 }
-        exds = BinaryExperimentalDataset(definition)
+        exds = definition.create_exds()
         exds.build()
         self.assertExDsDimensions(exds, 25, 75, 8, 4)
 
@@ -203,7 +203,7 @@ class TestBinaryExperimentalDataset(TestBase):
                 }
         definition.options['remove_features_by_p_thresholds'] = True
         definition.options['remove_objectives_by_p_thresholds'] = True
-        exds = BinaryExperimentalDataset(definition)
+        exds = definition.create_exds()
         exds.build()
         self.assertExDsDimensions(exds, 25, 75, 8, 2)
         self.assertObjectivesNotInExDs(exds, expected_objectives_to_remove.keys())
@@ -224,7 +224,7 @@ class TestBinaryExperimentalDataset(TestBase):
         definition.options['probability_thresholds__objectives'] = {
                 'train': (0.2, 0.8)
                 }
-        exds = BinaryExperimentalDataset(definition)
+        exds = definition.create_exds()
         exds.build()
         self.assertExDsDimensions(exds, 25, 75, 8, 4)
 
@@ -247,7 +247,7 @@ class TestBinaryExperimentalDataset(TestBase):
                 }
         definition.options['remove_features_by_p_thresholds'] = True
         definition.options['remove_objectives_by_p_thresholds'] = True
-        exds = BinaryExperimentalDataset(definition)
+        exds = definition.create_exds()
         exds.build()
         self.assertExDsDimensions(exds, 25, 75, 8, 1)
         self.assertObjectivesNotInExDs(exds, expected_objectives_to_remove.keys())
@@ -268,7 +268,7 @@ class TestBinaryExperimentalDataset(TestBase):
         definition.options['probability_thresholds__objectives'] = {
                 'test': (0.0, 0.5)
                 }
-        exds = BinaryExperimentalDataset(definition)
+        exds = definition.create_exds()
         exds.build()
         self.assertExDsDimensions(exds, 25, 75, 8, 4)
 
@@ -289,7 +289,7 @@ class TestBinaryExperimentalDataset(TestBase):
                 }
         definition.options['remove_features_by_p_thresholds'] = True
         definition.options['remove_objectives_by_p_thresholds'] = True
-        exds = BinaryExperimentalDataset(definition)
+        exds = definition.create_exds()
         exds.build()
         self.assertExDsDimensions(exds, 25, 75, 8, 3)
         self.assertObjectivesNotInExDs(exds, expected_objectives_to_remove.keys())
@@ -376,6 +376,7 @@ class TestBinaryExperimentalDataset(TestBase):
     def default_exds_definition(self, exds_folder):
         definition = ExperimentalDatasetDefinition()
         definition.name = "test_binary_exds"
+        definition.exds_class = BinaryExperimentalDataset
         definition.source = BinarySyntheticDatasetSource
         definition.source_configuration = self.default_binarysyntheticdatasetsource_configuration()
         definition.exds_folder = exds_folder
@@ -385,8 +386,6 @@ class TestBinaryExperimentalDataset(TestBase):
         definition.options['probability_thresholds__objectives'] = {}
         definition.auto_lock_after_build = True
         definition.tags = []
-
-        definition.setup()
 
         return definition
 

@@ -52,6 +52,7 @@ class ExperimentalDatasetDefinition():
 
     def __init__(self):
         self.name = ""
+        self.exds_class = None
         self.source = None
         self.source_configuration = {}
         self.exds_folder = ""
@@ -63,9 +64,10 @@ class ExperimentalDatasetDefinition():
         self.tags = []
 
 
-    def setup(self):
+    def create_exds(self):
         self.folder = self.exds_folder + '/' + self.name
         self.validate()
+        return self.exds_class(self)
 
 
     def validate(self):
