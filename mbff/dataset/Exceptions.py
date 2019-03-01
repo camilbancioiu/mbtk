@@ -1,4 +1,5 @@
 class DatasetMatrixNotFinalizedError(Exception):
+
     def __init__(self, datasetmatrix, attempt):
         self.datasetmatrix = datasetmatrix
         self.message = "DatasetMatrix not finalized. " + attempt
@@ -7,6 +8,7 @@ class DatasetMatrixNotFinalizedError(Exception):
 
 
 class DatasetMatrixFinalizedError(Exception):
+
     def __init__(self, datasetmatrix, attempt):
         self.datasetmatrix = datasetmatrix
         self.message = "DatasetMatrix already finalized. " + attempt
@@ -15,6 +17,7 @@ class DatasetMatrixFinalizedError(Exception):
 
 
 class ExperimentalDatasetFolderException(Exception):
+
     def __init__(self, definition, folder, message):
         self.exds_definition = definition
         self.folder = folder
