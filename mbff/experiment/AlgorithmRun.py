@@ -7,6 +7,7 @@ class AlgorithmRun:
         self.parameters = parameters
         self.label = self.parameters['label']
         self.algorithm = self.parameters['algorithm']
+        self.algorithm_name = self.algorithm.__name__
         self.exds = exds
 
         self.start_time = 0
