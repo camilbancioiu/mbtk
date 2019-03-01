@@ -3,9 +3,9 @@ import numpy
 
 class AlgorithmRun:
 
-    def __init__(self, label, exds, parameters):
-        self.label = label
+    def __init__(self, exds, parameters):
         self.parameters = parameters
+        self.label = self.parameters['label']
         self.algorithm = self.parameters['algorithm']
         self.exds = exds
 
