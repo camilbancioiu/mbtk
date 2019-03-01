@@ -102,7 +102,6 @@ class ExperimentalDatasetDefinition():
             raise ExperimentalDatasetFolderException(self, self.folder, 'Folder {} is locked, cannot delete it.'.format(self.name))
             return
         shutil.rmtree(self.folder)
-        print('{}: ExDs folder deleted.'.format(self.name))
 
 
     def unlock_folder(self, lock_type='exds'):
