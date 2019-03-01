@@ -6,6 +6,7 @@ class AlgorithmRun:
     def __init__(self, exds, parameters):
         self.parameters = parameters
         self.label = self.parameters['label']
+        self.ID = ''
         self.algorithm = self.parameters['algorithm']
         self.algorithm_name = self.algorithm.__name__
         self.exds = exds
@@ -15,6 +16,7 @@ class AlgorithmRun:
         self.duration = 0.0
 
         self.classifier_class = self.parameters['classifier_class']
+        self.classifier_classname = self.classifier_class.__name__
         self.classifier_evaluation = {}
 
         self.datasetmatrix_train = None
