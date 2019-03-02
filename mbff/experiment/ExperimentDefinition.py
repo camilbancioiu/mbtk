@@ -1,14 +1,32 @@
+import os
+import shutil
+from pathlib import Path
 from mbff.experiment.Exceptions import ExperimentFolderException
 
 class ExperimentDefinition:
 
-    def __init__(self, name, exds_definition, experiments_folder, algorithm_run_parameters, configuration):
-        self.name = name
-        self.exds_definition = exds_definition
-        self.algorithm_run_parameters = algorithm_run_parameters
+    def __init__(self):
+        self.name = ''
+        self.experiment_run_class = None
+        self.experiments_folder = ''
+        self.exds_definition = None
+        self.algorithm_run_configuration = {}
+        self.algorithm_run_parameters = []
+        self.save_algorithm_run_datapoints = False
+        self.algorithm_run_stdout = 'stdout'
+        self.auto_lock_after_finishing = True
+        self.quiet = False
         self.tags = []
-        self.folder = experiments_folder + '/' + self.name
-        self.configuration = configuration
+
+
+    def create_experiment_run(self):
+        self.folder = self.experiments_folder + '/' + self.name
+        self.validate()
+        return self.experiment_run_class(self)
+
+
+    def validate(self):
+        return True
 
 
     def get_lock_filename(self, lock_type='experiment'):
@@ -53,7 +71,7 @@ class ExperimentDefinition:
         shutil.rmtree(self.folder + '/' + subfolder)
 
 
-    def unlock_folder(self, lock_type='exds'):
+    def unlock_folder(self, lock_type='experiment'):
         folder = self.folder
         if not self.folder_is_locked(lock_type):
             pass

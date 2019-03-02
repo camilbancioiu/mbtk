@@ -1,14 +1,15 @@
 import scipy
 import numpy
 
-from mbff_tests.TestBase import TestBase
+from string import Template
 
-from mbff.dataset.sources.DatasetSource import DatasetSource
-from mbff.dataset.DatasetMatrix import DatasetMatrix
+from mbff_tests.TestBase import TestBase
+from mbff_tests.MockDatasetSource import MockDatasetSource
+
 from mbff.dataset.ExperimentalDatasetDefinition import ExperimentalDatasetDefinition
 from mbff.dataset.ExperimentalDataset import ExperimentalDataset
 from mbff.experiment.AlgorithmRun import AlgorithmRun
-from mbff.algorithms.basic.IGt import algorithm_IGt__binary
+from mbff.algorithms.basic.IGt import algorithm_IGt__binary as IGt
 
 class TestAlgorithmRun(TestBase):
 
@@ -24,20 +25,24 @@ class TestAlgorithmRun(TestBase):
         # rows in the ExperimentalDataset will always be [0, 1, 5].
 
         # Prepare an AlgorithmRun instance.
-        parameters = {
+        configuration = {
                 'label': 'test_algrun',
-                'classifier_class': MockBernouliClassifier,
-                'algorithm': algorithm_IGt__binary,
+                'classifier': MockBernouliClassifier,
+                'algorithm': IGt,
+                }
+        parameters = {
                 'Q': 4,
                 'objective_index': 0
                 }
-        algrun = AlgorithmRun(exds, parameters)
+        algrun = AlgorithmRun(exds, configuration, parameters)
 
         # We run the algorithm at the specified parameters, on the specified
         # ExDs.
         algrun.run()
 
         # Verify if the AlgorithmRun now contains the expected results.
+        self.assertEqual('mbff.algorithms.basic.IGt.algorithm_IGt__binary', algrun.algorithm_name)
+        self.assertEqual('mbff_tests.TestAlgorithmRun.MockBernouliClassifier', algrun.classifier_classname)
         self.assertListEqual([0, 4, 1, 5], algrun.selected_features)
         self.assertLess(0, algrun.duration)
 
@@ -48,6 +53,25 @@ class TestAlgorithmRun(TestBase):
                 'FN': 2
                 }
         self.assertDictEqual(expected_classifier_evaluation, algrun.classifier_evaluation)
+
+
+    def test_algorithm_run_configuration(self):
+        # Prepare an AlgorithmRun instance.
+        configuration = {
+                'label': Template('${nosubstitution}__test_IGt_Q${Q}_Obj${objective_index}'),
+                'classifier': MockBernouliClassifier,
+                'algorithm': IGt,
+                }
+        parameters = {
+                'Q': 4,
+                'objective_index': 0
+                }
+        algrun = AlgorithmRun(None, configuration, parameters)
+
+        self.assertEqual('${nosubstitution}__test_IGt_Q4_Obj0', algrun.label)
+        self.assertEqual('mbff.algorithms.basic.IGt.algorithm_IGt__binary', algrun.algorithm_name)
+        self.assertEqual('mbff_tests.TestAlgorithmRun.MockBernouliClassifier', algrun.classifier_classname)
+
 
 
     def default_exds_definition(self, exds_folder):
@@ -70,47 +94,6 @@ class TestAlgorithmRun(TestBase):
 
     def default_samples_train(self):
         pass
-
-
-
-class MockDatasetSource(DatasetSource):
-
-    def __init__(self, configuration):
-        pass
-
-
-    def default_datasetmatrix(label):
-        sample_count = 8
-        feature_count = 8
-        datasetmatrix = DatasetMatrix(label)
-        datasetmatrix.row_labels = ['row{}'.format(i) for i in range(0, sample_count)]
-        datasetmatrix.column_labels_X = ['feature{}'.format(i) for i in range(0, feature_count)]
-        datasetmatrix.column_labels_Y = ['objective']
-        datasetmatrix.Y = scipy.sparse.csr_matrix(numpy.matrix([
-            [1], # training sample
-            [0], # training sample
-            [1], # testing sample
-            [0], # testing sample
-            [1], # testing sample
-            [0], # training sample
-            [1], # testing sample
-            [0]  # testing sample
-            ]))
-        datasetmatrix.X = scipy.sparse.csr_matrix(numpy.matrix([
-            [1, 1, 1, 1, 0, 1, 0, 1], # training sample
-            [0, 1, 1, 1, 1, 0, 0, 1], # training sample
-            [1, 1, 1, 0, 0, 0, 1, 0], # testing sample
-            [0, 0, 1, 0, 1, 1, 1, 0], # testing sample
-            [1, 1, 0, 1, 0, 0, 1, 1], # testing sample
-            [0, 0, 0, 1, 1, 1, 0, 1], # training sample
-            [1, 1, 1, 1, 0, 0, 1, 0], # testing sample
-            [0, 0, 0, 1, 1, 1, 1, 0]  # testing sample
-            ]))
-        return datasetmatrix
-
-
-    def create_dataset_matrix(self, label):
-        return MockDatasetSource.default_datasetmatrix(label)
 
 
 

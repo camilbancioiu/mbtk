@@ -15,19 +15,11 @@ def ensure_folder(folder):
 def load_matrix(folder, matrix_name):
     matrix = None
     fname = folder + "/{0}.mtx".format(matrix_name)
-    try:
-        matrix = scipy.io.mmread(fname)
-    except FileNotFoundError:
-        matrix = None
-        mpprint('Matrix {0} could not be loaded from file {1} .'.format(matrix_name, fname))
-        return matrix
+    matrix = scipy.io.mmread(fname)
     if isinstance(matrix, numpy.ndarray):
         matrix = numpy.matrix(matrix)
     else:
-        try:
-            matrix = matrix.tocsr()
-        except AttributeError:
-            pass
+        matrix = matrix.tocsr()
     return matrix
 
 
@@ -60,6 +52,7 @@ class MultiFileWriter:
 
 
     def close(self):
-        for f in self.files():
+        self.flush()
+        for f in self.files:
             if not f is sys.__stdout__:
                 f.close()

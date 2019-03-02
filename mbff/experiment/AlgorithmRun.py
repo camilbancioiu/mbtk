@@ -1,22 +1,24 @@
 import time
 import numpy
+from string import Template
 
 class AlgorithmRun:
 
-    def __init__(self, exds, parameters):
+    def __init__(self, exds, configuration, parameters):
+        self.configuration = configuration
         self.parameters = parameters
-        self.label = self.parameters['label']
         self.ID = ''
-        self.algorithm = self.parameters['algorithm']
-        self.algorithm_name = self.algorithm.__name__
+        self.algorithm = self.configuration['algorithm']
+        self.algorithm_name = '.'.join([self.algorithm.__module__, self.algorithm.__name__])
         self.exds = exds
 
         self.start_time = 0
         self.end_time = 0
         self.duration = 0.0
 
-        self.classifier_class = self.parameters['classifier_class']
-        self.classifier_classname = self.classifier_class.__name__
+        self.selected_features = []
+        self.classifier_class = self.configuration['classifier']
+        self.classifier_classname = '.'.join([self.classifier_class.__module__, self.classifier_class.__name__])
         self.classifier_evaluation = {}
 
         self.datasetmatrix_train = None
@@ -27,6 +29,11 @@ class AlgorithmRun:
         self.objective_train = None
         self.objective_test = None
         self.predictions = {}
+
+        # self.label could be a Template string.
+        self.label = self.configuration['label']
+        if isinstance(self.label, Template):
+            self.label = self.label.safe_substitute(self.parameters)
 
 
     def run(self):
