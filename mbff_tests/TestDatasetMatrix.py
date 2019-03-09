@@ -4,6 +4,8 @@ import scipy
 import shutil
 import unittest
 
+from pathlib import Path
+
 from mbff_tests.TestBase import TestBase
 
 from mbff.dataset.DatasetMatrix import DatasetMatrix
@@ -334,13 +336,13 @@ class TestDatasetMatrix(TestBase):
 
         # Finalize the DatasetMatrix and save it.
         dm.finalize()
-        dm.save(folder)
+        dm.save(Path(folder))
         self.check_datamatrix_files(folder, dm.label)
 
         # Load the saved data into a fresh DatasetMatrix with the same label
         # and compare with the old one.
         dm2 = DatasetMatrix(dm.label)
-        dm2.load(folder)
+        dm2.load(Path(folder))
         self.assertEqual(dm, dm2)
 
 

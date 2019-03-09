@@ -38,7 +38,7 @@ class TestExperimentRun(TestBase):
         experiment_run.run()
 
         log_folder = experiments_folder + '/test_experiment_run/algorithm_run_logs'
-        self.assertTrue(bool(Path(log_folder).exists()))
+        self.assertTrue(Path(log_folder).exists())
         expected_log_files = [
                 '0__test_IGt_BernoulliNB__Q2_Obj0.log',
                 '1__test_IGt_BernoulliNB__Q4_Obj0.log',
@@ -49,7 +49,7 @@ class TestExperimentRun(TestBase):
         self.assertListEqual(expected_log_files, created_log_files)
 
         datapoints_folder = experiments_folder + '/test_experiment_run/algorithm_run_datapoints'
-        self.assertTrue(bool(Path(datapoints_folder).exists()))
+        self.assertTrue(Path(datapoints_folder).exists())
         expected_datapoints_files = [
                 '0__test_IGt_BernoulliNB__Q2_Obj0.pickle',
                 '1__test_IGt_BernoulliNB__Q4_Obj0.pickle',
@@ -59,7 +59,7 @@ class TestExperimentRun(TestBase):
         created_datapoints_files = sorted([f for f in os.listdir(datapoints_folder) if os.path.isfile(datapoints_folder + '/' + f)])
         self.assertListEqual(expected_datapoints_files, created_datapoints_files)
 
-        self.assertFalse(bool(Path(experiments_folder + '/test_experiment_run/checkpoint').exists()))
+        self.assertFalse(Path(experiments_folder + '/test_experiment_run/checkpoint').exists())
 
         # Disallow running the experiment again, because finishing the
         # experiment should also lock its folder.
@@ -79,7 +79,7 @@ class TestExperimentRun(TestBase):
         created_datapoints_files = sorted([f for f in os.listdir(datapoints_folder) if os.path.isfile(datapoints_folder + '/' + f)])
         self.assertListEqual(expected_log_files, created_log_files)
         self.assertListEqual(expected_datapoints_files, created_datapoints_files)
-        self.assertFalse(bool(Path(experiments_folder + '/test_experiment_run/checkpoint').exists()))
+        self.assertFalse(Path(experiments_folder + '/test_experiment_run/checkpoint').exists())
 
         self.assertTrue(experiment_run.definition.folder_is_locked())
 
@@ -92,10 +92,8 @@ class TestExperimentRun(TestBase):
         exds = exds_definition.create_exds()
         exds.build()
 
-        definition = ExperimentDefinition()
-        definition.name = "test_experiment_run__interrupted"
+        definition = ExperimentDefinition(experiments_folder, "test_experiment_run__interrupted")
         definition.experiment_run_class = ExperimentRun
-        definition.experiments_folder = experiments_folder
         definition.exds_definition = self.default_exds_definition(exds_folder, "test_exds_experimentrun_interrupted")
         definition.algorithm_run_configuration = {
                 'classifier': BernoulliNB,
@@ -113,7 +111,8 @@ class TestExperimentRun(TestBase):
                 {'fail': False, 'interrupt': False, 'objective_index': 0},
                 ]
         definition.save_algorithm_run_datapoints = True
-        definition.algorithm_run_stdout = 'logfile-and-stdout'
+        definition.algorithm_run_log__stdout = True
+        definition.algorithm_run_log__file = True
         definition.quiet = True
 
         experiment_run = definition.create_experiment_run()
@@ -131,7 +130,7 @@ class TestExperimentRun(TestBase):
         # crashed. The log file of the crashed AlgorithmRun is closed by a
         # ``finally`` block in ExperimentRun.run_algorithm().
         log_folder = experiments_folder + '/test_experiment_run__interrupted/algorithm_run_logs'
-        self.assertTrue(bool(Path(log_folder).exists()))
+        self.assertTrue(Path(log_folder).exists())
         expected_log_files = [
                 '0__MockFaultyFS.log',
                 '1__MockFaultyFS.log',
@@ -143,7 +142,7 @@ class TestExperimentRun(TestBase):
         # We expect 2 pickle files only, because the third AlgorithmRun has
         # crashed and there was no datapoint file created for it.
         datapoints_folder = experiments_folder + '/test_experiment_run__interrupted/algorithm_run_datapoints'
-        self.assertTrue(bool(Path(datapoints_folder).exists()))
+        self.assertTrue(Path(datapoints_folder).exists())
         expected_datapoints_files = [
                 '0__MockFaultyFS.pickle',
                 '1__MockFaultyFS.pickle',
@@ -151,7 +150,7 @@ class TestExperimentRun(TestBase):
         created_datapoints_files = sorted([f for f in os.listdir(datapoints_folder) if os.path.isfile(datapoints_folder + '/' + f)])
         self.assertListEqual(expected_datapoints_files, created_datapoints_files)
 
-        self.assertTrue(bool(Path(experiments_folder + '/test_experiment_run__interrupted/checkpoint').exists()))
+        self.assertTrue(Path(experiments_folder + '/test_experiment_run__interrupted/checkpoint').exists())
         self.assertEqual(2, experiment_run.load_checkpoint())
 
         # Now we prevent the algorithm from crashing, but it will be
@@ -167,7 +166,7 @@ class TestExperimentRun(TestBase):
 
         # The experiment was interrupted at the AlgorithmRun with index 6.
         log_folder = experiments_folder + '/test_experiment_run__interrupted/algorithm_run_logs'
-        self.assertTrue(bool(Path(log_folder).exists()))
+        self.assertTrue(Path(log_folder).exists())
         expected_log_files = [
                 '0__MockFaultyFS.log',
                 '1__MockFaultyFS.log',
@@ -181,7 +180,7 @@ class TestExperimentRun(TestBase):
         self.assertListEqual(expected_log_files, created_log_files)
 
         datapoints_folder = experiments_folder + '/test_experiment_run__interrupted/algorithm_run_datapoints'
-        self.assertTrue(bool(Path(datapoints_folder).exists()))
+        self.assertTrue(Path(datapoints_folder).exists())
         expected_datapoints_files = [
                 '0__MockFaultyFS.pickle',
                 '1__MockFaultyFS.pickle',
@@ -193,7 +192,7 @@ class TestExperimentRun(TestBase):
         created_datapoints_files = sorted([f for f in os.listdir(datapoints_folder) if os.path.isfile(datapoints_folder + '/' + f)])
         self.assertListEqual(expected_datapoints_files, created_datapoints_files)
 
-        self.assertTrue(bool(Path(experiments_folder + '/test_experiment_run__interrupted/checkpoint').exists()))
+        self.assertTrue(Path(experiments_folder + '/test_experiment_run__interrupted/checkpoint').exists())
         self.assertEqual(6, experiment_run.load_checkpoint())
 
         # Now remove all crashes, allowing the experiment to run to the end.
@@ -201,7 +200,7 @@ class TestExperimentRun(TestBase):
 
         experiment_run.run()
         log_folder = experiments_folder + '/test_experiment_run__interrupted/algorithm_run_logs'
-        self.assertTrue(bool(Path(log_folder).exists()))
+        self.assertTrue(Path(log_folder).exists())
         expected_log_files = [
                 '0__MockFaultyFS.log',
                 '1__MockFaultyFS.log',
@@ -216,7 +215,7 @@ class TestExperimentRun(TestBase):
         self.assertListEqual(expected_log_files, created_log_files)
 
         datapoints_folder = experiments_folder + '/test_experiment_run__interrupted/algorithm_run_datapoints'
-        self.assertTrue(bool(Path(datapoints_folder).exists()))
+        self.assertTrue(Path(datapoints_folder).exists())
         expected_datapoints_files = [
                 '0__MockFaultyFS.pickle',
                 '1__MockFaultyFS.pickle',
@@ -230,7 +229,7 @@ class TestExperimentRun(TestBase):
         created_datapoints_files = sorted([f for f in os.listdir(datapoints_folder) if os.path.isfile(datapoints_folder + '/' + f)])
         self.assertListEqual(expected_datapoints_files, created_datapoints_files)
 
-        self.assertFalse(bool(Path(experiments_folder + '/test_experiment_run__interrupted/checkpoint').exists()))
+        self.assertFalse(Path(experiments_folder + '/test_experiment_run__interrupted/checkpoint').exists())
 
 
     def test_experiment_run__contents_of_logs_and_datapoints(self):
@@ -238,10 +237,8 @@ class TestExperimentRun(TestBase):
 
 
     def default_experiment_definition(self, experiments_folder, exds_folder, algorithm_run_parameters):
-        definition = ExperimentDefinition()
-        definition.name = 'test_experiment_run'
+        definition = ExperimentDefinition(experiments_folder, 'test_experiment_run')
         definition.experiment_run_class = ExperimentRun
-        definition.experiments_folder = experiments_folder
         definition.exds_definition = self.default_exds_definition(exds_folder, "test_exds_experimentrun")
         definition.algorithm_run_configuration = {
                 'classifier': BernoulliNB,
@@ -251,19 +248,18 @@ class TestExperimentRun(TestBase):
         definition.algorithm_run_parameters = algorithm_run_parameters
 
         definition.save_algorithm_run_datapoints = True
-        definition.algorithm_run_stdout = 'logfile-and-stdout'
+        definition.algorithm_run_log__stdout = True
+        definition.algorithm_run_log__file = True
         definition.quiet = True
 
         return definition
 
 
     def default_exds_definition(self, exds_folder, name):
-        definition = ExperimentalDatasetDefinition()
-        definition.name = name
+        definition = ExperimentalDatasetDefinition(exds_folder, name)
         definition.exds_class = ExperimentalDataset
         definition.source = MockDatasetSource
         definition.source_configuration = {}
-        definition.exds_folder = exds_folder
         definition.training_subset_size = 3/8
         definition.random_seed = 42
         definition.auto_lock_after_build = True

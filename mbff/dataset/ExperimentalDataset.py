@@ -3,7 +3,7 @@ import os
 import shutil
 from pathlib import Path
 
-import mbff.utilities as util
+import mbff.utilities.functions as util
 from mbff.dataset.DatasetMatrix import DatasetMatrix
 
 class ExperimentalDataset():
@@ -209,14 +209,14 @@ class ExperimentalDataset():
         """
         Save this ExperimentalDataset to ``self.definition.folder``.
         """
-        util.ensure_folder(self.definition.folder)
+        self.definition.ensure_folder()
 
         if not self.definition.folder_is_locked():
-            self.matrix.save(self.definition.folder)
-            self.matrix_train.save(self.definition.folder)
-            self.matrix_test.save(self.definition.folder)
+            self.matrix.save(self.definition.path)
+            self.matrix_train.save(self.definition.path)
+            self.matrix_test.save(self.definition.path)
         else:
-            raise ExperimentalDatasetError(self.definition, "Cannot save - ExDs is folder locked.")
+            raise ExperimentalDatasetError(self.definition, "Cannot save - ExDs folder is locked.")
 
 
     def load(self):
@@ -225,15 +225,15 @@ class ExperimentalDataset():
         """
         if self.matrix is None:
             self.matrix = DatasetMatrix("dataset_full")
-        self.matrix.load(self.definition.folder)
+        self.matrix.load(self.definition.path)
 
         if self.matrix_train is None:
             self.matrix_train = DatasetMatrix("dataset_train")
-        self.matrix_train.load(self.definition.folder)
+        self.matrix_train.load(self.definition.path)
 
         if self.matrix_test is None:
             self.matrix_test = DatasetMatrix("dataset_test")
-        self.matrix_test.load(self.definition.folder)
+        self.matrix_test.load(self.definition.path)
 
 
 

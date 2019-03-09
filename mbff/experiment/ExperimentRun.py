@@ -7,7 +7,8 @@ import pickle
 from pathlib import Path
 from string import Template
 
-import mbff.utilities as util
+import mbff.utilities.functions as util
+from mbff.utilities.MultiFileWriter import MultiFileWriter
 from mbff.experiment.AlgorithmRun import AlgorithmRun
 from mbff.experiment.AlgorithmRunDatapoint import AlgorithmRunDatapoint
 from mbff.experiment.Exceptions import ExperimentFolderLockedException
@@ -22,12 +23,15 @@ class ExperimentRun:
         self.end_time = None
         self.duration = None
 
+        self.checkpoint_path = None
+
 
     def run(self):
         self.definition.ensure_folder()
         if self.definition.folder_is_locked():
-            raise ExperimentFolderLockedException(self.definition, self.definition.folder, 'Experiment folder is locked, cannot start.')
+            raise ExperimentFolderLockedException(self.definition, str(self.definition.path), 'Experiment folder is locked, cannot start.')
 
+        self.checkpoint_path = self.definition.path / 'checkpoint'
         self.start_time = time.time()
         self.print_experiment_run_header()
 
@@ -78,46 +82,38 @@ class ExperimentRun:
 
 
     def save_algorithm_run_datapoint(self, algorithm_run):
-        self.definition.ensure_subfolder('algorithm_run_datapoints')
-        filename = "{}/algorithm_run_datapoints/{}.pickle".format(self.definition.folder, algorithm_run.ID)
+        datapoint_file = self.definition.subfolder('algorithm_run_datapoints') / '{}.pickle'.format(algorithm_run.ID)
         algorithm_run_datapoint = AlgorithmRunDatapoint(algorithm_run)
-        with open(filename, 'wb') as f:
+        with datapoint_file.open(mode='wb') as f:
             pickle.dump(algorithm_run_datapoint, f)
 
 
     def has_previous_checkpoint(self):
-        return bool(Path("{}/checkpoint".format(self.definition.folder)).exists())
+        return self.checkpoint_path.exists()
 
 
     def save_checkpoint(self, algorithm_run_index):
-        with open("{}/checkpoint".format(self.definition.folder), 'wt') as checkpoint_file:
-            checkpoint_file.write(str(algorithm_run_index))
+        self.checkpoint_path.write_text(str(algorithm_run_index))
 
 
     def load_checkpoint(self):
-        with open("{}/checkpoint".format(self.definition.folder), 'rt') as checkpoint_file:
-            content = checkpoint_file.read()
+        content = self.checkpoint_path.read_text()
         return int(content)
 
 
     def remove_checkpoint(self):
-        os.remove("{}/checkpoint".format(self.definition.folder))
+        self.checkpoint_path.unlink()
 
 
     def get_algorithm_run_stdout_destination(self, algorithm_run):
-        output_file_name = self.definition.folder + '/algorithm_run_logs/{}.log'.format(algorithm_run.ID)
-        destination = self.definition.algorithm_run_stdout
-        if destination == 'file':
-            self.definition.ensure_subfolder('algorithm_run_logs')
-            return open(output_file_name, 'wt')
-        elif destination == 'logfile-and-stdout':
-            self.definition.ensure_subfolder('algorithm_run_logs')
-            output_file = open(output_file_name, 'wt')
-            return util.MultiFileWriter([output_file, sys.stdout])
-        elif destination == 'stdout':
-            return sys.stdout
-        else:
-            return sys.stdout
+        destinations = []
+        if self.definition.algorithm_run_log__stdout:
+            destinations.append(sys.stdout)
+        if self.definition.algorithm_run_log__file:
+            output_file = self.definition.subfolder('algorithm_run_logs') / '{}.log'.format(algorithm_run.ID)
+            destinations.append(output_file.open(mode='wt'))
+
+        return MultiFileWriter(destinations)
 
 
     def print_experiment_run_header(self):

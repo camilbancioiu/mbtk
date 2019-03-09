@@ -374,12 +374,10 @@ class TestBinaryExperimentalDataset(TestBase):
 
 
     def default_exds_definition(self, exds_folder):
-        definition = ExperimentalDatasetDefinition()
-        definition.name = "test_binary_exds"
+        definition = ExperimentalDatasetDefinition(exds_folder, "test_binary_exds")
         definition.exds_class = BinaryExperimentalDataset
         definition.source = BinarySyntheticDatasetSource
         definition.source_configuration = self.default_binarysyntheticdatasetsource_configuration()
-        definition.exds_folder = exds_folder
         definition.training_subset_size = 0.25
         definition.random_seed = 42
         definition.options['probability_thresholds__features'] = {}

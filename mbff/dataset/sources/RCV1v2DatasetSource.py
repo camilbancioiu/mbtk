@@ -4,7 +4,7 @@ import scipy
 from mbff.dataset.sources.DatasetSource import DatasetSource
 from mbff.dataset.DatasetMatrix import DatasetMatrix
 
-import mbff.utilities as util
+import mbff.utilities.functions as util
 
 class RCV1v2DatasetSource(DatasetSource):
     """

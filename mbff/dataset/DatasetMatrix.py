@@ -2,7 +2,7 @@ import numpy
 import scipy
 import scipy.io
 import pickle
-import mbff.utilities as util
+import mbff.utilities.functions as util
 from mbff.dataset.Exceptions import DatasetMatrixNotFinalizedError, DatasetMatrixFinalizedError
 
 class DatasetMatrix:
@@ -336,63 +336,63 @@ class DatasetMatrix:
         del self.column_labels_Y[c]
 
 
-    def save(self, folder):
+    def save(self, path):
         """
         Save ``X``, ``Y``, ``self.row_labels``, ``self.column_labels_X`` and
         ``self.column_labels_Y`` as files in the subfolder
-        ``[folder]/[self.label]``. To load these back into a
+        ``[path]/[self.label]``. To load these back into a
         :py:class:`DatasetMatrix` instance at a later time, use :py:meth:`load`.
 
-        If the folder ``[folder]/[self.label]`` does not exist, it will be
+        If the folder ``[path]/[self.label]`` does not exist, it will be
         created.
 
-        :param str folder: The root folder in which to create the subfolder
-            named ``[self.label]`` in which to save.
+        :param str path: The Path object representing the root folder in which
+            to create the subfolder named ``[self.label]`` in which to save.
         :return: ``None``
         """
         if self.final == False:
             raise DatasetMatrixNotFinalizedError(self, "Cannot save.")
 
-        folder += '/' + self.label
-        util.ensure_folder(folder)
+        matrix_path = path / self.label
+        util.ensure_folder(matrix_path)
 
-        util.save_matrix(folder, "X", self.X)
-        util.save_matrix(folder, "Y", self.Y)
+        util.save_matrix(matrix_path, "X", self.X)
+        util.save_matrix(matrix_path, "Y", self.Y)
 
-        with open(folder + '/row_labels.txt', mode='wt') as f:
-            f.write('\n'.join(self.row_labels))
+        row_labels_file = matrix_path / 'row_labels.txt'
+        row_labels_file.write_text('\n'.join(self.row_labels))
 
-        with open(folder + '/column_labels_X.txt', mode='wt') as f:
-            f.write('\n'.join(self.column_labels_X))
+        column_labels_X_file = matrix_path / 'column_labels_X.txt'
+        column_labels_X_file.write_text('\n'.join(self.column_labels_X))
 
-        with open(folder + '/column_labels_Y.txt', mode='wt') as f:
-            f.write('\n'.join(self.column_labels_Y))
+        column_labels_Y_file = matrix_path / 'column_labels_Y.txt'
+        column_labels_Y_file.write_text('\n'.join(self.column_labels_Y))
 
 
-    def load(self, folder):
+    def load(self, path):
         """
         Load ``X``, ``Y``, ``self.row_labels``, ``self.column_labels_X`` and
         ``self.column_labels_Y`` from files in the subfolder
-        ``[folder]/[self.label]``. To save them, use :py:meth:`save`.
+        ``[path]/[self.label]``. To save them, use :py:meth:`save`.
 
-        The folder ``[folder]/[self.label]`` must exist.
+        The folder ``[path]/[self.label]`` must exist.
 
-        :param str folder: The root folder in which to find the subfolder
-            ``[self.label]`` from which to load.
+        :param str path: The Path object representing the root folder in which
+            to find the subfolder ``[self.label]`` from which to load.
         :return: ``None``
         """
-        folder += '/' + self.label
+        matrix_path = path / self.label
 
-        self.X = util.load_matrix(folder, "X")
-        self.Y = util.load_matrix(folder, "Y")
+        self.X = util.load_matrix(matrix_path, "X")
+        self.Y = util.load_matrix(matrix_path, "Y")
 
-        with open(folder + '/row_labels.txt', mode='rt') as f:
+        with (matrix_path / 'row_labels.txt').open(mode='rt') as f:
             self.row_labels = list(map(str.strip, list(f)))
 
-        with open(folder + '/column_labels_X.txt', mode='rt') as f:
+        with (matrix_path / 'column_labels_X.txt').open(mode='rt') as f:
             self.column_labels_X = list(map(str.strip, list(f)))
 
-        with open(folder + '/column_labels_Y.txt', mode='rt') as f:
+        with (matrix_path / 'column_labels_Y.txt').open(mode='rt') as f:
             self.column_labels_Y = list(map(str.strip, list(f)))
 
         self.final = True

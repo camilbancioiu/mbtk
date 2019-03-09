@@ -77,21 +77,20 @@ class TestExperimentalDataset(TestBase):
         # ExperimentalDataset.
         # - The original matrix:
         loadedMatrix_original = DatasetMatrix("dataset_full")
-        loadedMatrix_original.load(exds.definition.folder)
+        loadedMatrix_original.load(exds.definition.path)
         self.assertEqual(exds.matrix, loadedMatrix_original)
         # - The training matrix:
         loadedMatrix_train = DatasetMatrix("dataset_train")
-        loadedMatrix_train.load(exds.definition.folder)
+        loadedMatrix_train.load(exds.definition.path)
         self.assertEqual(exds.matrix_train, loadedMatrix_train)
         # - The test matrix:
         loadedMatrix_test = DatasetMatrix("dataset_test")
-        loadedMatrix_test.load(exds.definition.folder)
+        loadedMatrix_test.load(exds.definition.path)
         self.assertEqual(exds.matrix_test, loadedMatrix_test)
 
 
     def default_exds_definition(self, exds_folder):
-        definition = ExperimentalDatasetDefinition()
-        definition.name = "test_exds_reuters"
+        definition = ExperimentalDatasetDefinition(exds_folder, "test_exds_reuters")
         definition.exds_class = ExperimentalDataset
         definition.source = RCV1v2DatasetSource
         definition.source_configuration = {

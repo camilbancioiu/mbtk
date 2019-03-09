@@ -75,12 +75,10 @@ class TestAlgorithmRun(TestBase):
 
 
     def default_exds_definition(self, exds_folder):
-        definition = ExperimentalDatasetDefinition()
-        definition.name = "test_exds_algorithmrun"
+        definition = ExperimentalDatasetDefinition(exds_folder, "test_exds_algorithmrun")
         definition.exds_class = ExperimentalDataset
         definition.source = MockDatasetSource
         definition.source_configuration = {}
-        definition.exds_folder = exds_folder
         definition.training_subset_size = 3/8
         definition.random_seed = 42
         definition.auto_lock_after_build = True

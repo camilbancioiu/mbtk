@@ -4,8 +4,9 @@ import shutil
 from pathlib import Path
 from mbff.dataset.DatasetMatrix import DatasetMatrix
 from mbff.dataset.Exceptions import ExperimentalDatasetFolderException
+from mbff.utilities.LockablePath import LockablePath
 
-class ExperimentalDatasetDefinition():
+class ExperimentalDatasetDefinition(LockablePath):
     """
     This class represents the definition of an ``ExperimentalDataset``, which
     contains the information needed to build an experimental dataset (exds)
@@ -50,13 +51,14 @@ class ExperimentalDatasetDefinition():
     :var tags: A list of arbitrary strings, used to categorize this exds.
     """
 
-    def __init__(self):
-        self.name = ""
+    def __init__(self, exds_folder, name):
+        self.exds_folder = exds_folder
+        self.name = name
+        super().__init__(self.exds_folder, self.name)
+        self.default_lock_type = 'exds'
         self.exds_class = None
         self.source = None
         self.source_configuration = {}
-        self.exds_folder = ""
-        self.folder = ""
         self.training_subset_size = 1.0
         self.options = { }
         self.random_seed = 42
@@ -65,50 +67,10 @@ class ExperimentalDatasetDefinition():
 
 
     def create_exds(self):
-        self.folder = self.exds_folder + '/' + self.name
-        self.validate()
         return self.exds_class(self)
 
 
     def validate(self):
         pass
-
-
-    def get_lock_filename(self, lock_type='exds'):
-        return '{}/locked_{}'.format(self.folder, lock_type)
-
-
-    def folder_is_locked(self, lock_type='exds'):
-        return bool(Path(self.get_lock_filename(lock_type)).exists())
-
-
-    def folder_exists(self):
-        return bool(Path(self.folder).exists())
-
-
-    def lock_folder(self, lock_type='exds'):
-        folder = self.folder
-        if self.folder_is_locked(lock_type):
-            pass
-        else:
-            with open(self.get_lock_filename(lock_type), 'w') as f:
-                f.write('locked')
-
-
-    def delete_folder(self):
-        if not self.folder_exists():
-            raise ExperimentalDatasetFolderException(self, self.folder, 'Folder {} does not exist, cannot delete it.'.format(self.name))
-        if self.folder_is_locked():
-            raise ExperimentalDatasetFolderException(self, self.folder, 'Folder {} is locked, cannot delete it.'.format(self.name))
-            return
-        shutil.rmtree(self.folder)
-
-
-    def unlock_folder(self, lock_type='exds'):
-        folder = self.folder
-        if not self.folder_is_locked(lock_type):
-            pass
-        else:
-            os.remove(self.get_lock_filename(lock_type))
 
 
