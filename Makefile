@@ -16,12 +16,15 @@ help:
 
 doc: Makefile
 	@$(SPHINXBUILD) -M html "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
+	notify-send "Make" "Sphinx documentation built."
 
 doc-clean: Makefile
 	rm -rf "$(BUILDDIR)/doctrees"
 	rm -rf "$(BUILDDIR)/html"
 
 doc-rebuild: doc-clean doc
+	notify-send "Make" "Sphinx documentation rebuilt."
 
 test: Makefile
 	python3 test.py
+	notify-send "Make" "Testing complete."
