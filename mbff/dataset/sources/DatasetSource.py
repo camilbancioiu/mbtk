@@ -20,10 +20,12 @@ class DatasetSource:
 
     def create_dataset_matrix(self, label='datasetsource'):
         """
-        The required method of a ``DatasetSource`` class. This method reads an
-        external source of data and produces a ``DatasetMatrix`` instance based
-        on ``configuration``. The newly created ``DatasetMatrix`` instance is
-        then returned.
+        The required method of a :py:class:`DatasetSource` class. This method
+        reads an external source of data and produces a
+        :py:class:`DatasetMatrix <mbff.dataset.DatasetMatrix.DatasetMatrix>`
+        instance based on ``configuration``.
+
+        :param str label: The label of the ``DatasetMatrix``
         """
         datasetmatrix = DatasetMatrix(label)
         datasetmatrix.X = scipy.sparse.csr_matrix(numpy.identity(8))

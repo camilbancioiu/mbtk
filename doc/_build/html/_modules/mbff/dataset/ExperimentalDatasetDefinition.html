@@ -46,8 +46,9 @@
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="k">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">mbff.dataset.DatasetMatrix</span> <span class="k">import</span> <span class="n">DatasetMatrix</span>
 <span class="kn">from</span> <span class="nn">mbff.dataset.Exceptions</span> <span class="k">import</span> <span class="n">ExperimentalDatasetFolderException</span>
+<span class="kn">from</span> <span class="nn">mbff.utilities.LockablePath</span> <span class="k">import</span> <span class="n">LockablePath</span>
 
-<div class="viewcode-block" id="ExperimentalDatasetDefinition"><a class="viewcode-back" href="../../../dataset/ExperimentalDatasetDefinition.html#mbff.dataset.ExperimentalDatasetDefinition.ExperimentalDatasetDefinition">[docs]</a><span class="k">class</span> <span class="nc">ExperimentalDatasetDefinition</span><span class="p">():</span>
+<div class="viewcode-block" id="ExperimentalDatasetDefinition"><a class="viewcode-back" href="../../../dataset/ExperimentalDatasetDefinition.html#mbff.dataset.ExperimentalDatasetDefinition.ExperimentalDatasetDefinition">[docs]</a><span class="k">class</span> <span class="nc">ExperimentalDatasetDefinition</span><span class="p">(</span><span class="n">LockablePath</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This class represents the definition of an ``ExperimentalDataset``, which</span>
 <span class="sd">    contains the information needed to build an experimental dataset (exds)</span>
@@ -92,12 +93,14 @@
 <span class="sd">    :var tags: A list of arbitrary strings, used to categorize this exds.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exds_folder</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">exds_folder</span> <span class="o">=</span> <span class="n">exds_folder</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exds_folder</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">default_lock_type</span> <span class="o">=</span> <span class="s1">&#39;exds&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">exds_class</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">source</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">source_configuration</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">exds_folder</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">folder</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">training_subset_size</span> <span class="o">=</span> <span class="mf">1.0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">options</span> <span class="o">=</span> <span class="p">{</span> <span class="p">}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">random_seed</span> <span class="o">=</span> <span class="mi">42</span>
@@ -105,52 +108,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">tags</span> <span class="o">=</span> <span class="p">[]</span>
 
 
-<div class="viewcode-block" id="ExperimentalDatasetDefinition.setup"><a class="viewcode-back" href="../../../dataset/ExperimentalDatasetDefinition.html#mbff.dataset.ExperimentalDatasetDefinition.ExperimentalDatasetDefinition.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">folder</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exds_folder</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span></div>
+<div class="viewcode-block" id="ExperimentalDatasetDefinition.create_exds"><a class="viewcode-back" href="../../../dataset/ExperimentalDatasetDefinition.html#mbff.dataset.ExperimentalDatasetDefinition.ExperimentalDatasetDefinition.create_exds">[docs]</a>    <span class="k">def</span> <span class="nf">create_exds</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">exds_class</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ExperimentalDatasetDefinition.validate"><a class="viewcode-back" href="../../../dataset/ExperimentalDatasetDefinition.html#mbff.dataset.ExperimentalDatasetDefinition.ExperimentalDatasetDefinition.validate">[docs]</a>    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">pass</span></div>
-
-
-<div class="viewcode-block" id="ExperimentalDatasetDefinition.get_lock_filename"><a class="viewcode-back" href="../../../dataset/ExperimentalDatasetDefinition.html#mbff.dataset.ExperimentalDatasetDefinition.ExperimentalDatasetDefinition.get_lock_filename">[docs]</a>    <span class="k">def</span> <span class="nf">get_lock_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lock_type</span><span class="o">=</span><span class="s1">&#39;exds&#39;</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">/locked_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">folder</span><span class="p">,</span> <span class="n">lock_type</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="ExperimentalDatasetDefinition.folder_is_locked"><a class="viewcode-back" href="../../../dataset/ExperimentalDatasetDefinition.html#mbff.dataset.ExperimentalDatasetDefinition.ExperimentalDatasetDefinition.folder_is_locked">[docs]</a>    <span class="k">def</span> <span class="nf">folder_is_locked</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lock_type</span><span class="o">=</span><span class="s1">&#39;exds&#39;</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_lock_filename</span><span class="p">(</span><span class="n">lock_type</span><span class="p">))</span><span class="o">.</span><span class="n">exists</span><span class="p">())</span></div>
-
-
-<div class="viewcode-block" id="ExperimentalDatasetDefinition.folder_exists"><a class="viewcode-back" href="../../../dataset/ExperimentalDatasetDefinition.html#mbff.dataset.ExperimentalDatasetDefinition.ExperimentalDatasetDefinition.folder_exists">[docs]</a>    <span class="k">def</span> <span class="nf">folder_exists</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">folder</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">())</span></div>
-
-
-<div class="viewcode-block" id="ExperimentalDatasetDefinition.lock_folder"><a class="viewcode-back" href="../../../dataset/ExperimentalDatasetDefinition.html#mbff.dataset.ExperimentalDatasetDefinition.ExperimentalDatasetDefinition.lock_folder">[docs]</a>    <span class="k">def</span> <span class="nf">lock_folder</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lock_type</span><span class="o">=</span><span class="s1">&#39;exds&#39;</span><span class="p">):</span>
-        <span class="n">folder</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">folder</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">folder_is_locked</span><span class="p">(</span><span class="n">lock_type</span><span class="p">):</span>
-            <span class="k">pass</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_lock_filename</span><span class="p">(</span><span class="n">lock_type</span><span class="p">),</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;locked&#39;</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="ExperimentalDatasetDefinition.delete_folder"><a class="viewcode-back" href="../../../dataset/ExperimentalDatasetDefinition.html#mbff.dataset.ExperimentalDatasetDefinition.ExperimentalDatasetDefinition.delete_folder">[docs]</a>    <span class="k">def</span> <span class="nf">delete_folder</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">folder_exists</span><span class="p">():</span>
-            <span class="k">raise</span> <span class="n">ExperimentalDatasetFolderException</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">folder</span><span class="p">,</span> <span class="s1">&#39;Folder </span><span class="si">{}</span><span class="s1"> does not exist, cannot delete it.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">folder_is_locked</span><span class="p">():</span>
-            <span class="k">raise</span> <span class="n">ExperimentalDatasetFolderException</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">folder</span><span class="p">,</span> <span class="s1">&#39;Folder </span><span class="si">{}</span><span class="s1"> is locked, cannot delete it.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
-            <span class="k">return</span>
-        <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">folder</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">: ExDs folder deleted.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">))</span></div>
-
-
-<div class="viewcode-block" id="ExperimentalDatasetDefinition.unlock_folder"><a class="viewcode-back" href="../../../dataset/ExperimentalDatasetDefinition.html#mbff.dataset.ExperimentalDatasetDefinition.ExperimentalDatasetDefinition.unlock_folder">[docs]</a>    <span class="k">def</span> <span class="nf">unlock_folder</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lock_type</span><span class="o">=</span><span class="s1">&#39;exds&#39;</span><span class="p">):</span>
-        <span class="n">folder</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">folder</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">folder_is_locked</span><span class="p">(</span><span class="n">lock_type</span><span class="p">):</span>
-            <span class="k">pass</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_lock_filename</span><span class="p">(</span><span class="n">lock_type</span><span class="p">))</span></div></div>
+        <span class="k">pass</span></div></div>
 
 
 </pre></div>

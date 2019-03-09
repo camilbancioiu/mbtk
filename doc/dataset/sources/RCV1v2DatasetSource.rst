@@ -6,3 +6,7 @@ Class ``RCV1v2DatasetSource``
   :members:
   :undoc-members:
 
+References
+----------
+.. bibliography:: references.bib
+

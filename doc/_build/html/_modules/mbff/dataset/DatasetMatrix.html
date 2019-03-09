@@ -44,7 +44,7 @@
 <span class="kn">import</span> <span class="nn">scipy</span>
 <span class="kn">import</span> <span class="nn">scipy.io</span>
 <span class="kn">import</span> <span class="nn">pickle</span>
-<span class="kn">import</span> <span class="nn">mbff.utilities</span> <span class="k">as</span> <span class="nn">util</span>
+<span class="kn">import</span> <span class="nn">mbff.utilities.functions</span> <span class="k">as</span> <span class="nn">util</span>
 <span class="kn">from</span> <span class="nn">mbff.dataset.Exceptions</span> <span class="k">import</span> <span class="n">DatasetMatrixNotFinalizedError</span><span class="p">,</span> <span class="n">DatasetMatrixFinalizedError</span>
 
 <div class="viewcode-block" id="DatasetMatrix"><a class="viewcode-back" href="../../../dataset/DatasetMatrix.html#mbff.dataset.DatasetMatrix.DatasetMatrix">[docs]</a><span class="k">class</span> <span class="nc">DatasetMatrix</span><span class="p">:</span>
@@ -257,11 +257,48 @@
 
         <span class="n">new_dataset_matrix</span> <span class="o">=</span> <span class="n">DatasetMatrix</span><span class="p">(</span><span class="n">new_label</span><span class="p">)</span>
 
-        <span class="n">all_rows</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">get_shape</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
         <span class="n">new_dataset_matrix</span><span class="o">.</span><span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">[</span><span class="n">rows_to_keep</span><span class="p">,]</span>
         <span class="n">new_dataset_matrix</span><span class="o">.</span><span class="n">Y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Y</span><span class="p">[</span><span class="n">rows_to_keep</span><span class="p">,]</span>
         <span class="n">new_dataset_matrix</span><span class="o">.</span><span class="n">row_labels</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">row_labels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">rows_to_keep</span><span class="p">]</span>
         <span class="n">new_dataset_matrix</span><span class="o">.</span><span class="n">column_labels_X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">column_labels_X</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">new_dataset_matrix</span><span class="o">.</span><span class="n">column_labels_Y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">column_labels_Y</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">new_dataset_matrix</span></div>
+
+
+<div class="viewcode-block" id="DatasetMatrix.select_columns_X"><a class="viewcode-back" href="../../../dataset/DatasetMatrix.html#mbff.dataset.DatasetMatrix.DatasetMatrix.select_columns_X">[docs]</a>    <span class="k">def</span> <span class="nf">select_columns_X</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns_to_keep</span><span class="p">,</span> <span class="n">new_label</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a new :py:class:`DatasetMatrix` instance, which only contains the requested</span>
+<span class="sd">        columns in ``X``. Affects ``column_labels_X`` as well. The ``Y`` matrix</span>
+<span class="sd">        will be copied over to the new instance, as will ``column_labels_Y``. Does not</span>
+<span class="sd">        raise ``DatasetMatrixFinalizedError``, because it doesn&#39;t try to modify</span>
+<span class="sd">        the original matrices.</span>
+
+<span class="sd">        :param list(int) columns_to_keep: A list of 0-based integer indices of</span>
+<span class="sd">            the columns of ``X`` which must be kept in the new instance.</span>
+<span class="sd">        :param str new_label: Optional label for the new instance. If ``&quot;&quot;``,</span>
+<span class="sd">            then ``self.label`` is used.</span>
+<span class="sd">        :return: A new :py:class:`DatasetMatrix` instance, with ``X``</span>
+<span class="sd">            containing only the requested columns, and a copy of the original</span>
+<span class="sd">            ``Y``.</span>
+<span class="sd">        :rtype: :py:class:`DatasetMatrix`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">columns_to_keep</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Argument &#39;columns_to_keep&#39; must be a non-empty list&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">columns_to_keep</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Argument &#39;columns_to_keep&#39; must be a non-empty list&quot;</span><span class="p">)</span>
+
+        <span class="n">columns_to_keep</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">columns_to_keep</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">new_label</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="n">new_label</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span>
+
+        <span class="n">new_dataset_matrix</span> <span class="o">=</span> <span class="n">DatasetMatrix</span><span class="p">(</span><span class="n">new_label</span><span class="p">)</span>
+
+        <span class="n">new_dataset_matrix</span><span class="o">.</span><span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">[:,</span><span class="n">columns_to_keep</span><span class="p">]</span>
+        <span class="n">new_dataset_matrix</span><span class="o">.</span><span class="n">Y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Y</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">new_dataset_matrix</span><span class="o">.</span><span class="n">row_labels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">row_labels</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">new_dataset_matrix</span><span class="o">.</span><span class="n">column_labels_X</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">column_labels_X</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">columns_to_keep</span><span class="p">]</span>
         <span class="n">new_dataset_matrix</span><span class="o">.</span><span class="n">column_labels_Y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">column_labels_Y</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
         <span class="k">return</span> <span class="n">new_dataset_matrix</span></div>
@@ -341,63 +378,63 @@
         <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">column_labels_Y</span><span class="p">[</span><span class="n">c</span><span class="p">]</span></div>
 
 
-<div class="viewcode-block" id="DatasetMatrix.save"><a class="viewcode-back" href="../../../dataset/DatasetMatrix.html#mbff.dataset.DatasetMatrix.DatasetMatrix.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">folder</span><span class="p">):</span>
+<div class="viewcode-block" id="DatasetMatrix.save"><a class="viewcode-back" href="../../../dataset/DatasetMatrix.html#mbff.dataset.DatasetMatrix.DatasetMatrix.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Save ``X``, ``Y``, ``self.row_labels``, ``self.column_labels_X`` and</span>
 <span class="sd">        ``self.column_labels_Y`` as files in the subfolder</span>
-<span class="sd">        ``[folder]/[self.label]``. To load these back into a</span>
+<span class="sd">        ``[path]/[self.label]``. To load these back into a</span>
 <span class="sd">        :py:class:`DatasetMatrix` instance at a later time, use :py:meth:`load`.</span>
 
-<span class="sd">        If the folder ``[folder]/[self.label]`` does not exist, it will be</span>
+<span class="sd">        If the folder ``[path]/[self.label]`` does not exist, it will be</span>
 <span class="sd">        created.</span>
 
-<span class="sd">        :param str folder: The root folder in which to create the subfolder</span>
-<span class="sd">            named ``[self.label]`` in which to save.</span>
+<span class="sd">        :param str path: The Path object representing the root folder in which</span>
+<span class="sd">            to create the subfolder named ``[self.label]`` in which to save.</span>
 <span class="sd">        :return: ``None``</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">final</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">DatasetMatrixNotFinalizedError</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;Cannot save.&quot;</span><span class="p">)</span>
 
-        <span class="n">folder</span> <span class="o">+=</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span>
-        <span class="n">util</span><span class="o">.</span><span class="n">ensure_folder</span><span class="p">(</span><span class="n">folder</span><span class="p">)</span>
+        <span class="n">matrix_path</span> <span class="o">=</span> <span class="n">path</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span>
+        <span class="n">util</span><span class="o">.</span><span class="n">ensure_folder</span><span class="p">(</span><span class="n">matrix_path</span><span class="p">)</span>
 
-        <span class="n">util</span><span class="o">.</span><span class="n">save_matrix</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="s2">&quot;X&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">)</span>
-        <span class="n">util</span><span class="o">.</span><span class="n">save_matrix</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="s2">&quot;Y&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Y</span><span class="p">)</span>
+        <span class="n">util</span><span class="o">.</span><span class="n">save_matrix</span><span class="p">(</span><span class="n">matrix_path</span><span class="p">,</span> <span class="s2">&quot;X&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">)</span>
+        <span class="n">util</span><span class="o">.</span><span class="n">save_matrix</span><span class="p">(</span><span class="n">matrix_path</span><span class="p">,</span> <span class="s2">&quot;Y&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Y</span><span class="p">)</span>
 
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">folder</span> <span class="o">+</span> <span class="s1">&#39;/row_labels.txt&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;wt&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">row_labels</span><span class="p">))</span>
+        <span class="n">row_labels_file</span> <span class="o">=</span> <span class="n">matrix_path</span> <span class="o">/</span> <span class="s1">&#39;row_labels.txt&#39;</span>
+        <span class="n">row_labels_file</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">row_labels</span><span class="p">))</span>
 
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">folder</span> <span class="o">+</span> <span class="s1">&#39;/column_labels_X.txt&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;wt&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">column_labels_X</span><span class="p">))</span>
+        <span class="n">column_labels_X_file</span> <span class="o">=</span> <span class="n">matrix_path</span> <span class="o">/</span> <span class="s1">&#39;column_labels_X.txt&#39;</span>
+        <span class="n">column_labels_X_file</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">column_labels_X</span><span class="p">))</span>
 
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">folder</span> <span class="o">+</span> <span class="s1">&#39;/column_labels_Y.txt&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;wt&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">column_labels_Y</span><span class="p">))</span></div>
+        <span class="n">column_labels_Y_file</span> <span class="o">=</span> <span class="n">matrix_path</span> <span class="o">/</span> <span class="s1">&#39;column_labels_Y.txt&#39;</span>
+        <span class="n">column_labels_Y_file</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">column_labels_Y</span><span class="p">))</span></div>
 
 
-<div class="viewcode-block" id="DatasetMatrix.load"><a class="viewcode-back" href="../../../dataset/DatasetMatrix.html#mbff.dataset.DatasetMatrix.DatasetMatrix.load">[docs]</a>    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">folder</span><span class="p">):</span>
+<div class="viewcode-block" id="DatasetMatrix.load"><a class="viewcode-back" href="../../../dataset/DatasetMatrix.html#mbff.dataset.DatasetMatrix.DatasetMatrix.load">[docs]</a>    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Load ``X``, ``Y``, ``self.row_labels``, ``self.column_labels_X`` and</span>
 <span class="sd">        ``self.column_labels_Y`` from files in the subfolder</span>
-<span class="sd">        ``[folder]/[self.label]``. To save them, use :py:meth:`save`.</span>
+<span class="sd">        ``[path]/[self.label]``. To save them, use :py:meth:`save`.</span>
 
-<span class="sd">        The folder ``[folder]/[self.label]`` must exist.</span>
+<span class="sd">        The folder ``[path]/[self.label]`` must exist.</span>
 
-<span class="sd">        :param str folder: The root folder in which to find the subfolder</span>
-<span class="sd">            ``[self.label]`` from which to load.</span>
+<span class="sd">        :param str path: The Path object representing the root folder in which</span>
+<span class="sd">            to find the subfolder ``[self.label]`` from which to load.</span>
 <span class="sd">        :return: ``None``</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">folder</span> <span class="o">+=</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span>
+        <span class="n">matrix_path</span> <span class="o">=</span> <span class="n">path</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">X</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">load_matrix</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="s2">&quot;X&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">Y</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">load_matrix</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="s2">&quot;Y&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">X</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">load_matrix</span><span class="p">(</span><span class="n">matrix_path</span><span class="p">,</span> <span class="s2">&quot;X&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Y</span> <span class="o">=</span> <span class="n">util</span><span class="o">.</span><span class="n">load_matrix</span><span class="p">(</span><span class="n">matrix_path</span><span class="p">,</span> <span class="s2">&quot;Y&quot;</span><span class="p">)</span>
 
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">folder</span> <span class="o">+</span> <span class="s1">&#39;/row_labels.txt&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;rt&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">with</span> <span class="p">(</span><span class="n">matrix_path</span> <span class="o">/</span> <span class="s1">&#39;row_labels.txt&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;rt&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">row_labels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="o">.</span><span class="n">strip</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">f</span><span class="p">)))</span>
 
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">folder</span> <span class="o">+</span> <span class="s1">&#39;/column_labels_X.txt&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;rt&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">with</span> <span class="p">(</span><span class="n">matrix_path</span> <span class="o">/</span> <span class="s1">&#39;column_labels_X.txt&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;rt&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">column_labels_X</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="o">.</span><span class="n">strip</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">f</span><span class="p">)))</span>
 
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">folder</span> <span class="o">+</span> <span class="s1">&#39;/column_labels_Y.txt&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;rt&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">with</span> <span class="p">(</span><span class="n">matrix_path</span> <span class="o">/</span> <span class="s1">&#39;column_labels_Y.txt&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;rt&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">column_labels_Y</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="o">.</span><span class="n">strip</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">f</span><span class="p">)))</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">final</span> <span class="o">=</span> <span class="kc">True</span></div>

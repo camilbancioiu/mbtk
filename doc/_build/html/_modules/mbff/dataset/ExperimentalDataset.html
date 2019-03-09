@@ -45,7 +45,7 @@
 <span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="k">import</span> <span class="n">Path</span>
 
-<span class="kn">import</span> <span class="nn">mbff.utilities</span> <span class="k">as</span> <span class="nn">util</span>
+<span class="kn">import</span> <span class="nn">mbff.utilities.functions</span> <span class="k">as</span> <span class="nn">util</span>
 <span class="kn">from</span> <span class="nn">mbff.dataset.DatasetMatrix</span> <span class="k">import</span> <span class="n">DatasetMatrix</span>
 
 <div class="viewcode-block" id="ExperimentalDataset"><a class="viewcode-back" href="../../../dataset/ExperimentalDataset.html#mbff.dataset.ExperimentalDataset.ExperimentalDataset">[docs]</a><span class="k">class</span> <span class="nc">ExperimentalDataset</span><span class="p">():</span>
@@ -251,14 +251,14 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Save this ExperimentalDataset to ``self.definition.folder``.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">util</span><span class="o">.</span><span class="n">ensure_folder</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">definition</span><span class="o">.</span><span class="n">folder</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">definition</span><span class="o">.</span><span class="n">ensure_folder</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">definition</span><span class="o">.</span><span class="n">folder_is_locked</span><span class="p">():</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">definition</span><span class="o">.</span><span class="n">folder</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">matrix_train</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">definition</span><span class="o">.</span><span class="n">folder</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">matrix_test</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">definition</span><span class="o">.</span><span class="n">folder</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">definition</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">matrix_train</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">definition</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">matrix_test</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">definition</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ExperimentalDatasetError</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">definition</span><span class="p">,</span> <span class="s2">&quot;Cannot save - ExDs is folder locked.&quot;</span><span class="p">)</span></div>
+            <span class="k">raise</span> <span class="n">ExperimentalDatasetError</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">definition</span><span class="p">,</span> <span class="s2">&quot;Cannot save - ExDs folder is locked.&quot;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ExperimentalDataset.load"><a class="viewcode-back" href="../../../dataset/ExperimentalDataset.html#mbff.dataset.ExperimentalDataset.ExperimentalDataset.load">[docs]</a>    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -267,15 +267,15 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">matrix</span> <span class="o">=</span> <span class="n">DatasetMatrix</span><span class="p">(</span><span class="s2">&quot;dataset_full&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">definition</span><span class="o">.</span><span class="n">folder</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">matrix</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">definition</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix_train</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">matrix_train</span> <span class="o">=</span> <span class="n">DatasetMatrix</span><span class="p">(</span><span class="s2">&quot;dataset_train&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">matrix_train</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">definition</span><span class="o">.</span><span class="n">folder</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">matrix_train</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">definition</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix_test</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">matrix_test</span> <span class="o">=</span> <span class="n">DatasetMatrix</span><span class="p">(</span><span class="s2">&quot;dataset_test&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">matrix_test</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">definition</span><span class="o">.</span><span class="n">folder</span><span class="p">)</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">matrix_test</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">definition</span><span class="o">.</span><span class="n">path</span><span class="p">)</span></div></div>
 
 
 

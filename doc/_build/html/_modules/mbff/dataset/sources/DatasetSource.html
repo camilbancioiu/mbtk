@@ -62,10 +62,12 @@
 
 <div class="viewcode-block" id="DatasetSource.create_dataset_matrix"><a class="viewcode-back" href="../../../../dataset/sources/DatasetSource.html#mbff.dataset.sources.DatasetSource.DatasetSource.create_dataset_matrix">[docs]</a>    <span class="k">def</span> <span class="nf">create_dataset_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;datasetsource&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        The required method of a ``DatasetSource`` class. This method reads an</span>
-<span class="sd">        external source of data and produces a ``DatasetMatrix`` instance based</span>
-<span class="sd">        on ``configuration``. The newly created ``DatasetMatrix`` instance is</span>
-<span class="sd">        then returned.</span>
+<span class="sd">        The required method of a :py:class:`DatasetSource` class. This method</span>
+<span class="sd">        reads an external source of data and produces a</span>
+<span class="sd">        :py:class:`DatasetMatrix &lt;mbff.dataset.DatasetMatrix.DatasetMatrix&gt;`</span>
+<span class="sd">        instance based on ``configuration``.</span>
+
+<span class="sd">        :param str label: The label of the ``DatasetMatrix``</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">datasetmatrix</span> <span class="o">=</span> <span class="n">DatasetMatrix</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
         <span class="n">datasetmatrix</span><span class="o">.</span><span class="n">X</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">csr_matrix</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="mi">8</span><span class="p">))</span>
