@@ -34,7 +34,10 @@ words.
 
 Instantiating a new :class:`RCV1v2DatasetSource
 <mbff.dataset.sources.RCV1v2DatasetSource>` requires a ``configuration``
-dictionary passed to the constructor, which may contain the following:
+dictionary passed to the constructor. This dictionary will affect all
+subsequent calls to :meth:`create_dataset_matrix()
+<mbff.dataset.sources.RCV1v2DatasetSource.RCV1v2DatasetSource.create_dataset_matrix>`.
+It may contain the following:
 
 * ``configuration['sourcefolder']`` must contain the path to the folder
   containing the downloaded RCV1v2 files, as described above. This item
@@ -57,7 +60,7 @@ dictionary passed to the constructor, which may contain the following:
   object returned by :meth:`create_dataset_matrix
   <mbff.dataset.sources.RCV1v2DatasetSource.RCV1v2DatasetSource.create_dataset_matrix>`.
 
-After instantiating, call the :meth:`create_dataset_matrix
+After instantiating, call the :meth:`create_dataset_matrix()
 <mbff.dataset.sources.RCV1v2DatasetSource.RCV1v2DatasetSource.create_dataset_matrix>`
 method to get a :class:`DatasetMatrix
 <mbff.dataset.DatasetMatrix.DatasetMatrix>` object, which contains the
@@ -83,6 +86,22 @@ documents in RCV1v2 represented as a `document-term matrix`_, as follows:
   columns in ``X`` (the features), in order.
 * The ``column_labels_Y`` list will contain the topics corresponding to the
   columns in ``Y`` (the objective variables, or classes), in order.
+
+Examples
+--------
+
+.. sourcecode:: python
+
+  from pathlib import Path
+  from mbff.dataset.sources.RCV1v2DatasetSource import RCV1v2DatasetSource
+
+  configuration = {
+          'sourcefolder': Path('/var/work/Personal/PhD/Datasets/Reuters/RCV1-v2'),
+          'filters': { },
+          'feature_type': 'binary'
+          }
+  source = RCV1v2DatasetSource(configuration)
+  # TODO
 
 Module :mod:`mbff.dataset.sources.RCV1v2DatasetSource`
 ------------------------------------------------------

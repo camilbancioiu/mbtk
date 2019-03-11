@@ -53,7 +53,7 @@
 <span class="sd">    A class which reads the RCV1v2 dataset files, as published by LYRL2004.</span>
 
 <span class="sd">    :var dict configuration: The configuration dictionary received by the constructor, stored for later reference.</span>
-<span class="sd">    :var str sourcefolder: The folder where the downloaded RCV1v2 files are located.</span>
+<span class="sd">    :var str sourcefolder: The folder where the downloaded RCV1v2 files are located, read from ``configuration``.</span>
 <span class="sd">    :var str sourcefile_documentIDs: The name of the file containing the list of all document IDs.</span>
 <span class="sd">    :var str sourcefile_document_tokens: The name of the file containing all the documents of the dataset, in token form.</span>
 <span class="sd">    :var str sourcefile_topic_assignments: The name of the file containing assignments of document IDs to topics.</span>
@@ -76,7 +76,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">sourcefile_industry_assignments</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">/oa9.rcv1-v2.industries.qrels.txt&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sourcefolder</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="RCV1v2DatasetSource.create_dataset_matrix"><a class="viewcode-back" href="../../../../dataset/sources/RCV1v2DatasetSource.html#mbff.dataset.sources.RCV1v2DatasetSource.RCV1v2DatasetSource.create_dataset_matrix">[docs]</a>    <span class="k">def</span> <span class="nf">create_dataset_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;rcv1v2&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="RCV1v2DatasetSource.create_dataset_matrix"><a class="viewcode-back" href="../../../../dataset/sources/RCV1v2DatasetSource.html#mbff.dataset.sources.RCV1v2DatasetSource.RCV1v2DatasetSource.create_dataset_matrix">[docs]</a>    <span class="k">def</span> <span class="nf">create_dataset_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;rcv1v2&#39;</span><span class="p">,</span> <span class="n">feature_type</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create a :class:`DatasetMatrix</span>
 <span class="sd">        &lt;mbff.dataset.DatasetMatrix.DatasetMatrix&gt;` object containing a</span>
@@ -114,11 +114,14 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unsupported RCV1v2 document filter specified. Either specify </span><span class="se">\</span>
 <span class="s2">                    the &#39;industry&#39; filter or no filter at all.&quot;</span><span class="p">)</span>
 
+        <span class="k">if</span> <span class="n">feature_type</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="n">feature_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">configuration</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;feature_type&#39;</span><span class="p">,</span> <span class="s1">&#39;wordcount&#39;</span><span class="p">)</span>
+
         <span class="n">documents</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_documents</span><span class="p">(</span><span class="n">documentIDs</span><span class="p">)</span>
         <span class="n">words</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gather_complete_word_list</span><span class="p">(</span><span class="n">documents</span><span class="p">)</span>
         <span class="n">topics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gather_complete_topic_list</span><span class="p">(</span><span class="n">documents</span><span class="p">)</span>
 
-        <span class="n">dok_matrix_words</span><span class="p">,</span> <span class="n">dok_matrix_topics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_dok_matrices</span><span class="p">(</span><span class="n">documents</span><span class="p">,</span> <span class="n">documentIDs</span><span class="p">,</span> <span class="n">words</span><span class="p">,</span> <span class="n">topics</span><span class="p">)</span>
+        <span class="n">dok_matrix_words</span><span class="p">,</span> <span class="n">dok_matrix_topics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_dok_matrices</span><span class="p">(</span><span class="n">documents</span><span class="p">,</span> <span class="n">documentIDs</span><span class="p">,</span> <span class="n">words</span><span class="p">,</span> <span class="n">topics</span><span class="p">,</span> <span class="n">feature_type</span><span class="p">)</span>
 
         <span class="n">datasetmatrix</span> <span class="o">=</span> <span class="n">DatasetMatrix</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
         <span class="n">datasetmatrix</span><span class="o">.</span><span class="n">X</span> <span class="o">=</span> <span class="n">dok_matrix_words</span><span class="o">.</span><span class="n">tocsr</span><span class="p">()</span>
@@ -181,7 +184,7 @@
         <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">([</span><span class="n">topic</span> <span class="k">for</span> <span class="n">document</span> <span class="ow">in</span> <span class="n">documents</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">for</span> <span class="n">topic</span> <span class="ow">in</span> <span class="n">document</span><span class="o">.</span><span class="n">topics</span><span class="p">])))</span></div>
 
 
-<div class="viewcode-block" id="RCV1v2DatasetSource.create_dok_matrices"><a class="viewcode-back" href="../../../../dataset/sources/RCV1v2DatasetSource.html#mbff.dataset.sources.RCV1v2DatasetSource.RCV1v2DatasetSource.create_dok_matrices">[docs]</a>    <span class="k">def</span> <span class="nf">create_dok_matrices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">documents</span><span class="p">,</span> <span class="n">documentIDs</span><span class="p">,</span> <span class="n">words</span><span class="p">,</span> <span class="n">topics</span><span class="p">):</span>
+<div class="viewcode-block" id="RCV1v2DatasetSource.create_dok_matrices"><a class="viewcode-back" href="../../../../dataset/sources/RCV1v2DatasetSource.html#mbff.dataset.sources.RCV1v2DatasetSource.RCV1v2DatasetSource.create_dok_matrices">[docs]</a>    <span class="k">def</span> <span class="nf">create_dok_matrices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">documents</span><span class="p">,</span> <span class="n">documentIDs</span><span class="p">,</span> <span class="n">words</span><span class="p">,</span> <span class="n">topics</span><span class="p">,</span> <span class="n">feature_type</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convert a collection of :class:`RCV1v2Document` objects into a pair</span>
 <span class="sd">        of matrices: a document-term matrix and a class-assignment matrix</span>
@@ -191,6 +194,7 @@
 <span class="sd">        :param list(int) documentIDs: The list of document IDs which should be added to the returned matrices.</span>
 <span class="sd">        :param list(str) words: The list of unique words used by the provided ``documents``, as returned by :meth:`gather_complete_word_list`.</span>
 <span class="sd">        :param list(str) topics: The list of unique topics to which the provided ``documents`` belong, as returned by :meth:`gather_complete_topic_list`.</span>
+<span class="sd">        :param str feature_type: The type of values to generate for the document-term matrix (``&#39;wordcount&#39;`` or ``&#39;binary&#39;``).</span>
 <span class="sd">        :return: A tuple containing the document-term matrix and class-assignment matrix.</span>
 <span class="sd">        :rtype: tuple(scipy.sparse.dok_matrix, scipy.sparse.dok_matrix)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -204,12 +208,12 @@
             <span class="n">documentID</span> <span class="o">=</span> <span class="n">documentIDs</span><span class="p">[</span><span class="n">row</span><span class="p">]</span>
             <span class="n">document</span> <span class="o">=</span> <span class="n">documents</span><span class="p">[</span><span class="n">documentID</span><span class="p">]</span>
 
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">configuration</span><span class="p">[</span><span class="s1">&#39;feature_type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;wordcount&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">feature_type</span> <span class="o">==</span> <span class="s1">&#39;wordcount&#39;</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">document</span><span class="o">.</span><span class="n">words</span><span class="p">:</span>
                     <span class="n">column</span> <span class="o">=</span> <span class="n">words_index</span><span class="p">[</span><span class="n">word</span><span class="p">]</span>
                     <span class="n">dok_matrix_words</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">column</span><span class="p">]</span> <span class="o">=</span> <span class="n">document</span><span class="o">.</span><span class="n">word_frequencies</span><span class="p">[</span><span class="n">word</span><span class="p">]</span>
 
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">configuration</span><span class="p">[</span><span class="s1">&#39;feature_type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;binary&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">feature_type</span> <span class="o">==</span> <span class="s1">&#39;binary&#39;</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">document</span><span class="o">.</span><span class="n">words</span><span class="p">:</span>
                     <span class="n">column</span> <span class="o">=</span> <span class="n">words_index</span><span class="p">[</span><span class="n">word</span><span class="p">]</span>
                     <span class="n">dok_matrix_words</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">column</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>

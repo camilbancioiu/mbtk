@@ -34,7 +34,7 @@ class RCV1v2DatasetSource(DatasetSource):
         self.sourcefile_industry_assignments = '{}/oa9.rcv1-v2.industries.qrels.txt'.format(self.sourcefolder)
 
 
-    def create_dataset_matrix(self, label='rcv1v2'):
+    def create_dataset_matrix(self, label='rcv1v2', feature_type=''):
         """
         Create a :class:`DatasetMatrix
         <mbff.dataset.DatasetMatrix.DatasetMatrix>` object containing a
@@ -72,11 +72,14 @@ class RCV1v2DatasetSource(DatasetSource):
             raise ValueError("Unsupported RCV1v2 document filter specified. Either specify \
                     the 'industry' filter or no filter at all.")
 
+        if feature_type == '':
+            feature_type = self.configuration.get('feature_type', 'wordcount')
+
         documents = self.read_documents(documentIDs)
         words = self.gather_complete_word_list(documents)
         topics = self.gather_complete_topic_list(documents)
 
-        dok_matrix_words, dok_matrix_topics = self.create_dok_matrices(documents, documentIDs, words, topics)
+        dok_matrix_words, dok_matrix_topics = self.create_dok_matrices(documents, documentIDs, words, topics, feature_type)
 
         datasetmatrix = DatasetMatrix(label)
         datasetmatrix.X = dok_matrix_words.tocsr()
@@ -139,7 +142,7 @@ class RCV1v2DatasetSource(DatasetSource):
         return sorted(list(set([topic for document in documents.values() for topic in document.topics])))
 
 
-    def create_dok_matrices(self, documents, documentIDs, words, topics):
+    def create_dok_matrices(self, documents, documentIDs, words, topics, feature_type):
         """
         Convert a collection of :class:`RCV1v2Document` objects into a pair
         of matrices: a document-term matrix and a class-assignment matrix
@@ -149,6 +152,7 @@ class RCV1v2DatasetSource(DatasetSource):
         :param list(int) documentIDs: The list of document IDs which should be added to the returned matrices.
         :param list(str) words: The list of unique words used by the provided ``documents``, as returned by :meth:`gather_complete_word_list`.
         :param list(str) topics: The list of unique topics to which the provided ``documents`` belong, as returned by :meth:`gather_complete_topic_list`.
+        :param str feature_type: The type of values to generate for the document-term matrix (``'wordcount'`` or ``'binary'``).
         :return: A tuple containing the document-term matrix and class-assignment matrix.
         :rtype: tuple(scipy.sparse.dok_matrix, scipy.sparse.dok_matrix)
         """
@@ -162,12 +166,12 @@ class RCV1v2DatasetSource(DatasetSource):
             documentID = documentIDs[row]
             document = documents[documentID]
 
-            if self.configuration['feature_type'] == 'wordcount':
+            if feature_type == 'wordcount':
                 for word in document.words:
                     column = words_index[word]
                     dok_matrix_words[row, column] = document.word_frequencies[word]
 
-            if self.configuration['feature_type'] == 'binary':
+            if feature_type == 'binary':
                 for word in document.words:
                     column = words_index[word]
                     dok_matrix_words[row, column] = 1

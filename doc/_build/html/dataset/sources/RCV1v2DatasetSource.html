@@ -75,7 +75,9 @@ documents by the “bag of words” principle. Namely, the document is represent
 by the words that it contains and the number of occurences of each of its
 words.</p>
 <p>Instantiating a new <a class="reference internal" href="#module-mbff.dataset.sources.RCV1v2DatasetSource" title="mbff.dataset.sources.RCV1v2DatasetSource"><code class="xref py py-class docutils literal notranslate"><span class="pre">RCV1v2DatasetSource</span></code></a> requires a <code class="docutils literal notranslate"><span class="pre">configuration</span></code>
-dictionary passed to the constructor, which may contain the following:</p>
+dictionary passed to the constructor. This dictionary will affect all
+subsequent calls to <a class="reference internal" href="#mbff.dataset.sources.RCV1v2DatasetSource.RCV1v2DatasetSource.create_dataset_matrix" title="mbff.dataset.sources.RCV1v2DatasetSource.RCV1v2DatasetSource.create_dataset_matrix"><code class="xref py py-meth docutils literal notranslate"><span class="pre">create_dataset_matrix()</span></code></a>.
+It may contain the following:</p>
 <ul class="simple">
 <li><code class="docutils literal notranslate"><span class="pre">configuration['sourcefolder']</span></code> must contain the path to the folder
 containing the downloaded RCV1v2 files, as described above. This item
@@ -97,7 +99,7 @@ or not setting <code class="docutils literal notranslate"><span class="pre">conf
 in the <a class="reference internal" href="../DatasetMatrix.html#mbff.dataset.DatasetMatrix.DatasetMatrix" title="mbff.dataset.DatasetMatrix.DatasetMatrix"><code class="xref py py-class docutils literal notranslate"><span class="pre">DatasetMatrix</span></code></a>
 object returned by <a class="reference internal" href="#mbff.dataset.sources.RCV1v2DatasetSource.RCV1v2DatasetSource.create_dataset_matrix" title="mbff.dataset.sources.RCV1v2DatasetSource.RCV1v2DatasetSource.create_dataset_matrix"><code class="xref py py-meth docutils literal notranslate"><span class="pre">create_dataset_matrix</span></code></a>.</li>
 </ul>
-<p>After instantiating, call the <a class="reference internal" href="#mbff.dataset.sources.RCV1v2DatasetSource.RCV1v2DatasetSource.create_dataset_matrix" title="mbff.dataset.sources.RCV1v2DatasetSource.RCV1v2DatasetSource.create_dataset_matrix"><code class="xref py py-meth docutils literal notranslate"><span class="pre">create_dataset_matrix</span></code></a>
+<p>After instantiating, call the <a class="reference internal" href="#mbff.dataset.sources.RCV1v2DatasetSource.RCV1v2DatasetSource.create_dataset_matrix" title="mbff.dataset.sources.RCV1v2DatasetSource.RCV1v2DatasetSource.create_dataset_matrix"><code class="xref py py-meth docutils literal notranslate"><span class="pre">create_dataset_matrix()</span></code></a>
 method to get a <a class="reference internal" href="../DatasetMatrix.html#mbff.dataset.DatasetMatrix.DatasetMatrix" title="mbff.dataset.DatasetMatrix.DatasetMatrix"><code class="xref py py-class docutils literal notranslate"><span class="pre">DatasetMatrix</span></code></a> object, which contains the
 documents in RCV1v2 represented as a <a class="reference external" href="https://en.wikipedia.org/wiki/Document-term_matrix">document-term matrix</a>, as follows:</p>
 <blockquote>
@@ -123,6 +125,21 @@ columns in <code class="docutils literal notranslate"><span class="pre">X</span>
 columns in <code class="docutils literal notranslate"><span class="pre">Y</span></code> (the objective variables, or classes), in order.</li>
 </ul>
 </div>
+<div class="section" id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">mbff.dataset.sources.RCV1v2DatasetSource</span> <span class="kn">import</span> <span class="n">RCV1v2DatasetSource</span>
+
+<span class="n">configuration</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;sourcefolder&#39;</span><span class="p">:</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;/var/work/Personal/PhD/Datasets/Reuters/RCV1-v2&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;filters&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="p">},</span>
+        <span class="s1">&#39;feature_type&#39;</span><span class="p">:</span> <span class="s1">&#39;binary&#39;</span>
+        <span class="p">}</span>
+<span class="n">source</span> <span class="o">=</span> <span class="n">RCV1v2DatasetSource</span><span class="p">(</span><span class="n">configuration</span><span class="p">)</span>
+<span class="c1"># TODO</span>
+</pre></div>
+</div>
+</div>
 <div class="section" id="module-mbff.dataset.sources.RCV1v2DatasetSource">
 <span id="module-mbff-dataset-sources-rcv1v2datasetsource"></span><h2>Module <a class="reference internal" href="#module-mbff.dataset.sources.RCV1v2DatasetSource" title="mbff.dataset.sources.RCV1v2DatasetSource"><code class="xref py py-mod docutils literal notranslate"><span class="pre">mbff.dataset.sources.RCV1v2DatasetSource</span></code></a><a class="headerlink" href="#module-mbff.dataset.sources.RCV1v2DatasetSource" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
@@ -136,7 +153,7 @@ columns in <code class="docutils literal notranslate"><span class="pre">Y</span>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
 <li><strong>configuration</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – The configuration dictionary received by the constructor, stored for later reference.</li>
-<li><strong>sourcefolder</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The folder where the downloaded RCV1v2 files are located.</li>
+<li><strong>sourcefolder</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The folder where the downloaded RCV1v2 files are located, read from <code class="docutils literal notranslate"><span class="pre">configuration</span></code>.</li>
 <li><strong>sourcefile_documentIDs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the file containing the list of all document IDs.</li>
 <li><strong>sourcefile_document_tokens</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the file containing all the documents of the dataset, in token form.</li>
 <li><strong>sourcefile_topic_assignments</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the file containing assignments of document IDs to topics.</li>
@@ -148,7 +165,7 @@ columns in <code class="docutils literal notranslate"><span class="pre">Y</span>
 </table>
 <dl class="method">
 <dt id="mbff.dataset.sources.RCV1v2DatasetSource.RCV1v2DatasetSource.create_dataset_matrix">
-<code class="descname">create_dataset_matrix</code><span class="sig-paren">(</span><em>label='rcv1v2'</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mbff/dataset/sources/RCV1v2DatasetSource.html#RCV1v2DatasetSource.create_dataset_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mbff.dataset.sources.RCV1v2DatasetSource.RCV1v2DatasetSource.create_dataset_matrix" title="Permalink to this definition">¶</a></dt>
+<code class="descname">create_dataset_matrix</code><span class="sig-paren">(</span><em>label='rcv1v2'</em>, <em>feature_type=''</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mbff/dataset/sources/RCV1v2DatasetSource.html#RCV1v2DatasetSource.create_dataset_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mbff.dataset.sources.RCV1v2DatasetSource.RCV1v2DatasetSource.create_dataset_matrix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a <a class="reference internal" href="../DatasetMatrix.html#mbff.dataset.DatasetMatrix.DatasetMatrix" title="mbff.dataset.DatasetMatrix.DatasetMatrix"><code class="xref py py-class docutils literal notranslate"><span class="pre">DatasetMatrix</span></code></a> object containing a
 document-term matrix based on the documents in the RCV1v2 dataset
 (previously downloaded).</p>
@@ -249,7 +266,7 @@ argument.</p>
 
 <dl class="method">
 <dt id="mbff.dataset.sources.RCV1v2DatasetSource.RCV1v2DatasetSource.create_dok_matrices">
-<code class="descname">create_dok_matrices</code><span class="sig-paren">(</span><em>documents</em>, <em>documentIDs</em>, <em>words</em>, <em>topics</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mbff/dataset/sources/RCV1v2DatasetSource.html#RCV1v2DatasetSource.create_dok_matrices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mbff.dataset.sources.RCV1v2DatasetSource.RCV1v2DatasetSource.create_dok_matrices" title="Permalink to this definition">¶</a></dt>
+<code class="descname">create_dok_matrices</code><span class="sig-paren">(</span><em>documents</em>, <em>documentIDs</em>, <em>words</em>, <em>topics</em>, <em>feature_type</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mbff/dataset/sources/RCV1v2DatasetSource.html#RCV1v2DatasetSource.create_dok_matrices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mbff.dataset.sources.RCV1v2DatasetSource.RCV1v2DatasetSource.create_dok_matrices" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert a collection of <a class="reference internal" href="#mbff.dataset.sources.RCV1v2DatasetSource.RCV1v2Document" title="mbff.dataset.sources.RCV1v2DatasetSource.RCV1v2Document"><code class="xref py py-class docutils literal notranslate"><span class="pre">RCV1v2Document</span></code></a> objects into a pair
 of matrices: a document-term matrix and a class-assignment matrix
 (class = RCV1v2 topic).</p>
@@ -262,6 +279,7 @@ of matrices: a document-term matrix and a class-assignment matrix
 <li><strong>documentIDs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>)</em>) – The list of document IDs which should be added to the returned matrices.</li>
 <li><strong>words</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>)</em>) – The list of unique words used by the provided <code class="docutils literal notranslate"><span class="pre">documents</span></code>, as returned by <a class="reference internal" href="#mbff.dataset.sources.RCV1v2DatasetSource.RCV1v2DatasetSource.gather_complete_word_list" title="mbff.dataset.sources.RCV1v2DatasetSource.RCV1v2DatasetSource.gather_complete_word_list"><code class="xref py py-meth docutils literal notranslate"><span class="pre">gather_complete_word_list()</span></code></a>.</li>
 <li><strong>topics</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>)</em>) – The list of unique topics to which the provided <code class="docutils literal notranslate"><span class="pre">documents</span></code> belong, as returned by <a class="reference internal" href="#mbff.dataset.sources.RCV1v2DatasetSource.RCV1v2DatasetSource.gather_complete_topic_list" title="mbff.dataset.sources.RCV1v2DatasetSource.RCV1v2DatasetSource.gather_complete_topic_list"><code class="xref py py-meth docutils literal notranslate"><span class="pre">gather_complete_topic_list()</span></code></a>.</li>
+<li><strong>feature_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The type of values to generate for the document-term matrix (<code class="docutils literal notranslate"><span class="pre">'wordcount'</span></code> or <code class="docutils literal notranslate"><span class="pre">'binary'</span></code>).</li>
 </ul>
 </td>
 </tr>
@@ -402,6 +420,7 @@ and the current list of unique words in the document.</p>
 <li><a class="reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">RCV1v2DatasetSource</span></code></a><ul>
 <li><a class="reference internal" href="#about-rcv1v2">About RCV1v2</a></li>
 <li><a class="reference internal" href="#reading-rcv1v2-documents">Reading RCV1v2 documents</a></li>
+<li><a class="reference internal" href="#examples">Examples</a></li>
 <li><a class="reference internal" href="#module-mbff.dataset.sources.RCV1v2DatasetSource">Module <code class="docutils literal notranslate"><span class="pre">mbff.dataset.sources.RCV1v2DatasetSource</span></code></a></li>
 <li><a class="reference internal" href="#references">References</a></li>
 </ul>
