@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Class DatasetSource &#8212; MBFF 0.3 documentation</title>
+    <title>Class BinarySyntheticDatasetSource &#8212; MBFF 0.3 documentation</title>
     <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/style.css" />
@@ -19,8 +19,8 @@
     
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Class BinarySyntheticDatasetSource" href="BinarySyntheticDatasetSource.html" />
-    <link rel="prev" title="Dataset sources" href="index.html" /> 
+    <link rel="next" title="Class RCV1v2DatasetSource" href="RCV1v2DatasetSource.html" />
+    <link rel="prev" title="Class DatasetSource" href="DatasetSource.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
@@ -32,10 +32,10 @@
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="BinarySyntheticDatasetSource.html" title="Class BinarySyntheticDatasetSource"
+          <a href="RCV1v2DatasetSource.html" title="Class RCV1v2DatasetSource"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="index.html" title="Dataset sources"
+          <a href="DatasetSource.html" title="Class DatasetSource"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../index.html">MBFF 0.3 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Dataset infrastructure</a> &#187;</li>
@@ -48,19 +48,18 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="module-mbff.dataset.sources.DatasetSource">
-<span id="class-datasetsource"></span><h1>Class <code class="docutils literal notranslate"><span class="pre">DatasetSource</span></code><a class="headerlink" href="#module-mbff.dataset.sources.DatasetSource" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-mbff.dataset.sources.BinarySyntheticDatasetSource">
+<span id="class-binarysyntheticdatasetsource"></span><h1>Class <code class="docutils literal notranslate"><span class="pre">BinarySyntheticDatasetSource</span></code><a class="headerlink" href="#module-mbff.dataset.sources.BinarySyntheticDatasetSource" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
-<dt id="mbff.dataset.sources.DatasetSource.DatasetSource">
-<em class="property">class </em><code class="descclassname">mbff.dataset.sources.DatasetSource.</code><code class="descname">DatasetSource</code><span class="sig-paren">(</span><em>configuration</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mbff/dataset/sources/DatasetSource.html#DatasetSource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mbff.dataset.sources.DatasetSource.DatasetSource" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
-<p>Base class for all dataset sources. It doesn’t provide any useful
-functionality, but exists for illustrative purposes and as a starting point
-for creating new DatasetSource classes.</p>
+<dt id="mbff.dataset.sources.BinarySyntheticDatasetSource.BinarySyntheticDatasetSource">
+<em class="property">class </em><code class="descclassname">mbff.dataset.sources.BinarySyntheticDatasetSource.</code><code class="descname">BinarySyntheticDatasetSource</code><span class="sig-paren">(</span><em>configuration</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mbff/dataset/sources/BinarySyntheticDatasetSource.html#BinarySyntheticDatasetSource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mbff.dataset.sources.BinarySyntheticDatasetSource.BinarySyntheticDatasetSource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="DatasetSource.html#mbff.dataset.sources.DatasetSource.DatasetSource" title="mbff.dataset.sources.DatasetSource.DatasetSource"><code class="xref py py-class docutils literal notranslate"><span class="pre">mbff.dataset.sources.DatasetSource.DatasetSource</span></code></a></p>
+<p>A dataset source which generates a random binary dataset by specifying the
+proportion of values of <code class="docutils literal notranslate"><span class="pre">1</span></code> for each feature and objective.</p>
 <dl class="method">
-<dt id="mbff.dataset.sources.DatasetSource.DatasetSource.create_dataset_matrix">
-<code class="descname">create_dataset_matrix</code><span class="sig-paren">(</span><em>label='datasetsource'</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mbff/dataset/sources/DatasetSource.html#DatasetSource.create_dataset_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mbff.dataset.sources.DatasetSource.DatasetSource.create_dataset_matrix" title="Permalink to this definition">¶</a></dt>
-<dd><p>The required method of a <a class="reference internal" href="#mbff.dataset.sources.DatasetSource.DatasetSource" title="mbff.dataset.sources.DatasetSource.DatasetSource"><code class="xref py py-class docutils literal notranslate"><span class="pre">DatasetSource</span></code></a> class. This method
+<dt id="mbff.dataset.sources.BinarySyntheticDatasetSource.BinarySyntheticDatasetSource.create_dataset_matrix">
+<code class="descname">create_dataset_matrix</code><span class="sig-paren">(</span><em>label='binarydataset'</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mbff/dataset/sources/BinarySyntheticDatasetSource.html#BinarySyntheticDatasetSource.create_dataset_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mbff.dataset.sources.BinarySyntheticDatasetSource.BinarySyntheticDatasetSource.create_dataset_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>The required method of a <code class="xref py py-class docutils literal notranslate"><span class="pre">DatasetSource</span></code> class. This method
 reads an external source of data and produces a
 <a class="reference internal" href="../DatasetMatrix.html#mbff.dataset.DatasetMatrix.DatasetMatrix" title="mbff.dataset.DatasetMatrix.DatasetMatrix"><code class="xref py py-class docutils literal notranslate"><span class="pre">DatasetMatrix</span></code></a>
 instance based on <code class="docutils literal notranslate"><span class="pre">configuration</span></code>.</p>
@@ -74,6 +73,16 @@ instance based on <code class="docutils literal notranslate"><span class="pre">c
 </table>
 </dd></dl>
 
+<dl class="method">
+<dt id="mbff.dataset.sources.BinarySyntheticDatasetSource.BinarySyntheticDatasetSource.create_random_binary_matrix">
+<code class="descname">create_random_binary_matrix</code><span class="sig-paren">(</span><em>row_count</em>, <em>probabilities_per_column</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mbff/dataset/sources/BinarySyntheticDatasetSource.html#BinarySyntheticDatasetSource.create_random_binary_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mbff.dataset.sources.BinarySyntheticDatasetSource.BinarySyntheticDatasetSource.create_random_binary_matrix" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="mbff.dataset.sources.BinarySyntheticDatasetSource.BinarySyntheticDatasetSource.create_shuffled_binary_column">
+<code class="descname">create_shuffled_binary_column</code><span class="sig-paren">(</span><em>row_count</em>, <em>p_one</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mbff/dataset/sources/BinarySyntheticDatasetSource.html#BinarySyntheticDatasetSource.create_shuffled_binary_column"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mbff.dataset.sources.BinarySyntheticDatasetSource.BinarySyntheticDatasetSource.create_shuffled_binary_column" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 </div>
@@ -85,15 +94,15 @@ instance based on <code class="docutils literal notranslate"><span class="pre">c
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
-  <p class="topless"><a href="index.html"
-                        title="previous chapter">Dataset sources</a></p>
+  <p class="topless"><a href="DatasetSource.html"
+                        title="previous chapter">Class <code class="docutils literal notranslate"><span class="pre">DatasetSource</span></code></a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="BinarySyntheticDatasetSource.html"
-                        title="next chapter">Class <code class="docutils literal notranslate"><span class="pre">BinarySyntheticDatasetSource</span></code></a></p>
+  <p class="topless"><a href="RCV1v2DatasetSource.html"
+                        title="next chapter">Class <code class="docutils literal notranslate"><span class="pre">RCV1v2DatasetSource</span></code></a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="../../_sources/dataset/sources/DatasetSource.rst.txt"
+      <li><a href="../../_sources/dataset/sources/BinarySyntheticDatasetSource.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
@@ -123,10 +132,10 @@ instance based on <code class="docutils literal notranslate"><span class="pre">c
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="BinarySyntheticDatasetSource.html" title="Class BinarySyntheticDatasetSource"
+          <a href="RCV1v2DatasetSource.html" title="Class RCV1v2DatasetSource"
              >next</a> |</li>
         <li class="right" >
-          <a href="index.html" title="Dataset sources"
+          <a href="DatasetSource.html" title="Class DatasetSource"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../index.html">MBFF 0.3 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Dataset infrastructure</a> &#187;</li>

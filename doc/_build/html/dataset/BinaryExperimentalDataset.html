@@ -1,0 +1,344 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Class BinaryExperimentalDataset &#8212; MBFF 0.3 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/style.css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Dataset sources" href="sources/index.html" />
+    <link rel="prev" title="Class ExperimentalDataset" href="ExperimentalDataset.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="sources/index.html" title="Dataset sources"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="ExperimentalDataset.html" title="Class ExperimentalDataset"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">MBFF 0.3 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Dataset infrastructure</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-mbff.dataset.BinaryExperimentalDataset">
+<span id="class-binaryexperimentaldataset"></span><h1>Class <code class="docutils literal notranslate"><span class="pre">BinaryExperimentalDataset</span></code><a class="headerlink" href="#module-mbff.dataset.BinaryExperimentalDataset" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="mbff.dataset.BinaryExperimentalDataset.BinaryExperimentalDataset">
+<em class="property">class </em><code class="descclassname">mbff.dataset.BinaryExperimentalDataset.</code><code class="descname">BinaryExperimentalDataset</code><span class="sig-paren">(</span><em>definition</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mbff/dataset/BinaryExperimentalDataset.html#BinaryExperimentalDataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mbff.dataset.BinaryExperimentalDataset.BinaryExperimentalDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="ExperimentalDataset.html#mbff.dataset.ExperimentalDataset.ExperimentalDataset" title="mbff.dataset.ExperimentalDataset.ExperimentalDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">mbff.dataset.ExperimentalDataset.ExperimentalDataset</span></code></a></p>
+<p>An experimental dataset which contains only binary data. This means that
+the three <a class="reference internal" href="DatasetMatrix.html#mbff.dataset.DatasetMatrix.DatasetMatrix" title="mbff.dataset.DatasetMatrix.DatasetMatrix"><code class="xref py py-class docutils literal notranslate"><span class="pre">DatasetMatrix</span></code></a> instances (<code class="docutils literal notranslate"><span class="pre">self.matrix</span></code>,
+<code class="docutils literal notranslate"><span class="pre">self.matrix_train</span></code>, <code class="docutils literal notranslate"><span class="pre">self.matrix_test</span></code>) are treated as if the contain
+only values <code class="docutils literal notranslate"><span class="pre">0</span></code> and <code class="docutils literal notranslate"><span class="pre">1</span></code>.</p>
+<p>The <a class="reference internal" href="#mbff.dataset.BinaryExperimentalDataset.BinaryExperimentalDataset" title="mbff.dataset.BinaryExperimentalDataset.BinaryExperimentalDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">BinaryExperimentalDataset</span></code></a> class provides an extra
+processing step to the default splitting operation performed by
+<a class="reference internal" href="ExperimentalDataset.html#mbff.dataset.ExperimentalDataset.ExperimentalDataset.build" title="mbff.dataset.ExperimentalDataset.ExperimentalDataset.build"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ExperimentalDataset.build()</span></code></a>.</p>
+<dl class="method">
+<dt id="mbff.dataset.BinaryExperimentalDataset.BinaryExperimentalDataset.process_before_split">
+<code class="descname">process_before_split</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mbff/dataset/BinaryExperimentalDataset.html#BinaryExperimentalDataset.process_before_split"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mbff.dataset.BinaryExperimentalDataset.BinaryExperimentalDataset.process_before_split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called after retrieving data from a dataset source, but before
+splitting the dataset into training and testing subsets.</p>
+<p>Classes inheriting <code class="docutils literal notranslate"><span class="pre">ExperimentalDataset</span></code> may implement this method to
+intervene at that point.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Nothing</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mbff.dataset.BinaryExperimentalDataset.BinaryExperimentalDataset.process_after_split">
+<code class="descname">process_after_split</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mbff/dataset/BinaryExperimentalDataset.html#BinaryExperimentalDataset.process_after_split"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mbff.dataset.BinaryExperimentalDataset.BinaryExperimentalDataset.process_after_split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called after splitting the dataset into training and testing subsets,
+but before finalizing and saving the ExperimentalDataset. This method
+is called regardless of the value of the argument
+<code class="docutils literal notranslate"><span class="pre">finalize_and_save</span></code>, received by the <code class="docutils literal notranslate"><span class="pre">build()</span></code> method.</p>
+<p>Classes inheriting <code class="docutils literal notranslate"><span class="pre">ExperimentalDataset</span></code> may implement this method to
+intervene at that point.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Nothing</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mbff.dataset.BinaryExperimentalDataset.BinaryExperimentalDataset.thresholded_features_to_remove">
+<code class="descname">thresholded_features_to_remove</code><span class="sig-paren">(</span><em>matrix_label</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mbff/dataset/BinaryExperimentalDataset.html#BinaryExperimentalDataset.thresholded_features_to_remove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mbff.dataset.BinaryExperimentalDataset.BinaryExperimentalDataset.thresholded_features_to_remove" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="mbff.dataset.BinaryExperimentalDataset.BinaryExperimentalDataset.thresholded_objectives_to_remove">
+<code class="descname">thresholded_objectives_to_remove</code><span class="sig-paren">(</span><em>matrix_label</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mbff/dataset/BinaryExperimentalDataset.html#BinaryExperimentalDataset.thresholded_objectives_to_remove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mbff.dataset.BinaryExperimentalDataset.BinaryExperimentalDataset.thresholded_objectives_to_remove" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="mbff.dataset.BinaryExperimentalDataset.BinaryExperimentalDataset.thresholded_columns_to_remove">
+<code class="descname">thresholded_columns_to_remove</code><span class="sig-paren">(</span><em>datasetmatrix</em>, <em>matrix_label</em>, <em>thresholds</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mbff/dataset/BinaryExperimentalDataset.html#BinaryExperimentalDataset.thresholded_columns_to_remove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mbff.dataset.BinaryExperimentalDataset.BinaryExperimentalDataset.thresholded_columns_to_remove" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="mbff.dataset.BinaryExperimentalDataset.BinaryExperimentalDataset.build">
+<code class="descname">build</code><span class="sig-paren">(</span><em>finalize_and_save=True</em><span class="sig-paren">)</span><a class="headerlink" href="#mbff.dataset.BinaryExperimentalDataset.BinaryExperimentalDataset.build" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build an ExperimentalDataset from an external dataset source, as
+dictated by <code class="docutils literal notranslate"><span class="pre">self.definition</span></code>.</p>
+<p>This is where we instantiate the class that will read an external
+source of data for us, and give back a <a class="reference internal" href="DatasetMatrix.html#module-mbff.dataset.DatasetMatrix" title="mbff.dataset.DatasetMatrix"><code class="xref py py-class docutils literal notranslate"><span class="pre">DatasetMatrix</span></code></a> instance containing the samples as rows,
+features as columns of its <code class="docutils literal notranslate"><span class="pre">X</span></code> matrix and objective variables as its
+<code class="docutils literal notranslate"><span class="pre">Y</span></code> matrix. The class that is to be instantiated as the dataset
+source is specified by <code class="docutils literal notranslate"><span class="pre">self.definition.source</span></code>, and its constructor
+parameters are provided in <code class="docutils literal notranslate"><span class="pre">self.definition.source_configuration</span></code>.
+After retrieval, the <code class="docutils literal notranslate"><span class="pre">DatasetMatrix</span></code> object containing the full
+dataset will be stored in <code class="docutils literal notranslate"><span class="pre">self.matrix</span></code>. The Feature Selection
+algorithms will only require this DatasetMatrix.</p>
+<p>After retrieving the full dataset from the external source, we perform
+a random split of the samples into two subsets: the training set and
+the testing (evaluation) set, which will later be used to train and
+evaluate learning algorithm (usually a classifier). They will be stored
+as two separate <code class="docutils literal notranslate"><span class="pre">DatasetMatrix</span></code> instances, in <code class="docutils literal notranslate"><span class="pre">self.matrix_train</span></code>
+and <code class="docutils literal notranslate"><span class="pre">self.matrix_test</span></code>. Together, they can rebuild the original full
+dataset from <code class="docutils literal notranslate"><span class="pre">self.matrix</span></code>. The Feature Selection algorithms will not
+normally be interested in these two submatrices.</p>
+<p>Classes that inherit ExperimentalDataset may also intervene in the
+build process, by overriding the following methods:</p>
+<ul class="simple">
+<li><a class="reference internal" href="#mbff.dataset.BinaryExperimentalDataset.BinaryExperimentalDataset.process_before_split" title="mbff.dataset.BinaryExperimentalDataset.BinaryExperimentalDataset.process_before_split"><code class="xref py py-meth docutils literal notranslate"><span class="pre">process_before_split()</span></code></a></li>
+<li><a class="reference internal" href="#mbff.dataset.BinaryExperimentalDataset.BinaryExperimentalDataset.process_after_split" title="mbff.dataset.BinaryExperimentalDataset.BinaryExperimentalDataset.process_after_split"><code class="xref py py-meth docutils literal notranslate"><span class="pre">process_after_split()</span></code></a></li>
+<li><a class="reference internal" href="#mbff.dataset.BinaryExperimentalDataset.BinaryExperimentalDataset.process_before_finalize_and_save" title="mbff.dataset.BinaryExperimentalDataset.BinaryExperimentalDataset.process_before_finalize_and_save"><code class="xref py py-meth docutils literal notranslate"><span class="pre">process_before_finalize_and_save()</span></code></a></li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>finalize_and_save</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Whether to finalize and save the 3            matrices after completing the build.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Nothing</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mbff.dataset.BinaryExperimentalDataset.BinaryExperimentalDataset.finalize">
+<code class="descname">finalize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mbff.dataset.BinaryExperimentalDataset.BinaryExperimentalDataset.finalize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finalize the 3 matrices. Simply calls <a class="reference internal" href="DatasetMatrix.html#mbff.dataset.DatasetMatrix.DatasetMatrix.finalize" title="mbff.dataset.DatasetMatrix.DatasetMatrix.finalize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">finalize()</span></code></a> on
+<code class="docutils literal notranslate"><span class="pre">self.matrix</span></code>, <code class="docutils literal notranslate"><span class="pre">self.matrix_train</span></code> and <code class="docutils literal notranslate"><span class="pre">self.matrix_test</span></code>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Nothing</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mbff.dataset.BinaryExperimentalDataset.BinaryExperimentalDataset.get_datasetmatrix">
+<code class="descname">get_datasetmatrix</code><span class="sig-paren">(</span><em>label</em><span class="sig-paren">)</span><a class="headerlink" href="#mbff.dataset.BinaryExperimentalDataset.BinaryExperimentalDataset.get_datasetmatrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the DatasetMatrix matrix specified by <code class="docutils literal notranslate"><span class="pre">label</span></code>.</p>
+<p>The only allowed values for <code class="docutils literal notranslate"><span class="pre">label</span></code> are <code class="docutils literal notranslate"><span class="pre">&quot;full&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;train&quot;</span></code> and
+<code class="docutils literal notranslate"><span class="pre">&quot;test&quot;</span></code>, which return the full dataset (<code class="docutils literal notranslate"><span class="pre">self.matrix</span></code>), the
+training dataset (<code class="docutils literal notranslate"><span class="pre">self.matrix_train</span></code>) and the test dataset
+(<code class="docutils literal notranslate"><span class="pre">self.matrix_test</span></code>) respectively. A <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ValueError</span></code></a> is raised
+for other values of <code class="docutils literal notranslate"><span class="pre">label</span></code>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The label of the <code class="docutils literal notranslate"><span class="pre">DatasetMatrix</span></code> to retrieve.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The <code class="docutils literal notranslate"><span class="pre">DatasetMatrix</span></code> specified by <code class="docutils literal notranslate"><span class="pre">label</span></code>, one of the following:<ul class="simple">
+<li><code class="docutils literal notranslate"><span class="pre">self.matrix</span></code> for <code class="docutils literal notranslate"><span class="pre">label</span> <span class="pre">==</span> <span class="pre">&quot;full&quot;</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">self.matrix_train</span></code> for <code class="docutils literal notranslate"><span class="pre">label</span> <span class="pre">==</span> <span class="pre">&quot;train&quot;</span></code></li>
+<li><code class="docutils literal notranslate"><span class="pre">self.matrix_test</span></code> for <code class="docutils literal notranslate"><span class="pre">label</span> <span class="pre">==</span> <span class="pre">&quot;test&quot;</span></code></li>
+</ul>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="DatasetMatrix.html#mbff.dataset.DatasetMatrix.DatasetMatrix" title="mbff.dataset.DatasetMatrix.DatasetMatrix">mbff.dataset.DatasetMatrix.DatasetMatrix</a></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><strong>ValueError</strong></a> – if <code class="docutils literal notranslate"><span class="pre">label</span></code> is not one of <code class="docutils literal notranslate"><span class="pre">&quot;full&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;train&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;test&quot;</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mbff.dataset.BinaryExperimentalDataset.BinaryExperimentalDataset.load">
+<code class="descname">load</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mbff.dataset.BinaryExperimentalDataset.BinaryExperimentalDataset.load" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load the ExperimentalDataset from <code class="docutils literal notranslate"><span class="pre">self.definition.path</span></code>. Simply calls
+<a class="reference internal" href="DatasetMatrix.html#mbff.dataset.DatasetMatrix.DatasetMatrix.load" title="mbff.dataset.DatasetMatrix.DatasetMatrix.load"><code class="xref py py-meth docutils literal notranslate"><span class="pre">load()</span></code></a> on
+<code class="docutils literal notranslate"><span class="pre">self.matrix</span></code>, <code class="docutils literal notranslate"><span class="pre">self.matrix_train</span></code> and <code class="docutils literal notranslate"><span class="pre">self.matrix_test</span></code>. In
+case either of these three is <code class="docutils literal notranslate"><span class="pre">None</span></code>, they are set to new
+<a class="reference internal" href="DatasetMatrix.html#mbff.dataset.DatasetMatrix.DatasetMatrix" title="mbff.dataset.DatasetMatrix.DatasetMatrix"><code class="xref py py-class docutils literal notranslate"><span class="pre">DatasetMatrix</span></code></a> instances.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Nothing</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mbff.dataset.BinaryExperimentalDataset.BinaryExperimentalDataset.perform_random_dataset_split">
+<code class="descname">perform_random_dataset_split</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mbff.dataset.BinaryExperimentalDataset.BinaryExperimentalDataset.perform_random_dataset_split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decide which rows of the full dataset <code class="docutils literal notranslate"><span class="pre">self.matrix</span></code> will be selected
+for the training dataset and which rows for the testing dataset.</p>
+<p>All rows of <code class="docutils literal notranslate"><span class="pre">self.matrix</span></code> will be decided on, which means that the
+union between the training rows and the testing rows will result in the
+original dataset.</p>
+<p>The selection is performed randomly, but the seed of the randomness is
+controlled by <code class="docutils literal notranslate"><span class="pre">self.definition.random_seed</span></code>, which makes this
+selection predictable. This means that for the same seed value, all
+calls to :py:meth`perform_random_dataset_split` will return the same
+selection of training and testing rows.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">a tuple which contains two lists:<p># the list of indices of the training rows
+# the list of indices of the testing rows</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a>(<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)">int</a>), <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a>(<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)">int</a>))</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mbff.dataset.BinaryExperimentalDataset.BinaryExperimentalDataset.process_before_finalize_and_save">
+<code class="descname">process_before_finalize_and_save</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mbff.dataset.BinaryExperimentalDataset.BinaryExperimentalDataset.process_before_finalize_and_save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called just before finalizing and saving the ExperimentalDataset. Only
+called if the argument <code class="docutils literal notranslate"><span class="pre">finalize_and_save</span></code> received by the
+<code class="docutils literal notranslate"><span class="pre">build()</span></code> method evaluates to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p>
+<p>Classes inheriting <code class="docutils literal notranslate"><span class="pre">ExperimentalDataset</span></code> may implement this method to
+intervene at that point.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Nothing</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="mbff.dataset.BinaryExperimentalDataset.BinaryExperimentalDataset.save">
+<code class="descname">save</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mbff.dataset.BinaryExperimentalDataset.BinaryExperimentalDataset.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save this ExperimentalDataset to <code class="docutils literal notranslate"><span class="pre">self.definition.path</span></code>. Simply calls
+<a class="reference internal" href="DatasetMatrix.html#mbff.dataset.DatasetMatrix.DatasetMatrix.save" title="mbff.dataset.DatasetMatrix.DatasetMatrix.save"><code class="xref py py-meth docutils literal notranslate"><span class="pre">save()</span></code></a> on
+<code class="docutils literal notranslate"><span class="pre">self.matrix</span></code>, <code class="docutils literal notranslate"><span class="pre">self.matrix_train</span></code> and <code class="docutils literal notranslate"><span class="pre">self.matrix_test</span></code>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Nothing</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference internal" href="ExperimentalDataset.html#mbff.dataset.ExperimentalDataset.ExperimentalDatasetError" title="mbff.dataset.ExperimentalDataset.ExperimentalDatasetError"><strong>ExperimentalDatasetError</strong></a> – if the ExperimentalDataset folder is locked</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="ExperimentalDataset.html"
+                        title="previous chapter">Class <code class="docutils literal notranslate"><span class="pre">ExperimentalDataset</span></code></a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="sources/index.html"
+                        title="next chapter">Dataset sources</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/dataset/BinaryExperimentalDataset.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="sources/index.html" title="Dataset sources"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="ExperimentalDataset.html" title="Class ExperimentalDataset"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">MBFF 0.3 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Dataset infrastructure</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2019, Camil Băncioiu.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.4.
+    </div>
+  </body>
+</html>

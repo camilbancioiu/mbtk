@@ -3,9 +3,10 @@ Dataset sources
 =====================
 
 .. toctree::
-  :maxdepth: 2
+  :maxdepth: 0
   :caption: Contents:
 
   DatasetSource.rst
+  BinarySyntheticDatasetSource.rst
   RCV1v2DatasetSource.rst
 

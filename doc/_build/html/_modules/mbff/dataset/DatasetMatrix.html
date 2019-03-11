@@ -190,7 +190,7 @@
 <span class="sd">        deletes the corresponding label from ``row_labels``.</span>
 
 <span class="sd">        :param int r: 0-based integer index of the row to delete.</span>
-<span class="sd">        :return: ``None``</span>
+<span class="sd">        :return: Nothing</span>
 <span class="sd">        :raises DatasetMatrixFinalizedError: if :py:meth:`finalize` has already</span>
 <span class="sd">            been called.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -211,7 +211,7 @@
 
 <span class="sd">        :param list(int) rows_to_keep: A list of 0-based integer indices of the rows</span>
 <span class="sd">            which must be kept.</span>
-<span class="sd">        :return: ``None``</span>
+<span class="sd">        :return: Nothing</span>
 <span class="sd">        :raises DatasetMatrixFinalizedError: if :py:meth:`finalize` has already</span>
 <span class="sd">            been called.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -312,7 +312,7 @@
 
 <span class="sd">        :param list(int) columns_to_delete: A list of 0-based integer indices</span>
 <span class="sd">            of the columns to delete from ``X``.</span>
-<span class="sd">        :return: ``None``</span>
+<span class="sd">        :return: Nothing</span>
 <span class="sd">        :raises DatasetMatrixFinalizedError: if :py:meth:`finalize` has already</span>
 <span class="sd">            been called.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -331,7 +331,7 @@
 
 <span class="sd">        :param list(int) columns_to_delete: A list of 0-based integer indices</span>
 <span class="sd">            of the columns to delete from ``Y``.</span>
-<span class="sd">        :return: ``None``</span>
+<span class="sd">        :return: Nothing</span>
 <span class="sd">        :raises DatasetMatrixFinalizedError: if :py:meth:`finalize` has already</span>
 <span class="sd">            been called.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -350,7 +350,7 @@
 
 <span class="sd">        :param int c: The 0-based integer index of the column to delete from</span>
 <span class="sd">            ``X``.</span>
-<span class="sd">        :return: ``None``</span>
+<span class="sd">        :return: Nothing</span>
 <span class="sd">        :raises DatasetMatrixFinalizedError: if :py:meth:`finalize` has already</span>
 <span class="sd">            been called.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -368,7 +368,7 @@
 
 <span class="sd">        :param int c: The 0-based integer index of the column to delete from</span>
 <span class="sd">            ``Y``.</span>
-<span class="sd">        :return: ``None``</span>
+<span class="sd">        :return: Nothing</span>
 <span class="sd">        :raises DatasetMatrixFinalizedError: if :py:meth:`finalize` has already</span>
 <span class="sd">            been called.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -390,7 +390,7 @@
 
 <span class="sd">        :param str path: The Path object representing the root folder in which</span>
 <span class="sd">            to create the subfolder named ``[self.label]`` in which to save.</span>
-<span class="sd">        :return: ``None``</span>
+<span class="sd">        :return: Nothing</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">final</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">DatasetMatrixNotFinalizedError</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;Cannot save.&quot;</span><span class="p">)</span>
@@ -421,7 +421,7 @@
 
 <span class="sd">        :param str path: The Path object representing the root folder in which</span>
 <span class="sd">            to find the subfolder ``[self.label]`` from which to load.</span>
-<span class="sd">        :return: ``None``</span>
+<span class="sd">        :return: Nothing</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">matrix_path</span> <span class="o">=</span> <span class="n">path</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span>
 
@@ -446,7 +446,7 @@
 <span class="sd">        ``.eliminate_zeros()``, ``.check_format()`` and ``.tocsc()`` on both</span>
 <span class="sd">        matrices, then set the ``self.final`` flag to ``True``.</span>
 
-<span class="sd">        :return: ``None``</span>
+<span class="sd">        :return: Nothing</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">final</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
             <span class="k">return</span>
@@ -469,7 +469,7 @@
 <span class="sd">        format. This method should not really be used unless for development or</span>
 <span class="sd">        testing purposes.</span>
 
-<span class="sd">        :return: ``None``</span>
+<span class="sd">        :return: Nothing</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">tocsr</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Y</span><span class="o">.</span><span class="n">tocsr</span><span class="p">()</span>

@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Class RCV1v2DatasetSource &#8212; MBFF 0.3 documentation</title>
+    <title>RCV1v2DatasetSource &#8212; MBFF 0.3 documentation</title>
     <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/style.css" />
@@ -20,7 +20,7 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Experimental infrastructure" href="../../experiment/index.html" />
-    <link rel="prev" title="Class DatasetSource" href="DatasetSource.html" /> 
+    <link rel="prev" title="Class BinarySyntheticDatasetSource" href="BinarySyntheticDatasetSource.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
@@ -35,7 +35,7 @@
           <a href="../../experiment/index.html" title="Experimental infrastructure"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="DatasetSource.html" title="Class DatasetSource"
+          <a href="BinarySyntheticDatasetSource.html" title="Class BinarySyntheticDatasetSource"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../index.html">MBFF 0.3 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Dataset infrastructure</a> &#187;</li>
@@ -48,30 +48,34 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="module-mbff.dataset.sources.RCV1v2DatasetSource">
-<span id="class-rcv1v2datasetsource"></span><h1>Class <code class="docutils literal notranslate"><span class="pre">RCV1v2DatasetSource</span></code><a class="headerlink" href="#module-mbff.dataset.sources.RCV1v2DatasetSource" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
-<dt id="mbff.dataset.sources.RCV1v2DatasetSource.RCV1v2DatasetSource">
-<em class="property">class </em><code class="descclassname">mbff.dataset.sources.RCV1v2DatasetSource.</code><code class="descname">RCV1v2DatasetSource</code><span class="sig-paren">(</span><em>configuration</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mbff/dataset/sources/RCV1v2DatasetSource.html#RCV1v2DatasetSource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mbff.dataset.sources.RCV1v2DatasetSource.RCV1v2DatasetSource" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="DatasetSource.html#mbff.dataset.sources.DatasetSource.DatasetSource" title="mbff.dataset.sources.DatasetSource.DatasetSource"><code class="xref py py-class docutils literal notranslate"><span class="pre">mbff.dataset.sources.DatasetSource.DatasetSource</span></code></a></p>
-<p>A class which reads the RCV1v2 dataset files, as published by LYRL2004.</p>
+  <div class="section" id="rcv1v2datasetsource">
+<h1><code class="docutils literal notranslate"><span class="pre">RCV1v2DatasetSource</span></code><a class="headerlink" href="#rcv1v2datasetsource" title="Permalink to this headline">¶</a></h1>
+<p>Before reading about this module further, it is recommended to understand
+the <a class="reference internal" href="../DatasetMatrix.html#mbff.dataset.DatasetMatrix.DatasetMatrix" title="mbff.dataset.DatasetMatrix.DatasetMatrix"><code class="xref py py-class docutils literal notranslate"><span class="pre">mbff.dataset.DatasetMatrix.DatasetMatrix</span></code></a> class.</p>
+<div class="section" id="about-rcv1v2">
+<h2>About RCV1v2<a class="headerlink" href="#about-rcv1v2" title="Permalink to this headline">¶</a></h2>
 <p>The RCV1v2 is a processed dataset based on the Reuters Corpus Volume 1,
 thus it is a dataset of text documents. The RCV1v2 differs from the
 original Reuters Corpus Volume 1 by representing each document as a list of
 sorted stemmed tokens, and not as the natural language text of the Reuters
-articles. This makes RCV1v2 a good starting point for creating experimental
-datasets, but loses some of the information found in the original Reuters
-articles. Refer to <a class="reference internal" href="#lyrl2004" id="id1">[LYRL04]</a> and <a class="reference internal" href="#lyrl2004readme-online" id="id2">[Lew15]</a> for
-more details about the RCV1v2 and its format.</p>
+Corpus Volume 1 articles. This makes RCV1v2 a good starting point for creating
+experimental datasets, but loses some of the information found in the original
+Reuters articles. Refer to <a class="reference internal" href="#lyrl2004" id="id1">[LYRL04]</a> and <a class="reference internal" href="#lyrl2004readme-online" id="id2">[Lew15]</a>
+for more details about the RCV1v2 and its format.</p>
 <p>A prerequisite of using this class is to download the RCV1v2 files. Use the
-<code class="docutils literal notranslate"><span class="pre">download_rcv1v2.sh</span></code> script bundled with MBFF, which will do it for you.
+<code class="docutils literal notranslate"><span class="pre">download_rcv1v2.sh</span></code> script bundle with MBFF, which will do it for you.
 It will create a new folder named <code class="docutils literal notranslate"><span class="pre">dataset_rcv1v2</span></code>, where it will
 download and unpack the required files.</p>
-<p>Before reading about this class further, it is recommended to understand
-the <a class="reference internal" href="../DatasetMatrix.html#mbff.dataset.DatasetMatrix.DatasetMatrix" title="mbff.dataset.DatasetMatrix.DatasetMatrix"><code class="xref py py-class docutils literal notranslate"><span class="pre">mbff.dataset.DatasetMatrix.DatasetMatrix</span></code></a> class.</p>
-<p>Instantiating a new <a class="reference internal" href="#mbff.dataset.sources.RCV1v2DatasetSource.RCV1v2DatasetSource" title="mbff.dataset.sources.RCV1v2DatasetSource.RCV1v2DatasetSource"><code class="xref py py-class docutils literal notranslate"><span class="pre">RCV1v2DatasetSource</span></code></a> requires a
-<code class="docutils literal notranslate"><span class="pre">configuration</span></code> dictionary passed to the constructor, which may contain
-the following:</p>
+</div>
+<div class="section" id="reading-rcv1v2-documents">
+<h2>Reading RCV1v2 documents<a class="headerlink" href="#reading-rcv1v2-documents" title="Permalink to this headline">¶</a></h2>
+<p>The <a class="reference internal" href="#module-mbff.dataset.sources.RCV1v2DatasetSource" title="mbff.dataset.sources.RCV1v2DatasetSource"><code class="xref py py-class docutils literal notranslate"><span class="pre">RCV1v2DatasetSource</span></code></a>
+class reads the files of the RCV1v2 package and constructs a collection of
+documents by the “bag of words” principle. Namely, the document is represented
+by the words that it contains and the number of occurences of each of its
+words.</p>
+<p>Instantiating a new <a class="reference internal" href="#module-mbff.dataset.sources.RCV1v2DatasetSource" title="mbff.dataset.sources.RCV1v2DatasetSource"><code class="xref py py-class docutils literal notranslate"><span class="pre">RCV1v2DatasetSource</span></code></a> requires a <code class="docutils literal notranslate"><span class="pre">configuration</span></code>
+dictionary passed to the constructor, which may contain the following:</p>
 <ul class="simple">
 <li><code class="docutils literal notranslate"><span class="pre">configuration['sourcefolder']</span></code> must contain the path to the folder
 containing the downloaded RCV1v2 files, as described above. This item
@@ -90,13 +94,14 @@ or not setting <code class="docutils literal notranslate"><span class="pre">conf
 <li><code class="docutils literal notranslate"><span class="pre">configuration['feature_type']</span></code> must contain either one of the strings
 <code class="docutils literal notranslate"><span class="pre">'wordcount'</span></code> or <code class="docutils literal notranslate"><span class="pre">'binary'</span></code>. If missing, it is automatically set to
 <code class="docutils literal notranslate"><span class="pre">'wordcount'</span></code>. Its value determines what type of values will be written
-in the <a class="reference internal" href="../DatasetMatrix.html#mbff.dataset.DatasetMatrix.DatasetMatrix" title="mbff.dataset.DatasetMatrix.DatasetMatrix"><code class="xref py py-class docutils literal notranslate"><span class="pre">DatasetMatrix</span></code></a> object returned by
-<a class="reference internal" href="#mbff.dataset.sources.RCV1v2DatasetSource.RCV1v2DatasetSource.create_dataset_matrix" title="mbff.dataset.sources.RCV1v2DatasetSource.RCV1v2DatasetSource.create_dataset_matrix"><code class="xref py py-meth docutils literal notranslate"><span class="pre">create_dataset_matrix()</span></code></a>.</li>
+in the <a class="reference internal" href="../DatasetMatrix.html#mbff.dataset.DatasetMatrix.DatasetMatrix" title="mbff.dataset.DatasetMatrix.DatasetMatrix"><code class="xref py py-class docutils literal notranslate"><span class="pre">DatasetMatrix</span></code></a>
+object returned by <a class="reference internal" href="#mbff.dataset.sources.RCV1v2DatasetSource.RCV1v2DatasetSource.create_dataset_matrix" title="mbff.dataset.sources.RCV1v2DatasetSource.RCV1v2DatasetSource.create_dataset_matrix"><code class="xref py py-meth docutils literal notranslate"><span class="pre">create_dataset_matrix</span></code></a>.</li>
 </ul>
-<p>After instantiating, call the <a class="reference internal" href="#mbff.dataset.sources.RCV1v2DatasetSource.RCV1v2DatasetSource.create_dataset_matrix" title="mbff.dataset.sources.RCV1v2DatasetSource.RCV1v2DatasetSource.create_dataset_matrix"><code class="xref py py-meth docutils literal notranslate"><span class="pre">create_dataset_matrix()</span></code></a> method to
-get a <a class="reference internal" href="../DatasetMatrix.html#mbff.dataset.DatasetMatrix.DatasetMatrix" title="mbff.dataset.DatasetMatrix.DatasetMatrix"><code class="xref py py-class docutils literal notranslate"><span class="pre">DatasetMatrix</span></code></a>
-object, which contains the documents in RCV1v2 represented as a
-<a class="reference external" href="https://en.wikipedia.org/wiki/Document-term_matrix">document-term matrix</a>, as follows:</p>
+<p>After instantiating, call the <a class="reference internal" href="#mbff.dataset.sources.RCV1v2DatasetSource.RCV1v2DatasetSource.create_dataset_matrix" title="mbff.dataset.sources.RCV1v2DatasetSource.RCV1v2DatasetSource.create_dataset_matrix"><code class="xref py py-meth docutils literal notranslate"><span class="pre">create_dataset_matrix</span></code></a>
+method to get a <a class="reference internal" href="../DatasetMatrix.html#mbff.dataset.DatasetMatrix.DatasetMatrix" title="mbff.dataset.DatasetMatrix.DatasetMatrix"><code class="xref py py-class docutils literal notranslate"><span class="pre">DatasetMatrix</span></code></a> object, which contains the
+documents in RCV1v2 represented as a <a class="reference external" href="https://en.wikipedia.org/wiki/Document-term_matrix">document-term matrix</a>, as follows:</p>
+<blockquote>
+<div></div></blockquote>
 <ul class="simple">
 <li>The <code class="docutils literal notranslate"><span class="pre">X</span></code> matrix represents each document as a row and each token (word)
 as a column. Each cell of the matrix contains the count in the word
@@ -117,7 +122,14 @@ columns in <code class="docutils literal notranslate"><span class="pre">X</span>
 <li>The <code class="docutils literal notranslate"><span class="pre">column_labels_Y</span></code> list will contain the topics corresponding to the
 columns in <code class="docutils literal notranslate"><span class="pre">Y</span></code> (the objective variables, or classes), in order.</li>
 </ul>
-<p>An instance of <a class="reference internal" href="#mbff.dataset.sources.RCV1v2DatasetSource.RCV1v2DatasetSource" title="mbff.dataset.sources.RCV1v2DatasetSource.RCV1v2DatasetSource"><code class="xref py py-class docutils literal notranslate"><span class="pre">RCV1v2DatasetSource</span></code></a> holds the following attributes:</p>
+</div>
+<div class="section" id="module-mbff.dataset.sources.RCV1v2DatasetSource">
+<span id="module-mbff-dataset-sources-rcv1v2datasetsource"></span><h2>Module <a class="reference internal" href="#module-mbff.dataset.sources.RCV1v2DatasetSource" title="mbff.dataset.sources.RCV1v2DatasetSource"><code class="xref py py-mod docutils literal notranslate"><span class="pre">mbff.dataset.sources.RCV1v2DatasetSource</span></code></a><a class="headerlink" href="#module-mbff.dataset.sources.RCV1v2DatasetSource" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="mbff.dataset.sources.RCV1v2DatasetSource.RCV1v2DatasetSource">
+<em class="property">class </em><code class="descclassname">mbff.dataset.sources.RCV1v2DatasetSource.</code><code class="descname">RCV1v2DatasetSource</code><span class="sig-paren">(</span><em>configuration</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mbff/dataset/sources/RCV1v2DatasetSource.html#RCV1v2DatasetSource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mbff.dataset.sources.RCV1v2DatasetSource.RCV1v2DatasetSource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="DatasetSource.html#mbff.dataset.sources.DatasetSource.DatasetSource" title="mbff.dataset.sources.DatasetSource.DatasetSource"><code class="xref py py-class docutils literal notranslate"><span class="pre">mbff.dataset.sources.DatasetSource.DatasetSource</span></code></a></p>
+<p>A class which reads the RCV1v2 dataset files, as published by LYRL2004.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -360,6 +372,7 @@ and the current list of unique words in the document.</p>
 
 </dd></dl>
 
+</div>
 <div class="section" id="references">
 <h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
 <p id="bibtex-bibliography-dataset/sources/RCV1v2DatasetSource-0"><table class="docutils citation" frame="void" id="lyrl2004readme-online" rules="none">
@@ -386,15 +399,18 @@ and the current list of unique words in the document.</p>
         <div class="sphinxsidebarwrapper">
   <h3><a href="../../index.html">Table of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">Class <code class="docutils literal notranslate"><span class="pre">RCV1v2DatasetSource</span></code></a><ul>
+<li><a class="reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">RCV1v2DatasetSource</span></code></a><ul>
+<li><a class="reference internal" href="#about-rcv1v2">About RCV1v2</a></li>
+<li><a class="reference internal" href="#reading-rcv1v2-documents">Reading RCV1v2 documents</a></li>
+<li><a class="reference internal" href="#module-mbff.dataset.sources.RCV1v2DatasetSource">Module <code class="docutils literal notranslate"><span class="pre">mbff.dataset.sources.RCV1v2DatasetSource</span></code></a></li>
 <li><a class="reference internal" href="#references">References</a></li>
 </ul>
 </li>
 </ul>
 
   <h4>Previous topic</h4>
-  <p class="topless"><a href="DatasetSource.html"
-                        title="previous chapter">Class <code class="docutils literal notranslate"><span class="pre">DatasetSource</span></code></a></p>
+  <p class="topless"><a href="BinarySyntheticDatasetSource.html"
+                        title="previous chapter">Class <code class="docutils literal notranslate"><span class="pre">BinarySyntheticDatasetSource</span></code></a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="../../experiment/index.html"
                         title="next chapter">Experimental infrastructure</a></p>
@@ -434,7 +450,7 @@ and the current list of unique words in the document.</p>
           <a href="../../experiment/index.html" title="Experimental infrastructure"
              >next</a> |</li>
         <li class="right" >
-          <a href="DatasetSource.html" title="Class DatasetSource"
+          <a href="BinarySyntheticDatasetSource.html" title="Class BinarySyntheticDatasetSource"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../index.html">MBFF 0.3 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Dataset infrastructure</a> &#187;</li>
