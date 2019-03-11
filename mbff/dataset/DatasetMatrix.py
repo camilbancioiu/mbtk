@@ -148,7 +148,7 @@ class DatasetMatrix:
         deletes the corresponding label from ``row_labels``.
 
         :param int r: 0-based integer index of the row to delete.
-        :return: ``None``
+        :return: Nothing
         :raises DatasetMatrixFinalizedError: if :py:meth:`finalize` has already
             been called.
         """
@@ -169,7 +169,7 @@ class DatasetMatrix:
 
         :param list(int) rows_to_keep: A list of 0-based integer indices of the rows
             which must be kept.
-        :return: ``None``
+        :return: Nothing
         :raises DatasetMatrixFinalizedError: if :py:meth:`finalize` has already
             been called.
         """
@@ -270,7 +270,7 @@ class DatasetMatrix:
 
         :param list(int) columns_to_delete: A list of 0-based integer indices
             of the columns to delete from ``X``.
-        :return: ``None``
+        :return: Nothing
         :raises DatasetMatrixFinalizedError: if :py:meth:`finalize` has already
             been called.
         """
@@ -289,7 +289,7 @@ class DatasetMatrix:
 
         :param list(int) columns_to_delete: A list of 0-based integer indices
             of the columns to delete from ``Y``.
-        :return: ``None``
+        :return: Nothing
         :raises DatasetMatrixFinalizedError: if :py:meth:`finalize` has already
             been called.
         """
@@ -308,7 +308,7 @@ class DatasetMatrix:
 
         :param int c: The 0-based integer index of the column to delete from
             ``X``.
-        :return: ``None``
+        :return: Nothing
         :raises DatasetMatrixFinalizedError: if :py:meth:`finalize` has already
             been called.
         """
@@ -326,7 +326,7 @@ class DatasetMatrix:
 
         :param int c: The 0-based integer index of the column to delete from
             ``Y``.
-        :return: ``None``
+        :return: Nothing
         :raises DatasetMatrixFinalizedError: if :py:meth:`finalize` has already
             been called.
         """
@@ -348,7 +348,7 @@ class DatasetMatrix:
 
         :param str path: The Path object representing the root folder in which
             to create the subfolder named ``[self.label]`` in which to save.
-        :return: ``None``
+        :return: Nothing
         """
         if self.final == False:
             raise DatasetMatrixNotFinalizedError(self, "Cannot save.")
@@ -379,7 +379,7 @@ class DatasetMatrix:
 
         :param str path: The Path object representing the root folder in which
             to find the subfolder ``[self.label]`` from which to load.
-        :return: ``None``
+        :return: Nothing
         """
         matrix_path = path / self.label
 
@@ -404,7 +404,7 @@ class DatasetMatrix:
         ``.eliminate_zeros()``, ``.check_format()`` and ``.tocsc()`` on both
         matrices, then set the ``self.final`` flag to ``True``.
 
-        :return: ``None``
+        :return: Nothing
         """
         if self.final == True:
             return
@@ -427,7 +427,7 @@ class DatasetMatrix:
         format. This method should not really be used unless for development or
         testing purposes.
 
-        :return: ``None``
+        :return: Nothing
         """
         self.X = self.X.tocsr()
         self.Y = self.Y.tocsr()

@@ -8,7 +8,7 @@ from mbff.dataset.DatasetMatrix import DatasetMatrix
 class BinarySyntheticDatasetSource(DatasetSource):
     """
     A dataset source which generates a random binary dataset by specifying the
-    proportion of ``1``s for each feature and objective.
+    proportion of values of ``1`` for each feature and objective.
     """
 
     def __init__(self, configuration):

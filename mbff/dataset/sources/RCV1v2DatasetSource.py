@@ -10,78 +10,8 @@ class RCV1v2DatasetSource(DatasetSource):
     """
     A class which reads the RCV1v2 dataset files, as published by LYRL2004.
 
-    The RCV1v2 is a processed dataset based on the Reuters Corpus Volume 1,
-    thus it is a dataset of text documents. The RCV1v2 differs from the
-    original Reuters Corpus Volume 1 by representing each document as a list of
-    sorted stemmed tokens, and not as the natural language text of the Reuters
-    articles. This makes RCV1v2 a good starting point for creating experimental
-    datasets, but loses some of the information found in the original Reuters
-    articles. Refer to :cite:`lyrl2004` and :cite:`lyrl2004readme_online` for
-    more details about the RCV1v2 and its format.
-
-    A prerequisite of using this class is to download the RCV1v2 files. Use the
-    ``download_rcv1v2.sh`` script bundled with MBFF, which will do it for you.
-    It will create a new folder named ``dataset_rcv1v2``, where it will
-    download and unpack the required files.
-
-    Before reading about this class further, it is recommended to understand
-    the :py:class:`mbff.dataset.DatasetMatrix.DatasetMatrix` class.
-
-    Instantiating a new :py:class:`RCV1v2DatasetSource` requires a
-    ``configuration`` dictionary passed to the constructor, which may contain
-    the following:
-
-    * ``configuration['sourcefolder']`` must contain the path to the folder
-      containing the downloaded RCV1v2 files, as described above. This item
-      must not be absent.
-    * ``configuration['filters']`` may contain a dictionary that specifies
-      criteria by which documents from RCV1v2 should be imported or ignored.
-      Currently, only the following possibilities are available:
-
-      * Specifying no filter at all, namely ``configuration['filters'] = {}``
-        or not setting ``configuration['filters']`` at all. This results in
-        *all documents* being loaded.
-      * Specifying a single industry filter , e.g.
-        ``configuration['filters']['industry'] = 'I3302'``. See
-        :cite:`lyrl2004` for a list of industries and what they mean.
-
-    * ``configuration['feature_type']`` must contain either one of the strings
-      ``'wordcount'`` or ``'binary'``. If missing, it is automatically set to
-      ``'wordcount'``. Its value determines what type of values will be written
-      in the :py:class:`DatasetMatrix
-      <mbff.dataset.DatasetMatrix.DatasetMatrix>` object returned by
-      :py:meth:`create_dataset_matrix`.
-
-    After instantiating, call the :py:meth:`create_dataset_matrix` method to
-    get a :py:class:`DatasetMatrix <mbff.dataset.DatasetMatrix.DatasetMatrix>`
-    object, which contains the documents in RCV1v2 represented as a
-    `document-term matrix`_, as follows:
-
-    .. _document-term matrix: https://en.wikipedia.org/wiki/Document-term_matrix
-
-    * The ``X`` matrix represents each document as a row and each token (word)
-      as a column. Each cell of the matrix contains the count in the word
-      corresponding to its column, in the document corresponding to its row,
-      assuming ``configuration['feature_type'] == 'wordcount'``. On the other
-      hand, if ``configuration['feature_type'] == 'binary'``, then the cells of
-      the matrix will contain either ``0`` or ``1``, representing the absence or
-      presence of a word in a document.
-    * The ``Y`` matrix represents each document as a row as well, but the
-      columns represent the classes to which a document may belong. The cells of
-      this matrix thus contain binary values (``1`` if the corresponding document
-      belongs to the class corresponding to the column, ``0`` otherwise).
-    * The ``row_labels`` list will contain the numeric IDs of the loaded documents,
-      in order, where each document ID in ``row_labels`` corresponds to a row in
-      ``X`` and a row in ``Y``, at the same position.
-    * The ``column_labels_X`` list will contain the tokens corresponding to the
-      columns in ``X`` (the features), in order.
-    * The ``column_labels_Y`` list will contain the topics corresponding to the
-      columns in ``Y`` (the objective variables, or classes), in order.
-
-    An instance of :py:class:`RCV1v2DatasetSource` holds the following attributes:
-
     :var dict configuration: The configuration dictionary received by the constructor, stored for later reference.
-    :var str sourcefolder: The folder where the downloaded RCV1v2 files are located.
+    :var str sourcefolder: The folder where the downloaded RCV1v2 files are located, read from ``configuration``.
     :var str sourcefile_documentIDs: The name of the file containing the list of all document IDs.
     :var str sourcefile_document_tokens: The name of the file containing all the documents of the dataset, in token form.
     :var str sourcefile_topic_assignments: The name of the file containing assignments of document IDs to topics.
@@ -106,7 +36,7 @@ class RCV1v2DatasetSource(DatasetSource):
 
     def create_dataset_matrix(self, label='rcv1v2'):
         """
-        Create a :py:class:`DatasetMatrix
+        Create a :class:`DatasetMatrix
         <mbff.dataset.DatasetMatrix.DatasetMatrix>` object containing a
         document-term matrix based on the documents in the RCV1v2 dataset
         (previously downloaded).
@@ -191,7 +121,7 @@ class RCV1v2DatasetSource(DatasetSource):
         Retrieve the entire vocabulary used by the ``documents`` received as
         argument.
 
-        :param dict documents: A dictionary with document IDs as keys and :py:class:`RCV1v2Document` instances as values.
+        :param dict documents: A dictionary with document IDs as keys and :class:`RCV1v2Document` instances as values.
         :return: A sorted list of unique words used by all the provided ``documents``.
         :rtype: list
         """
@@ -202,7 +132,7 @@ class RCV1v2DatasetSource(DatasetSource):
         """
         Retrieve all the topics to which the provided ``documents`` belong.
 
-        :param dict documents: A dictionary with document IDs as keys and :py:class:`RCV1v2Document` instances as values.
+        :param dict documents: A dictionary with document IDs as keys and :class:`RCV1v2Document` instances as values.
         :return: A sorted list of all the unique topics to which the provided ``documents`` belong.
         :rtype: list
         """
@@ -211,14 +141,14 @@ class RCV1v2DatasetSource(DatasetSource):
 
     def create_dok_matrices(self, documents, documentIDs, words, topics):
         """
-        Convert a collection of :py:class:`RCV1v2Document` objects into a pair
+        Convert a collection of :class:`RCV1v2Document` objects into a pair
         of matrices: a document-term matrix and a class-assignment matrix
         (class = RCV1v2 topic).
 
-        :param dict documents: A dictionary with document IDs as keys and :py:class:`RCV1v2Document` instances as values.
+        :param dict documents: A dictionary with document IDs as keys and :class:`RCV1v2Document` instances as values.
         :param list(int) documentIDs: The list of document IDs which should be added to the returned matrices.
-        :param list(str) words: The list of unique words used by the provided ``documents``, as returned by :py:meth:`gather_complete_word_list`.
-        :param list(str) topics: The list of unique topics to which the provided ``documents`` belong, as returned by :py:meth:`gather_complete_topic_list`.
+        :param list(str) words: The list of unique words used by the provided ``documents``, as returned by :meth:`gather_complete_word_list`.
+        :param list(str) topics: The list of unique topics to which the provided ``documents`` belong, as returned by :meth:`gather_complete_topic_list`.
         :return: A tuple containing the document-term matrix and class-assignment matrix.
         :rtype: tuple(scipy.sparse.dok_matrix, scipy.sparse.dok_matrix)
         """
@@ -252,11 +182,11 @@ class RCV1v2DatasetSource(DatasetSource):
     def read_documents(self, requested_documentIDs):
         """
         Read the files of the RCV1v2 dataset and instantiate
-        :py:class:`RCV1v2Document` objects corresponding to the documents
+        :class:`RCV1v2Document` objects corresponding to the documents
         specified by the list ``requested_documentIDs``.
 
         :param list(int) requested_documentIDs: The list of document IDs which should be read from the RCV1v2 files.
-        :return: A dictionary with documentIDs as keys and instances of :py:class:`RCV1v2Document` objects as values.
+        :return: A dictionary with documentIDs as keys and instances of :class:`RCV1v2Document` objects as values.
         :rtype: dict
         """
         if len(requested_documentIDs) == 0:
@@ -319,10 +249,10 @@ class RCV1v2DatasetSource(DatasetSource):
         """
         Read the files of the RCV1v2 dataset to discover to what topics do the
         provided ``documents`` belong and update the document objects directly,
-        with the topics each belongs to. See :py:class:`RCV1v2Document` for
+        with the topics each belongs to. See :class:`RCV1v2Document` for
         more details.
 
-        :param dict documents: A dictionary with document IDs as keys and :py:class:`RCV1v2Document` instances as values.
+        :param dict documents: A dictionary with document IDs as keys and :class:`RCV1v2Document` instances as values.
         :return: Nothing
         """
         with open(self.sourcefile_topic_assignments, 'r') as sourcefile:
@@ -350,7 +280,7 @@ class RCV1v2Document():
     :var dict topic_values: A dictionary with topics as keys and integers as\
         values, currently only binary. If this document belongs to a topic, then\
         its corresponding value in this dictionary is ``1``, or ``0`` otherwise.
-    :var RCV1v2DatasetSource source: The :py:class:`RCV1v2DatasetSource`\
+    :var RCV1v2DatasetSource source: The :class:`RCV1v2DatasetSource`\
         instance which retrieved and manages this document.
     """
 
