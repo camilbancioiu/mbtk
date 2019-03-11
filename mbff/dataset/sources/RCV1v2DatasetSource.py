@@ -20,7 +20,8 @@ class RCV1v2DatasetSource(DatasetSource):
 
     def __init__(self, configuration):
         self.configuration = configuration
-        self.sourcefolder = self.configuration['sourcefolder']
+        # TODO update documentation to refer to sourcepath, not sourcefolder
+        self.sourcepath = self.configuration['sourcepath']
 
         if not 'feature_type' in self.configuration.keys():
             self.configuration['feature_type'] = 'wordcount'
@@ -28,10 +29,10 @@ class RCV1v2DatasetSource(DatasetSource):
         if not 'filters' in self.configuration.keys():
             self.configuration['filters'] = {}
 
-        self.sourcefile_documentIDs          = '{}/oa7.rcv1v2-ids.txt'.format(self.sourcefolder)
-        self.sourcefile_document_tokens      = '{}/token/lyrl2004_tokens_all.dat'.format(self.sourcefolder)
-        self.sourcefile_topic_assignments    = '{}/oa8.rcv1-v2.topics.qrels.txt'.format(self.sourcefolder)
-        self.sourcefile_industry_assignments = '{}/oa9.rcv1-v2.industries.qrels.txt'.format(self.sourcefolder)
+        self.sourcefile_documentIDs          = self.sourcepath / 'oa7.rcv1v2-ids.txt'
+        self.sourcefile_document_tokens      = self.sourcepath / 'token/lyrl2004_tokens_all.dat'
+        self.sourcefile_topic_assignments    = self.sourcepath / 'oa8.rcv1-v2.topics.qrels.txt'
+        self.sourcefile_industry_assignments = self.sourcepath / 'oa9.rcv1-v2.industries.qrels.txt'
 
 
     def create_dataset_matrix(self, label='rcv1v2', feature_type=''):
@@ -99,7 +100,7 @@ class RCV1v2DatasetSource(DatasetSource):
         :return: Sorted list of document IDs available in RCV1v2.
         :rtype: list
         """
-        documentIDs = numpy.loadtxt(self.sourcefile_documentIDs, dtype='uint32').tolist()
+        documentIDs = numpy.loadtxt(str(self.sourcefile_documentIDs), dtype='uint32').tolist()
         return sorted(documentIDs)
 
 
@@ -111,7 +112,7 @@ class RCV1v2DatasetSource(DatasetSource):
         :param str industry: An industry code, as defined by RCV1v2.
         """
         documentIDs = []
-        with open(self.sourcefile_industry_assignments, 'r') as sourcefile:
+        with self.sourcefile_industry_assignments.open(mode='rt') as sourcefile:
             for line in sourcefile:
                 industry_assignment = line.split()
                 if industry_assignment[0] == industry:
@@ -197,7 +198,7 @@ class RCV1v2DatasetSource(DatasetSource):
             return {}
 
         documents = {}
-        sourcefile_tokens = open(self.sourcefile_document_tokens, 'r')
+        sourcefile_tokens = self.sourcefile_document_tokens.open(mode='rt')
 
         document = None
         for line in sourcefile_tokens.readlines():
@@ -259,7 +260,7 @@ class RCV1v2DatasetSource(DatasetSource):
         :param dict documents: A dictionary with document IDs as keys and :class:`RCV1v2Document` instances as values.
         :return: Nothing
         """
-        with open(self.sourcefile_topic_assignments, 'r') as sourcefile:
+        with self.sourcefile_topic_assignments.open(mode='rt') as sourcefile:
             for line in sourcefile:
                 assignment = line.split()
                 documentID = int(assignment[1])

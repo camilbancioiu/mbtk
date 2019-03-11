@@ -1,5 +1,7 @@
 import unittest
 
+from pathlib import Path
+
 from mbff_tests.TestBase import TestBase
 
 from mbff.dataset.DatasetMatrix import DatasetMatrix
@@ -94,7 +96,7 @@ class TestExperimentalDataset(TestBase):
         definition.exds_class = ExperimentalDataset
         definition.source = RCV1v2DatasetSource
         definition.source_configuration = {
-                'sourcefolder': 'testfiles/rcv1v2_test_dataset',
+                'sourcepath': Path('testfiles/rcv1v2_test_dataset'),
                 'filters': {},
                 'feature_type': 'binary'
                 }

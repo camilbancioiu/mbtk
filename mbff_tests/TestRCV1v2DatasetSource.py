@@ -2,6 +2,8 @@ import numpy
 import scipy
 import unittest
 
+from pathlib import Path
+
 from mbff_tests.TestBase import TestBase
 
 from mbff.dataset.sources.RCV1v2DatasetSource import RCV1v2DatasetSource
@@ -95,7 +97,7 @@ class TestRCV1v2DatasetSource(TestBase):
 
     def default_configuration(self):
         configuration = {
-                'sourcefolder': 'testfiles/rcv1v2_test_dataset',
+                'sourcepath': Path('testfiles/rcv1v2_test_dataset'),
                 'filters': {},
                 'feature_type': 'wordcount'
                 }
