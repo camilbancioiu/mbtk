@@ -35,7 +35,7 @@ class RCV1v2DatasetSource(DatasetSource):
         self.sourcefile_industry_assignments = self.sourcepath / 'oa9.rcv1-v2.industries.qrels.txt'
 
 
-    def create_dataset_matrix(self, label='rcv1v2', feature_type=''):
+    def create_dataset_matrix(self, label='rcv1v2', feature_type='', filters={}):
         """
         Create a :class:`DatasetMatrix
         <mbff.dataset.DatasetMatrix.DatasetMatrix>` object containing a
@@ -65,9 +65,12 @@ class RCV1v2DatasetSource(DatasetSource):
         :rtype: mbff.dataset.DatasetMatrix.DatasetMatrix
         """
         documentIDs = []
-        if 'industry' in self.configuration['filters'].keys():
-            documentIDs = self.read_documentIDs_in_industry(self.configuration['filters']['industry'])
-        elif len(self.configuration['filters']) == 0:
+        if len(filters) == 0:
+            filters = self.configuration['filters']
+
+        if 'industry' in filters.keys():
+            documentIDs = self.read_documentIDs_in_industry(filters['industry'])
+        elif len(filters) == 0:
             documentIDs = self.read_all_documentIDs()
         else:
             raise ValueError("Unsupported RCV1v2 document filter specified. Either specify \
