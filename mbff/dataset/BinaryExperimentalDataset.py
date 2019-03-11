@@ -4,9 +4,16 @@ from mbff.dataset.ExperimentalDataset import ExperimentalDataset
 
 class BinaryExperimentalDataset(ExperimentalDataset):
     """
-    An ExperimentalDataset which contains only binary data, i.e. the three
-    DatasetMatrix instances (dataset_full, dataset_train, dataset_test) contain
-    only ``0`` and ``1``.
+    An experimental dataset which contains only binary data. This means that
+    the three :py:class:`DatasetMatrix
+    <mbff.dataset.DatasetMatrix.DatasetMatrix>` instances (``self.matrix``,
+    ``self.matrix_train``, ``self.matrix_test``) are treated as if the contain
+    only values ``0`` and ``1``.
+
+    The :py:class:`BinaryExperimentalDataset` class provides an extra
+    processing step to the default splitting operation performed by
+    :py:meth:`ExperimentalDataset.build()
+    <mbff.dataset.ExperimentalDataset.ExperimentalDataset.build>`.
     """
 
     def process_before_split(self):
