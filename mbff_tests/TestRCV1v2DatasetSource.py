@@ -97,7 +97,7 @@ class TestRCV1v2DatasetSource(TestBase):
 
     def default_configuration(self):
         configuration = {
-                'sourcepath': Path('testfiles/rcv1v2_test_dataset'),
+                'sourcepath': Path('testfiles', 'rcv1v2_test_dataset'),
                 'filters': {},
                 'feature_type': 'wordcount'
                 }

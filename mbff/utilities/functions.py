@@ -35,3 +35,12 @@ def create_index(l):
 
 
 
+def read_bif_file(path):
+    from lark import Lark
+    from mbff.utilities.bif.Grammar import bif_grammar
+    from mbff.utilities.bif.Transformers import get_transformer_chain
+    parser = Lark(bif_grammar)
+    tree = parser.parse(path.read_text())
+
+    bayesian_network_model = get_transformer_chain().transform(tree)
+    return bayesian_network_model

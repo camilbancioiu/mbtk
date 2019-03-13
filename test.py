@@ -9,6 +9,7 @@ from mbff_tests.TestInfoTheory import TestInfoTheory
 from mbff_tests.TestAlgorithmIGt import TestAlgorithmIGt
 from mbff_tests.TestAlgorithmRun import TestAlgorithmRun
 from mbff_tests.TestExperimentRun import TestExperimentRun
+from mbff_tests.TestBIFReading import TestBIFReading
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
