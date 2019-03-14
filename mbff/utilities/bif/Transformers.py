@@ -81,12 +81,12 @@ class BIFTransformerProbabilities(Transformer):
 
     def probability_block(self, items):
         attributes = dict([item for sublist in items for item in sublist])
-        pmd = ProbabilityMassDistribution(attributes['variable_name'])
-        pmd.conditioning_set = attributes.get('conditioning_set', None)
-        pmd.probabilities = attributes['probabilities']
-        pmd.properties = attributes['properties']
+        pd = ProbabilityDistribution(attributes['variable_name'])
+        pd.conditioning_set = attributes.get('conditioning_set', None)
+        pd.probabilities = attributes['probabilities']
+        pd.properties = attributes['properties']
 
-        return pmd
+        return pd
 
 
 class BIFTransformerNetwork(Transformer):
@@ -108,8 +108,8 @@ class BIFTransformerNetwork(Transformer):
                 bn.variables[item.name] = item
 
         for item in items:
-            if isinstance(item, ProbabilityMassDistribution):
-                bn.variables[item.variable_name].pmd = item
+            if isinstance(item, ProbabilityDistribution):
+                bn.variables[item.variable_name].probdist = item
 
         return bn
 

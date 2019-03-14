@@ -15,4 +15,4 @@ class TestBIFReading(TestBase):
         self.assertListEqual(
                 ["age", "education", "occupation", "sex", "transportation", "unknown"],
                 sorted([variable.properties['label'] for variable in bn.variables.values()]))
-        self.assertListEqual(['A', 'S'], bn.variables['E'].pmd.conditioning_set)
+        self.assertListEqual(['A', 'S'], bn.variables['E'].probdist.conditioning_set)

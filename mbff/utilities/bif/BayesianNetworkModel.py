@@ -5,7 +5,7 @@ class Variable:
         self.values = []
         self.value_count = len(self.values)
         self.properties = {}
-        self.pmd = None
+        self.probdist = None
 
 
     def __str__(self):
@@ -13,7 +13,7 @@ class Variable:
 
 
 
-class ProbabilityMassDistribution:
+class ProbabilityDistribution:
 
     def __init__(self, variable_name):
         self.variable_name = variable_name
