@@ -47,7 +47,7 @@ class TestAlgorithmIGt(TestBase):
         datasetmatrix.row_labels = ['row{}'.format(i) for i in range(0, sample_count)]
         datasetmatrix.column_labels_X = ['feature{}'.format(i) for i in range(0, feature_count)]
         datasetmatrix.column_labels_Y = ['objective']
-        datasetmatrix.Y = scipy.sparse.csr_matrix(numpy.matrix([
+        datasetmatrix.Y = scipy.sparse.csr_matrix(numpy.array([
             [1],
             [0],
             [1],
@@ -57,7 +57,7 @@ class TestAlgorithmIGt(TestBase):
             [1],
             [0]
             ]))
-        datasetmatrix.X = scipy.sparse.csr_matrix(numpy.matrix([
+        datasetmatrix.X = scipy.sparse.csr_matrix(numpy.array([
             [1, 1, 1, 1, 0, 1, 0, 1],
             [0, 1, 1, 1, 1, 0, 0, 1],
             [1, 1, 1, 0, 0, 0, 1, 0],

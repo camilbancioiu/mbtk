@@ -65,10 +65,10 @@ class AlgorithmRun:
         n_expected = numpy.logical_not(expected)
         n_predictions = numpy.logical_not(predictions)
         evaluation = {}
-        evaluation['TP'] = numpy.asscalar(numpy.sum(numpy.logical_and(expected, predictions)))
-        evaluation['TN'] = numpy.asscalar(numpy.sum(numpy.logical_and(n_expected, n_predictions)))
-        evaluation['FP'] = numpy.asscalar(numpy.sum(numpy.logical_and(n_expected, predictions)))
-        evaluation['FN'] = numpy.asscalar(numpy.sum(numpy.logical_and(expected, n_predictions)))
+        evaluation['TP'] = numpy.sum(numpy.logical_and(expected, predictions)).item()
+        evaluation['TN'] = numpy.sum(numpy.logical_and(n_expected, n_predictions)).item()
+        evaluation['FP'] = numpy.sum(numpy.logical_and(n_expected, predictions)).item()
+        evaluation['FN'] = numpy.sum(numpy.logical_and(expected, n_predictions)).item()
         return evaluation
 
 

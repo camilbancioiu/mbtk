@@ -167,7 +167,7 @@ class TestRCV1v2DatasetSource(TestBase):
         # The columns are:
         # 0      1      2            3      4         5        6       7      8     9      10         11     12       13     14      15
         # almond ascend carbohydrate cloud difference dopamine firefly galaxy night oxygen polyrhythm python rhapsody rocket session sonata
-        return scipy.sparse.csr_matrix(numpy.matrix([
+        return scipy.sparse.csr_matrix(numpy.array([
             # 0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15
             [ 8,  0,  0,  0,  0,  0,  0,  6,  0,  0,  0,  5,  0, 12,  2,  0], # 101
             [10,  0,  0,  0,  0,  0,  0,  4,  2,  0,  0,  4,  0,  3,  0,  0], # 102
@@ -192,7 +192,7 @@ class TestRCV1v2DatasetSource(TestBase):
         # The columns are:
         # 0      1      2            3      4         5        6       7      8     9      10         11     12       13     14      15
         # almond ascend carbohydrate cloud difference dopamine firefly galaxy night oxygen polyrhythm python rhapsody rocket session sonata
-        return scipy.sparse.csr_matrix(numpy.matrix([
+        return scipy.sparse.csr_matrix(numpy.array([
             # 0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15
             [ 1,  0,  0,  0,  0,  0,  0,  1,  0,  0,  0,  1,  0,  1,  1,  0], # 101
             [ 1,  0,  0,  0,  0,  0,  0,  1,  1,  0,  0,  1,  0,  1,  0,  0], # 102
@@ -216,7 +216,7 @@ class TestRCV1v2DatasetSource(TestBase):
         # The columns are:
         # 0        1       2        3
         # arboreal encoded sidereal unknown
-        return scipy.sparse.csr_matrix(numpy.matrix([
+        return scipy.sparse.csr_matrix(numpy.array([
             # 0  1  2  3
             [ 1, 0, 0, 1 ], # 101
             [ 1, 0, 0, 1 ], # 102

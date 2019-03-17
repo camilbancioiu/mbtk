@@ -30,12 +30,12 @@ class TestDatasetMatrix(TestBase):
 
         # Remove the third row. Affects X and Y at the same time.
         dm.delete_row(2)
-        expected_X = scipy.sparse.csr_matrix(numpy.matrix([
+        expected_X = scipy.sparse.csr_matrix(numpy.array([
                 [ 1,  2,  3,  4],
                 [ 5,  6,  7,  8],
                 [13, 14, 15, 16]]))
 
-        expected_Y = scipy.sparse.csr_matrix(numpy.matrix([
+        expected_Y = scipy.sparse.csr_matrix(numpy.array([
                 [101, 102],
                 [201, 202],
                 [401, 402]]))
@@ -48,11 +48,11 @@ class TestDatasetMatrix(TestBase):
 
         # Remove the first row.
         dm.delete_row(0)
-        expected_X = scipy.sparse.csr_matrix(numpy.matrix([
+        expected_X = scipy.sparse.csr_matrix(numpy.array([
                 [ 5,  6,  7,  8],
                 [13, 14, 15, 16]]))
 
-        expected_Y = scipy.sparse.csr_matrix(numpy.matrix([
+        expected_Y = scipy.sparse.csr_matrix(numpy.array([
                 [201, 202],
                 [401, 402]]))
 
@@ -94,11 +94,11 @@ class TestDatasetMatrix(TestBase):
 
         # Keep rows 1 and 3.
         dm.keep_rows([1, 3])
-        expected_X = scipy.sparse.csr_matrix(numpy.matrix([
+        expected_X = scipy.sparse.csr_matrix(numpy.array([
                 [ 5,  6,  7,  8],
                 [13, 14, 15, 16]]))
 
-        expected_Y = scipy.sparse.csr_matrix(numpy.matrix([
+        expected_Y = scipy.sparse.csr_matrix(numpy.array([
                 [201, 202],
                 [401, 402]]))
 
@@ -110,10 +110,10 @@ class TestDatasetMatrix(TestBase):
 
         # Keep row 0 of the remaining 2 (labeled 'row1').
         dm.keep_rows([0])
-        expected_X = scipy.sparse.csr_matrix(numpy.matrix([
+        expected_X = scipy.sparse.csr_matrix(numpy.array([
                 [ 5,  6,  7,  8]]))
 
-        expected_Y = scipy.sparse.csr_matrix(numpy.matrix([
+        expected_Y = scipy.sparse.csr_matrix(numpy.array([
                 [201, 202]]))
 
         self.assertTrue(DatasetMatrix.sparse_equal(expected_X, dm.X))
@@ -137,11 +137,11 @@ class TestDatasetMatrix(TestBase):
 
         # Create new matrix by selecting rows 1 and 3.
         dm = dm.select_rows([1, 3], "test_matrix_selected_rows")
-        expected_X = scipy.sparse.csr_matrix(numpy.matrix([
+        expected_X = scipy.sparse.csr_matrix(numpy.array([
                 [ 5,  6,  7,  8],
                 [13, 14, 15, 16]]))
 
-        expected_Y = scipy.sparse.csr_matrix(numpy.matrix([
+        expected_Y = scipy.sparse.csr_matrix(numpy.array([
                 [201, 202],
                 [401, 402]]))
 
@@ -153,10 +153,10 @@ class TestDatasetMatrix(TestBase):
 
         # Keep row 0 of the remaining 2 (labeled 'row1').
         dm = dm.select_rows([0], "test_matrix_selected_rows_2")
-        expected_X = scipy.sparse.csr_matrix(numpy.matrix([
+        expected_X = scipy.sparse.csr_matrix(numpy.array([
                 [ 5,  6,  7,  8]]))
 
-        expected_Y = scipy.sparse.csr_matrix(numpy.matrix([
+        expected_Y = scipy.sparse.csr_matrix(numpy.array([
                 [201, 202]]))
 
         self.assertTrue(DatasetMatrix.sparse_equal(expected_X, dm.X))
@@ -180,7 +180,7 @@ class TestDatasetMatrix(TestBase):
 
         # Create new datasetmatrix where X has only columns 1 and 2.
         dm = dm.select_columns_X([1, 2], 'test_matrix_selected_colsX')
-        expected_X = scipy.sparse.csr_matrix(numpy.matrix([
+        expected_X = scipy.sparse.csr_matrix(numpy.array([
                 [ 2,  3],
                 [ 6,  7],
                 [10, 11],
@@ -194,7 +194,7 @@ class TestDatasetMatrix(TestBase):
 
         # Select X column 0 from the resulting datasetmatrix.
         dm = dm.select_columns_X([0], 'test_matrix_selected_colsX_2')
-        expected_X = scipy.sparse.csr_matrix(numpy.matrix([
+        expected_X = scipy.sparse.csr_matrix(numpy.array([
                 [ 2],
                 [ 6],
                 [10],
@@ -217,7 +217,7 @@ class TestDatasetMatrix(TestBase):
 
         # Remove the third column from the X matrix.
         dm.delete_column_X(2)
-        expected_X = scipy.sparse.csr_matrix(numpy.matrix([
+        expected_X = scipy.sparse.csr_matrix(numpy.array([
                 [ 1,  2,  4],
                 [ 5,  6,  8],
                 [ 9, 10, 12],
@@ -233,7 +233,7 @@ class TestDatasetMatrix(TestBase):
 
         # Remove the last column from the X matrix.
         dm.delete_column_X(2)
-        expected_X = scipy.sparse.csr_matrix(numpy.matrix([
+        expected_X = scipy.sparse.csr_matrix(numpy.array([
                 [ 1,  2],
                 [ 5,  6],
                 [ 9, 10],
@@ -259,7 +259,7 @@ class TestDatasetMatrix(TestBase):
         # Remove the first column from the Y matrix.
         dm.delete_column_Y(0)
         expected_X = self.default_matrix_X()
-        expected_Y = scipy.sparse.csr_matrix(numpy.matrix([
+        expected_Y = scipy.sparse.csr_matrix(numpy.array([
                 [102],
                 [202],
                 [302],
@@ -287,7 +287,7 @@ class TestDatasetMatrix(TestBase):
 
 
     def default_matrix_X(self):
-        return scipy.sparse.csr_matrix(numpy.matrix([
+        return scipy.sparse.csr_matrix(numpy.array([
                 [ 1,  2,  3,  4],
                 [ 5,  6,  7,  8],
                 [ 9, 10, 11, 12],
@@ -295,7 +295,7 @@ class TestDatasetMatrix(TestBase):
 
 
     def default_matrix_Y(self):
-        return scipy.sparse.csr_matrix(numpy.matrix([
+        return scipy.sparse.csr_matrix(numpy.array([
                 [101, 102],
                 [201, 202],
                 [301, 302],
