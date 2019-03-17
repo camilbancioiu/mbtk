@@ -1,6 +1,6 @@
 from lark import Transformer
 
-from mbff.utilities.bif.BayesianNetwork import *
+from mbff.dataset.BayesianNetwork import *
 
 def get_transformer_chain():
     basic = BIFTransformerBasic()
