@@ -1,6 +1,6 @@
 from lark import Transformer
 
-from mbff.utilities.bif.BayesianNetworkModel import *
+from mbff.utilities.bif.BayesianNetwork import *
 
 def get_transformer_chain():
     basic = BIFTransformerBasic()
@@ -99,7 +99,7 @@ class BIFTransformerNetwork(Transformer):
         return attributes
 
     def network_definition(self, items):
-        bn = BayesianNetworkModel('')
+        bn = BayesianNetwork('')
         for item in items:
             if isinstance(item, dict):
                 bn.name = item['network_name']

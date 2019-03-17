@@ -30,7 +30,8 @@ class ProbabilityDistribution:
             return "ProbabilityMassDistribution for variable {}, conditioned on {}".format(self.variable_name, self.conditioning_set)
 
 
-class BayesianNetworkModel:
+
+class BayesianNetwork:
 
     def __init__(self, name):
         self.name = name
