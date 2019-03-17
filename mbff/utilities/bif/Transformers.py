@@ -65,10 +65,10 @@ class BIFTransformerProbabilities(Transformer):
         return items[0][1]
 
     def variable_value_probabilities__simple(self, items):
-        return ('<unconditional>', items[0])
+        return [('<unconditional>', items[0])]
 
     def variable_value_probabilities__cond(self, items):
-        return items[0]
+        return items
 
     def variable_value_probabilities__cond_line(self, items):
         return (tuple(items[0]), items[1])
@@ -77,7 +77,7 @@ class BIFTransformerProbabilities(Transformer):
         return [('conditioning_set', items[0])]
 
     def variable_value_probabilities(self, items):
-        return [('probabilities', dict(items))]
+        return [('probabilities', dict(items[0]))]
 
     def probability_block(self, items):
         attributes = dict([item for sublist in items for item in sublist])
@@ -109,7 +109,10 @@ class BIFTransformerNetwork(Transformer):
 
         for item in items:
             if isinstance(item, ProbabilityDistribution):
-                bn.variables[item.variable_name].probdist = item
+                variable = bn.variables[item.variable_name]
+                pd = item
+                variable.probdist = pd
+                pd.variable = variable
 
         return bn
 

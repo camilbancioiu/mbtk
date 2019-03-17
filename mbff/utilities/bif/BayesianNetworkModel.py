@@ -17,8 +17,9 @@ class ProbabilityDistribution:
 
     def __init__(self, variable_name):
         self.variable_name = variable_name
+        self.variable = None
         self.probabilities = {}
-        self.conditioning_set = []
+        self.conditioning_set = None
         self.properties = {}
 
 
