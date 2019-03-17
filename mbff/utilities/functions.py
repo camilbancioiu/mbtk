@@ -44,3 +44,6 @@ def read_bif_file(path):
 
     bayesian_network_model = get_transformer_chain().transform(tree)
     return bayesian_network_model
+
+
+
