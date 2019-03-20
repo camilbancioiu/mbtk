@@ -16,7 +16,7 @@ network_definition : block*
 
 network_block : "network" network_name "{" property_list "}"
 variable_block : "variable" variable_identifier "{" variable_type_def  property_list "}"
-probability_block : "probability" "(" variable_identifier ("|" conditioning_set)? ")" "{" variable_value_probabilities property_list "}"
+probability_block : "probability" "(" variable_identifier ("|" conditioning_variable_names)? ")" "{" variable_value_probabilities property_list "}"
 
 identifier : /[a-zA-Z0-9-_]+/
 string_value : /[a-zA-Z0-9-_.]+/
@@ -37,7 +37,7 @@ probabilities_list : probability_value ("," probability_value)*
 variable_value_count : INT
 variable_type_def : "type" "discrete" "[" variable_value_count "]" "{" variable_value_list "}" ";"
 
-conditioning_set : variable_list
+conditioning_variable_names : variable_list
 variable_value_tuple : "(" variable_value_list ")"
 variable_value_probabilities : variable_value_probabilities__simple | variable_value_probabilities__cond
 variable_value_probabilities__simple : "table" probabilities_list ";"
