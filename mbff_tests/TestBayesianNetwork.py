@@ -30,14 +30,10 @@ class TestBayesianNetwork(TestBase):
             self.assertAlmostEqual(pair[0], pair[1])
 
 
-    def test_sample_roll(self):
-        variable = self.default_variable__unconditioned()
-        # TODO
-
-
     def test_sampling_single(self):
         survey_bif = Path('testfiles', 'bif_files', 'survey.bif')
         bn = util.read_bif_file(survey_bif)
+        bn.variable_names__sampling_order = ['AGE', 'SEX', 'EDU', 'OCC', 'R', 'TRN']
 
         bn.finalize()
 
@@ -45,17 +41,17 @@ class TestBayesianNetwork(TestBase):
         self.assertValidExpectedSample(sample)
 
 
-    @unittest.skip
     def test_sampling_multiple(self):
         survey_bif = Path('testfiles', 'bif_files', 'survey.bif')
         bn = util.read_bif_file(survey_bif)
+        bn.variable_names__sampling_order = ['AGE', 'SEX', 'EDU', 'OCC', 'R', 'TRN']
 
         bn.finalize()
 
         random.seed(42)
-        samples = bn.sample_matrix(1000)
+        samples = bn.sample_matrix(100000)
         self.assertIsInstance(samples, numpy.ndarray)
-        self.assertEqual((1000, 6), samples.shape)
+        self.assertEqual((100000, 6), samples.shape)
 
         AGEpd = self.calculate_probdist(samples[:, 0])
         EDUpd = self.calculate_probdist(samples[:, 1])
@@ -64,15 +60,74 @@ class TestBayesianNetwork(TestBase):
         SEXpd = self.calculate_probdist(samples[:, 4])
         TRNpd = self.calculate_probdist(samples[:, 5])
 
-        print(AGEpd)
-        self.assertAlmostEqual(0.3, AGEpd[0])   # Pr(AGE = young) = 0.3
-        self.assertAlmostEqual(0.5, AGEpd[1])   # Pr(AGE = adult) = 0.5
-        self.assertAlmostEqual(0.2, AGEpd[2])   # Pr(AGE = old)   = 0.2
+        delta = 0.003
 
-        self.assertAlmostEqual(0.49, SEXpd[0])   # Pr(SEX = M) = 0.49
-        self.assertAlmostEqual(0.51, SEXpd[1])   # Pr(SEX = F) = 0.51
+        self.assertAlmostEqual(0.3, AGEpd[0], delta=delta)   # Pr(AGE = young) = 0.3
+        self.assertAlmostEqual(0.5, AGEpd[1], delta=delta)   # Pr(AGE = adult) = 0.5
+        self.assertAlmostEqual(0.2, AGEpd[2], delta=delta)   # Pr(AGE = old)   = 0.2
 
-        # TODO EDU, OCC, R, TRN
+        self.assertAlmostEqual(0.49, SEXpd[0], delta=delta)   # Pr(SEX = M) = 0.49
+        self.assertAlmostEqual(0.51, SEXpd[1], delta=delta)   # Pr(SEX = F) = 0.51
+
+        EDU_p_highschool = (
+                0.3 * 0.49 * 0.75
+              + 0.5 * 0.49 * 0.72
+              + 0.2 * 0.49 * 0.88
+              + 0.3 * 0.51 * 0.64
+              + 0.5 * 0.51 * 0.7
+              + 0.2 * 0.51 * 0.9 )
+        self.assertAlmostEqual(EDU_p_highschool, EDUpd[0], delta=delta)
+
+        EDU_p_uni = (
+                0.3 * 0.49 * 0.25
+              + 0.5 * 0.49 * 0.28
+              + 0.2 * 0.49 * 0.12
+              + 0.3 * 0.51 * 0.36
+              + 0.5 * 0.51 * 0.3
+              + 0.2 * 0.51 * 0.1 )
+        self.assertAlmostEqual(EDU_p_uni, EDUpd[1], delta=delta)
+
+        OCC_p_emp = (
+                EDU_p_highschool * 0.96
+              + EDU_p_uni        * 0.92)
+        self.assertAlmostEqual(OCC_p_emp, OCCpd[0], delta=delta)
+
+        OCC_p_self = (
+                EDU_p_highschool * 0.04
+              + EDU_p_uni        * 0.08)
+        self.assertAlmostEqual(OCC_p_self, OCCpd[1], delta=delta)
+
+        R_p_small = (
+                EDU_p_highschool * 0.25
+              + EDU_p_uni        * 0.2 )
+        self.assertAlmostEqual(R_p_small, Rpd[0], delta=delta)
+
+        R_p_big = (
+                EDU_p_highschool * 0.75
+              + EDU_p_uni        * 0.8 )
+        self.assertAlmostEqual(R_p_big, Rpd[1], delta=delta)
+
+        TRN_p_car = (
+                OCC_p_emp   * R_p_small * 0.48
+              + OCC_p_self  * R_p_small * 0.56
+              + OCC_p_emp   * R_p_big   * 0.58
+              + OCC_p_self  * R_p_big   * 0.70)
+        self.assertAlmostEqual(TRN_p_car, TRNpd[0], delta=delta)
+
+        TRN_p_train = (
+                OCC_p_emp   * R_p_small * 0.42
+              + OCC_p_self  * R_p_small * 0.36
+              + OCC_p_emp   * R_p_big   * 0.24
+              + OCC_p_self  * R_p_big   * 0.21)
+        self.assertAlmostEqual(TRN_p_train, TRNpd[1], delta=delta)
+
+        TRN_p_other = (
+                OCC_p_emp   * R_p_small * 0.10
+              + OCC_p_self  * R_p_small * 0.08
+              + OCC_p_emp   * R_p_big   * 0.18
+              + OCC_p_self  * R_p_big   * 0.09)
+
+        self.assertAlmostEqual(TRN_p_other, TRNpd[2], delta=delta)
 
 
     def calculate_probdist(self, column):

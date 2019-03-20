@@ -14,6 +14,8 @@ class BayesianNetwork:
         self.name = name
         self.variables = {}
         self.properties = {}
+        self.variables__sampling_order = []
+        self.variable_names__sampling_order = []
 
 
     def variable_names(self):
@@ -22,9 +24,21 @@ class BayesianNetwork:
 
     def sample(self, as_list=False, values_as_indices=False):
         sample = {}
-        while len(sample) < len(self.variables):
-            for varname, variable in self.variables.items():
-                sample = variable.sample(sample)
+
+        if len(self.variables__sampling_order) == 0:
+            # If no optimal sampling order for Variables has been specified,
+            # then sample all Variables in no specific order, but enabling
+            # recursive sampling of conditioning Variables.
+            while len(sample) < len(self.variables):
+                for varname, variable in self.variables.items():
+                    sample = variable.sample(sample, recursive=True)
+
+        else:
+            # An optimal sampling order has been specified for Variables. This
+            # means that recursive sampling can be disabled without causing any
+            # exceptions when calling Variable.sample().
+            for variable in self.variables__sampling_order:
+                sample = variable.sample(sample, recursive=False)
 
         if values_as_indices:
             sample = self.sample_values_to_indices(sample)
@@ -59,6 +73,9 @@ class BayesianNetwork:
         for variable in self.variables.values():
             variable.probdist.finalize()
 
+        for varname in self.variable_names__sampling_order:
+            self.variables__sampling_order.append(self.variables[varname])
+
 
 
 class Variable:
@@ -92,7 +109,7 @@ class Variable:
         self.probdist = None
 
 
-    def sample(self, partial_sample={}):
+    def sample(self, partial_sample={}, recursive=True):
         """
         Produce a random sample that respects the probability distribution of
         the Variable.
@@ -114,13 +131,20 @@ class Variable:
             # This Variable is not conditioned by any other.
             conditioning_values = '<unconditioned>'
         else:
-            # This Variable is conditioned by other Variables. We need to
-            # determine which of the conditioning Variables have been sampled
-            # already, and which have not.
-            unsampled_conditioning_variables = self.get_unsampled_conditioning_variables(partial_sample)
-            # Recursively sample all unsampled conditioning Variables.
-            for unsampled_variable in unsampled_conditioning_variables:
-                partial_sample = unsampled_variable.sample(partial_sample)
+            # If recursive sampling of conditioning Variables is enabled, then
+            # iterate over not-yet-sampled conditioning Variables and sample them now.
+            # If recursive sampling is NOT enabled, then ignore this step,
+            # because BayesianNetwork.sample() should already know the proper
+            # sampling order which ensures all conditioning Variables are
+            # sampled before a conditioned Variable.
+            if recursive:
+                # This Variable is conditioned by other Variables. We need to
+                # determine which of the conditioning Variables have been sampled
+                # already, and which have not.
+                unsampled_conditioning_variables = self.get_unsampled_conditioning_variables(partial_sample)
+                # Recursively sample all unsampled conditioning Variables.
+                for unsampled_variable in unsampled_conditioning_variables:
+                    partial_sample = unsampled_variable.sample(partial_sample, recursive=True)
             conditioning_values = self.get_conditioning_values_from_partial_sample(partial_sample)
 
         value_index = self.probdist.sample(conditioning_values)
