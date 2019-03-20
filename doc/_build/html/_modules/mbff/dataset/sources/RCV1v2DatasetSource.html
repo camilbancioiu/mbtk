@@ -62,7 +62,8 @@
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">configuration</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">configuration</span> <span class="o">=</span> <span class="n">configuration</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">sourcefolder</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">configuration</span><span class="p">[</span><span class="s1">&#39;sourcefolder&#39;</span><span class="p">]</span>
+        <span class="c1"># TODO update documentation to refer to sourcepath, not sourcefolder</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sourcepath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">configuration</span><span class="p">[</span><span class="s1">&#39;sourcepath&#39;</span><span class="p">]</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="s1">&#39;feature_type&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">configuration</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">configuration</span><span class="p">[</span><span class="s1">&#39;feature_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;wordcount&#39;</span>
@@ -70,13 +71,13 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="s1">&#39;filters&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">configuration</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">configuration</span><span class="p">[</span><span class="s1">&#39;filters&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">sourcefile_documentIDs</span>          <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">/oa7.rcv1v2-ids.txt&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sourcefolder</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">sourcefile_document_tokens</span>      <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">/token/lyrl2004_tokens_all.dat&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sourcefolder</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">sourcefile_topic_assignments</span>    <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">/oa8.rcv1-v2.topics.qrels.txt&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sourcefolder</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">sourcefile_industry_assignments</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">/oa9.rcv1-v2.industries.qrels.txt&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sourcefolder</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sourcefile_documentIDs</span>          <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sourcepath</span> <span class="o">/</span> <span class="s1">&#39;oa7.rcv1v2-ids.txt&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sourcefile_document_tokens</span>      <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sourcepath</span> <span class="o">/</span> <span class="s1">&#39;token/lyrl2004_tokens_all.dat&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sourcefile_topic_assignments</span>    <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sourcepath</span> <span class="o">/</span> <span class="s1">&#39;oa8.rcv1-v2.topics.qrels.txt&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sourcefile_industry_assignments</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sourcepath</span> <span class="o">/</span> <span class="s1">&#39;oa9.rcv1-v2.industries.qrels.txt&#39;</span>
 
 
-<div class="viewcode-block" id="RCV1v2DatasetSource.create_dataset_matrix"><a class="viewcode-back" href="../../../../dataset/sources/RCV1v2DatasetSource.html#mbff.dataset.sources.RCV1v2DatasetSource.RCV1v2DatasetSource.create_dataset_matrix">[docs]</a>    <span class="k">def</span> <span class="nf">create_dataset_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;rcv1v2&#39;</span><span class="p">,</span> <span class="n">feature_type</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="RCV1v2DatasetSource.create_dataset_matrix"><a class="viewcode-back" href="../../../../dataset/sources/RCV1v2DatasetSource.html#mbff.dataset.sources.RCV1v2DatasetSource.RCV1v2DatasetSource.create_dataset_matrix">[docs]</a>    <span class="k">def</span> <span class="nf">create_dataset_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;rcv1v2&#39;</span><span class="p">,</span> <span class="n">feature_type</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">filters</span><span class="o">=</span><span class="p">{}):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create a :class:`DatasetMatrix</span>
 <span class="sd">        &lt;mbff.dataset.DatasetMatrix.DatasetMatrix&gt;` object containing a</span>
@@ -106,9 +107,12 @@
 <span class="sd">        :rtype: mbff.dataset.DatasetMatrix.DatasetMatrix</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">documentIDs</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">if</span> <span class="s1">&#39;industry&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">configuration</span><span class="p">[</span><span class="s1">&#39;filters&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-            <span class="n">documentIDs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_documentIDs_in_industry</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">configuration</span><span class="p">[</span><span class="s1">&#39;filters&#39;</span><span class="p">][</span><span class="s1">&#39;industry&#39;</span><span class="p">])</span>
-        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">configuration</span><span class="p">[</span><span class="s1">&#39;filters&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">filters</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">filters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">configuration</span><span class="p">[</span><span class="s1">&#39;filters&#39;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="s1">&#39;industry&#39;</span> <span class="ow">in</span> <span class="n">filters</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">documentIDs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_documentIDs_in_industry</span><span class="p">(</span><span class="n">filters</span><span class="p">[</span><span class="s1">&#39;industry&#39;</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">filters</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">documentIDs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_all_documentIDs</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unsupported RCV1v2 document filter specified. Either specify </span><span class="se">\</span>
@@ -141,7 +145,7 @@
 <span class="sd">        :return: Sorted list of document IDs available in RCV1v2.</span>
 <span class="sd">        :rtype: list</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">documentIDs</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sourcefile_documentIDs</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;uint32&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="n">documentIDs</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sourcefile_documentIDs</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;uint32&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
         <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">documentIDs</span><span class="p">)</span></div>
 
 
@@ -153,7 +157,7 @@
 <span class="sd">        :param str industry: An industry code, as defined by RCV1v2.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">documentIDs</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sourcefile_industry_assignments</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">sourcefile</span><span class="p">:</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">sourcefile_industry_assignments</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;rt&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">sourcefile</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">sourcefile</span><span class="p">:</span>
                 <span class="n">industry_assignment</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
                 <span class="k">if</span> <span class="n">industry_assignment</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">industry</span><span class="p">:</span>
@@ -239,7 +243,7 @@
             <span class="k">return</span> <span class="p">{}</span>
 
         <span class="n">documents</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="n">sourcefile_tokens</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sourcefile_document_tokens</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+        <span class="n">sourcefile_tokens</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sourcefile_document_tokens</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;rt&#39;</span><span class="p">)</span>
 
         <span class="n">document</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">sourcefile_tokens</span><span class="o">.</span><span class="n">readlines</span><span class="p">():</span>
@@ -301,7 +305,7 @@
 <span class="sd">        :param dict documents: A dictionary with document IDs as keys and :class:`RCV1v2Document` instances as values.</span>
 <span class="sd">        :return: Nothing</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sourcefile_topic_assignments</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">sourcefile</span><span class="p">:</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">sourcefile_topic_assignments</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;rt&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">sourcefile</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">sourcefile</span><span class="p">:</span>
                 <span class="n">assignment</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
                 <span class="n">documentID</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">assignment</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
