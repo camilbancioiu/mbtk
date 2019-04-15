@@ -79,8 +79,26 @@ class BayesianNetwork:
         for variable in self.variables.values():
             variable.probdist.finalize()
 
+        if len(self.variable_names__sampling_order) == 0:
+            self.variable_names__sampling_order = self.detect_optimal_variable_sampling_order()
+
         for varname in self.variable_names__sampling_order:
             self.variables__sampling_order.append(self.variables[varname])
+
+
+    def detect_optimal_variable_sampling_order(self):
+        optimal_sampling_order = []
+        variable_names = self.variable_names()
+
+        while len(variable_names) > 0:
+            for varname in variable_names:
+                variable = self.variables[varname]
+                conditioning_varnames = variable.probdist.conditioning_variables.keys()
+                if len(conditioning_varnames) == 0 or set(conditioning_varnames).issubset(optimal_sampling_order):
+                    optimal_sampling_order.append(variable.name)
+            variable_names = [varname for varname in variable_names if varname not in optimal_sampling_order]
+
+        return optimal_sampling_order
 
 
 

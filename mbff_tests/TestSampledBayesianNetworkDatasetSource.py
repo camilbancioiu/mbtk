@@ -18,13 +18,10 @@ class TestSampledBayesianNetworkDatasetSource(TestBase):
 
         random.seed(configuration['random_seed'])
         bayesian_network = util.read_bif_file(configuration['sourcepath'])
-        bayesian_network.variable_names__sampling_order = ['AGE', 'SEX', 'EDU', 'OCC', 'R', 'TRN']
         bayesian_network.finalize()
         sample_matrix = bayesian_network.sample_matrix(configuration['sample_count'])
 
-        sbnds = SampledBayesianNetworkDatasetSource(self.default_configuration(), finalize_bn=False)
-        sbnds.bayesian_network.variable_names__sampling_order = ['AGE', 'SEX', 'EDU', 'OCC', 'R', 'TRN']
-        sbnds.bayesian_network.finalize()
+        sbnds = SampledBayesianNetworkDatasetSource(self.default_configuration())
         sbnds.reset_random_seed = True
         datasetmatrix = sbnds.create_dataset_matrix('test_sbnds')
 

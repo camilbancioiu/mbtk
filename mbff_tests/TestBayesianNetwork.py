@@ -34,9 +34,10 @@ class TestBayesianNetwork(TestBase):
     def test_sampling_single(self):
         survey_bif = Path('testfiles', 'bif_files', 'survey.bif')
         bn = util.read_bif_file(survey_bif)
-        bn.variable_names__sampling_order = ['AGE', 'SEX', 'EDU', 'OCC', 'R', 'TRN']
 
         bn.finalize()
+
+        self.assertListEqual(['AGE', 'SEX', 'EDU', 'OCC', 'R', 'TRN'], bn.variable_names__sampling_order)
 
         sample = bn.sample()
         self.assertValidExpectedSample(sample)
@@ -45,9 +46,9 @@ class TestBayesianNetwork(TestBase):
     def test_sampling_multiple(self):
         survey_bif = Path('testfiles', 'bif_files', 'survey.bif')
         bn = util.read_bif_file(survey_bif)
-        bn.variable_names__sampling_order = ['AGE', 'SEX', 'EDU', 'OCC', 'R', 'TRN']
 
         bn.finalize()
+        self.assertListEqual(['AGE', 'SEX', 'EDU', 'OCC', 'R', 'TRN'], bn.variable_names__sampling_order)
 
         random.seed(42)
         samples = bn.sample_matrix(100000)
