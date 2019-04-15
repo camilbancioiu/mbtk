@@ -9,6 +9,7 @@ from mbff_tests.TestBase import TestBase
 
 import mbff.utilities.functions as util
 from mbff.dataset.BayesianNetwork import *
+from mbff.dataset.Exceptions import *
 
 
 class TestBayesianNetwork(TestBase):
@@ -36,6 +37,11 @@ class TestBayesianNetwork(TestBase):
         bn = util.read_bif_file(survey_bif)
 
         bn.finalize()
+        bn.finalized = False
+        with self.assertRaises(BayesianNetworkNotFinalizedError):
+            sample = bn.sample()
+
+        bn.finalized = True
 
         self.assertListEqual(['AGE', 'SEX', 'EDU', 'OCC', 'R', 'TRN'], bn.variable_names__sampling_order)
 

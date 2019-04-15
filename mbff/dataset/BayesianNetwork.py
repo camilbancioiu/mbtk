@@ -7,6 +7,18 @@ import numpy
 
 from collections import OrderedDict
 
+from mbff.dataset.Exceptions import BayesianNetworkFinalizedError, BayesianNetworkNotFinalizedError
+
+
+def finalization_required(func):
+    def wrapper_guard_finalized(*args, **kwargs):
+        instance = args[0]
+        if instance.finalized == False:
+            raise BayesianNetworkNotFinalizedError(instance, "Cannot call method {}()".format(func.__name__))
+        else:
+            return func(*args, **kwargs)
+    return wrapper_guard_finalized
+
 
 class BayesianNetwork:
 
@@ -16,6 +28,7 @@ class BayesianNetwork:
         self.properties = {}
         self.variables__sampling_order = []
         self.variable_names__sampling_order = []
+        self.finalized = False
 
 
     def variable_names(self):
@@ -26,6 +39,7 @@ class BayesianNetwork:
         return self.variable_names().index(varname)
 
 
+    @finalization_required
     def sample(self, as_list=False, values_as_indices=False):
         sample = {}
 
@@ -54,14 +68,17 @@ class BayesianNetwork:
         return sample
 
 
+    @finalization_required
     def sample_as_list(self, sample):
         return [sample[varname] for varname in self.variable_names()]
 
 
+    @finalization_required
     def samples(self, n=1, as_list=False, values_as_indices=False):
         return [self.sample(as_list, values_as_indices) for i in range(n)]
 
 
+    @finalization_required
     def sample_matrix(self, n=1):
         samples = self.samples(n, as_list=True, values_as_indices=True)
         return numpy.asarray(list(samples))
@@ -85,6 +102,8 @@ class BayesianNetwork:
         for varname in self.variable_names__sampling_order:
             self.variables__sampling_order.append(self.variables[varname])
 
+        self.finalized = True
+
 
     def detect_optimal_variable_sampling_order(self):
         optimal_sampling_order = []
@@ -99,6 +118,8 @@ class BayesianNetwork:
             variable_names = [varname for varname in variable_names if varname not in optimal_sampling_order]
 
         return optimal_sampling_order
+
+
 
 
 
