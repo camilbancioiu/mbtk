@@ -14,10 +14,16 @@ class BinarySyntheticDatasetSource(DatasetSource):
 
     def __init__(self, configuration):
         self.configuration = configuration
+        self.reset_random_seed = True
 
 
-    def create_dataset_matrix(self, label='binarydataset'):
-        random.seed(self.configuration['random_seed'])
+    def create_dataset_matrix(self, label='binarydataset', other_random_seed=-1):
+        if self.reset_random_seed or (other_random_seed != -1 and other_random_seed != self.configuration['random_seed']):
+            if other_random_seed == -1:
+                random.seed(self.configuration['random_seed'])
+            else:
+                random.seed(other_random_seed)
+            self.reset_random_seed = False
         (X, col_labels_X) = self.create_random_binary_matrix(
                 self.configuration['row_count'],
                 self.configuration['features']
