@@ -5,6 +5,7 @@ import random
 from mbff.dataset.sources.DatasetSource import DatasetSource
 from mbff.dataset.DatasetMatrix import DatasetMatrix
 
+
 class BinarySyntheticDatasetSource(DatasetSource):
     """
     A dataset source which generates a random binary dataset by specifying the

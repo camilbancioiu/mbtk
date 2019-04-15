@@ -19,7 +19,11 @@ class BayesianNetwork:
 
 
     def variable_names(self):
-        return sorted(self.variables.keys())
+        return list(sorted(self.variables.keys()))
+
+
+    def variable_index(self, varname):
+        return self.variable_names().index(varname)
 
 
     def sample(self, as_list=False, values_as_indices=False):
@@ -28,7 +32,8 @@ class BayesianNetwork:
         if len(self.variables__sampling_order) == 0:
             # If no optimal sampling order for Variables has been specified,
             # then sample all Variables in no specific order, but enabling
-            # recursive sampling of conditioning Variables.
+            # recursive sampling of conditioning Variables. This is not a fast
+            # process.
             while len(sample) < len(self.variables):
                 for varname, variable in self.variables.items():
                     sample = variable.sample(sample, recursive=True)
@@ -36,7 +41,8 @@ class BayesianNetwork:
         else:
             # An optimal sampling order has been specified for Variables. This
             # means that recursive sampling can be disabled without causing any
-            # exceptions when calling Variable.sample().
+            # exceptions when calling Variable.sample(). Disabling recursive
+            # sampling makes everything much faster.
             for variable in self.variables__sampling_order:
                 sample = variable.sample(sample, recursive=False)
 

@@ -10,6 +10,7 @@ from mbff_tests.TestBase import TestBase
 import mbff.utilities.functions as util
 from mbff.dataset.BayesianNetwork import *
 
+
 class TestBayesianNetwork(TestBase):
 
     def test_probability_distribution(self):
