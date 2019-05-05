@@ -11,7 +11,6 @@ def ensure_folder(folder):
     path.mkdir(parents=True, exist_ok=True)
 
 
-
 def load_matrix(path, matrix_name):
     matrix = None
     fname = str(path / "{0}.mtx".format(matrix_name))
@@ -23,16 +22,13 @@ def load_matrix(path, matrix_name):
     return matrix
 
 
-
 def save_matrix(path, matrix_name, matrix):
     fname = str(path / "{0}.mtx".format(matrix_name))
     scipy.io.mmwrite(fname, matrix)
 
 
-
 def create_index(l):
     return dict(zip(l, range(0, len(l))))
-
 
 
 def read_bif_file(path):
