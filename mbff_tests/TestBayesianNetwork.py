@@ -19,13 +19,13 @@ class TestBayesianNetwork(TestBase):
         probdist = variable.probdist
 
         self.assertEqual(1, len(probdist.probabilities))
-        self.assertEqual(0, len(probdist.conditioning_variables))
+        self.assertEqual(0, len(probdist.conditioning_variable_nodes))
         self.assertEqual(0, len(probdist.cummulative_probabilities))
 
         probdist.finalize()
 
         self.assertEqual(1, len(probdist.probabilities))
-        self.assertEqual(0, len(probdist.conditioning_variables))
+        self.assertEqual(0, len(probdist.conditioning_variable_nodes))
 
         cprobs_compare = zip([0.2, 0.3, 0.8, 1.0], probdist.cummulative_probabilities['<unconditioned>'])
         for pair in cprobs_compare:
@@ -43,7 +43,7 @@ class TestBayesianNetwork(TestBase):
 
         bn.finalized = True
 
-        self.assertListEqual(['AGE', 'SEX', 'EDU', 'OCC', 'R', 'TRN'], bn.variable_names__sampling_order)
+        self.assertListEqual(['AGE', 'SEX', 'EDU', 'OCC', 'R', 'TRN'], bn.variable_node_names__sampling_order)
 
         sample = bn.sample()
         self.assertValidExpectedSample(sample)
@@ -54,7 +54,7 @@ class TestBayesianNetwork(TestBase):
         bn = util.read_bif_file(survey_bif)
 
         bn.finalize()
-        self.assertListEqual(['AGE', 'SEX', 'EDU', 'OCC', 'R', 'TRN'], bn.variable_names__sampling_order)
+        self.assertListEqual(['AGE', 'SEX', 'EDU', 'OCC', 'R', 'TRN'], bn.variable_node_names__sampling_order)
 
         random.seed(42)
         samples = bn.sample_matrix(100000)
@@ -148,9 +148,9 @@ class TestBayesianNetwork(TestBase):
 
 
     def default_variable__unconditioned(self):
-        variable = Variable('ASDF')
+        variable = VariableNode('ASDF')
         variable.values = ['rocket', 'carbohydrate', 'albatross', 'oxygen']
-        variable.probdist = ProbabilityDistribution(variable)
+        variable.probdist = ProbabilityDistributionOfVariableNode(variable)
         variable.probdist.probabilities = {'<unconditioned>' : [0.2, 0.1, 0.5, 0.2]}
         return variable
 

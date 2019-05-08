@@ -54,7 +54,7 @@ class BIFTransformerVariables(Transformer):
 
     def variable_block(self, items):
         attributes = dict([item for sublist in items for item in sublist])
-        variable = Variable(attributes['variable_name'])
+        variable = VariableNode(attributes['variable_name'])
         variable.values = attributes['value_list']
         variable.properties = attributes['properties']
         return variable
@@ -100,10 +100,10 @@ class BIFTransformerProbabilities(Transformer):
 
     def probability_block(self, items):
         attributes = dict([item for sublist in items for item in sublist])
-        pd = ProbabilityDistribution(attributes['variable_name'])
+        pd = ProbabilityDistributionOfVariableNode(attributes['variable_name'])
         pd.probabilities = attributes['probabilities']
         conditioning_variable_names = attributes.get('conditioning_variable_names', [])
-        pd.conditioning_variables = OrderedDict.fromkeys(conditioning_variable_names)
+        pd.conditioning_variable_nodes = OrderedDict.fromkeys(conditioning_variable_names)
         pd.properties = attributes['properties']
         return pd
 
@@ -127,19 +127,19 @@ class BIFTransformerNetwork(Transformer):
             if isinstance(item, dict):
                 bn.name = item['network_name']
                 bn.properties = item.get('properties', {})
-            if isinstance(item, Variable):
-                bn.variables[item.name] = item
+            if isinstance(item, VariableNode):
+                bn.variable_nodes[item.name] = item
 
-        # Secondly, add references from Variables to ProbabilityDistributions and vice-versa.
+        # Secondly, add references from VariableNodes to ProbabilityDistributionOfVariableNode and vice-versa.
         for item in items:
-            if isinstance(item, ProbabilityDistribution):
-                variable = bn.variables[item.variable_name]
+            if isinstance(item, ProbabilityDistributionOfVariableNode):
+                variable = bn.variable_nodes[item.variable_name]
                 pd = item
                 variable.probdist = pd
                 pd.variable = variable
 
-                for varname in pd.conditioning_variables.keys():
-                    pd.conditioning_variables[varname] = bn.variables[varname]
+                for varname in pd.conditioning_variable_nodes.keys():
+                    pd.conditioning_variable_nodes[varname] = bn.variable_nodes[varname]
 
         return bn
 

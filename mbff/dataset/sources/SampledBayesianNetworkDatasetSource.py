@@ -31,7 +31,7 @@ class SampledBayesianNetworkDatasetSource():
 
         sample_count = self.configuration['sample_count']
         objective_names = sorted(self.configuration['objectives'])
-        feature_names = list(sorted(list(set(self.bayesian_network.variable_names()) - set(objective_names))))
+        feature_names = list(sorted(list(set(self.bayesian_network.variable_node_names()) - set(objective_names))))
 
         sample_matrix = self.bayesian_network.sample_matrix(sample_count)
 
@@ -39,12 +39,12 @@ class SampledBayesianNetworkDatasetSource():
         Y = numpy.empty((sample_count, 0), dtype=numpy.int8)
 
         for varname in feature_names:
-            varindex = self.bayesian_network.variable_index(varname)
+            varindex = self.bayesian_network.variable_nodes_index(varname)
             feature = sample_matrix[:, varindex][numpy.newaxis].T
             X = numpy.hstack((X, feature))
 
         for varname in objective_names:
-            varindex = self.bayesian_network.variable_index(varname)
+            varindex = self.bayesian_network.variable_nodes_index(varname)
             objective = sample_matrix[:, varindex][numpy.newaxis].T
             Y = numpy.hstack((Y, objective))
 
