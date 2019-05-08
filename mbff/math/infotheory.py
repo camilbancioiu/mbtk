@@ -1,6 +1,8 @@
 import math
 import numpy
 
+
+
 def MI__binary(X, Y):
     pX = calculate_pmf__binary(X)
     pY = calculate_pmf__binary(Y)
