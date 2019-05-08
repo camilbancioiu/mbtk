@@ -1,6 +1,6 @@
 import numpy
 
-import mbff.infotheory as infotheory
+import mbff.math.infotheory as infotheory
 
 from mbff_tests.TestBase import TestBase
 

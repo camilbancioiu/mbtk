@@ -7,7 +7,7 @@ import numpy
 
 from collections import OrderedDict
 
-from mbff.dataset.Exceptions import BayesianNetworkFinalizedError, BayesianNetworkNotFinalizedError
+from mbff.math.Exceptions import BayesianNetworkFinalizedError, BayesianNetworkNotFinalizedError
 
 
 def finalization_required(func):

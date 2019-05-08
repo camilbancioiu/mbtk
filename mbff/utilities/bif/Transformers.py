@@ -1,7 +1,7 @@
 from collections import OrderedDict
 from lark import Transformer
 
-from mbff.dataset.BayesianNetwork import *
+from mbff.math.BayesianNetwork import *
 
 def get_transformer_chain():
     basic = BIFTransformerBasic()

@@ -8,8 +8,8 @@ import unittest
 from mbff_tests.TestBase import TestBase
 
 import mbff.utilities.functions as util
-from mbff.dataset.BayesianNetwork import *
-from mbff.dataset.Exceptions import *
+from mbff.math.BayesianNetwork import *
+from mbff.math.Exceptions import *
 
 
 class TestBayesianNetwork(TestBase):

@@ -1,6 +1,6 @@
 import operator
 
-import mbff.infotheory as infotheory
+import mbff.math.infotheory as infotheory
 
 def algorithm_IGt__binary(datasetmatrix, parameters):
     (sample_count, feature_count) = datasetmatrix.X.get_shape()
