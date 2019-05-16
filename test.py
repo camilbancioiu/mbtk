@@ -12,6 +12,7 @@ from mbff_tests.TestExperimentRun import TestExperimentRun
 from mbff_tests.TestBIFReading import TestBIFReading
 from mbff_tests.TestBayesianNetwork import TestBayesianNetwork
 from mbff_tests.TestSampledBayesianNetworkDatasetSource import TestSampledBayesianNetworkDatasetSource
+from mbff_tests.TestVariableAndPMF import TestVariableAndPMF
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

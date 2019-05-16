@@ -1,0 +1,86 @@
+import numpy
+import operator
+from collections import Counter
+
+from mbff.math.Exceptions import VariableInstancesOfUnequalCount
+
+
+class Variable:
+
+    def __init__(self, instances):
+        self.ID = -1
+        self.name = ''
+        self.instances = instances
+        self.values = None
+        self.update_values()
+
+
+    def update_values(self):
+        if not self.instances is None:
+            self.values = sorted(list(Counter(self.instances).keys()))
+
+
+
+class JointVariables(Variable):
+
+    def __init__(self, *variables):
+        super().__init__(None)
+
+        variables = self.flatten_variables_list(variables)
+
+        self.variables = sorted(variables, key=operator.attrgetter('ID'))
+        self.validate_variables()
+
+        self.ID = None
+
+        self.variableIDs = [var.ID for var in self.variables]
+        self.instances = list(zip(*[var.instances for var in self.variables]))
+        self.values = None
+        self.update_values()
+
+
+    def flatten_variables_list(self, variables):
+        flattened_variables_list = []
+        for variable in variables:
+            if type(variable) == Variable:
+                flattened_variables_list.append(variable)
+            if type(variable) == JointVariables:
+                flattened_variables_list.extend(variable.variables)
+        return flattened_variables_list
+
+
+    def validate_variables(self):
+        validate_variable_instances_lengths(self.variables)
+
+
+
+class IndexVariable(Variable):
+
+    def __init__(self, variable):
+        super().__init__(None)
+
+        self.source_variable = variable
+
+        # An IndexVariable is just a representation of a simple Variable or
+        # JointVariables, and therefore can be used in place of the source
+        # variable
+        self.ID = self.source_variable.ID
+        self.values = None
+        self.values_index = None
+
+        self.update_values()
+
+
+    def update_values(self):
+        if not self.source_variable.values is None:
+            self.values_index = dict(enumerate(self.source_variable.values))
+            self.values = sorted(list(self.values_index.keys()))
+
+
+
+def validate_variable_instances_lengths(variables):
+    lengths = [len(var.instances) for var in variables]
+    for i in range(len(lengths) - 1):
+        if lengths[i] != lengths[i+1]:
+            raise VariableInstancesOfUnequalCount([variables[i], variables[i+1]])
+
