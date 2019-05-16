@@ -5,34 +5,34 @@
 Examples
 --------
 
-Simple example involving :class:`Variable` and :class:`ProbabilityDistribution`:
+Simple example involving :class:`VariableNode` and :class:`ProbabilityDistributionOfVariableNode`:
 
 .. sourcecode:: python
 
-  from mbff.dataset.BayesianNetwork import *
+  from mbff.math.BayesianNetwork import *
 
-  # Variable AGE, with its simple probability distribution
-  AGE = Variable('AGE')
+  # VariableNode AGE, with its simple probability distribution
+  AGE = VariableNode('AGE')
   AGE.values = ['young', 'adult', 'old']
-  AGE.probdist = ProbabilityDistribution(AGE)
+  AGE.probdist = ProbabilityDistributionOfVariableNode(AGE)
   AGE.probdist.conditioning_variables = None    # Not a conditional probability distribution
   AGE.probdist.probabilities = {
     '<unconditioned>' : [0.3, 0.5, 0.2]         # Pr(young) = 0.3, Pr(adult) = 0.5, Pr(old) = 0.2
   }
 
-  # Variable SEX, with its simple probability distribution
-  SEX = Variable('SEX')
+  # VariableNode SEX, with its simple probability distribution
+  SEX = VariableNode('SEX')
   SEX.values = ['M', 'F']
-  SEX.probdist = ProbabilityDistribution(SEX)
+  SEX.probdist = ProbabilityDistributionOfVariableNode(SEX)
   SEX.probdist.conditioning_variables = None    # Not a conditional probability distribution
   SEX.probdist.probabilities = {
     '<unconditioned>' : [0.5, 0.5]              # Pr(M) = 0.5, Pr(F) = 0.5
   }
 
-  # Variable EDU, with probability distribution conditioned by AGE and SEX
-  EDU = Variable('EDU')
+  # VariableNode EDU, with probability distribution conditioned by AGE and SEX
+  EDU = VariableNode('EDU')
   EDU.values = ['highschool', 'uni']
-  EDU.probdist = ProbabilityDistribution(AGE)
+  EDU.probdist = ProbabilityDistributionOfVariableNode(AGE)
   EDU.probdist.conditioning_variables = [AGE, SEX]
   EDU.probdist.probabilities = {
     ('young', 'M')    : [0.75, 0.25],           # e.g. Pr(uni | young, M) = 0.25
@@ -50,14 +50,14 @@ Simple example involving :class:`Variable` and :class:`ProbabilityDistribution`:
     'EDU' : EDU
   }
 
-Module :mod:`mbff.dataset.BayesianNetwork`
+Module :mod:`mbff.math.BayesianNetwork`
 ------------------------------------------
 
-.. autoclass:: mbff.dataset.BayesianNetwork.BayesianNetwork
+.. autoclass:: mbff.math.BayesianNetwork.BayesianNetwork
   :members:
 
-.. autoclass:: mbff.dataset.BayesianNetwork.Variable
+.. autoclass:: mbff.math.BayesianNetwork.VariableNode
   :members:
 
-.. autoclass:: mbff.dataset.BayesianNetwork.ProbabilityDistribution
+.. autoclass:: mbff.math.BayesianNetwork.ProbabilityDistributionOfVariableNode
   :members:

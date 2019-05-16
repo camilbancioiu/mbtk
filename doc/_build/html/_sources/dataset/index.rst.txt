@@ -10,6 +10,5 @@ Dataset infrastructure
   ExperimentalDatasetDefinition.rst
   ExperimentalDataset.rst
   BinaryExperimentalDataset.rst
-  BayesianNetwork.rst
   sources/index.rst
 

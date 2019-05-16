@@ -16,6 +16,7 @@ Markov Blanket Feature Filters: Framework documentation
   dataset/index.rst
   experiment/index.rst
   algorithms/index.rst
+  math/index.rst
   utilities/index.rst
 
 
