@@ -1,9 +1,15 @@
 import math
+import random
 import numpy
+
+from pathlib import Path
+
+import mbff.utilities.functions as util
 
 from mbff.math.Variable import Variable, JointVariables
 from mbff.math.PMF import PMF, CPMF
 from mbff.math.Exceptions import VariableInstancesOfUnequalCount
+from mbff.dataset.sources.SampledBayesianNetworkDatasetSource import SampledBayesianNetworkDatasetSource
 
 from mbff_tests.TestBase import TestBase
 
@@ -190,6 +196,78 @@ class TestVariableAndPMF(TestBase):
         self.assertAlmostEqual(1, test_p_ip)
 
 
+    def test_conditional_pmf__from_bayesian_network(self):
+        configuration = {}
+        configuration['sourcepath'] = Path('testfiles', 'bif_files', 'survey.bif')
+        configuration['sample_count'] = int(3e5)
+        # Using a random seed of 42 somehow requires 2e6 samples to pass, but
+        # with the seed 43, it is sufficient to generate only 3e5. Maybe the
+        # random generator is biased somehow?
+        configuration['random_seed'] = 43
+        configuration['values_as_indices'] = False
+        configuration['objectives'] = ['R', 'TRN']
+
+        bayesian_network = util.read_bif_file(configuration['sourcepath'])
+        bayesian_network.finalize()
+
+        sbnds = SampledBayesianNetworkDatasetSource(configuration)
+        sbnds.reset_random_seed = True
+        datasetmatrix = sbnds.create_dataset_matrix('test_sbnds')
+
+        self.assertEqual(['AGE', 'EDU', 'OCC', 'SEX'], datasetmatrix.column_labels_X)
+        self.assertEqual(['R', 'TRN'], datasetmatrix.column_labels_Y)
+
+        delta = 0.007
+
+        AGE = Variable(datasetmatrix.get_column_by_label('X', 'AGE'))
+        PrAge = PMF(AGE)
+
+        SEX = Variable(datasetmatrix.get_column_by_label('X', 'SEX'))
+        PrSex = PMF(SEX)
+
+        self.assert_PMF_AlmostEquals_BNProbDist(
+                bayesian_network.variable_nodes['AGE'].probdist,
+                PrAge,
+                delta=delta)
+
+        self.assert_PMF_AlmostEquals_BNProbDist(
+                bayesian_network.variable_nodes['SEX'].probdist,
+                PrSex,
+                delta=delta)
+
+        EDU = Variable(datasetmatrix.get_column_by_label('X', 'EDU'))
+        PrEdu = CPMF(EDU, given=JointVariables(AGE, SEX))
+
+        self.assert_CPMF_AlmostEquals_BNProbDist(
+                bayesian_network.variable_nodes['EDU'].probdist,
+                PrEdu,
+                delta=delta)
+
+        OCC = Variable(datasetmatrix.get_column_by_label('X', 'OCC'))
+        PrOcc = CPMF(OCC, given=EDU)
+
+        self.assert_CPMF_AlmostEquals_BNProbDist(
+                bayesian_network.variable_nodes['OCC'].probdist,
+                PrOcc,
+                delta=delta)
+
+        R = Variable(datasetmatrix.get_column_by_label('Y', 'R'))
+        PrR = CPMF(R, given=EDU)
+
+        self.assert_CPMF_AlmostEquals_BNProbDist(
+                bayesian_network.variable_nodes['R'].probdist,
+                PrR,
+                delta=delta)
+
+        TRN = Variable(datasetmatrix.get_column_by_label('Y', 'TRN'))
+        PrTRN = CPMF(TRN, given=JointVariables(OCC, R))
+
+        self.assert_CPMF_AlmostEquals_BNProbDist(
+                bayesian_network.variable_nodes['TRN'].probdist,
+                PrTRN,
+                delta=delta)
+
+
     def test_joint_variables__unequal_numbers_of_instances(self):
         # Variable animals has 6 instances.
         animals = Variable(['cat', 'dog', 'cat', 'mouse', 'dog', 'cat'])
@@ -222,3 +300,25 @@ class TestVariableAndPMF(TestBase):
         with self.assertRaises(VariableInstancesOfUnequalCount):
             JointVariables(fauna, can_fly)
 
+
+    def assert_PMF_AlmostEquals_BNProbDist(self, probdist, pmf, delta):
+        probdist_dict = dict(enumerate(probdist.probabilities['<unconditioned>']))
+        pmf_dict = pmf.probabilities
+        self.assertEqual(set(probdist_dict.keys()), set(pmf_dict.keys()))
+        for key in probdist_dict.keys():
+            self.assertAlmostEqual(probdist_dict[key], pmf_dict[key], delta=delta)
+
+
+    def assert_CPMF_AlmostEquals_BNProbDist(self, probdist, cpmf, delta):
+        indexed_probdist = probdist.probabilities_with_indexed_conditioning
+        for conditioning_key, probabilities in indexed_probdist.items():
+            probdist_dict = dict(enumerate(indexed_probdist[conditioning_key]))
+            pmf_dict = cpmf.given(conditioning_key).probabilities
+            self.assertEqual(set(probdist_dict.keys()), set(pmf_dict.keys()))
+            for key in probdist_dict.keys():
+                try:
+                    self.assertAlmostEqual(probdist_dict[key], pmf_dict[key], delta=delta)
+                except AssertionError:
+                    print("Key", key)
+                    print("Conditioning key", conditioning_key)
+                    raise
