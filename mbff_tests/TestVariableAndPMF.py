@@ -1,5 +1,6 @@
 import math
 import random
+import unittest
 import numpy
 
 from pathlib import Path
@@ -195,7 +196,8 @@ class TestVariableAndPMF(TestBase):
         self.assertAlmostEqual(1, test_p_c)
         self.assertAlmostEqual(1, test_p_ip)
 
-
+    
+    @unittest.skipIf(TestBase.tag_excluded('sampling'), 'Sampling tests excluded')
     def test_conditional_pmf__from_bayesian_network(self):
         configuration = {}
         configuration['sourcepath'] = Path('testfiles', 'bif_files', 'survey.bif')

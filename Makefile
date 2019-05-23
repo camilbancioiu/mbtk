@@ -24,3 +24,7 @@ doc-rebuild: doc-clean doc
 test: Makefile
 	python3 test.py
 	notify-send "Make" "Testing complete."
+
+test-quick: Makefile
+	python3 test.py quick
+	notify-send "Make" "Testing complete."

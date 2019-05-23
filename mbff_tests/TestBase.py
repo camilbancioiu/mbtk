@@ -4,7 +4,14 @@ import shutil
 from pathlib import Path
 
 class TestBase(unittest.TestCase):
+
     TestFilesRootFolder = 'testfiles/tmp'
+    TestsTagsToExclude = []
+
+
+    def tag_excluded(tag):
+        return tag in TestBase.TestsTagsToExclude
+
 
     def ensure_tmp_subfolder(self, subfolder):
         path = Path(TestBase.TestFilesRootFolder + '/' + subfolder)

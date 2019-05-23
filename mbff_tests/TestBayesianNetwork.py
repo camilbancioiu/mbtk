@@ -49,6 +49,7 @@ class TestBayesianNetwork(TestBase):
         self.assertValidExpectedSample(sample)
 
 
+    @unittest.skipIf(TestBase.tag_excluded('sampling'), 'Sampling tests excluded')
     def test_sampling_multiple(self):
         survey_bif = Path('testfiles', 'bif_files', 'survey.bif')
         bn = util.read_bif_file(survey_bif)

@@ -12,6 +12,7 @@ import mbff.utilities.functions as util
 
 class TestSampledBayesianNetworkDatasetSource(TestBase):
 
+    @unittest.skipIf(TestBase.tag_excluded('sampling'), 'Sampling tests excluded')
     def test_sampling_bayesian_network_as_dataset_source(self):
         configuration = self.default_configuration()
         sample_count = configuration['sample_count']
@@ -44,7 +45,7 @@ class TestSampledBayesianNetworkDatasetSource(TestBase):
     def default_configuration(self):
         configuration = {}
         configuration['sourcepath'] = Path('testfiles', 'bif_files', 'survey.bif')
-        configuration['sample_count'] = 100
+        configuration['sample_count'] = 1000
         configuration['random_seed'] = 42
         configuration['objectives'] = ['R', 'TRN']
 
