@@ -121,8 +121,6 @@ class BayesianNetwork:
 
 
 
-
-
 class VariableNode:
     """
     Class representing a VariableNode in a :class:`BayesianNetwork`.
@@ -244,6 +242,7 @@ class ProbabilityDistributionOfVariableNode:
             self.variable = var
             self.variable_name = self.variable.name
         self.probabilities = {}
+        self.probabilities_with_indexed_conditioning = {}
         self.conditioning_variable_nodes = OrderedDict()
         self.cummulative_probabilities = OrderedDict()
         self.properties = {}
@@ -269,6 +268,8 @@ class ProbabilityDistributionOfVariableNode:
 
     def finalize(self):
         self.cummulative_probabilities = self.create_cummulative_probabilities(self.probabilities)
+        if '<unconditioned>' not in self.probabilities:
+            self.probabilities_with_indexed_conditioning = self.create_probabilities_with_indexed_conditioning()
 
 
     def create_cummulative_probabilities(self, probabilities):
@@ -276,6 +277,19 @@ class ProbabilityDistributionOfVariableNode:
         for key, probs in probabilities.items():
             cummulative_probabilities[key] = list(itertools.accumulate(probs, func=operator.add))
         return cummulative_probabilities
+
+
+    def create_probabilities_with_indexed_conditioning(self):
+        prob_indexed = {}
+        for conditioning_values in self.probabilities:
+            indexed_conditioning_values = []
+            for i, value in enumerate(conditioning_values):
+                cond_variable = list(self.conditioning_variable_nodes.values())[i]
+                value_index = cond_variable.values.index(value)
+                indexed_conditioning_values.append(value_index)
+            prob_indexed[tuple(indexed_conditioning_values)] = self.probabilities[conditioning_values]
+
+        return prob_indexed
 
 
     def copy(self):
