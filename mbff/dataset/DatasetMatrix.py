@@ -95,6 +95,18 @@ class DatasetMatrix:
             raise ValueError('Unknown matrix label. Only X and Y are allowed.')
 
 
+    def get_column_by_label(self, matrix_label, column_label):
+        # TODO add proper documentation
+        if matrix_label == 'X':
+            column = self.column_labels_X.index(column_label)
+            return self.get_column_X(column)
+        elif matrix_label == 'Y':
+            column = self.column_labels_Y.index(column_label)
+            return self.get_column_Y(column)
+        else:
+            raise ValueError('Unknown matrix label. Only X and Y are allowed.')
+
+
     def get_column_labels(self, matrix_label):
         """
         Return the column labels of the matrix specified by ``matrix_label``.
