@@ -78,6 +78,8 @@ class CPMF(PMF):
     def given(self, *args):
         if len(args) == 1:
             key = args[0]
+            if type(key) == tuple and len(key) == 1:
+                key = key[0]
         else:
             key = tuple(args)
 
