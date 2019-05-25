@@ -1,5 +1,6 @@
 import numpy
 import operator
+import itertools
 from collections import Counter
 
 from mbff.math.Exceptions import VariableInstancesOfUnequalCount
@@ -18,6 +19,32 @@ class Variable:
     def update_values(self):
         if not self.instances is None:
             self.values = sorted(list(Counter(self.instances).keys()))
+
+
+class Omega(Variable):
+
+    def __init__(self, instance_count):
+        super().__init__(None)
+        self.ID = -1024
+        self.name = 'Omega'
+        self.instances = UniformInstances(1, instance_count)
+        self.values = [1]
+
+
+
+class UniformInstances:
+
+    def __init__(self, value, instance_count):
+        self.value = value
+        self.instance_count = instance_count
+
+
+    def __iter__(self):
+        return itertools.repeat(self.value, times=self.instance_count)
+
+
+    def __len__(self):
+        return self.instance_count
 
 
 
