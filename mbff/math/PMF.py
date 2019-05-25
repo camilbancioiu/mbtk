@@ -1,5 +1,6 @@
 import numpy
 from collections import Counter
+from mbff.utilities import functions as util
 
 
 class PMF:
@@ -14,6 +15,10 @@ class PMF:
             self.value_counts = {}
             self.probabilities = {}
             self.total_count = 0
+
+
+    def __str__(self):
+        return str(self.probabilities)
 
 
     def items(self):
@@ -33,10 +38,7 @@ class PMF:
 
 
     def p(self, *args):
-        if len(args) == 1:
-            key = args[0]
-        else:
-            key = tuple(args)
+        key = process_pmf_key(args)
 
         try:
             return self.probabilities[key]
@@ -75,13 +77,12 @@ class CPMF(PMF):
         self.normalize_conditional_counts()
 
 
+    def __str__(self):
+        return str(self.conditional_probabilities)
+
+
     def given(self, *args):
-        if len(args) == 1:
-            key = args[0]
-            if type(key) == tuple and len(key) == 1:
-                key = key[0]
-        else:
-            key = tuple(args)
+        key = process_pmf_key(args)
 
         try:
             return self.conditional_probabilities[key]
@@ -106,3 +107,12 @@ class CPMF(PMF):
 
 
 
+def process_pmf_key(key):
+    # If the key is a tuple or list, flatten it.
+    key = util.flatten(key)
+    # Convert the key to a tuple, in case it is a list.
+    key = tuple(key)
+    # If the key only has a single element, take that as the key.
+    if len(key) == 1:
+        key = key[0]
+    return key
