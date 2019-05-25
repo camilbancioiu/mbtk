@@ -8,7 +8,7 @@ from pathlib import Path
 import mbff.utilities.functions as util
 
 from mbff.math.Variable import Variable, JointVariables
-from mbff.math.PMF import PMF, CPMF
+from mbff.math.PMF import PMF, CPMF, process_pmf_key
 from mbff.math.Exceptions import VariableInstancesOfUnequalCount
 from mbff.dataset.sources.SampledBayesianNetworkDatasetSource import SampledBayesianNetworkDatasetSource
 
@@ -268,6 +268,44 @@ class TestVariableAndPMF(TestBase):
                 bayesian_network.variable_nodes['TRN'].probdist,
                 PrTRN,
                 delta=delta)
+
+
+    def test_pmf_key_processing(self):
+        key = (0, 1)
+        expected = (0, 1)
+        self.assertEqual(expected, process_pmf_key(key))
+
+        key = (2,)
+        expected = 2
+        self.assertEqual(expected, process_pmf_key(key))
+
+        key = (0, (1,))
+        expected = (0, 1)
+        self.assertEqual(expected, process_pmf_key(key))
+
+        key = ((0, 1), 2)
+        expected = (0, 1, 2)
+        self.assertEqual(expected, process_pmf_key(key))
+
+        key = ((0, 1), (5, 6, (7,)))
+        expected = (0, 1, 5, 6, 7)
+        self.assertEqual(expected, process_pmf_key(key))
+
+        key = (0, 1, [2, 3, 4, (5, 6), 7])
+        expected = (0, 1, 2, 3, 4, 5, 6, 7)
+        self.assertEqual(expected, process_pmf_key(key))
+
+        key = [0, 1]
+        expected = (0, 1)
+        self.assertEqual(expected, process_pmf_key(key))
+
+        key = [(0, 1), 2]
+        expected = (0, 1, 2)
+        self.assertEqual(expected, process_pmf_key(key))
+
+        key = [(0, 1), [2], [3, 4, (5,)]]
+        expected = (0, 1, 2, 3, 4, 5)
+        self.assertEqual(expected, process_pmf_key(key))
 
 
     def test_joint_variables__unequal_numbers_of_instances(self):
