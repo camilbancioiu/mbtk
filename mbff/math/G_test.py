@@ -26,6 +26,11 @@ def G_value__unoptimized(X, Y, Z=None):
 
 
 
+def calculate_degrees_of_freedom(X, Y):
+    return (len(X.values) - 1) * (len(Y.values) - 1)
+
+
+
 def conditional_mutual_information(PrXYcZ, PrXcZ, PrYcZ, PrZ, base=2):
     logarithm = create_logarithm_function(base)
     cMI = 0.0
