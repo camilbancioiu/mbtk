@@ -6,6 +6,10 @@ from mbff.math.PMF import PMF, CPMF
 from mbff.math.Exceptions import VariableInstancesOfUnequalCount
 
 
+def G_test(G, DF):
+    pass
+
+
 def G_value__unoptimized(X, Y, Z=None):
     # If Z is none, use the Universe as the conditioning variable.
     if Z is None:
@@ -39,7 +43,6 @@ def G_value__unoptimized_with_cMI(X, Y, Z=None):
         validate_variable_instances_lengths([X, Y, Z])
 
     N = len(X.instances)
-    DF = calculate_degrees_of_freedom(X, Y)
 
     (PrXYcZ, PrXcZ, PrYcZ, PrZ) = calculate_pmf_for_cmi(X, Y, Z)
     cMI = conditional_mutual_information(PrXYcZ, PrXcZ, PrYcZ, PrZ, base='e')
@@ -63,7 +66,9 @@ def conditional_mutual_information(PrXYcZ, PrXcZ, PrYcZ, PrZ, base=2):
                 if pxycz == 0 or pxcz == 0 or pycz == 0:
                     continue
                 else:
-                    cMI += pz * pxycz * logarithm(pxycz / (pxcz * pycz))
+                    pcMI = pz * pxycz * logarithm(pxycz / (pxcz * pycz))
+                    cMI += pcMI
+                    print('cMI: {} + {}'.format(cMI, pcMI))
     return cMI
 
 
