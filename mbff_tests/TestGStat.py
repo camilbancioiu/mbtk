@@ -26,59 +26,103 @@ class TestGStat(TestBase):
 
     def setUp(self):
         if not TestGStat.ClassIsSetUp:
-            self.prepare_datasetmatrix()
+            self.prepare_datasetmatrices()
 
 
-    def prepare_datasetmatrix(self):
-        dataset_folder = Path('testfiles', 'tmp', 'test_gstat_dm')
+    @unittest.skip
+    def test_G_value__lungcancer(self):
+        Omega = TestGStat.Omega['lungcancer']
+        lungcancer = TestGStat.DatasetMatrix['lungcancer']
+
+        ASIA    = Variable(lungcancer.get_column_by_label('X', 'ASIA'), 'ASIA')
+        TUB     = Variable(lungcancer.get_column_by_label('X', 'TUB'), 'TUB')
+        EITHER  = Variable(lungcancer.get_column_by_label('X', 'EITHER'), 'EITHER')
+        LUNG    = Variable(lungcancer.get_column_by_label('X', 'LUNG'), 'LUNG')
+        SMOKE   = Variable(lungcancer.get_column_by_label('X', 'SMOKE'), 'SMOKE')
+        BRONC   = Variable(lungcancer.get_column_by_label('X', 'BRONC'), 'BRONC')
+        DYSP    = Variable(lungcancer.get_column_by_label('Y', 'DYSP'), 'DYSP')
+        XRAY    = Variable(lungcancer.get_column_by_label('Y', 'XRAY'), 'XRAY')
+
+        self.print_pmf(SMOKE)
+        print()
+        self.print_pmf(LUNG)
+        print()
+        self.print_pmf(BRONC)
+        print()
+        self.print_cpmf(LUNG, SMOKE)
+        print()
+        self.print_cpmf(BRONC, SMOKE)
+        print()
+
+        self.analyze_variable_g_values(LUNG, SMOKE, Omega)
+        self.analyze_variable_g_values(BRONC, SMOKE, Omega)
+        self.analyze_variable_g_values(LUNG, BRONC, Omega)
+        self.analyze_variable_g_values(LUNG, BRONC, SMOKE)
+
+
+    def test_cmi__survey(self):
+        Omega = TestGStat.Omega['survey']
+        survey = TestGStat.DatasetMatrix['survey']
+        AGE = Variable(survey.get_column_by_label('X', 'AGE'))
+        SEX = Variable(survey.get_column_by_label('X', 'SEX'))
+        EDU = Variable(survey.get_column_by_label('X', 'EDU'))
+        OCC = Variable(survey.get_column_by_label('X', 'OCC'))
+        R = Variable(survey.get_column_by_label('X', 'R'))
+        TRN = Variable(survey.get_column_by_label('Y', 'TRN'))
+
+        self.print_pmf(SMOKE)
+        print()
+        self.print_pmf(LUNG)
+        print()
+        self.print_pmf(BRONC)
+        print()
+        self.print_cpmf(LUNG, SMOKE)
+        print()
+        self.print_cpmf(BRONC, SMOKE)
+        print()
+
+
+    def configure_datasetmatrix(self, dm_label):
         configuration = {}
-        configuration['sourcepath'] = Path('testfiles', 'bif_files', 'survey.bif')
-        configuration['sample_count'] = int(2e4)
-        configuration['random_seed'] = 42*42
-        configuration['values_as_indices'] = False
-        configuration['objectives'] = ['TRN']
-        try:
-            TestGStat.DatasetMatrix = DatasetMatrix('g_stat_dataset')
-            TestGStat.DatasetMatrix.load(dataset_folder)
-        except:
+        if dm_label == 'lungcancer':
+            configuration['sourcepath'] = Path('testfiles', 'bif_files', 'lungcancer.bif')
+            configuration['sample_count'] = int(2e5)
+            configuration['random_seed'] = 42*42
+            configuration['values_as_indices'] = False
+            configuration['objectives'] = ['DYSP', 'XRAY']
+
+        if dm_label == 'survey':
+            configuration['sourcepath'] = Path('testfiles', 'bif_files', 'survey.bif')
+            configuration['sample_count'] = int(2e5)
+            configuration['random_seed'] = 42*42
+            configuration['values_as_indices'] = False
+            configuration['objectives'] = ['TRN']
+        return configuration
+
+
+    def prepare_datasetmatrices(self):
+        TestGStat.DatasetMatrix = {}
+        TestGStat.Omega = {}
+
+        dataset_folder = Path('testfiles', 'tmp', 'test_gstat_dm')
+        for dm_label in ['survey', 'lungcancer']:
+            configuration = self.configure_datasetmatrix(dm_label)
             bayesian_network = util.read_bif_file(configuration['sourcepath'])
-            bayesian_network.finalize()
-            sbnds = SampledBayesianNetworkDatasetSource(configuration)
-            sbnds.reset_random_seed = True
-            TestGStat.DatasetMatrix = sbnds.create_dataset_matrix('g_stat_dataset')
-            TestGStat.DatasetMatrix.finalize()
-            TestGStat.DatasetMatrix.save(dataset_folder)
-            print('Dataset rebuilt.')
-        TestGStat.Omega = Omega(configuration['sample_count'])
+            try:
+                datasetmatrix = DatasetMatrix(dm_label)
+                datasetmatrix.load(dataset_folder)
+                TestGStat.DatasetMatrix[dm_label] = datasetmatrix
+            except:
+                bayesian_network.finalize()
+                sbnds = SampledBayesianNetworkDatasetSource(configuration)
+                sbnds.reset_random_seed = True
+                datasetmatrix = sbnds.create_dataset_matrix(dm_label)
+                datasetmatrix.finalize()
+                datasetmatrix.save(dataset_folder)
+                TestGStat.DatasetMatrix[dm_label] = datasetmatrix
+                print('Dataset rebuilt.')
+            TestGStat.Omega[dm_label] = Omega(configuration['sample_count'])
         TestGStat.ClassIsSetUp = True
-
-
-    def test_G_value(self):
-        AGE = Variable(self.DatasetMatrix.get_column_by_label('X', 'AGE'), 'AGE')
-        SEX = Variable(self.DatasetMatrix.get_column_by_label('X', 'SEX'), 'SEX')
-        EDU = Variable(self.DatasetMatrix.get_column_by_label('X', 'EDU'), 'EDU')
-        OCC = Variable(self.DatasetMatrix.get_column_by_label('X', 'OCC'), 'OCC')
-        R = Variable(self.DatasetMatrix.get_column_by_label('X', 'R'), 'R')
-        TRN = Variable(self.DatasetMatrix.get_column_by_label('Y', 'TRN'), 'TRN')
-
-
-        self.print_pmf(EDU)
-        print()
-        self.print_pmf(OCC)
-        print()
-        self.print_pmf(R)
-        print()
-        self.print_cpmf(OCC, EDU)
-        print()
-        self.print_cpmf(R, EDU)
-        print()
-        self.print_pmf(JointVariables(OCC, R))
-        print()
-        self.print_cpmf(JointVariables(OCC, R), EDU)
-        print()
-
-        self.analyze_variable_g_values(OCC, R, self.Omega)
-        self.analyze_variable_g_values(OCC, R, EDU)
 
 
     def print_pmf(self, var):
@@ -111,45 +155,6 @@ class TestGStat(TestBase):
         print('G-value\t', Gvalue)
         print('p\t', chi.cdf(Gvalue, DF))
         print()
-
-
-
-    @unittest.skip
-    def test_cmi(self):
-        AGE = Variable(self.DatasetMatrix.get_column_by_label('X', 'AGE'))
-        SEX = Variable(self.DatasetMatrix.get_column_by_label('X', 'SEX'))
-        EDU = Variable(self.DatasetMatrix.get_column_by_label('X', 'EDU'))
-        OCC = Variable(self.DatasetMatrix.get_column_by_label('X', 'OCC'))
-        R = Variable(self.DatasetMatrix.get_column_by_label('X', 'R'))
-        TRN = Variable(self.DatasetMatrix.get_column_by_label('Y', 'TRN'))
-
-        X = AGE
-        Y = SEX
-        Z = self.Omega
-        (PrXYcZ, PrXcZ, PrYcZ, PrZ) = calculate_pmf_for_cmi(X, Y, Z)
-        cMI = conditional_mutual_information(PrXYcZ, PrXcZ, PrYcZ, PrZ, base=2)
-        self.assertLess(cMI, 2e-6)
-
-        X = JointVariables(AGE, SEX)
-        Y = EDU
-        Z = self.Omega
-        (PrXYcZ, PrXcZ, PrYcZ, PrZ) = calculate_pmf_for_cmi(X, Y, Z)
-        cMI = conditional_mutual_information(PrXYcZ, PrXcZ, PrYcZ, PrZ, base=2)
-        self.assertGreater(cMI, 0.025)
-
-        X = AGE
-        Y = OCC
-        Z = self.Omega
-        (PrXYcZ, PrXcZ, PrYcZ, PrZ) = calculate_pmf_for_cmi(X, Y, Z)
-        cMI = conditional_mutual_information(PrXYcZ, PrXcZ, PrYcZ, PrZ, base=2)
-        self.assertGreater(cMI, 0.0001)
-
-        X = AGE
-        Y = OCC
-        Z = EDU
-        (PrXYcZ, PrXcZ, PrYcZ, PrZ) = calculate_pmf_for_cmi(X, Y, Z)
-        cMI = conditional_mutual_information(PrXYcZ, PrXcZ, PrYcZ, PrZ, base=2)
-        self.assertLess(cMI, 2e-5)
 
 
     def print_var_pmf(self, var, pmf, name):
