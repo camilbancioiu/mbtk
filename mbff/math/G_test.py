@@ -30,7 +30,7 @@ def G_value__unoptimized(X, Y, Z=None):
 
 
 
-def G_value__unoptimized_with_cMI(X, Y, Z=None):
+def G_value__unoptimized_with_cMI(X, Y, Z=None, logbase='e'):
     # If Z is none, use the Universe as the conditioning variable.
     if Z is None:
         # Raise an exception if one of the Variables has a different number of
