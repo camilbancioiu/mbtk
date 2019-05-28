@@ -16,7 +16,7 @@ from mbff_tests.TestBase import TestBase
 
 import scipy.stats
 
-@unittest.skipIf(TestBase.tag_excluded('sampling'), 'Sampling tests excluded')
+@unittest.skipIf(TestBase.tag_excluded('conditional_independence'), 'Conditional independence tests excluded')
 class TestGStat(TestBase):
 
     ClassIsSetUp = False
@@ -28,7 +28,6 @@ class TestGStat(TestBase):
         if not TestGStat.ClassIsSetUp:
             self.prepare_datasetmatrices()
 
-    @unittest.skip
     def test_G_value__lungcancer(self):
         Omega = TestGStat.Omega['lungcancer']
         lungcancer = TestGStat.DatasetMatrix['lungcancer']

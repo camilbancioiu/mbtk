@@ -13,6 +13,7 @@ if __name__ == '__main__':
 
     if test_profile == 'quick':
         TestBase.TestsTagsToExclude.append('sampling')
+        TestBase.TestsTagsToExclude.append('conditional_independence')
         del sys.argv[1]
 
     # After deciding what tests to exclude, we can now import them. Importing
