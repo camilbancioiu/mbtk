@@ -11,7 +11,7 @@ if __name__ == '__main__':
 
     print('Running test profile \'{}\''.format(test_profile))
 
-    if test_profile == 'quick':
+    if test_profile == 'quick' or test_profile == 'all':
         TestBase.TestsTagsToExclude.append('sampling')
         TestBase.TestsTagsToExclude.append('conditional_independence')
         del sys.argv[1]
