@@ -12,7 +12,13 @@ class Variable:
         self.ID = -1
         self.name = name
         self.instances = instances
+        self.lazy_instances_loader = None
         self.values = None
+        self.update_values()
+
+
+    def load_instances(self):
+        self.instances = self.lazy_instances_loader()
         self.update_values()
 
 

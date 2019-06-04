@@ -3,6 +3,7 @@ import scipy
 import scipy.io
 import pickle
 import mbff.utilities.functions as util
+from mbff.math.Variable import Variable
 from mbff.dataset.Exceptions import DatasetMatrixNotFinalizedError, DatasetMatrixFinalizedError
 
 class DatasetMatrix:
@@ -151,6 +152,44 @@ class DatasetMatrix:
         :rtype: ``numpy.array`` of size ``(1, row_count)``.
         """
         return self.Y.getcol(column).transpose().toarray().ravel()
+
+
+    def get_variable(self, matrix_label, column):
+        """
+        Get the column at the index ``column`` from either matrix ``X`` or
+        ``Y``, depending on the value provided for ``matrix_label``, wrapped in
+        a Variable object, with ID and lazy instances configured.
+
+         See also :py:meth:`get_column`.
+
+        :param str matrix_label: The matrix to get the column from, either
+            ``"X"`` or ``"Y"``.
+        :param int column: 0-based integer index of the column to retrieve.
+        :return: A ``Variable`` object wrapping the requested column.
+        :rtype: ``py:class:mbff.math.Variable``
+        :raises ValueError: if ``matrix_label`` is neither ``"X"`` nor ``"Y""``.
+        """
+        column_getter = None
+        column_labels = None
+        if matrix_label == 'X':
+            column_getter = self.get_column_X
+            column_labels = self.column_labels_X
+        elif matrix_label == 'Y':
+            column_getter = self.get_column_Y
+            column_labels = self.column_labels_Y
+        else:
+            raise ValueError('Unknown matrix label. Only X and Y are allowed.')
+
+        datasetmatrix = self
+
+        def lazy_instances_loader():
+            return column_getter(column)
+
+        variable = Variable(None)
+        variable.ID = column
+        variable.name = column_labels[column]
+        variable.lazy_instances_loader = lazy_instances_loader
+        return variable
 
 
     def delete_row(self, r):

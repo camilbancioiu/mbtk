@@ -9,6 +9,7 @@ from pathlib import Path
 from mbff_tests.TestBase import TestBase
 
 from mbff.dataset.DatasetMatrix import DatasetMatrix
+from mbff.math.Variable import Variable
 from mbff.dataset.Exceptions import DatasetMatrixNotFinalizedError, DatasetMatrixFinalizedError
 
 
@@ -284,6 +285,25 @@ class TestDatasetMatrix(TestBase):
 
         folder = str(self.ensure_empty_tmp_subfolder('test_datasetmatrix__removing_columns_Y'))
         self.check_saving_and_loading(dm, folder)
+
+
+    def test_making_variables(self):
+        # Set up a simple DatasetMatrix
+        dm = DatasetMatrix('testmatrix')
+        self.configure_default_datasetmatrix(dm)
+
+        variable = dm.get_variable('X', 1)
+        self.assertEqual(1, variable.ID)
+        self.assertEqual('colx1', variable.name)
+        self.assertIsNone(variable.instances)
+        self.assertIsNone(variable.values)
+        self.assertIsNotNone(variable.lazy_instances_loader)
+
+        variable.load_instances()
+        self.assertIsNotNone(variable.instances)
+        self.assertEqual(4, len(variable.instances))
+        self.assertEqual(dm.get_column('X', 1).tolist(), variable.instances.tolist())
+        self.assertEqual([2, 6, 10, 14], variable.values)
 
 
     def default_matrix_X(self):
