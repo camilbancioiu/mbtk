@@ -34,6 +34,7 @@ if __name__ == '__main__':
     from mbff_tests.TestSampledBayesianNetworkDatasetSource import TestSampledBayesianNetworkDatasetSource
     from mbff_tests.TestVariableAndPMF import TestVariableAndPMF
     from mbff_tests.TestGStat import TestGStat
+    from mbff_tests.TestADTree import TestADTree
 
     import unittest
     unittest.main(verbosity=2)
