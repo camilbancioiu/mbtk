@@ -9,6 +9,43 @@ from mbff_tests.TestBase import TestBase
 
 class TestADTree(TestBase):
 
+    def default_small_dataset(self):
+        dataset = scipy.sparse.csr_matrix(numpy.array([
+            [1, 2, 3, 2, 2, 3, 3, 3],
+            [2, 1, 1, 2, 1, 2, 2, 2]]).transpose())
+
+        column_values = {
+                0: [1, 2, 3],
+                1: [1, 2]}
+        return (dataset, column_values)
+
+
+    def default_small_dataset_2(self):
+        dataset = scipy.sparse.csr_matrix(numpy.array([
+            [1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2],
+            [1, 1, 2, 2, 3, 3, 4, 4, 1, 1, 2, 2, 3, 3, 4, 4],
+            [1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2]]).transpose())
+
+        column_values = {
+                0: [1, 2],
+                1: [1, 2, 3, 4],
+                2: [1, 2]}
+        return (dataset, column_values)
+
+
+    def default_small_dataset_3(self):
+        dataset = scipy.sparse.csr_matrix(numpy.array([
+            [1, 1, 2, 1, 1, 2, 1, 2, 2, 2, 2, 2, 1, 2, 2, 2],
+            [2, 2, 1, 3, 3, 2, 2, 1, 1, 2, 3, 3, 1, 1, 2, 3],
+            [1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2]]).transpose())
+
+        column_values = {
+                0: [1, 2],
+                1: [1, 2, 3, 4],
+                2: [1, 2]}
+        return (dataset, column_values)
+
+
     def assertVaryNodeCorrect(self, vary, column_index, values, mcv, children_count):
         self.assertIsNotNone(vary)
         self.assertEqual(column_index, vary.column_index)
@@ -23,6 +60,39 @@ class TestADTree(TestBase):
         self.assertEqual(value, adNode.value)
         self.assertEqual(count, adNode.count)
         self.assertEqual(children_count, len(adNode.Vary_children))
+
+
+    def test_simple_ADTree_query_count(self):
+        (dataset, column_values) = self.default_small_dataset()
+        adtree = ADTree(dataset, column_values)
+        
+        self.assertEqual(8, adtree.query_count({}))
+        self.assertEqual(1, adtree.query_count({0:1}))
+        self.assertEqual(3, adtree.query_count({0:2}))
+        self.assertEqual(4, adtree.query_count({0:3}))
+        
+        self.assertEqual(0, adtree.query_count({0:1, 1:1}))
+        self.assertEqual(1, adtree.query_count({0:1, 1:2}))
+
+        self.assertEqual(2, adtree.query_count({0:2, 1:1}))
+        self.assertEqual(1, adtree.query_count({0:2, 1:2}))
+
+        self.assertEqual(1, adtree.query_count({0:3, 1:1}))
+        self.assertEqual(3, adtree.query_count({0:3, 1:2}))
+
+        self.assertEqual(3, adtree.query_count({1:1}))
+        self.assertEqual(5, adtree.query_count({1:2}))
+
+
+    def test_simple_ADTree_query_count2(self):
+        (dataset, column_values) = self.default_small_dataset_3()
+        adtree = ADTree(dataset, column_values)
+
+        self.assertEqual(16, adtree.query_count({}))
+        self.assertEqual(6, adtree.query_count({0:1}))
+        self.assertEqual(5, adtree.query_count({1:3}))
+        self.assertEqual(3, adtree.query_count({0:2, 1:3}))
+        self.assertEqual(1, adtree.query_count({0:2, 1:2, 2:1}))
 
 
     def test_simple_ADTree_query(self):
@@ -194,29 +264,3 @@ class TestADTree(TestBase):
         self.assertIsNone(child31)
         child32 = vary3.AD_children[1]
         self.assertADNodeCorrect(child32, 2, 2, 8, 0)
-
-
-
-
-    def default_small_dataset(self):
-        dataset = scipy.sparse.csr_matrix(numpy.array([
-            [1, 2, 3, 2, 2, 3, 3, 3],
-            [2, 1, 1, 2, 1, 2, 2, 2]]).transpose())
-
-        column_values = {
-                0: [1, 2, 3],
-                1: [1, 2]}
-        return (dataset, column_values)
-
-
-    def default_small_dataset_2(self):
-        dataset = scipy.sparse.csr_matrix(numpy.array([
-            [1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2],
-            [1, 1, 2, 2, 3, 3, 4, 4, 1, 1, 2, 2, 3, 3, 4, 4],
-            [1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2]]).transpose())
-
-        column_values = {
-                0: [1, 2],
-                1: [1, 2, 3, 4],
-                2: [1, 2]}
-        return (dataset, column_values)
