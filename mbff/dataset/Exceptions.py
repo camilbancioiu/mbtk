@@ -23,3 +23,12 @@ class ExperimentalDatasetFolderException(Exception):
         self.folder = folder
         self.message = message
         super().__init__(self.message)
+
+
+class ExperimentalDatasetError(Exception):
+    def __init__(self, exds_definition, message):
+        self.exds_definition = exds_definition
+        self.message = message
+        super().__init__(self.message)
+
+

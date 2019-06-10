@@ -1,8 +1,8 @@
 import numpy
 
-from mbff.dataset.ExperimentalDataset import ExperimentalDataset
+from mbff.dataset.ModelBuildingExperimentalDataset import ModelBuildingExperimentalDataset
 
-class BinaryExperimentalDataset(ExperimentalDataset):
+class BinaryExperimentalDataset(ModelBuildingExperimentalDataset):
     """
     An experimental dataset which contains only binary data. This means that
     the three :py:class:`DatasetMatrix
@@ -12,9 +12,15 @@ class BinaryExperimentalDataset(ExperimentalDataset):
 
     The :py:class:`BinaryExperimentalDataset` class provides an extra
     processing step to the default splitting operation performed by
-    :py:meth:`ExperimentalDataset.build()
-    <mbff.dataset.ExperimentalDataset.ExperimentalDataset.build>`.
+    :py:meth:`ModelBuildingExperimentalDataset.build()
+    <mbff.dataset.ExperimentalDataset.ModelBuildingExperimentalDataset.build>`.
     """
+
+    def perform_random_dataset_split(self):
+        self.process_before_split()
+        super().perform_random_dataset_split()
+        self.process_after_split()
+
 
     def process_before_split(self):
         if self.definition.options.get('remove_features_by_p_thresholds', False) == True:

@@ -8,7 +8,7 @@ from mbff_tests.TestBase import TestBase
 from mbff_tests.MockDatasetSource import MockDatasetSource
 
 from mbff.dataset.ExperimentalDatasetDefinition import ExperimentalDatasetDefinition
-from mbff.dataset.ExperimentalDataset import ExperimentalDataset
+from mbff.dataset.ModelBuildingExperimentalDataset import ModelBuildingExperimentalDataset
 from mbff.experiment.ExperimentDefinition import ExperimentDefinition
 from mbff.experiment.ExperimentRun import ExperimentRun
 from mbff.experiment.AlgorithmRun import AlgorithmAndClassifierRun
@@ -297,7 +297,7 @@ class TestExperimentRun(TestBase):
 
     def default_exds_definition(self, exds_folder, name):
         definition = ExperimentalDatasetDefinition(exds_folder, name)
-        definition.exds_class = ExperimentalDataset
+        definition.exds_class = ModelBuildingExperimentalDataset
         definition.source = MockDatasetSource
         definition.source_configuration = {}
         definition.training_subset_size = 3/8

@@ -6,10 +6,10 @@ from mbff_tests.TestBase import TestBase
 
 from mbff.dataset.DatasetMatrix import DatasetMatrix
 from mbff.dataset.ExperimentalDatasetDefinition import ExperimentalDatasetDefinition
-from mbff.dataset.ExperimentalDataset import ExperimentalDataset
+from mbff.dataset.ModelBuildingExperimentalDataset import ModelBuildingExperimentalDataset
 from mbff.dataset.sources.RCV1v2DatasetSource import RCV1v2DatasetSource
 
-class TestExperimentalDataset(TestBase):
+class TestModelBuildingExperimentalDataset(TestBase):
 
     def test_exds_build(self):
         folder = str(self.ensure_empty_tmp_subfolder('test_exds_repository__test_build'))
@@ -76,9 +76,9 @@ class TestExperimentalDataset(TestBase):
         self.assertTrue(exds.matrix_test.final)
 
         # Verify if the matrices can be loaded individually from the saved
-        # ExperimentalDataset.
+        # ModelBuildingExperimentalDataset.
         # - The original matrix:
-        loadedMatrix_original = DatasetMatrix("dataset_full")
+        loadedMatrix_original = DatasetMatrix("dataset")
         loadedMatrix_original.load(exds.definition.path)
         self.assertEqual(exds.matrix, loadedMatrix_original)
         # - The training matrix:
@@ -93,7 +93,7 @@ class TestExperimentalDataset(TestBase):
 
     def default_exds_definition(self, exds_folder):
         definition = ExperimentalDatasetDefinition(exds_folder, "test_exds_reuters")
-        definition.exds_class = ExperimentalDataset
+        definition.exds_class = ModelBuildingExperimentalDataset
         definition.source = RCV1v2DatasetSource
         definition.source_configuration = {
                 'sourcepath': Path('testfiles/rcv1v2_test_dataset'),
