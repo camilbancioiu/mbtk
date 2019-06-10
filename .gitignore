@@ -1,6 +1,7 @@
 # MBFF custom files and folders to ignore
 .project
 testfiles/tmp
+testfiles/notes
 
 # Vim swap files
 *.swp
