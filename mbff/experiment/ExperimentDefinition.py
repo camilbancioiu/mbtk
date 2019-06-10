@@ -12,6 +12,8 @@ class ExperimentDefinition(LockablePath):
         super().__init__(self.experiments_folder, self.name)
         self.default_lock_type = 'experiment'
         self.experiment_run_class = None
+        self.algorithm_run_class = None
+        self.algorithm_run_datapoint_class = None
         self.exds_definition = None
         self.algorithm_run_configuration = {}
         self.algorithm_run_parameters = []

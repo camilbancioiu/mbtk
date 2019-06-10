@@ -11,6 +11,8 @@ from mbff.dataset.ExperimentalDatasetDefinition import ExperimentalDatasetDefini
 from mbff.dataset.ExperimentalDataset import ExperimentalDataset
 from mbff.experiment.ExperimentDefinition import ExperimentDefinition
 from mbff.experiment.ExperimentRun import ExperimentRun
+from mbff.experiment.AlgorithmRun import AlgorithmAndClassifierRun
+from mbff.experiment.AlgorithmRunDatapoint import AlgorithmAndClassifierRunDatapoint
 from mbff.experiment.Exceptions import ExperimentFolderLockedException
 from mbff.algorithms.basic.IGt import algorithm_IGt__binary as IGt
 
@@ -110,6 +112,8 @@ class TestExperimentRun(TestBase):
         # Define the ExperimentRun. Use a mock algorithm, which will break when requested by the parameters.
         definition = ExperimentDefinition(experiments_folder, "test_experiment_run__interrupted")
         definition.experiment_run_class = ExperimentRun
+        definition.algorithm_run_class = AlgorithmAndClassifierRun
+        definition.algorithm_run_datapoint_class = AlgorithmAndClassifierRunDatapoint
         definition.exds_definition = self.default_exds_definition(exds_folder, "test_exds_experimentrun_interrupted")
         definition.algorithm_run_configuration = {
                 'classifier': BernoulliNB,
@@ -273,6 +277,8 @@ class TestExperimentRun(TestBase):
     def default_experiment_definition(self, experiments_folder, exds_folder, algorithm_run_parameters):
         definition = ExperimentDefinition(experiments_folder, 'test_experiment_run')
         definition.experiment_run_class = ExperimentRun
+        definition.algorithm_run_class = AlgorithmAndClassifierRun
+        definition.algorithm_run_datapoint_class = AlgorithmAndClassifierRunDatapoint
         definition.exds_definition = self.default_exds_definition(exds_folder, "test_exds_experimentrun")
         definition.algorithm_run_configuration = {
                 'classifier': BernoulliNB,

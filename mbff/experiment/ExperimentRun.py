@@ -9,7 +9,6 @@ from string import Template
 
 import mbff.utilities.functions as util
 from mbff.utilities.MultiFileWriter import MultiFileWriter
-from mbff.experiment.AlgorithmRun import AlgorithmRun
 from mbff.experiment.AlgorithmRunDatapoint import AlgorithmRunDatapoint
 from mbff.experiment.Exceptions import ExperimentFolderLockedException
 
@@ -64,7 +63,7 @@ class ExperimentRun:
 
 
     def run_algorithm(self, algorithm_run_index, algorithm_run_parameters):
-        algorithm_run = AlgorithmRun(self.exds, self.definition.algorithm_run_configuration, algorithm_run_parameters)
+        algorithm_run = self.definition.algorithm_run_class(self.exds, self.definition.algorithm_run_configuration, algorithm_run_parameters)
         algorithm_run.ID = Template(algorithm_run.label).safe_substitute(algorithm_run_index=algorithm_run_index)
 
         algorithm_run_stdout_destination = self.get_algorithm_run_stdout_destination(algorithm_run)
@@ -83,7 +82,7 @@ class ExperimentRun:
 
     def save_algorithm_run_datapoint(self, algorithm_run):
         datapoint_file = self.definition.subfolder('algorithm_run_datapoints') / '{}.pickle'.format(algorithm_run.ID)
-        algorithm_run_datapoint = AlgorithmRunDatapoint(algorithm_run)
+        algorithm_run_datapoint = self.definition.algorithm_run_datapoint_class(algorithm_run)
         with datapoint_file.open(mode='wb') as f:
             pickle.dump(algorithm_run_datapoint, f)
 

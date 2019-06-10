@@ -8,7 +8,7 @@ from mbff_tests.MockDatasetSource import MockDatasetSource
 
 from mbff.dataset.ExperimentalDatasetDefinition import ExperimentalDatasetDefinition
 from mbff.dataset.ExperimentalDataset import ExperimentalDataset
-from mbff.experiment.AlgorithmRun import AlgorithmRun
+from mbff.experiment.AlgorithmRun import AlgorithmAndClassifierRun
 from mbff.algorithms.basic.IGt import algorithm_IGt__binary as IGt
 
 class TestAlgorithmRun(TestBase):
@@ -34,7 +34,7 @@ class TestAlgorithmRun(TestBase):
                 'Q': 4,
                 'objective_index': 0
                 }
-        algrun = AlgorithmRun(exds, configuration, parameters)
+        algrun = AlgorithmAndClassifierRun(exds, configuration, parameters)
 
         # We run the algorithm at the specified parameters, on the specified
         # ExDs.
@@ -66,7 +66,7 @@ class TestAlgorithmRun(TestBase):
                 'Q': 4,
                 'objective_index': 0
                 }
-        algrun = AlgorithmRun(None, configuration, parameters)
+        algrun = AlgorithmAndClassifierRun(None, configuration, parameters)
 
         self.assertEqual('${nosubstitution}__test_IGt_Q4_Obj0', algrun.label)
         self.assertEqual('mbff.algorithms.basic.IGt.algorithm_IGt__binary', algrun.algorithm_name)
