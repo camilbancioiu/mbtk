@@ -17,18 +17,7 @@ class AlgorithmRun:
         self.duration = 0.0
 
         self.selected_features = []
-        self.classifier_class = self.configuration['classifier']
-        self.classifier_classname = '.'.join([self.classifier_class.__module__, self.classifier_class.__name__])
-        self.classifier_evaluation = {}
-
-        self.datasetmatrix_train = None
-        self.datasetmatrix_test = None
-        self.samples_train = None
-        self.samples_test = None
         self.objective_index = -1
-        self.objective_train = None
-        self.objective_test = None
-        self.predictions = {}
 
         # self.label could be a Template string.
         self.label = self.configuration['label']
@@ -42,6 +31,29 @@ class AlgorithmRun:
         self.end_time = time.time()
         self.duration = (self.end_time - self.start_time) * 1000.0
 
+
+
+class AlgorithmAndClassifierRun(AlgorithmRun):
+
+    def __init__(self, exds, configuration, parameters):
+        super().__init__(exds, configuration, parameters)
+
+        self.classifier_class = self.configuration['classifier']
+        self.classifier_classname = '.'.join([self.classifier_class.__module__, self.classifier_class.__name__])
+        self.classifier_evaluation = {}
+
+        self.datasetmatrix_train = None
+        self.datasetmatrix_test = None
+        self.samples_train = None
+        self.samples_test = None
+
+        self.objective_train = None
+        self.objective_test = None
+        self.predictions = {}
+
+
+    def run(self):
+        super().run()
         self.classifier_evaluation = self.evaluate_classifier()
 
 
@@ -70,5 +82,3 @@ class AlgorithmRun:
         evaluation['FP'] = numpy.sum(numpy.logical_and(n_expected, predictions)).item()
         evaluation['FN'] = numpy.sum(numpy.logical_and(expected, n_predictions)).item()
         return evaluation
-
-
