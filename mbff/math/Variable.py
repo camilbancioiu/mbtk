@@ -68,6 +68,7 @@ class JointVariables(Variable):
 
         self.name = '(' + ', '.join([var.name for var in self.variables]) + ')'
         self.variableIDs = [var.ID for var in self.variables]
+        # TODO add support for lazy loading of instances.
         self.instances = list(zip(*[var.instances for var in self.variables]))
         self.values = None
         self.update_values()
