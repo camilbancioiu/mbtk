@@ -1,40 +1,66 @@
 import math
 import numpy
 
+from mbff.math.PMF import PMF, CPMF
+from mbff.math.Variable import JointVariables
 
 
-def MI__binary(X, Y):
-    pX = calculate_pmf__binary(X)
-    pY = calculate_pmf__binary(Y)
-    pXY = calculate_joint_pmf2__binary(X, Y)
-
-    def pmi(x, y):
-        marginals = pX[x] * pY[y]
-        joint = pXY[(x,y)]
-        if joint == 0 or marginals == 0:
-            return 0
-        else:
-            return joint * math.log2(joint / marginals)
-
-    return pmi(0, 0) + pmi(0, 1) + pmi(1, 0) + pmi(1, 1)
+def mutual_information(PrXY, PrX, PrY, base=2):
+    logarithm = create_logarithm_function(base)
+    MI = 0.0
+    for (x, px) in PrX.items():
+        for (y, py) in PrY.items():
+            pxy = PrXY.p(x, y)
+            if pxy == 0 or px == 0 or py == 0:
+                continue
+            else:
+                pMI = pxy * logarithm(pxy / (px * py))
+                MI += pMI
+    return MI
 
 
-def calculate_pmf__binary(X):
-    size = len(X)
-    p = {}
-    p[1] = numpy.sum(X) / size
-    p[0] = 1 - p[1]
-    return p
+
+def calculate_pmf_for_mi(X, Y):
+    PrXY = PMF(JointVariables(X, Y))
+    PrX = PMF(X)
+    PrY = PMF(Y)
+
+    return (PrXY, PrX, PrY)
 
 
-def calculate_joint_pmf2__binary(X, Y):
-    size = len(X)
-    p = {}
-    n_X = numpy.logical_not(X)
-    n_Y = numpy.logical_not(Y)
-    p[(0,0)] = numpy.sum(numpy.logical_and(n_X, n_Y)) / size
-    p[(1,1)] = numpy.sum(numpy.logical_and(X, Y)) / size
-    p[(0,1)] = numpy.sum(numpy.logical_and(n_X, Y)) / size
-    p[(1,0)] = numpy.sum(numpy.logical_and(X, n_Y)) / size
-    return p
 
+def conditional_mutual_information(PrXYcZ, PrXcZ, PrYcZ, PrZ, base=2):
+    logarithm = create_logarithm_function(base)
+    cMI = 0.0
+    for (z, pz) in PrZ.items():
+        for (x, pxcz) in PrXcZ.given(z).items():
+            for (y, pycz) in PrYcZ.given(z).items():
+                pxycz = PrXYcZ.given(z).p(x, y)
+                if pxycz == 0 or pxcz == 0 or pycz == 0:
+                    continue
+                else:
+                    pcMI = pz * pxycz * logarithm(pxycz / (pxcz * pycz))
+                    cMI += pcMI
+    return cMI
+
+
+
+def calculate_pmf_for_cmi(X, Y, Z):
+    PrXYcZ = CPMF(JointVariables(X, Y), Z)
+    PrXcZ = CPMF(X, Z)
+    PrYcZ = CPMF(Y, Z)
+    PrZ = PMF(Z)
+
+    return (PrXYcZ, PrXcZ, PrYcZ, PrZ)
+
+
+
+def create_logarithm_function(base):
+    if base == 'e':
+        return math.log
+    elif base == 2:
+        return math.log2
+    elif base == 10:
+        return math.log10
+    else:
+        return lambda x: math.log(x, base)
