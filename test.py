@@ -11,10 +11,13 @@ if __name__ == '__main__':
 
     print('Running test profile \'{}\''.format(test_profile))
 
-    if test_profile == 'quick' or test_profile == 'all':
+    if test_profile == 'quick':
         TestBase.TestsTagsToExclude.append('sampling')
         TestBase.TestsTagsToExclude.append('conditional_independence')
         del sys.argv[1]
+    elif test_profile == 'all':
+        del sys.argv[1]
+
 
     # After deciding what tests to exclude, we can now import them. Importing
     # AFTER setting TestsTagsToExclude is required, because unittest.skipIf
