@@ -1,7 +1,6 @@
 import os
 import shutil
 from pathlib import Path
-from mbff.experiment.Exceptions import ExperimentFolderException
 from mbff.utilities.LockablePath import LockablePath
 
 class ExperimentDefinition(LockablePath):

@@ -1,6 +1,8 @@
 from pathlib import Path
 import shutil
 
+from mbff.utilities.Exceptions import *
+
 class LockablePath:
 
     def __init__(self, repository, folder):
@@ -36,18 +38,18 @@ class LockablePath:
 
     def delete_folder(self):
         if not self.folder_exists():
-            raise ExperimentFolderException(self, self.folder, 'Experiment folder {} does not exist, cannot delete it.'.format(self.name))
+            raise LockablePathException(self, self.path, 'Folder {} does not exist, cannot delete it.'.format(self.name))
         if self.folder_is_locked():
-            raise ExperimentFolderException(self, self.folder, 'Experiment folder {} is locked, cannot delete it.'.format(self.name))
+            raise LockablePathException(self, self.path, 'Folder {} is locked, cannot delete it.'.format(self.name))
             return
-        shutil.rmtree(self.folder)
+        shutil.rmtree(self.path)
 
 
     def delete_subfolder(self, subfolder):
         if self.folder_is_locked():
-            raise ExperimentFolderException(self, self.folder, 'Experiment folder is locked, cannot delete any subfolder.')
+            raise LockablePathException(self, self.path, 'Folder is locked, cannot delete any subfolder.')
         if not self.subfolder_exists(subfolder):
-            raise ExperimentFolderException(self, self.folder, 'Experiment subfolder {} does not exist.'.format(subfolder))
+            raise LockablePathException(self, self.path, 'Fubfolder {} does not exist.'.format(subfolder))
         shutil.rmtree(self.path / subfolder)
 
 

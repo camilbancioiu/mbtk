@@ -32,6 +32,10 @@ class AlgorithmRun:
         self.duration = (self.end_time - self.start_time) * 1000.0
 
 
+    def __str__(self):
+        return "AlgorithmRun: " + self.ID
+
+
 
 class AlgorithmAndClassifierRun(AlgorithmRun):
 

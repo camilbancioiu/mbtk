@@ -56,6 +56,10 @@ class ExperimentalDatasetDefinition(LockablePath):
         return self.exds_class(self)
 
 
+    def exds_ready(self):
+        return self.folder_exists() and self.folder_is_locked()
+
+
     def validate(self):
         pass
 

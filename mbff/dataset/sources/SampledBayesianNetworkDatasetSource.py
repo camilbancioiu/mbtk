@@ -30,7 +30,7 @@ class SampledBayesianNetworkDatasetSource():
             self.reset_random_seed = False
 
         sample_count = self.configuration['sample_count']
-        objective_names = sorted(self.configuration['objectives'])
+        objective_names = sorted(self.configuration.get('objectives', []))
         feature_names = list(sorted(list(set(self.bayesian_network.variable_node_names()) - set(objective_names))))
 
         sample_matrix = self.bayesian_network.sample_matrix(sample_count)
@@ -56,8 +56,3 @@ class SampledBayesianNetworkDatasetSource():
         datasetmatrix.column_labels_Y = objective_names
 
         return datasetmatrix
-
-
-
-        # TODO split sample_matrix into X and Y, based on self.configuration['objectives']
-        # TODO determine row_labels, column_labels_X and column_labels_Y

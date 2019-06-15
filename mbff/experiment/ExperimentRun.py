@@ -35,7 +35,10 @@ class ExperimentRun:
         self.print_experiment_run_header()
 
         self.exds = self.definition.exds_definition.create_exds()
-        self.exds.load()
+        if self.definition.exds_definition.exds_ready():
+            self.exds.load()
+        else:
+            self.exds.build()
 
         self.definition.ensure_subfolder('algorithm_run_logs')
         self.definition.ensure_subfolder('algorithm_run_datapoints')
@@ -78,6 +81,9 @@ class ExperimentRun:
 
         if self.definition.save_algorithm_run_datapoints:
             self.save_algorithm_run_datapoint(algorithm_run)
+
+        if not self.definition.quiet:
+            print(str(algorithm_run))
 
 
     def save_algorithm_run_datapoint(self, algorithm_run):
