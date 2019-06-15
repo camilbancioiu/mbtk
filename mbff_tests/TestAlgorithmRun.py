@@ -9,7 +9,7 @@ from mbff_tests.MockDatasetSource import MockDatasetSource
 from mbff.dataset.ExperimentalDatasetDefinition import ExperimentalDatasetDefinition
 from mbff.dataset.ModelBuildingExperimentalDataset import ModelBuildingExperimentalDataset
 from mbff.experiment.AlgorithmRun import AlgorithmAndClassifierRun
-from mbff.algorithms.basic.IGt import algorithm_IGt__binary as IGt
+from mbff.algorithms.basic.IGt import algorithm_IGt as IGt
 
 class TestAlgorithmRun(TestBase):
 
@@ -41,7 +41,7 @@ class TestAlgorithmRun(TestBase):
         algrun.run()
 
         # Verify if the AlgorithmRun now contains the expected results.
-        self.assertEqual('mbff.algorithms.basic.IGt.algorithm_IGt__binary', algrun.algorithm_name)
+        self.assertEqual('mbff.algorithms.basic.IGt.algorithm_IGt', algrun.algorithm_name)
         self.assertEqual('mbff_tests.TestAlgorithmRun.MockBernouliClassifier', algrun.classifier_classname)
         self.assertListEqual([0, 4, 1, 5], algrun.selected_features)
         self.assertLess(0, algrun.duration)
@@ -69,7 +69,7 @@ class TestAlgorithmRun(TestBase):
         algrun = AlgorithmAndClassifierRun(None, configuration, parameters)
 
         self.assertEqual('${nosubstitution}__test_IGt_Q4_Obj0', algrun.label)
-        self.assertEqual('mbff.algorithms.basic.IGt.algorithm_IGt__binary', algrun.algorithm_name)
+        self.assertEqual('mbff.algorithms.basic.IGt.algorithm_IGt', algrun.algorithm_name)
         self.assertEqual('mbff_tests.TestAlgorithmRun.MockBernouliClassifier', algrun.classifier_classname)
 
 

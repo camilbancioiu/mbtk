@@ -3,8 +3,7 @@ import numpy
 
 from mbff_tests.TestBase import TestBase
 
-from mbff.algorithms.basic.IGt import algorithm_IGt__binary
-
+from mbff.algorithms.basic.IGt import algorithm_IGt
 from mbff.dataset.DatasetMatrix import DatasetMatrix
 
 class TestAlgorithmIGt(TestBase):
@@ -18,7 +17,7 @@ class TestAlgorithmIGt(TestBase):
                 'objective_index': 0
                 }
         expected_features = [0, 4]
-        computed_features = algorithm_IGt__binary(datasetmatrix, parameters)
+        computed_features = algorithm_IGt(datasetmatrix, parameters)
         self.assertListEqual(expected_features, computed_features)
 
         # Select the top four features.
@@ -27,7 +26,7 @@ class TestAlgorithmIGt(TestBase):
                 'objective_index': 0
                 }
         expected_features = [0, 4, 1, 5]
-        computed_features = algorithm_IGt__binary(datasetmatrix, parameters)
+        computed_features = algorithm_IGt(datasetmatrix, parameters)
         self.assertListEqual(expected_features, computed_features)
 
         # Select all features, thus seeing them sorted by MI.
@@ -36,7 +35,7 @@ class TestAlgorithmIGt(TestBase):
                 'objective_index': 0
                 }
         expected_features = [0, 4, 1, 5, 2, 6, 3, 7]
-        computed_features = algorithm_IGt__binary(datasetmatrix, parameters)
+        computed_features = algorithm_IGt(datasetmatrix, parameters)
         self.assertListEqual(expected_features, computed_features)
 
 

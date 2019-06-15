@@ -14,7 +14,7 @@ from mbff.experiment.ExperimentRun import ExperimentRun
 from mbff.experiment.AlgorithmRun import AlgorithmAndClassifierRun
 from mbff.experiment.AlgorithmRunDatapoint import AlgorithmAndClassifierRunDatapoint
 from mbff.experiment.Exceptions import ExperimentFolderLockedException
-from mbff.algorithms.basic.IGt import algorithm_IGt__binary as IGt
+from mbff.algorithms.basic.IGt import algorithm_IGt as IGt
 
 
 class TestExperimentRun(TestBase):
