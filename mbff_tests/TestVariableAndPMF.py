@@ -68,7 +68,7 @@ class TestVariableAndPMF(TestBase):
         sizes.ID = 1
         sizes.name = 'sizes'
 
-        fauna = JointVariables(animals, colors, sizes)
+        fauna = JointVariables(sizes, colors, animals)
         self.assertListEqual([1, 2, 3], fauna.variableIDs)
         self.assertIs(sizes, fauna.variables[0])
         self.assertIs(colors, fauna.variables[1])

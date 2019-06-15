@@ -61,7 +61,7 @@ class JointVariables(Variable):
 
         variables = self.flatten_variables_list(variables)
 
-        self.variables = sorted(variables, key=operator.attrgetter('ID'))
+        self.variables = variables
         self.validate_variables()
 
         self.ID = None
@@ -85,6 +85,14 @@ class JointVariables(Variable):
 
     def validate_variables(self):
         validate_variable_instances_lengths(self.variables)
+
+
+
+class SortedJointVariables(JointVariables):
+
+    def __init__(self, *variables):
+        variables = sorted(variables, operator.attrgetter("ID"))
+        super().__init__(variables)
 
 
 
