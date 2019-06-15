@@ -35,7 +35,7 @@ class ExperimentalDataset():
         self.total_row_count = 0
 
 
-    def build(self, finalize_and_save=True):
+    def build(self, finalize_and_save=None):
         """
         Build an ExperimentalDataset from an external dataset source, as
         dictated by ``self.definition``.
@@ -71,6 +71,9 @@ class ExperimentalDataset():
 
         self.total_row_count = self.matrix.X.get_shape()[0]
 
+        if finalize_and_save == None:
+            finalize_and_save = self.definition.after_build__finalize_and_save
+
         if finalize_and_save:
             self.finalize_and_save()
 
@@ -78,7 +81,7 @@ class ExperimentalDataset():
     def finalize_and_save(self):
         self.finalize()
         self.save()
-        if self.definition.auto_lock_after_build:
+        if self.definition.after_save__auto_lock:
             self.definition.lock_folder()
 
 

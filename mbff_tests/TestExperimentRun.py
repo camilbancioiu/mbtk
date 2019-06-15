@@ -302,7 +302,7 @@ class TestExperimentRun(TestBase):
         definition.source_configuration = {}
         definition.options['training_subset_size'] = 3/8
         definition.options['random_seed'] = 42
-        definition.auto_lock_after_build = True
+        definition.after_save__auto_lock = True
         definition.tags = []
 
         return definition

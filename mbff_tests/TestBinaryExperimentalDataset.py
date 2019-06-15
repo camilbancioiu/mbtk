@@ -382,7 +382,7 @@ class TestBinaryExperimentalDataset(TestBase):
         definition.options['random_seed'] = 42
         definition.options['probability_thresholds__features'] = {}
         definition.options['probability_thresholds__objectives'] = {}
-        definition.auto_lock_after_build = True
+        definition.after_save__auto_lock = True
         definition.tags = []
 
         return definition

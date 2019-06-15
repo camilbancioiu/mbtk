@@ -103,7 +103,7 @@ class TestModelBuildingExperimentalDataset(TestBase):
         definition.exds_folder = exds_folder
         definition.options['training_subset_size'] = 0.25
         definition.options['random_seed'] = 42
-        definition.auto_lock_after_build = True
+        definition.after_save__auto_lock = True
         definition.tags = []
 
         return definition

@@ -58,7 +58,7 @@ class ExperimentRun:
         self.remove_checkpoint()
         self.print_experiment_run_footer()
 
-        if self.definition.auto_lock_after_finishing:
+        if self.definition.after_finishing__auto_lock:
             self.definition.lock_folder()
 
 

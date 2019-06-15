@@ -27,9 +27,14 @@ class ExperimentalDatasetDefinition(LockablePath):
     :var exds_folder: The folder where the exds should create its own subfolder
         to save itself to, or where to load itself from. Can be thought of as
         the "experimental dataset repository".
-    :var auto_lock_after_build: Determines whether the folder of the exds is
+    :var after_build__finalize_and_save: Determines whether the exds is
+        finalized and saved immediately after building. If false, the exds will
+        be built in memory only, and saving can be performed manually at a
+        later time.
+    :var after_save__auto_lock: Determines whether the folder of the exds is
         automatically locked after building. Locking the folder of an exds will
-        prevent accidental rebuilding or deleting.
+        prevent accidental rebuilding or deleting. Only relevant if
+        `after_build__finalize_and_save` is `True`.
     :var tags: A list of arbitrary strings, used to categorize this exds.
     """
 
@@ -42,7 +47,8 @@ class ExperimentalDatasetDefinition(LockablePath):
         self.source = None
         self.source_configuration = {}
         self.options = { }
-        self.auto_lock_after_build = True
+        self.after_build__finalize_and_save = True
+        self.after_save__auto_lock = True
         self.tags = []
 
 

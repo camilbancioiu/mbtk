@@ -20,7 +20,7 @@ class ExperimentDefinition(LockablePath):
         self.save_algorithm_run_datapoints = False
         self.algorithm_run_log__stdout = True
         self.algorithm_run_log__file = False
-        self.auto_lock_after_finishing = True
+        self.after_finishing__auto_lock = True
         self.quiet = False
         self.tags = []
 
