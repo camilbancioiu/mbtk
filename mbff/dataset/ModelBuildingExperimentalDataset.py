@@ -124,18 +124,18 @@ class ModelBuildingExperimentalDataset(ExperimentalDataset):
         original dataset.
 
         The selection is performed randomly, but the seed of the randomness is
-        controlled by ``self.definition.random_seed``, which makes this
+        controlled by ``self.definition.options['random_seed']``, which makes this
         selection predictable. This means that for the same seed value, all
         calls to :py:meth`perform_random_dataset_split` will return the same
         selection of training and testing rows.
         """
         # Determine how many rows will be designated as *training rows*.
-        train_rows_count = int(self.total_row_count * self.definition.training_subset_size)
+        train_rows_count = int(self.total_row_count * self.definition.options['training_subset_size'])
 
         # Create the ``shuffled_rows`` list, which contains the indices of all
         # the rows from ``self.matrix``, but randomly ordered.
         rows = range(self.total_row_count)
-        random.seed(self.definition.random_seed)
+        random.seed(self.definition.options['random_seed'])
         shuffled_rows = random.sample(rows, len(rows))
 
         # Slice ``shuffled_rows`` into two parts: the first part will contain

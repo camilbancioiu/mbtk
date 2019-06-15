@@ -101,8 +101,8 @@ class TestModelBuildingExperimentalDataset(TestBase):
                 'feature_type': 'binary'
                 }
         definition.exds_folder = exds_folder
-        definition.training_subset_size = 0.25
-        definition.random_seed = 42
+        definition.options['training_subset_size'] = 0.25
+        definition.options['random_seed'] = 42
         definition.auto_lock_after_build = True
         definition.tags = []
 

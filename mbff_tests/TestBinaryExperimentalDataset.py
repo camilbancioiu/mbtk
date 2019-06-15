@@ -378,8 +378,8 @@ class TestBinaryExperimentalDataset(TestBase):
         definition.exds_class = BinaryExperimentalDataset
         definition.source = BinarySyntheticDatasetSource
         definition.source_configuration = self.default_binarysyntheticdatasetsource_configuration()
-        definition.training_subset_size = 0.25
-        definition.random_seed = 42
+        definition.options['training_subset_size'] = 0.25
+        definition.options['random_seed'] = 42
         definition.options['probability_thresholds__features'] = {}
         definition.options['probability_thresholds__objectives'] = {}
         definition.auto_lock_after_build = True

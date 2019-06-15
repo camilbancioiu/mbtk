@@ -79,8 +79,8 @@ class TestAlgorithmRun(TestBase):
         definition.exds_class = ModelBuildingExperimentalDataset
         definition.source = MockDatasetSource
         definition.source_configuration = {}
-        definition.training_subset_size = 3/8
-        definition.random_seed = 42
+        definition.options['training_subset_size'] = 3/8
+        definition.options['random_seed'] = 42
         definition.auto_lock_after_build = True
         definition.tags = []
         return definition
