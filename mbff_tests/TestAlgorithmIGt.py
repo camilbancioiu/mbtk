@@ -34,7 +34,7 @@ class TestAlgorithmIGt(TestBase):
                 'Q': 8,
                 'objective_index': 0
                 }
-        expected_features = [0, 4, 1, 5, 2, 6, 3, 7]
+        expected_features = [0, 4, 1, 5, 6, 2, 3, 7]
         computed_features = algorithm_IGt(datasetmatrix, parameters)
         self.assertListEqual(expected_features, computed_features)
 
