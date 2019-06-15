@@ -13,4 +13,5 @@ def algorithm_IGt__binary(datasetmatrix, parameters):
         IG_per_feature.append((feature_index, feature_IG))
 
     sorted_IG_per_feature = sorted(IG_per_feature, key=operator.itemgetter(1), reverse=True)
-    return [pair[0] for pair in sorted_IG_per_feature[0:Q]]
+    selected_features = [pair[0] for pair in sorted_IG_per_feature[0:Q]]
+    return selected_features
