@@ -41,6 +41,8 @@ class DatasetMatrix:
         instance is final or not. Initially ``False``. Calling ``.finalize()``
         will set this to ``True``. Saving is possible only after finalizing. A
         loaded :py:class:`DatasetMatrix` is always finalized.
+    :var metadata: A dictionary which holds miscellaneous information
+        pertaining to this :py:class`DatasetMatrix` instance.
     """
 
     def __init__(self, label):
@@ -51,6 +53,7 @@ class DatasetMatrix:
         self.column_labels_X = []
         self.column_labels_Y = []
         self.final = False
+        self.metadata = {}
 
 
     def get_matrix(self, matrix_label):

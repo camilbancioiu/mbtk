@@ -33,6 +33,7 @@ class DatasetSource:
         datasetmatrix.row_labels = ["row{}".format(r) for r in range(8)]
         datasetmatrix.column_labels_X = ["colX{}".format(c) for c in range(8)]
         datasetmatrix.column_labels_Y = ["colY{}".format(c) for c in range(8)]
+        datasetmatrix.metadata['source'] = self
 
         return datasetmatrix
 

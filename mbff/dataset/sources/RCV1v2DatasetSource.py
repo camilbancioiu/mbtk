@@ -91,6 +91,7 @@ class RCV1v2DatasetSource(DatasetSource):
         datasetmatrix.row_labels = list(map(str, documentIDs))
         datasetmatrix.column_labels_X = words
         datasetmatrix.column_labels_Y = topics
+        datasetmatrix.metadata['source'] = self
 
         return datasetmatrix
 

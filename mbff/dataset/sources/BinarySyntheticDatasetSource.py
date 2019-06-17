@@ -40,6 +40,7 @@ class BinarySyntheticDatasetSource(DatasetSource):
         datasetmatrix.row_labels = ['row{}'.format(i) for i in range(0, self.configuration['row_count'])]
         datasetmatrix.column_labels_X = col_labels_X
         datasetmatrix.column_labels_Y = col_labels_Y
+        datasetmatrix.metadata['source'] = self
 
         return datasetmatrix
 

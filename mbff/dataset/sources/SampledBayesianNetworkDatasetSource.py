@@ -54,5 +54,6 @@ class SampledBayesianNetworkDatasetSource():
         datasetmatrix.row_labels = ['row{}'.format(i) for i in range(0, sample_count)]
         datasetmatrix.column_labels_X = feature_names
         datasetmatrix.column_labels_Y = objective_names
+        datasetmatrix.metadata['source'] = self
 
         return datasetmatrix
