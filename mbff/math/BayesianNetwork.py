@@ -174,7 +174,7 @@ class BayesianNetwork:
 
 
     def conditionally_independent(self, x, y, conditioning_set):
-        return d_separated(x, conditioning_set, y)
+        return self.d_separated(x, conditioning_set, y)
 
 
     def d_separated(self, x, separators, y):
