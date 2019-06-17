@@ -28,6 +28,7 @@ class BayesianNetwork:
         self.properties = {}
         self.variable_nodes__sampling_order = []
         self.variable_node_names__sampling_order = []
+        self.graph = None
         self.finalized = False
 
 
@@ -102,6 +103,12 @@ class BayesianNetwork:
         for varname in self.variable_node_names__sampling_order:
             self.variable_nodes__sampling_order.append(self.variable_nodes[varname])
 
+        for ID, varname in enumerate(self.variable_node_names()):
+            self.variable_nodes[varname].ID = ID
+
+        self.graph_d = self.as_directed_graph()
+        self.graph_u = self.as_undirected_graph()
+
         self.finalized = True
 
 
@@ -118,6 +125,117 @@ class BayesianNetwork:
             variable_names = [varname for varname in variable_names if varname not in optimal_sampling_order]
 
         return optimal_sampling_order
+
+
+    def as_directed_graph(self):
+        graph = {}
+        for node in self.variable_nodes.values():
+            cond_nodes = node.probdist.conditioning_variable_nodes.values()
+            if len(cond_nodes) > 0:
+                for cnode in cond_nodes:
+                    try:
+                        graph[cnode.ID].append(node.ID)
+                    except KeyError:
+                        graph[cnode.ID] = [node.ID]
+        for i in graph:
+            graph[i] = sorted(graph[i])
+
+        for node in self.variable_nodes.values():
+            if node.ID not in graph:
+                graph[node.ID] = []
+
+        return graph
+
+
+    def as_undirected_graph(self):
+        graph = {}
+        for node in self.variable_nodes.values():
+            cond_nodes = node.probdist.conditioning_variable_nodes.values()
+            if len(cond_nodes) > 0:
+                for cnode in cond_nodes:
+                    try:
+                        if not node.ID in graph[cnode.ID]:
+                            graph[cnode.ID].append(node.ID)
+                    except KeyError:
+                        graph[cnode.ID] = [node.ID]
+                    try:
+                        if not cnode.ID in graph[node.ID]:
+                            graph[node.ID].append(cnode.ID)
+                    except KeyError:
+                        graph[node.ID] = [cnode.ID]
+        for i in graph:
+            graph[i] = sorted(graph[i])
+
+        for node in self.variable_nodes.values():
+            if node.ID not in graph:
+                graph[node.ID] = []
+
+        return graph
+
+
+    def conditionally_independent(self, x, y, conditioning_set):
+        return d_separated(x, conditioning_set, y)
+
+
+    def d_separated(self, x, separators, y):
+        paths = self.find_all_undirected_paths(x, y)
+        for path in paths:
+            if not self.is_path_blocked_by_nodes(path, separators):
+                return False
+        return True
+
+
+    def is_path_blocked_by_nodes(self, path, blockers):
+        for i, node in enumerate(path):
+            if i == 0 or i == (len(path) - 1):
+                continue
+            is_collider = self.is_node_collider(path, i)
+            is_blocker = node in blockers
+            has_descendants_in_blockers = (len(set(blockers) & set(self.graph_d[node])) > 0)
+
+            if is_collider:
+                if not has_descendants_in_blockers:
+                    return True
+            if not is_collider:
+                if is_blocker:
+                    return True
+
+        return False
+
+
+    def is_node_collider(self, path, i):
+        node_prev = path[i - 1]
+        node_this = path[i]
+        node_next = path[i + 1]
+
+        if (node_this in self.graph_d[node_prev]) and (node_this in self.graph_d[node_next]):
+            return True
+        else:
+            return False
+
+
+    def find_all_directed_paths(self, start, end):
+        return self.find_all_paths(self.graph_d, start, end)
+
+
+    def find_all_undirected_paths(self, start, end, path=[]):
+        return self.find_all_paths(self.graph_u, start, end)
+
+
+    def find_all_paths(self, graph, start, end, path=[]):
+        path = path + [start]
+        if start == end:
+            return [path]
+        if not start in graph:
+            return []
+        paths = []
+        for node in graph[start]:
+            if node not in path:
+                newpaths = self.find_all_paths(graph, node, end, path)
+                for newpath in newpaths:
+                    paths.append(newpath)
+        return paths
+
 
 
 
@@ -146,6 +264,7 @@ class VariableNode:
     """
 
     def __init__(self, name):
+        self.ID = -1
         self.name = name
         self.values = []
         self.properties = {}
