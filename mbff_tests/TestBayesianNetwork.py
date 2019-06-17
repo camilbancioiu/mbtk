@@ -143,6 +143,7 @@ class TestBayesianNetwork(TestBase):
         survey_bif = Path('testfiles', 'bif_files', 'survey.bif')
         bn = util.read_bif_file(survey_bif)
         bn.finalize()
+        self.assertEqual(0, bn.variable_nodes['AGE'].ID)
         self.assertEqual(1, bn.variable_nodes['EDU'].ID)
         self.assertEqual(2, bn.variable_nodes['OCC'].ID)
         self.assertEqual(3, bn.variable_nodes['R'].ID)
