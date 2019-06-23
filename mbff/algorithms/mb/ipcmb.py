@@ -12,8 +12,14 @@ def algorithm_IPCMB(datasetmatrix, parameters):
     # The 'target' is the index of a column in datasetmatrix.X.
     target = parameters['target']
 
-    # The set of all variables (i.e. the indices of the columns in datasetmatrix.X)
-    U = set(range(datasetmatrix.X.get_shape()[1]))
+    # The set of all variables; it is provided as
+    # parameters['all_variables'], or alternatively it is read directly from
+    # the provided datasetmatrix.
+    U = None
+    try:
+        U = set(parameters['all_variables'])
+    except KeyError:
+        U = set(range(datasetmatrix.X.get_shape()[1]))
     print("U =", U)
 
     # Special cache managed by IPCMB. This has nothing to do with AD-trees, dcMI or
