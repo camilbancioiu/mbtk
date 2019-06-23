@@ -173,6 +173,42 @@ class BayesianNetwork:
         return graph
 
 
+    def from_directed_graph(self, graph):
+        self.graph_d = graph.copy()
+        self.graph_u = {}
+        all_nodes = set()
+        for node, descendants in self.graph_d.items():
+            all_nodes.add(node)
+            if len(descendants) > 0:
+                for descendant in descendants:
+                    all_nodes.add(descendant)
+                    # For each directed connection in self.graph_d from `node`
+                    # to `descendant`, add two connections in self.graph_u: one
+                    # from `node` to `descendant`, and one from `descendant` to
+                    # `node`.
+                    try:
+                        if not descendant in self.graph_u[node]:
+                            self.graph_u[node].append(descendant)
+                    except KeyError:
+                        self.graph_u[node] = [descendant]
+                    try:
+                        if not node in self.graph_u[descendant]:
+                            self.graph_u[descendant].append(node)
+                    except KeyError:
+                        self.graph_u[descendant] = [node]
+
+        for node in all_nodes:
+            try:
+                self.graph_u[node] = sorted(self.graph_u[node])
+            except KeyError:
+                self.graph_u[node] = []
+
+            try:
+                self.graph_d[node] = sorted(self.graph_d[node])
+            except KeyError:
+                self.graph_d[node] = []
+
+
     def conditionally_independent(self, x, y, conditioning_set):
         return self.d_separated(x, conditioning_set, y)
 
@@ -185,19 +221,21 @@ class BayesianNetwork:
         return True
 
 
-    def is_path_blocked_by_nodes(self, path, blockers):
+    def is_path_blocked_by_nodes(self, path, conditioning_nodes):
         for i, node in enumerate(path):
             if i == 0 or i == (len(path) - 1):
                 continue
+            descendants = self.graph_d[node]
             is_collider = self.is_node_collider(path, i)
-            is_blocker = node in blockers
-            has_descendants_in_blockers = (len(set(blockers) & set(self.graph_d[node])) > 0)
+            is_conditioned_on = node in conditioning_nodes
+            descendants_in_conditioning_nodes = set(descendants) & set(conditioning_nodes)
+            has_descendants_in_conditioning_nodes = (len(descendants_in_conditioning_nodes) > 0)
 
             if is_collider:
-                if not has_descendants_in_blockers:
+                if not is_conditioned_on and not has_descendants_in_conditioning_nodes:
                     return True
             if not is_collider:
-                if is_blocker:
+                if is_conditioned_on:
                     return True
 
         return False
