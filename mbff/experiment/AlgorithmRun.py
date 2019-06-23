@@ -27,7 +27,12 @@ class AlgorithmRun:
 
     def run(self):
         self.start_time = time.time()
-        self.selected_features = self.algorithm(self.exds.matrix, self.parameters)
+
+        if not self.exds is None:
+            self.selected_features = self.algorithm(self.exds.matrix, self.parameters)
+        else:
+            self.selected_features = self.algorithm(None, self.parameters)
+
         self.end_time = time.time()
         self.duration = (self.end_time - self.start_time) * 1000.0
 
@@ -58,6 +63,10 @@ class AlgorithmAndClassifierRun(AlgorithmRun):
 
     def run(self):
         super().run()
+        # WARNING: classifier evaluation requires an exds which contains
+        # `datasetmatrix_train` and `datasetmatrix_test`. If the provided exds
+        # does not contain these matrices, or if the exds is not provided at
+        # all (i.e. self.exds is None), exceptions will be raised.
         self.classifier_evaluation = self.evaluate_classifier()
 
 

@@ -34,11 +34,14 @@ class ExperimentRun:
         self.start_time = time.time()
         self.print_experiment_run_header()
 
-        self.exds = self.definition.exds_definition.create_exds()
-        if self.definition.exds_definition.exds_ready():
-            self.exds.load()
+        if not self.definition.exds_definition is None:
+            self.exds = self.definition.exds_definition.create_exds()
+            if self.definition.exds_definition.exds_ready():
+                self.exds.load()
+            else:
+                self.exds.build()
         else:
-            self.exds.build()
+            self.exds = None
 
         self.definition.ensure_subfolder('algorithm_run_logs')
         self.definition.ensure_subfolder('algorithm_run_datapoints')
