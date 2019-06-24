@@ -24,7 +24,7 @@ def algorithm_IPCMB(datasetmatrix, parameters):
 
     # Special cache managed by IPCMB. This has nothing to do with AD-trees, dcMI or
     # JMI tables.
-    SepSetCache = dict()
+    SepSetCache = SetCache()
 
     # This is the test of conditional independence. It is a function that must
     # be returned by the CI test builder provided as a parameter (the test
@@ -48,9 +48,11 @@ def algorithm_IPCMB(datasetmatrix, parameters):
                 for Z in itertools.combinations(AdjacentNodes - {X}, CutSetSize):
                     Z = set(Z)
                     if conditionally_independent(X, T, Z):
-                        NonPC = NonPC | {X}
-                        SepSetCache[(T, X)] = Z
+                        NonPC.add(X)
+                        SepSetCache.add(Z, T, X)
                         break
+                if not SepSetCache.contains(T, X):
+                    SepSetCache.add(set(), T, X)
             AdjacentNodes = AdjacentNodes - NonPC
             NonPC = set()
             CutSetSize += 1
@@ -65,21 +67,23 @@ def algorithm_IPCMB(datasetmatrix, parameters):
         print('CandidatePC_T =', CandidatePC_T)
 
         PC = set()
-        CandidateSpouses = dict()
+        CandidateSpouses = SetCache()
         for X in CandidatePC_T:
             CandidatePC_X = RecognizePC(X, U - {X})
             print('CandidatePC_X =', CandidatePC_X)
             if T in CandidatePC_X:
-                PC = PC | {X}
-                CandidateSpouses[(T, X)] = CandidatePC_X - {T}  # Note: added " - {T}" even if not in the article
+                PC.add(X)
+                new_spouses = CandidatePC_X - {T}
+                CandidateSpouses.add(new_spouses, T, X)
 
-        MB = PC
 
+        MB = PC.copy()
         for X in PC:
-            for Y in CandidateSpouses[(T, X)]:
+            for Y in CandidateSpouses.get(T, X):
                 if Y not in MB:
-                    if not conditionally_independent(T, Y, SepSetCache[(T, Y)] | {X}):
-                        MB = MB + {Y}
+                    separation_set = SepSetCache.get(T, Y)
+                    if not conditionally_independent(T, Y, separation_set | {X}):
+                        MB.add(Y)
 
         return MB
     
@@ -88,3 +92,21 @@ def algorithm_IPCMB(datasetmatrix, parameters):
 
     return selected_features
 
+
+
+class SetCache:
+
+    def __init__(self):
+        self.cache = dict()
+
+
+    def add(self, cset, *elements):
+        self.cache[frozenset(elements)] = cset
+
+
+    def get(self, *elements):
+        return self.cache[frozenset(elements)]
+
+
+    def contains(self, *elements):
+        return frozenset(elements) in self.cache
