@@ -114,6 +114,14 @@ class TestAlgorithmIPCMB(TestBase):
         mb = algorithm_IPCMB(None, parameters)
         self.assertEqual([5, 16, 21, 25], mb)
 
+        parameters = self.make_parameters(16, bn)
+        mb = algorithm_IPCMB(None, parameters)
+        self.assertEqual([20, 21, 31], mb)
+
+        parameters = self.make_parameters(34, bn)
+        mb = algorithm_IPCMB(None, parameters)
+        self.assertEqual([1, 9, 18, 19, 22, 33, 36], mb)
+
 
     def make_parameters(self, target, bn):
         return {
