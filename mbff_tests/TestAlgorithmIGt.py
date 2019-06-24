@@ -6,6 +6,7 @@ from mbff_tests.TestBase import TestBase
 from mbff.algorithms.basic.IGt import algorithm_IGt
 from mbff.dataset.DatasetMatrix import DatasetMatrix
 
+
 class TestAlgorithmIGt(TestBase):
 
     def test_selecting_features(self):

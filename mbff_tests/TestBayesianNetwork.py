@@ -548,5 +548,3 @@ class TestBayesianNetwork(TestBase):
         self.assertIn(sample['OCC'], ['emp', 'self'])
         self.assertIn(sample['R'],   ['small', 'big'])
         self.assertIn(sample['TRN'], ['car', 'train', 'other'])
-
-

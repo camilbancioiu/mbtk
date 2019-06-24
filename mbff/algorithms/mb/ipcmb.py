@@ -6,7 +6,7 @@ def algorithm_IPCMB(datasetmatrix, parameters):
     Implementation of the IPC-MB algorithm.
 
     Note that this algorithm will only operate on datasetmatrix.X and will
-    ignore datasetmatrix.Y. 
+    ignore datasetmatrix.Y.
     """
 
     # The 'target' is the index of a column in datasetmatrix.X.
