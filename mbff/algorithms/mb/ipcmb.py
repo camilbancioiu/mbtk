@@ -86,10 +86,8 @@ def algorithm_IPCMB(datasetmatrix, parameters):
                         MB.add(Y)
 
         return MB
-    
-    selected_features = list(IPCMB(target))
-    print(selected_features)
 
+    selected_features = sorted(list(IPCMB(target)))
     return selected_features
 
 
