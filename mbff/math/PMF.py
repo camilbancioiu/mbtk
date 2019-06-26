@@ -52,7 +52,7 @@ class PMF:
 
 
     def normalize_counts(self, update_probabilities=False):
-        normalized_counts = {}
+        normalized_counts = dict()
         for value, count in self.value_counts.items():
             normalized_counts[value] = (count * 1.0) / self.total_count
 

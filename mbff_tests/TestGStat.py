@@ -28,6 +28,7 @@ class TestGStat(TestBase):
         if not TestGStat.ClassIsSetUp:
             self.prepare_datasetmatrices()
 
+
     def test_G_value__lungcancer(self):
         Omega = TestGStat.Omega['lungcancer']
         lungcancer = TestGStat.DatasetMatrix['lungcancer']
@@ -75,11 +76,22 @@ class TestGStat(TestBase):
         Omega = TestGStat.Omega['survey']
         survey = TestGStat.DatasetMatrix['survey']
 
+        # VariableID: 0
         AGE = Variable(survey.get_column_by_label('X', 'AGE'), 'AGE')
+
+        # VariableID: 4
         SEX = Variable(survey.get_column_by_label('X', 'SEX'), 'SEX')
+
+        # VariableID: 1
         EDU = Variable(survey.get_column_by_label('X', 'EDU'), 'EDU')
+
+        # VariableID: 2
         OCC = Variable(survey.get_column_by_label('X', 'OCC'), 'OCC')
+
+        # VariableID: 3
         R = Variable(survey.get_column_by_label('X', 'R'), 'R')
+
+        # VariableID: 5
         TRN = Variable(survey.get_column_by_label('Y', 'TRN'), 'TRN')
 
         significance = 0.99

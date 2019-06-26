@@ -27,6 +27,7 @@ class Variable:
             self.values = sorted(list(Counter(self.instances).keys()))
 
 
+
 class Omega(Variable):
 
     def __init__(self, instance_count):
