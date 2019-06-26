@@ -18,7 +18,8 @@ class Variable:
 
 
     def load_instances(self):
-        self.instances = self.lazy_instances_loader()
+        if not self.lazy_instances_loader is None:
+            self.instances = self.lazy_instances_loader()
         self.update_values()
 
 
@@ -60,19 +61,38 @@ class JointVariables(Variable):
     def __init__(self, *variables):
         super().__init__(None)
 
-        variables = self.flatten_variables_list(variables)
-
-        self.variables = variables
-        self.validate_variables()
-
+        self.variables = self.flatten_variables_list(variables)
         self.ID = None
-
         self.name = '(' + ', '.join([var.name for var in self.variables]) + ')'
         self.variableIDs = [var.ID for var in self.variables]
-        # TODO add support for lazy loading of instances.
-        self.instances = list(zip(*[var.instances for var in self.variables]))
-        self.values = None
-        self.update_values()
+        self.lazy_instances_loader = None
+
+        self.lazy_instances_loader = self.lazy_joint_instances_loader
+
+        if self.all_variables_have_instances():
+            self.validate_variables()
+            self.instances = self.lazy_joint_instances_loader()
+            self.values = None
+            self.update_values()
+        else:
+            self.instances = None
+            self.values = None
+
+
+    def lazy_joint_instances_loader(self):
+        for variable in self.variables:
+            variable.load_instances()
+        self.validate_variables()
+        if len(self.variables) == 1:
+            return self.variables[0].instances
+        return list(zip(*[var.instances for var in self.variables]))
+
+
+    def all_variables_have_instances(self):
+        for var in self.variables:
+            if var.instances is None:
+                return False
+        return True
 
 
     def flatten_variables_list(self, variables):
