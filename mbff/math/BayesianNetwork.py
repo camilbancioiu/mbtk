@@ -214,6 +214,8 @@ class BayesianNetwork:
 
 
     def d_separated(self, x, separators, y):
+        if isinstance(separators, int):
+            separators = [separators]
         paths = self.find_all_undirected_paths(x, y)
         for path in paths:
             if not self.is_path_blocked_by_nodes(path, separators):
