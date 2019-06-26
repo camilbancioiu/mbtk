@@ -78,7 +78,12 @@ class CPMF(PMF):
 
 
     def __str__(self):
-        return str(self.conditional_probabilities)
+        output = ''
+        for key, pmf in self.conditional_probabilities.items():
+            output += str(key) + ':\n'
+            for pmfkey, cp in pmf.items():
+                output += '\t{}: {}\n'.format(pmfkey, cp)
+        return output
 
 
     def given(self, *args):
