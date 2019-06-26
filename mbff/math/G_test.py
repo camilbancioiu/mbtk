@@ -10,7 +10,13 @@ import mbff.math.infotheory as infotheory
 from scipy.stats import chi2
 
 
-def G_test_conditionally_independent(significance, X, Y, Z):
+def conditionally_independent__unoptimized(significance, X, Y, Z):
+    result = G_test_conditionally_independent__unoptimized(significance, X, Y, Z)
+    return result.independent
+
+
+
+def G_test_conditionally_independent__unoptimized(significance, X, Y, Z):
     G = G_value__unoptimized(X, Y, Z)
     DF = calculate_degrees_of_freedom(X, Y)
 
