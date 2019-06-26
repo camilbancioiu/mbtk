@@ -3,7 +3,7 @@ import scipy
 import scipy.io
 import pickle
 import mbff.utilities.functions as util
-from mbff.math.Variable import Variable
+from mbff.math.Variable import Variable, JointVariables
 from mbff.dataset.Exceptions import DatasetMatrixNotFinalizedError, DatasetMatrixFinalizedError
 
 class DatasetMatrix:
@@ -172,6 +172,9 @@ class DatasetMatrix:
         :rtype: ``py:class:mbff.math.Variable``
         :raises ValueError: if ``matrix_label`` is neither ``"X"`` nor ``"Y""``.
         """
+        if column is None:
+            return None
+
         column_getter = None
         column_labels = None
         if matrix_label == 'X':
@@ -193,6 +196,20 @@ class DatasetMatrix:
         variable.name = column_labels[column]
         variable.lazy_instances_loader = lazy_instances_loader
         return variable
+
+
+    def get_variables(self, matrix_label, columns):
+        if columns is None:
+            return None
+
+        if isinstance(columns, int):
+            column = columns
+            return self.get_variable(matrix_label, column)
+
+        variables = []
+        for column in columns:
+            variables.append(self.get_variable(matrix_label, column))
+        return JointVariables(*variables)
 
 
     def delete_row(self, r):
