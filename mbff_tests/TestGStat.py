@@ -168,12 +168,12 @@ class TestGStat(TestBase):
         dataset_folder = Path('testfiles', 'tmp', 'test_gstat_dm')
         for dm_label in ['survey', 'lungcancer']:
             configuration = self.configure_datasetmatrix(dm_label)
-            bayesian_network = util.read_bif_file(configuration['sourcepath'])
             try:
                 datasetmatrix = DatasetMatrix(dm_label)
                 datasetmatrix.load(dataset_folder)
                 TestGStat.DatasetMatrix[dm_label] = datasetmatrix
             except:
+                bayesian_network = util.read_bif_file(configuration['sourcepath'])
                 bayesian_network.finalize()
                 sbnds = SampledBayesianNetworkDatasetSource(configuration)
                 sbnds.reset_random_seed = True
