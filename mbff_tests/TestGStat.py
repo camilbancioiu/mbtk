@@ -96,6 +96,8 @@ class TestGStat(TestBase):
 
         significance = 0.99
 
+        self.assertDependent(significance, R, EDU, AGE)
+
         self.assertCondIndependent(significance, AGE, SEX, Omega)
         self.assertDependent(significance, AGE, EDU, Omega)
         self.assertDependent(significance, SEX, EDU, Omega)

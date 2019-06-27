@@ -87,6 +87,9 @@ class TestVariableAndPMF(TestBase):
         self.assertEqual(1/6, PrFauna.p('small', 'silver', 'mouse'))
         self.assertEqual(0,   PrFauna.p('small', 'silver', 'dog'))
 
+        singleton_joint = JointVariables(animals)
+        self.assertEqual(['cat', 'dog', 'cat', 'mouse', 'dog', 'cat'], singleton_joint.instances)
+
 
     def test_pmf_expected_values(self):
         animals = Variable(['cat', 'dog', 'cat', 'mouse', 'dog', 'cat', 'cat', 'dog'])
