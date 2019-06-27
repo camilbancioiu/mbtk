@@ -165,8 +165,12 @@ class TestAlgorithmIPCMB(TestBase):
                 VarZ.load_instances()
 
                 result = mbff.math.G_test.G_test_conditionally_independent__unoptimized(significance, VarX, VarY, VarZ)
+
                 result.computed_d_separation = bn.d_separated(X, Z, Y)
                 ci_test_results.append(result)
+
+                import gc; gc.collect()
+
                 return result.independent
 
             return conditionally_independent
