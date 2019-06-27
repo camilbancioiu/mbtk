@@ -10,7 +10,7 @@ from mbff.dataset.DatasetMatrix import DatasetMatrix
 from mbff.math.Variable import Variable, JointVariables, Omega
 from mbff.math.PMF import PMF, CPMF
 from mbff.dataset.sources.SampledBayesianNetworkDatasetSource import SampledBayesianNetworkDatasetSource
-import mbff.math.G_test as G_test
+import mbff.math.G_test__unoptimized as G_test
 
 from mbff_tests.TestBase import TestBase
 
@@ -134,12 +134,12 @@ class TestGStat(TestBase):
 
 
     def assertCondIndependent(self, significance, X, Y, Z):
-        result = G_test.G_test_conditionally_independent__unoptimized(significance, X, Y, Z)
+        result = G_test.G_test_conditionally_independent(significance, X, Y, Z)
         self.assertTrue(result.independent)
 
 
     def assertDependent(self, significance, X, Y, Z):
-        result = G_test.G_test_conditionally_independent__unoptimized(significance, X, Y, Z)
+        result = G_test.G_test_conditionally_independent(significance, X, Y, Z)
         self.assertFalse(result.independent)
 
 

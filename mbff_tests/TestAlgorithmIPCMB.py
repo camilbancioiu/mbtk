@@ -9,7 +9,7 @@ from mbff.math.BayesianNetwork import BayesianNetwork
 from mbff.math.Variable import Variable, JointVariables, Omega
 from mbff.dataset.sources.SampledBayesianNetworkDatasetSource import SampledBayesianNetworkDatasetSource
 from mbff.algorithms.mb.ipcmb import algorithm_IPCMB
-import mbff.math.G_test
+import mbff.math.G_test__unoptimized as G_test
 import mbff.utilities.functions as util
 import mbff.math.infotheory as infotheory
 
@@ -147,45 +147,20 @@ class TestAlgorithmIPCMB(TestBase):
         bn = util.read_bif_file(survey_bif)
         bn.finalize()
 
-        ci_test_results = []
-
-        def ci_test_builder(datasetmatrix, parameters):
-            significance = parameters['ci_test_significance']
-            def conditionally_independent(X, Y, Z):
-                # Load the actual variable instances (samples) from the
-                # datasetmatrix.
-                VarX = datasetmatrix.get_variable('X', X)
-                VarY = datasetmatrix.get_variable('X', Y)
-                if len(Z) == 0:
-                    VarZ = parameters['omega']
-                else:
-                    VarZ = datasetmatrix.get_variables('X', Z)
-                VarX.load_instances()
-                VarY.load_instances()
-                VarZ.load_instances()
-
-                result = mbff.math.G_test.G_test_conditionally_independent__unoptimized(significance, VarX, VarY, VarZ)
-
-                result.computed_d_separation = bn.d_separated(X, Z, Y)
-                ci_test_results.append(result)
-
-                import gc; gc.collect()
-
-                return result.independent
-
-            return conditionally_independent
-
         parameters = dict()
         parameters['target'] = 3
-        parameters['ci_test_builder'] = ci_test_builder
+        parameters['ci_test_builder'] = G_test.ci_test_builder
         parameters['ci_test_significance'] = 0.99
         parameters['debug'] = True
         parameters['omega'] = Omega
+        parameters['source_bayesian_network'] = bn
+        parameters['ci_test_results'] = list()
 
         print()
         print('Starting IPC-MB...')
         mb = algorithm_IPCMB(datasetmatrix, parameters)
 
+        ci_test_results = parameters['ci_test_results']
         print()
         print('==========')
         print('CI test trace:')
