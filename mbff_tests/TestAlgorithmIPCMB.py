@@ -1,16 +1,32 @@
+import unittest
 from pprint import pprint
 from pathlib import Path
 
 from mbff_tests.TestBase import TestBase
 
+from mbff.dataset.DatasetMatrix import DatasetMatrix
 from mbff.math.BayesianNetwork import BayesianNetwork
+from mbff.math.Variable import Variable, JointVariables, Omega
+from mbff.dataset.sources.SampledBayesianNetworkDatasetSource import SampledBayesianNetworkDatasetSource
 from mbff.algorithms.mb.ipcmb import algorithm_IPCMB
+import mbff.math.G_test
 import mbff.utilities.functions as util
+import mbff.math.infotheory as infotheory
 
 
 class TestAlgorithmIPCMB(TestBase):
 
-    def test_finding_Markov_blankets(self):
+    ClassIsSetUp = False
+    DatasetMatrices = None
+    Omega = None
+
+
+    def setUp(self):
+        if not TestAlgorithmIPCMB.ClassIsSetUp:
+            self.prepare_datasetmatrices()
+
+
+    def test_finding_Markov_blankets_in_graphs(self):
         # Simple graph imitating the 'survey' Bayesian network, from
         # http://www.bnlearn.com/bnrepository/discrete-small.html#survey
         graph = {
@@ -123,6 +139,60 @@ class TestAlgorithmIPCMB(TestBase):
         self.assertEqual([1, 9, 18, 19, 22, 33, 36], mb)
 
 
+    def test_finding_Markov_blankets_in_datasetmatrix(self):
+        Omega = TestAlgorithmIPCMB.Omega['survey']
+        datasetmatrix = TestAlgorithmIPCMB.DatasetMatrices['survey']
+
+        survey_bif = Path('testfiles', 'bif_files', 'survey.bif')
+        bn = util.read_bif_file(survey_bif)
+        bn.finalize()
+
+        ci_test_results = []
+
+        def ci_test_builder(datasetmatrix, parameters):
+            significance = parameters['ci_test_significance']
+            def conditionally_independent(X, Y, Z):
+                # Load the actual variable instances (samples) from the
+                # datasetmatrix.
+                VarX = datasetmatrix.get_variable('X', X)
+                VarY = datasetmatrix.get_variable('X', Y)
+                if len(Z) == 0:
+                    VarZ = parameters['omega']
+                else:
+                    VarZ = datasetmatrix.get_variables('X', Z)
+                VarX.load_instances()
+                VarY.load_instances()
+                VarZ.load_instances()
+
+                result = mbff.math.G_test.G_test_conditionally_independent__unoptimized(significance, VarX, VarY, VarZ)
+                result.computed_d_separation = bn.d_separated(X, Z, Y)
+                ci_test_results.append(result)
+                return result.independent
+
+            return conditionally_independent
+
+        parameters = dict()
+        parameters['target'] = 3
+        parameters['ci_test_builder'] = ci_test_builder
+        parameters['ci_test_significance'] = 0.99
+        parameters['debug'] = True
+        parameters['omega'] = Omega
+
+        print()
+        print('Starting IPC-MB...')
+        mb = algorithm_IPCMB(datasetmatrix, parameters)
+
+        print()
+        print('==========')
+        print('CI test trace:')
+        for result in ci_test_results:
+            print(result)
+        print()
+        print('Total: {} CI tests'.format(len(ci_test_results)))
+
+        self.assertEqual([1, 2, 5], mb)
+
+
     def make_parameters(self, target, bn):
         return {
                 'target': target,
@@ -131,4 +201,48 @@ class TestAlgorithmIPCMB(TestBase):
                 'pc_only': False,
                 'debug': False
                 }
+
+
+    def configure_datasetmatrix(self, dm_label):
+        configuration = {}
+        if dm_label == 'lungcancer':
+            configuration['sourcepath'] = Path('testfiles', 'bif_files', 'lungcancer.bif')
+            configuration['sample_count'] = int(5e5)
+            configuration['random_seed'] = 42*42
+            configuration['values_as_indices'] = True
+            configuration['objectives'] = []
+
+        if dm_label == 'survey':
+            configuration['sourcepath'] = Path('testfiles', 'bif_files', 'survey.bif')
+            configuration['sample_count'] = int(1e6)
+            configuration['random_seed'] = 42*42
+            configuration['values_as_indices'] = True
+            configuration['objectives'] = []
+        return configuration
+
+
+    def prepare_datasetmatrices(self):
+        TestAlgorithmIPCMB.DatasetMatrices = {}
+        TestAlgorithmIPCMB.Omega = {}
+
+        dataset_folder = Path('testfiles', 'tmp', 'test_ipcmb_dm')
+        for dm_label in ['survey', 'lungcancer']:
+            configuration = self.configure_datasetmatrix(dm_label)
+            try:
+                datasetmatrix = DatasetMatrix(dm_label)
+                datasetmatrix.load(dataset_folder)
+                TestAlgorithmIPCMB.DatasetMatrices[dm_label] = datasetmatrix
+            except:
+                print('Cannot load DatasetMatrix {} from {}, must rebuild.'.format(dm_label, dataset_folder))
+                bayesian_network = util.read_bif_file(configuration['sourcepath'])
+                bayesian_network.finalize()
+                sbnds = SampledBayesianNetworkDatasetSource(configuration)
+                sbnds.reset_random_seed = True
+                datasetmatrix = sbnds.create_dataset_matrix(dm_label)
+                datasetmatrix.finalize()
+                datasetmatrix.save(dataset_folder)
+                TestAlgorithmIPCMB.DatasetMatrices[dm_label] = datasetmatrix
+                print('Dataset rebuilt.')
+            TestAlgorithmIPCMB.Omega[dm_label] = Omega(configuration['sample_count'])
+        TestAlgorithmIPCMB.ClassIsSetUp = True
 
