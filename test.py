@@ -38,6 +38,7 @@ if __name__ == '__main__':
     from mbff_tests.TestVariableAndPMF import TestVariableAndPMF
     from mbff_tests.TestGStat import TestGStat
     from mbff_tests.TestADTree import TestADTree
+    from mbff_tests.TestAlgorithmIPCMB import TestAlgorithmIPCMB
 
     import unittest
     unittest.main(verbosity=2)
