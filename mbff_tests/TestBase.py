@@ -13,6 +13,10 @@ class TestBase(unittest.TestCase):
         return tag in TestBase.TestsTagsToExclude
 
 
+    def tearDown(self):
+        import gc; gc.collect()
+
+
     def ensure_tmp_subfolder(self, subfolder):
         path = Path(TestBase.TestFilesRootFolder + '/' + subfolder)
         path.mkdir(parents=True, exist_ok=True)
