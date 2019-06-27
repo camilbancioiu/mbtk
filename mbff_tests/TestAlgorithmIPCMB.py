@@ -140,11 +140,11 @@ class TestAlgorithmIPCMB(TestBase):
 
 
     def test_finding_Markov_blankets_in_datasetmatrix(self):
-        Omega = TestAlgorithmIPCMB.Omega['survey']
-        datasetmatrix = TestAlgorithmIPCMB.DatasetMatrices['survey']
+        Omega = TestAlgorithmIPCMB.Omega['lungcancer']
+        datasetmatrix = TestAlgorithmIPCMB.DatasetMatrices['lungcancer']
 
-        survey_bif = Path('testfiles', 'bif_files', 'survey.bif')
-        bn = util.read_bif_file(survey_bif)
+        lungcancer_bif = Path('testfiles', 'bif_files', 'lungcancer.bif')
+        bn = util.read_bif_file(lungcancer_bif)
         bn.finalize()
 
         parameters = dict()
