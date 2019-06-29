@@ -6,6 +6,7 @@ from mbff_tests.TestBase import TestBase
 
 from mbff.dataset.DatasetMatrix import DatasetMatrix
 from mbff.math.BayesianNetwork import BayesianNetwork
+from mbff.math.DSeparationCITest import DSeparationCITest
 from mbff.math.Variable import Variable, JointVariables, Omega
 from mbff.dataset.sources.SampledBayesianNetworkDatasetSource import SampledBayesianNetworkDatasetSource
 from mbff.algorithms.mb.ipcmb import algorithm_IPCMB
@@ -138,6 +139,17 @@ class TestAlgorithmIPCMB(TestBase):
         self.assertEqual([1, 9, 18, 19, 22, 33, 36], mb)
 
 
+    def make_parameters(self, target, bn):
+        return {
+                'target': target,
+                'all_variables': sorted(list(bn.graph_d.keys())),
+                'ci_test_class': DSeparationCITest,
+                'source_bayesian_network': bn,
+                'pc_only': False,
+                'debug': False
+                }
+
+
     @unittest.skipIf(TestBase.tag_excluded('ipcmb_run_with_dataset'), 'Tests running IPC-MB on datasets are excluded')
     def test_finding_Markov_blankets_in_datasetmatrix(self):
         Omega = TestAlgorithmIPCMB.Omega['lungcancer']
@@ -170,16 +182,6 @@ class TestAlgorithmIPCMB(TestBase):
         # FIXME figure out what's the correct MB of the node 3 in the Bayesian
         # network 'lungcancer'
         self.assertEqual('FIXME', mb)
-
-
-    def make_parameters(self, target, bn):
-        return {
-                'target': target,
-                'all_variables': sorted(list(bn.graph_d.keys())),
-                'ci_test_builder': lambda dm, param: bn.conditionally_independent,
-                'pc_only': False,
-                'debug': False
-                }
 
 
     def configure_datasetmatrix(self, dm_label):
