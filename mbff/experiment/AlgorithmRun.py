@@ -10,6 +10,7 @@ class AlgorithmRun:
         self.ID = ''
         self.algorithm = self.configuration['algorithm']
         self.algorithm_name = '.'.join([self.algorithm.__module__, self.algorithm.__name__])
+        self.algorithm_instance = None
         self.exds = exds
 
         self.start_time = 0
@@ -27,14 +28,17 @@ class AlgorithmRun:
 
     def run(self):
         self.start_time = time.time()
-
-        if not self.exds is None:
-            self.selected_features = self.algorithm(self.exds.matrix, self.parameters)
-        else:
-            self.selected_features = self.algorithm(None, self.parameters)
-
+        self.select_features()
         self.end_time = time.time()
         self.duration = (self.end_time - self.start_time) * 1000.0
+
+
+    def select_features(self):
+        if not self.exds is None:
+            self.algorithm_instance = self.algorithm(self.exds.matrix, self.parameters)
+        else:
+            self.algorithm_instance = self.algorithm(None, self.parameters)
+        self.selected_features = self.algorithm_instance.select_features()
 
 
     def __str__(self):
