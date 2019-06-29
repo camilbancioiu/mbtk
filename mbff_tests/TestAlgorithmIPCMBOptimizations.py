@@ -8,8 +8,8 @@ from mbff.dataset.DatasetMatrix import DatasetMatrix
 from mbff.math.BayesianNetwork import BayesianNetwork
 from mbff.math.Variable import Variable, JointVariables, Omega
 from mbff.dataset.sources.SampledBayesianNetworkDatasetSource import SampledBayesianNetworkDatasetSource
-from mbff.algorithms.mb.ipcmb import algorithm_IPCMB
-import mbff.math.G_test__unoptimized as G_test
+from mbff.algorithms.mb.ipcmb import AlgorithmIPCMB
+import mbff.math.G_test__unoptimized
 import mbff.utilities.functions as util
 
 
@@ -42,19 +42,18 @@ class TestAlgorithmIPCMBOptimizations(TestBase):
 
         parameters = dict()
         parameters['target'] = 3
-        parameters['ci_test_builder'] = G_test.ci_test_builder
+        parameters['ci_test_class'] = mbff.math.G_test__unoptimized.G_test
         parameters['ci_test_significance'] = 0.95
         parameters['debug'] = True
         parameters['omega'] = Omega
         parameters['source_bayesian_network'] = bn
-        parameters['ci_test_results'] = list()
 
-        algorithm_IPCMB(datasetmatrix, parameters)
-        computed_citrs = parameters['ci_test_results']
+        ipcmb = AlgorithmIPCMB(datasetmatrix, parameters)
+        ipcmb.select_features()
+        computed_citrs = ipcmb.CITest.ci_test_results
 
         self.assertEqual(reference_citrs, computed_citrs)
         print('All ok')
-
 
 
     def prepare_reference_ci_test_results(self):
@@ -83,16 +82,16 @@ class TestAlgorithmIPCMBOptimizations(TestBase):
 
         parameters = dict()
         parameters['target'] = 3
-        parameters['ci_test_builder'] = G_test.ci_test_builder
+        parameters['ci_test_class'] = mbff.math.G_test__unoptimized.G_test
         parameters['ci_test_significance'] = 0.95
         parameters['debug'] = True
         parameters['omega'] = Omega
         parameters['source_bayesian_network'] = bn
         parameters['ci_test_results'] = list()
 
-        algorithm_IPCMB(datasetmatrix, parameters)
-
-        return parameters['ci_test_results']
+        ipcmb = AlgorithmIPCMB(datasetmatrix, parameters)
+        ipcmb.select_features()
+        return ipcmb.CITest.ci_test_results
 
 
     def print_ci_test_results(self, ci_test_results):
