@@ -9,7 +9,7 @@ from mbff.math.BayesianNetwork import BayesianNetwork
 from mbff.math.DSeparationCITest import DSeparationCITest
 from mbff.math.Variable import Variable, JointVariables, Omega
 from mbff.dataset.sources.SampledBayesianNetworkDatasetSource import SampledBayesianNetworkDatasetSource
-from mbff.algorithms.mb.ipcmb import algorithm_IPCMB
+from mbff.algorithms.mb.ipcmb import AlgorithmIPCMB
 import mbff.math.G_test__unoptimized
 import mbff.utilities.functions as util
 
@@ -41,11 +41,11 @@ class TestAlgorithmIPCMB(TestBase):
         bn.from_directed_graph(graph)
 
         parameters = self.make_parameters(3, bn)
-        mb = algorithm_IPCMB(None, parameters)
+        mb = AlgorithmIPCMB(None, parameters).select_features()
         self.assertEqual([1, 2, 5], mb)
 
         parameters = self.make_parameters(1, bn)
-        mb = algorithm_IPCMB(None, parameters)
+        mb = AlgorithmIPCMB(None, parameters).select_features()
         self.assertEqual([0, 2, 3, 4], mb)
 
         # Remove the edge 1 → 2 from the Bayesian network.
@@ -54,11 +54,11 @@ class TestAlgorithmIPCMB(TestBase):
         bn.from_directed_graph(graph)
 
         parameters = self.make_parameters(3, bn)
-        mb = algorithm_IPCMB(None, parameters)
+        mb = AlgorithmIPCMB(None, parameters).select_features()
         self.assertEqual([1, 2, 5], mb)
 
         parameters = self.make_parameters(1, bn)
-        mb = algorithm_IPCMB(None, parameters)
+        mb = AlgorithmIPCMB(None, parameters).select_features()
         self.assertEqual([0, 3, 4], mb)
 
         # Replace the edge from 1 → 3 with 1 → 2.
@@ -67,11 +67,11 @@ class TestAlgorithmIPCMB(TestBase):
         bn.from_directed_graph(graph)
 
         parameters = self.make_parameters(3, bn)
-        mb = algorithm_IPCMB(None, parameters)
+        mb = AlgorithmIPCMB(None, parameters).select_features()
         self.assertEqual([2, 5], mb)
 
         parameters = self.make_parameters(1, bn)
-        mb = algorithm_IPCMB(None, parameters)
+        mb = AlgorithmIPCMB(None, parameters).select_features()
         self.assertEqual([0, 2, 4], mb)
 
         # Test IPC-MB with the graphs proposed in the PCMB article, used to
@@ -88,23 +88,23 @@ class TestAlgorithmIPCMB(TestBase):
 
         parameters = self.make_parameters(4, bn)
         parameters['pc_only'] = True
-        pc = algorithm_IPCMB(None, parameters)
+        pc = AlgorithmIPCMB(None, parameters).select_features()
         self.assertEqual([1], pc)
 
         parameters = self.make_parameters(4, bn)
-        mb = algorithm_IPCMB(None, parameters)
+        mb = AlgorithmIPCMB(None, parameters).select_features()
         self.assertEqual([0, 1], mb)
 
         parameters = self.make_parameters(0, bn)
-        mb = algorithm_IPCMB(None, parameters)
+        mb = AlgorithmIPCMB(None, parameters).select_features()
         self.assertEqual([1, 2, 4], mb)
 
         parameters = self.make_parameters(2, bn)
-        mb = algorithm_IPCMB(None, parameters)
+        mb = AlgorithmIPCMB(None, parameters).select_features()
         self.assertEqual([0, 1, 3], mb)
 
         parameters = self.make_parameters(1, bn)
-        mb = algorithm_IPCMB(None, parameters)
+        mb = AlgorithmIPCMB(None, parameters).select_features()
         self.assertEqual([0, 2, 3, 4], mb)
 
         # Test IPC-MB with the ALARM network.
@@ -112,31 +112,31 @@ class TestAlgorithmIPCMB(TestBase):
         bn.finalize()
 
         parameters = self.make_parameters(22, bn)
-        mb = algorithm_IPCMB(None, parameters)
+        mb = AlgorithmIPCMB(None, parameters).select_features()
         self.assertEqual([18, 34], mb)
 
         parameters = self.make_parameters(1, bn)
-        mb = algorithm_IPCMB(None, parameters)
+        mb = AlgorithmIPCMB(None, parameters).select_features()
         self.assertEqual([3, 9, 17, 29, 32, 33, 34], mb)
 
         parameters = self.make_parameters(17, bn)
-        mb = algorithm_IPCMB(None, parameters)
+        mb = AlgorithmIPCMB(None, parameters).select_features()
         self.assertEqual([1, 3, 29, 32], mb)
 
         parameters = self.make_parameters(24, bn)
-        mb = algorithm_IPCMB(None, parameters)
+        mb = AlgorithmIPCMB(None, parameters).select_features()
         self.assertEqual([27], mb)
 
         parameters = self.make_parameters(20, bn)
-        mb = algorithm_IPCMB(None, parameters)
+        mb = AlgorithmIPCMB(None, parameters).select_features()
         self.assertEqual([5, 16, 21, 25], mb)
 
         parameters = self.make_parameters(16, bn)
-        mb = algorithm_IPCMB(None, parameters)
+        mb = AlgorithmIPCMB(None, parameters).select_features()
         self.assertEqual([20, 21, 31], mb)
 
         parameters = self.make_parameters(34, bn)
-        mb = algorithm_IPCMB(None, parameters)
+        mb = AlgorithmIPCMB(None, parameters).select_features()
         self.assertEqual([1, 9, 18, 19, 22, 33, 36], mb)
 
 
@@ -168,9 +168,11 @@ class TestAlgorithmIPCMB(TestBase):
         parameters['omega'] = Omega
         parameters['source_bayesian_network'] = bn
 
-        mb = algorithm_IPCMB(datasetmatrix, parameters)
+        ipcmb = AlgorithmIPCMB(datasetmatrix, parameters)
 
-        ci_test_results = parameters['ci_test_results']
+        mb = ipcmb.select_features()
+
+        ci_test_results = ipcmb.CITest.ci_test_results
         print()
         print('==========')
         print('CI test trace:')
