@@ -489,6 +489,3 @@ class ProbabilityDistributionOfVariableNode:
             return "ProbabilityMassDistribution for variable {}, unconditioned".format(self.variable_name)
         else:
             return "ProbabilityMassDistribution for variable {}, conditioned on {}".format(self.variable_name, self.conditioning_variable_names)
-
-
-

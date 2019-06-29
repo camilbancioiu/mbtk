@@ -8,7 +8,7 @@ from mbff.math.Exceptions import VariableInstancesOfUnequalCount
 
 class Variable:
 
-    def __init__(self, instances, name=''):
+    def __init__(self, instances, name='unnamed'):
         self.ID = -1
         self.name = name
         self.instances = instances
@@ -28,6 +28,13 @@ class Variable:
             self.values = sorted(list(Counter(self.instances).keys()))
 
 
+    def simple_representation(self):
+        if self.ID == -1:
+            return self.name
+        else:
+            return self.ID
+
+
 
 class Omega(Variable):
 
@@ -37,6 +44,10 @@ class Omega(Variable):
         self.name = 'Ω'
         self.instances = UniformInstances(1, instance_count)
         self.values = [1]
+
+
+    def simple_representation(self):
+        return self.name
 
 
 
@@ -77,6 +88,10 @@ class JointVariables(Variable):
         else:
             self.instances = None
             self.values = None
+
+
+    def simple_representation(self):
+        return '(' + ', '.join([str(var.simple_representation()) for var in self.variables]) + ')'
 
 
     def lazy_joint_instances_loader(self):

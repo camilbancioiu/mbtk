@@ -1,3 +1,5 @@
+import mbff.math.Variable
+
 class CITestResult:
 
     def __init__(self):
@@ -34,7 +36,6 @@ class CITestResult:
             )
 
 
-
     def set_independent(self, independent, significance):
         self.independent = independent
         self.dependent = not independent
@@ -48,29 +49,32 @@ class CITestResult:
 
 
     def set_variables(self, X, Y, Z):
-        try:
-            self.X = X.ID
-            if self.X is None or self.X == -1:
-                self.X = X.name
-        except:
-            self.X = X
+        self.X = self.get_variable_representation(X)
+        self.Y = self.get_variable_representation(Y)
+        self.Z = self.get_variable_representation(Z)
+
+
+    def get_variable_representation(self, variable):
+        if variable is None:
+            return '∅'
+
+        if type(variable) == int:
+            if variable == -1:
+                return 'unnamed'
+
+            if variable == -1024:
+                return 'Ω'
+
+            return variable
+
+        if isinstance(variable, set) or isinstance(variable, list):
+            if len(variable) == 0:
+                return '∅'
 
         try:
-            self.Y = Y.ID
-            if self.Y is None or self.Y == -1:
-                self.Y = Y.name
-        except:
-            self.Y = Y
-
-        if Z is None:
-            self.Z = '∅'
-        else:
-            try:
-                self.Z = Z.ID
-                if self.Z is None or self.Z == -1:
-                    self.Z = Z.name
-            except:
-                self.Z = Z
+            return variable.simple_representation()
+        except AttributeError:
+            return str(variable)
 
 
     def set_statistic(self, name, value, params):
@@ -106,7 +110,7 @@ class CITestResult:
             " with {statistic}={statistic_value:<8.2f}"
             " at p={p_value:<9.6f} on the {test_distribution} distribution"
             )
-        
+
         return format_string.format(**self.__dict__)
 
 
