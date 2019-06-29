@@ -157,8 +157,6 @@ class TestAlgorithmIPCMB(TestBase):
         parameters['source_bayesian_network'] = bn
         parameters['ci_test_results'] = list()
 
-        print()
-        print('Starting IPC-MB...')
         mb = algorithm_IPCMB(datasetmatrix, parameters)
 
         ci_test_results = parameters['ci_test_results']
@@ -213,7 +211,6 @@ class TestAlgorithmIPCMB(TestBase):
                 datasetmatrix.load(dataset_folder)
                 TestAlgorithmIPCMB.DatasetMatrices[dm_label] = datasetmatrix
             except:
-                print('Cannot load DatasetMatrix {} from {}, must rebuild.'.format(dm_label, dataset_folder))
                 bayesian_network = util.read_bif_file(configuration['sourcepath'])
                 bayesian_network.finalize()
                 sbnds = SampledBayesianNetworkDatasetSource(configuration)
@@ -222,7 +219,6 @@ class TestAlgorithmIPCMB(TestBase):
                 datasetmatrix.finalize()
                 datasetmatrix.save(dataset_folder)
                 TestAlgorithmIPCMB.DatasetMatrices[dm_label] = datasetmatrix
-                print('Dataset rebuilt.')
             TestAlgorithmIPCMB.Omega[dm_label] = Omega(configuration['sample_count'])
         TestAlgorithmIPCMB.ClassIsSetUp = True
 
