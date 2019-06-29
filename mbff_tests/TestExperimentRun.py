@@ -14,7 +14,7 @@ from mbff.experiment.ExperimentRun import ExperimentRun
 from mbff.experiment.AlgorithmRun import AlgorithmAndClassifierRun
 from mbff.experiment.AlgorithmRunDatapoint import AlgorithmAndClassifierRunDatapoint
 from mbff.experiment.Exceptions import ExperimentFolderLockedException
-from mbff.algorithms.basic.IGt import algorithm_IGt as IGt
+from mbff.algorithms.basic.IGt import AlgorithmIGt
 
 
 class TestExperimentRun(TestBase):
@@ -48,10 +48,10 @@ class TestExperimentRun(TestBase):
         log_folder = experiments_folder + '/test_experiment_run/algorithm_run_logs'
         self.assertTrue(Path(log_folder).exists())
         expected_log_files = [
-                '0__test_IGt_BernoulliNB__Q2_Obj0.log',
-                '1__test_IGt_BernoulliNB__Q4_Obj0.log',
-                '2__test_IGt_BernoulliNB__Q6_Obj0.log',
-                '3__test_IGt_BernoulliNB__Q8_Obj0.log'
+                '0__test_AlgorithmIGt_BernoulliNB__Q2_Obj0.log',
+                '1__test_AlgorithmIGt_BernoulliNB__Q4_Obj0.log',
+                '2__test_AlgorithmIGt_BernoulliNB__Q6_Obj0.log',
+                '3__test_AlgorithmIGt_BernoulliNB__Q8_Obj0.log'
                 ]
         created_log_files = sorted([f for f in os.listdir(log_folder) if os.path.isfile(log_folder + '/' + f)])
         self.assertListEqual(expected_log_files, created_log_files)
@@ -60,10 +60,10 @@ class TestExperimentRun(TestBase):
         datapoints_folder = experiments_folder + '/test_experiment_run/algorithm_run_datapoints'
         self.assertTrue(Path(datapoints_folder).exists())
         expected_datapoints_files = [
-                '0__test_IGt_BernoulliNB__Q2_Obj0.pickle',
-                '1__test_IGt_BernoulliNB__Q4_Obj0.pickle',
-                '2__test_IGt_BernoulliNB__Q6_Obj0.pickle',
-                '3__test_IGt_BernoulliNB__Q8_Obj0.pickle'
+                '0__test_AlgorithmIGt_BernoulliNB__Q2_Obj0.pickle',
+                '1__test_AlgorithmIGt_BernoulliNB__Q4_Obj0.pickle',
+                '2__test_AlgorithmIGt_BernoulliNB__Q6_Obj0.pickle',
+                '3__test_AlgorithmIGt_BernoulliNB__Q8_Obj0.pickle'
                 ]
         created_datapoints_files = sorted([f for f in os.listdir(datapoints_folder) if os.path.isfile(datapoints_folder + '/' + f)])
         self.assertListEqual(expected_datapoints_files, created_datapoints_files)
@@ -282,8 +282,8 @@ class TestExperimentRun(TestBase):
         definition.exds_definition = self.default_exds_definition(exds_folder, "test_exds_experimentrun")
         definition.algorithm_run_configuration = {
                 'classifier': BernoulliNB,
-                'algorithm': IGt,
-                'label': Template('${algorithm_run_index}__test_IGt_BernoulliNB__Q${Q}_Obj${objective_index}')
+                'algorithm': AlgorithmIGt,
+                'label': Template('${algorithm_run_index}__test_AlgorithmIGt_BernoulliNB__Q${Q}_Obj${objective_index}')
                 }
         definition.algorithm_run_parameters = algorithm_run_parameters
 
