@@ -16,6 +16,25 @@ class CITestResult:
         self.computed_d_separation = None
 
 
+    def __eq__(self, other):
+        return  (
+                self.independent == other.independent
+            and self.dependent == other.dependent
+            and self.X == other.X
+            and self.Y == other.Y
+            and self.Z == other.Z
+            and self.statistic == self.statistic
+            and self.statistic_value == self.statistic_value
+            and self.statistic_parameters == self.statistic_parameters
+            and self.test_distribution == self.test_distribution
+            and self.test_distribution_parameters == self.test_distribution_parameters
+            and self.p_value == self.p_value
+            and self.significance == self.significance
+            and self.computed_d_separation == self.computed_d_separation
+            )
+
+
+
     def set_independent(self, independent, significance):
         self.independent = independent
         self.dependent = not independent
