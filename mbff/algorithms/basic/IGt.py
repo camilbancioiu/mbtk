@@ -19,7 +19,7 @@ class AlgorithmIGt:
 
 
     def IGt(self):
-        objective = datasetmatrix.get_variable('Y', objective_index)
+        objective = self.datasetmatrix.get_variable('Y', self.objective_index)
         objective.load_instances()
 
         (sample_count, feature_count) = self.datasetmatrix.X.get_shape()
@@ -35,7 +35,7 @@ class AlgorithmIGt:
             IG_per_feature.append((feature_index, feature_IG))
 
         sorted_IG_per_feature = sorted(IG_per_feature, key=operator.itemgetter(1), reverse=True)
-        selected_features = [pair[0] for pair in sorted_IG_per_feature[0:Q]]
+        selected_features = [pair[0] for pair in sorted_IG_per_feature[0:self.Q]]
         return selected_features
 
 
