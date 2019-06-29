@@ -120,10 +120,10 @@ class CITestResult:
         self.duration_in_seconds = self.duration / 1000
 
         format_string = (
-            "CI test {X:>12} ⊥ {Y:<12} | {Z:<16}: {i_or_d}"
+            "CI test {X:>4} ⊥ {Y:<4} | {Z:<20}: {i_or_d}"
             " @ {significance:6.4f}"
-            " with {statistic}={statistic_value:<8.2f}"
-            " at p={p_value:<9.6f} on {test_distribution}"
+            " with {statistic}={statistic_value:>8.2f}"
+            " at p={p_value:<8.6f} on {test_distribution}"
             ", Δt={duration_in_seconds:>10.4f}s"
             )
 
