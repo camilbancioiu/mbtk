@@ -22,14 +22,14 @@ class TestAlgorithmIPCMBOptimizations(TestBase):
 
 
     def setUp(self):
-        self.DatasetMatricesInUse = ['lungcancer']
+        self.DatasetMatricesInUse = ['survey']
         if not TestAlgorithmIPCMBOptimizations.ClassIsSetUp:
             self.prepare_datasetmatrices()
             self.prepare_reference_ci_test_results()
 
     
     def test_IPCMB_w_AD_tree(self):
-        dm_label = 'lungcancer'
+        dm_label = 'survey'
 
         reference_citrs = self.ReferenceCITestResults[dm_label]
 
