@@ -22,6 +22,8 @@ class TestGStat(TestBase):
     ClassIsSetUp = False
     DatasetMatrix = None
     Omega = None
+    # TODO add lungcancer too
+    DatasetMatricesInUse = ['survey']
 
 
     def setUp(self):
@@ -166,7 +168,7 @@ class TestGStat(TestBase):
         TestGStat.Omega = {}
 
         dataset_folder = Path('testfiles', 'tmp', 'test_gstat_dm')
-        for dm_label in ['survey', 'lungcancer']:
+        for dm_label in self.DatasetMatricesInUse:
             configuration = self.configure_datasetmatrix(dm_label)
             try:
                 datasetmatrix = DatasetMatrix(dm_label)
