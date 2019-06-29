@@ -65,7 +65,7 @@ class CITestResult:
 
     def end_timing(self):
         self.end_time = time.time()
-        self.duration = (self.end_time - self.start_time) * 1000.0
+        self.duration = (self.end_time - self.start_time)
 
 
     def get_variable_representation(self, variable):
@@ -117,13 +117,14 @@ class CITestResult:
             else:
                 d_sep_verification = '✘'
         self.i_or_d += d_sep_verification
+        self.duration_in_seconds = self.duration / 1000
 
         format_string = (
             "CI test {X:>12} ⊥ {Y:<12} | {Z:<16}: {i_or_d}"
             " @ {significance:6.4f}"
             " with {statistic}={statistic_value:<8.2f}"
             " at p={p_value:<9.6f} on {test_distribution}"
-            ", Δt={duration}"
+            ", Δt={duration_in_seconds:>10.4f}s"
             )
 
         return format_string.format(**self.__dict__)
