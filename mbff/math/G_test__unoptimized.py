@@ -10,79 +10,77 @@ import mbff.math.infotheory as infotheory
 from scipy.stats import chi2
 
 
-def ci_test_builder(datasetmatrix, parameters):
-    significance = parameters['ci_test_significance']
-    omega = parameters['omega']
-    ci_test_results = parameters.get('ci_test_results', list())
-    source_bn = parameters.get('source_bayesian_network', None)
+class G_test:
 
-    def conditionally_independent(X, Y, Z):
+    def __init__(self, datasetmatrix, parameters):
+        self.datasetmatrix = datasetmatrix
+        self.significance = parameters.get('ci_test_significance', 0)
+        self.omega = parameters.get('omega', None)
+        self.source_bn = parameters.get('source_bayesian_network', None)
+        self.ci_test_results = []
+
+
+    def conditionally_independent(self, X, Y, Z):
         # Load the actual variable instances (samples) from the
         # datasetmatrix.
-        (VarX, VarY, VarZ) = load_variables(X, Y, Z, datasetmatrix, omega)
-        result = G_test_conditionally_independent(significance, VarX, VarY, VarZ)
+        (VarX, VarY, VarZ) = self.load_variables(X, Y, Z)
+        result = self.G_test_conditionally_independent(VarX, VarY, VarZ)
 
-        if not source_bn is None:
-            result.computed_d_separation = source_bn.d_separated(X, Z, Y)
+        if not self.source_bn is None:
+            result.computed_d_separation = self.source_bn.d_separated(X, Z, Y)
 
-        ci_test_results.append(result)
+        self.ci_test_results.append(result)
 
         # Garbage collection required to deallocate variable instances.
         import gc; gc.collect()
 
         return result.independent
 
-    return conditionally_independent
+
+    def G_test_conditionally_independent(self, VarX, VarY, VarZ):
+        G = self.G_value(VarX, VarY, VarZ)
+        DF = self.calculate_degrees_of_freedom(VarX, VarY)
+
+        p = chi2.cdf(G, DF)
+        independent = None
+        if p < self.significance:
+            independent = True
+        else:
+            independent = False
+
+        result = CITestResult()
+        result.set_independent(independent, self.significance)
+        result.set_variables(VarX, VarY, VarZ)
+        result.set_statistic('G', G, dict())
+        result.set_distribution('chi2', p, {'DoF': DF})
+
+        return result
 
 
+    def G_value(self, VarX, VarY, VarZ):
+        validate_variable_instances_lengths([VarX, VarY, VarZ])
 
-def G_test_conditionally_independent(significance, VarX, VarY, VarZ):
-    G = G_value(VarX, VarY, VarZ)
-    DF = calculate_degrees_of_freedom(VarX, VarY)
+        N = len(VarX.instances)
 
-    p = chi2.cdf(G, DF)
-    independent = None
-    if p < significance:
-        independent = True
-    else:
-        independent = False
-
-    result = CITestResult()
-    result.set_independent(independent, significance)
-    result.set_variables(VarX, VarY, VarZ)
-    result.set_statistic('G', G, dict())
-    result.set_distribution('chi2', p, {'DoF': DF})
-
-    return result
+        (PrXYcZ, PrXcZ, PrYcZ, PrZ) = infotheory.calculate_pmf_for_cmi(VarX, VarY, VarZ)
+        cMI = infotheory.conditional_mutual_information(PrXYcZ, PrXcZ, PrYcZ, PrZ, base='e')
+        return 2 * N * cMI
 
 
+    def load_variables(self, X, Y, Z):
+        VarX = self.datasetmatrix.get_variable('X', X)
+        VarY = self.datasetmatrix.get_variable('X', Y)
+        if len(Z) == 0:
+            VarZ = self.omega
+        else:
+            VarZ = self.datasetmatrix.get_variables('X', Z)
 
-def G_value(VarX, VarY, VarZ):
-    validate_variable_instances_lengths([VarX, VarY, VarZ])
+        VarX.load_instances()
+        VarY.load_instances()
+        VarZ.load_instances()
 
-    N = len(VarX.instances)
-
-    (PrXYcZ, PrXcZ, PrYcZ, PrZ) = infotheory.calculate_pmf_for_cmi(VarX, VarY, VarZ)
-    cMI = infotheory.conditional_mutual_information(PrXYcZ, PrXcZ, PrYcZ, PrZ, base='e')
-    return 2 * N * cMI
-
-
-
-def calculate_degrees_of_freedom(VarX, VarY):
-    return (len(VarX.values) - 1) * (len(VarY.values) - 1)
-
+        return (VarX, VarY, VarZ)
 
 
-def load_variables(X, Y, Z, datasetmatrix, omega):
-    VarX = datasetmatrix.get_variable('X', X)
-    VarY = datasetmatrix.get_variable('X', Y)
-    if len(Z) == 0:
-        VarZ = omega
-    else:
-        VarZ = datasetmatrix.get_variables('X', Z)
-
-    VarX.load_instances()
-    VarY.load_instances()
-    VarZ.load_instances()
-
-    return (VarX, VarY, VarZ)
+    def calculate_degrees_of_freedom(self, VarX, VarY):
+        return (len(VarX.values) - 1) * (len(VarY.values) - 1)

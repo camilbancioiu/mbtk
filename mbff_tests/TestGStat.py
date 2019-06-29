@@ -10,7 +10,8 @@ from mbff.dataset.DatasetMatrix import DatasetMatrix
 from mbff.math.Variable import Variable, JointVariables, Omega
 from mbff.math.PMF import PMF, CPMF
 from mbff.dataset.sources.SampledBayesianNetworkDatasetSource import SampledBayesianNetworkDatasetSource
-import mbff.math.G_test__unoptimized as G_test
+import mbff.math.G_test__unoptimized
+
 
 from mbff_tests.TestBase import TestBase
 
@@ -29,11 +30,13 @@ class TestGStat(TestBase):
     def setUp(self):
         if not TestGStat.ClassIsSetUp:
             self.prepare_datasetmatrices()
+        self.G_test = None
 
 
     def test_G_value__lungcancer(self):
         Omega = TestGStat.Omega['lungcancer']
         lungcancer = TestGStat.DatasetMatrix['lungcancer']
+
 
         ASIA    = Variable(lungcancer.get_column_by_label('X', 'ASIA'), 'ASIA')
         TUB     = Variable(lungcancer.get_column_by_label('X', 'TUB'), 'TUB')
@@ -44,34 +47,38 @@ class TestGStat(TestBase):
         DYSP    = Variable(lungcancer.get_column_by_label('Y', 'DYSP'), 'DYSP')
         XRAY    = Variable(lungcancer.get_column_by_label('Y', 'XRAY'), 'XRAY')
 
-        significance = 0.99
+        parameters = dict()
+        parameters['significance'] = 0.99
+        parameters['omega'] = Omega
 
-        self.assertCondIndependent(significance, ASIA, SMOKE, Omega)
-        self.assertCondIndependent(significance, ASIA, LUNG, Omega)
-        self.assertCondIndependent(significance, ASIA, BRONC, Omega)
+        self.G_test = mbff.math.G_test__unoptimized.G_test(lungcancer, parameters)
 
-        self.assertDependent(significance, ASIA, TUB, Omega)
-        self.assertDependent(significance, ASIA, EITHER, Omega)
-        self.assertDependent(significance, ASIA, XRAY, Omega)
-        self.assertDependent(significance, ASIA, DYSP, Omega)
+        self.assertCondIndependent(ASIA, SMOKE, Omega)
+        self.assertCondIndependent(ASIA, LUNG, Omega)
+        self.assertCondIndependent(ASIA, BRONC, Omega)
 
-        self.assertCondIndependent(significance, EITHER, ASIA, JointVariables(TUB, LUNG))
-        self.assertCondIndependent(significance, EITHER, SMOKE, JointVariables(TUB, LUNG))
-        self.assertCondIndependent(significance, DYSP, SMOKE, JointVariables(EITHER, BRONC))
-        self.assertCondIndependent(significance, DYSP, LUNG, JointVariables(EITHER, BRONC))
-        self.assertCondIndependent(significance, DYSP, TUB, JointVariables(EITHER, BRONC))
+        self.assertDependent(ASIA, TUB, Omega)
+        self.assertDependent(ASIA, EITHER, Omega)
+        self.assertDependent(ASIA, XRAY, Omega)
+        self.assertDependent(ASIA, DYSP, Omega)
 
-        self.assertCondIndependent(significance, XRAY, TUB, EITHER)
-        self.assertCondIndependent(significance, XRAY, LUNG, EITHER)
-        self.assertCondIndependent(significance, XRAY, ASIA, EITHER)
-        self.assertCondIndependent(significance, XRAY, SMOKE, EITHER)
-        self.assertCondIndependent(significance, XRAY, DYSP, EITHER)
-        self.assertCondIndependent(significance, XRAY, BRONC, EITHER)
+        self.assertCondIndependent(EITHER, ASIA, JointVariables(TUB, LUNG))
+        self.assertCondIndependent(EITHER, SMOKE, JointVariables(TUB, LUNG))
+        self.assertCondIndependent(DYSP, SMOKE, JointVariables(EITHER, BRONC))
+        self.assertCondIndependent(DYSP, LUNG, JointVariables(EITHER, BRONC))
+        self.assertCondIndependent(DYSP, TUB, JointVariables(EITHER, BRONC))
 
-        self.assertDependent(significance, XRAY, EITHER, Omega)
-        self.assertDependent(significance, XRAY, LUNG, Omega)
-        self.assertDependent(significance, XRAY, SMOKE, Omega)
-        self.assertDependent(significance, XRAY, TUB, Omega)
+        self.assertCondIndependent(XRAY, TUB, EITHER)
+        self.assertCondIndependent(XRAY, LUNG, EITHER)
+        self.assertCondIndependent(XRAY, ASIA, EITHER)
+        self.assertCondIndependent(XRAY, SMOKE, EITHER)
+        self.assertCondIndependent(XRAY, DYSP, EITHER)
+        self.assertCondIndependent(XRAY, BRONC, EITHER)
+
+        self.assertDependent(XRAY, EITHER, Omega)
+        self.assertDependent(XRAY, LUNG, Omega)
+        self.assertDependent(XRAY, SMOKE, Omega)
+        self.assertDependent(XRAY, TUB, Omega)
 
 
     def test_G_value__survey(self):
@@ -96,52 +103,59 @@ class TestGStat(TestBase):
         # VariableID: 5
         TRN = Variable(survey.get_column_by_label('Y', 'TRN'), 'TRN')
 
-        significance = 0.99
+        parameters = dict()
+        parameters['ci_test_significance'] = 0.99
+        parameters['omega'] = Omega
 
-        self.assertDependent(significance, R, EDU, AGE)
+        self.G_test = mbff.math.G_test__unoptimized.G_test(survey, parameters)
+        print()
 
-        self.assertCondIndependent(significance, AGE, SEX, Omega)
-        self.assertDependent(significance, AGE, EDU, Omega)
-        self.assertDependent(significance, SEX, EDU, Omega)
+        self.assertDependent(R, EDU, AGE)
 
-        self.assertDependent(significance, OCC, EDU, Omega)
-        self.assertDependent(significance, R, EDU, Omega)
+        self.assertCondIndependent(AGE, SEX, Omega)
+        self.assertDependent(AGE, EDU, Omega)
+        self.assertDependent(SEX, EDU, Omega)
 
-        self.assertDependent(significance, OCC, AGE, Omega)
-        self.assertDependent(significance, OCC, SEX, Omega)
-        self.assertDependent(significance, R, AGE, Omega)
-        self.assertDependent(significance, R, SEX, Omega)
+        self.assertDependent(OCC, EDU, Omega)
+        self.assertDependent(R, EDU, Omega)
 
-        self.assertCondIndependent(significance, OCC, AGE, EDU)
-        self.assertCondIndependent(significance, OCC, SEX, EDU)
-        self.assertCondIndependent(significance, OCC, JointVariables(AGE, SEX), EDU)
+        self.assertDependent(OCC, AGE, Omega)
+        self.assertDependent(OCC, SEX, Omega)
+        self.assertDependent(R, AGE, Omega)
+        self.assertDependent(R, SEX, Omega)
 
-        self.assertCondIndependent(significance, R, AGE, EDU)
-        self.assertCondIndependent(significance, R, SEX, EDU)
-        self.assertCondIndependent(significance, R, JointVariables(AGE, SEX), EDU)
+        self.assertCondIndependent(OCC, AGE, EDU)
+        self.assertCondIndependent(OCC, SEX, EDU)
+        self.assertCondIndependent(OCC, JointVariables(AGE, SEX), EDU)
 
-        self.assertDependent(significance, TRN, OCC, Omega)
-        self.assertDependent(significance, TRN, R, Omega)
-        self.assertDependent(significance, TRN, EDU, Omega)
+        self.assertCondIndependent(R, AGE, EDU)
+        self.assertCondIndependent(R, SEX, EDU)
+        self.assertCondIndependent(R, JointVariables(AGE, SEX), EDU)
 
-        self.assertCondIndependent(significance, TRN, EDU, JointVariables(OCC, R))
+        self.assertDependent(TRN, OCC, Omega)
+        self.assertDependent(TRN, R, Omega)
+        self.assertDependent(TRN, EDU, Omega)
+
+        self.assertCondIndependent(TRN, EDU, JointVariables(OCC, R))
         # Why does this assertion fail for significance 0.99? TRN is isolated
         # by the rest of the variables by JointVariables(OCC, R). Yet it needs
         # 0.9999 to pass. Dataset too large? Or maybe too few samples to
         # properly estimate the joint distributions (TRN, AGE) and (TRN, SEX)?
         # But there are 1e6 samples...
-        significance = 0.9999
-        self.assertCondIndependent(significance, TRN, SEX, JointVariables(OCC, R))
-        self.assertCondIndependent(significance, TRN, AGE, JointVariables(OCC, R))
+        self.G_test.significance = 0.9999
+        self.assertCondIndependent(TRN, SEX, JointVariables(OCC, R))
+        self.assertCondIndependent(TRN, AGE, JointVariables(OCC, R))
 
 
-    def assertCondIndependent(self, significance, X, Y, Z):
-        result = G_test.G_test_conditionally_independent(significance, X, Y, Z)
+    def assertCondIndependent(self, X, Y, Z):
+        result = self.G_test.G_test_conditionally_independent(X, Y, Z)
+        print(result)
         self.assertTrue(result.independent)
 
 
-    def assertDependent(self, significance, X, Y, Z):
-        result = G_test.G_test_conditionally_independent(significance, X, Y, Z)
+    def assertDependent(self, X, Y, Z):
+        result = self.G_test.G_test_conditionally_independent(X, Y, Z)
+        print(result)
         self.assertFalse(result.independent)
 
 
