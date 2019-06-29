@@ -168,7 +168,9 @@ class TestAlgorithmIPCMB(TestBase):
         print()
         print('Total: {} CI tests'.format(len(ci_test_results)))
 
-        self.assertEqual([1, 2, 5], mb)
+        # FIXME figure out what's the correct MB of the node 3 in the Bayesian
+        # network 'lungcancer'
+        self.assertEqual('FIXME', mb)
 
 
     def make_parameters(self, target, bn):
