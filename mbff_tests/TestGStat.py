@@ -23,8 +23,7 @@ class TestGStat(TestBase):
     ClassIsSetUp = False
     DatasetMatrix = None
     Omega = None
-    # TODO add lungcancer too
-    DatasetMatricesInUse = ['survey']
+    DatasetMatricesInUse = ['survey', 'lungcancer']
 
 
     def setUp(self):

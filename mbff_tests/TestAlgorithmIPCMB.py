@@ -19,6 +19,7 @@ class TestAlgorithmIPCMB(TestBase):
     ClassIsSetUp = False
     DatasetMatrices = None
     Omega = None
+    DatasetMatricesInUse = ['survey']
 
 
     def setUp(self):
@@ -152,11 +153,11 @@ class TestAlgorithmIPCMB(TestBase):
 
     @unittest.skipIf(TestBase.tag_excluded('ipcmb_run_with_dataset'), 'Tests running IPC-MB on datasets are excluded')
     def test_finding_Markov_blankets_in_datasetmatrix(self):
-        Omega = TestAlgorithmIPCMB.Omega['lungcancer']
-        datasetmatrix = TestAlgorithmIPCMB.DatasetMatrices['lungcancer']
+        Omega = TestAlgorithmIPCMB.Omega['survey']
+        datasetmatrix = TestAlgorithmIPCMB.DatasetMatrices['survey']
 
-        lungcancer_bif = Path('testfiles', 'bif_files', 'lungcancer.bif')
-        bn = util.read_bif_file(lungcancer_bif)
+        bif_file = Path('testfiles', 'bif_files', 'survey.bif')
+        bn = util.read_bif_file(bif_file)
         bn.finalize()
 
         parameters = dict()
@@ -166,7 +167,6 @@ class TestAlgorithmIPCMB(TestBase):
         parameters['debug'] = True
         parameters['omega'] = Omega
         parameters['source_bayesian_network'] = bn
-        parameters['ci_test_results'] = list()
 
         mb = algorithm_IPCMB(datasetmatrix, parameters)
 
@@ -179,9 +179,7 @@ class TestAlgorithmIPCMB(TestBase):
         print()
         print('Total: {} CI tests'.format(len(ci_test_results)))
 
-        # FIXME figure out what's the correct MB of the node 3 in the Bayesian
-        # network 'lungcancer'
-        self.assertEqual('FIXME', mb)
+        self.assertEqual([1, 2, 5], mb)
 
 
     def configure_datasetmatrix(self, dm_label):
@@ -207,7 +205,7 @@ class TestAlgorithmIPCMB(TestBase):
         TestAlgorithmIPCMB.Omega = {}
 
         dataset_folder = Path('testfiles', 'tmp', 'test_ipcmb_dm')
-        for dm_label in ['lungcancer']:
+        for dm_label in self.DatasetMatricesInUse:
             configuration = self.configure_datasetmatrix(dm_label)
             try:
                 datasetmatrix = DatasetMatrix(dm_label)
