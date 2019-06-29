@@ -204,7 +204,7 @@ class TestAlgorithmIPCMB(TestBase):
         TestAlgorithmIPCMB.Omega = {}
 
         dataset_folder = Path('testfiles', 'tmp', 'test_ipcmb_dm')
-        for dm_label in ['survey', 'lungcancer']:
+        for dm_label in ['lungcancer']:
             configuration = self.configure_datasetmatrix(dm_label)
             try:
                 datasetmatrix = DatasetMatrix(dm_label)
