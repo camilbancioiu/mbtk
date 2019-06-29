@@ -139,6 +139,7 @@ class TestAlgorithmIPCMB(TestBase):
         self.assertEqual([1, 9, 18, 19, 22, 33, 36], mb)
 
 
+    @unittest.skipIf(TestBase.tag_excluded('ipcmb_run_with_dataset'), 'Tests running IPC-MB on datasets are excluded')
     def test_finding_Markov_blankets_in_datasetmatrix(self):
         Omega = TestAlgorithmIPCMB.Omega['lungcancer']
         datasetmatrix = TestAlgorithmIPCMB.DatasetMatrices['lungcancer']
