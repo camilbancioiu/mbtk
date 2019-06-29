@@ -23,7 +23,7 @@ def ci_test_builder(datasetmatrix, parameters):
         result = G_test_conditionally_independent(significance, VarX, VarY, VarZ)
 
         if not source_bn is None:
-            result.computed_d_separation = bn.d_separated(X, Z, Y)
+            result.computed_d_separation = source_bn.d_separated(X, Z, Y)
 
         ci_test_results.append(result)
 
@@ -77,7 +77,7 @@ def G_test_conditionally_independent(significance, VarX, VarY, VarZ):
 def G_value(VarX, VarY, VarZ):
     validate_variable_instances_lengths([VarX, VarY, VarZ])
 
-    N = len(X.instances)
+    N = len(VarX.instances)
 
     (PrXYcZ, PrXcZ, PrYcZ, PrZ) = infotheory.calculate_pmf_for_cmi(VarX, VarY, VarZ)
     cMI = infotheory.conditional_mutual_information(PrXYcZ, PrXcZ, PrYcZ, PrZ, base='e')
