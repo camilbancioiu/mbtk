@@ -53,12 +53,12 @@ class AlgorithmIPCMB:
         details.
         """
         if self.debug: print('Begin IPCMB')
-        CandidatePC_T = RecognizePC(T, self.U - {T})
+        CandidatePC_T = self.RecognizePC(T, self.U - {T})
 
         PC = set()
         CandidateSpouses = SetCache()
         for X in CandidatePC_T:
-            CandidatePC_X = RecognizePC(X, self.U - {X})
+            CandidatePC_X = self.RecognizePC(X, self.U - {X})
             if T in CandidatePC_X:
                 PC.add(X)
                 new_spouses = CandidatePC_X - {T}
