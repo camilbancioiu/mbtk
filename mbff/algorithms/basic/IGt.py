@@ -4,28 +4,39 @@ import math
 from pprint import pprint
 import mbff.math.infotheory as infotheory
 
-def algorithm_IGt(datasetmatrix, parameters):
-    Q = parameters['Q']
-    objective_index = parameters['objective_index']
 
-    objective = datasetmatrix.get_variable('Y', objective_index)
-    objective.load_instances()
+class AlgorithmIGt:
+    
+    def __init__(self, datasetmatrix, parameters):
+        self.parameters = parameters
+        self.Q = self.parameters['Q']
+        self.objective_index = self.parameters['objective_index']
+        self.datasetmatrix = datasetmatrix
 
-    (sample_count, feature_count) = datasetmatrix.X.get_shape()
-    IG_per_feature = []
 
-    for feature_index in range(feature_count):
+    def select_features(self):
+        return self.IGt()
 
-        feature = datasetmatrix.get_variable('X', feature_index)
-        feature.load_instances()
 
-        (PrXY, PrX, PrY) = infotheory.calculate_pmf_for_mi(feature, objective)
-        feature_IG = infotheory.mutual_information(PrXY, PrX, PrY)
-        IG_per_feature.append((feature_index, feature_IG))
+    def IGt(self):
+        objective = datasetmatrix.get_variable('Y', objective_index)
+        objective.load_instances()
 
-    sorted_IG_per_feature = sorted(IG_per_feature, key=operator.itemgetter(1), reverse=True)
-    selected_features = [pair[0] for pair in sorted_IG_per_feature[0:Q]]
-    return selected_features
+        (sample_count, feature_count) = self.datasetmatrix.X.get_shape()
+        IG_per_feature = []
+
+        for feature_index in range(feature_count):
+
+            feature = self.datasetmatrix.get_variable('X', feature_index)
+            feature.load_instances()
+
+            (PrXY, PrX, PrY) = infotheory.calculate_pmf_for_mi(feature, objective)
+            feature_IG = infotheory.mutual_information(PrXY, PrX, PrY)
+            IG_per_feature.append((feature_index, feature_IG))
+
+        sorted_IG_per_feature = sorted(IG_per_feature, key=operator.itemgetter(1), reverse=True)
+        selected_features = [pair[0] for pair in sorted_IG_per_feature[0:Q]]
+        return selected_features
 
 
 
