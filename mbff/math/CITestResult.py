@@ -1,3 +1,4 @@
+import time
 import mbff.math.Variable
 
 class CITestResult:
@@ -16,6 +17,10 @@ class CITestResult:
         self.p_value = None
         self.significance = None
         self.computed_d_separation = None
+
+        self.start_time = 0
+        self.end_time = 0
+        self.duration = 0.0
 
 
     def __eq__(self, other):
@@ -52,6 +57,15 @@ class CITestResult:
         self.X = self.get_variable_representation(X)
         self.Y = self.get_variable_representation(Y)
         self.Z = self.get_variable_representation(Z)
+
+
+    def start_timing(self):
+        self.start_time = time.time()
+
+
+    def end_timing(self):
+        self.end_time = time.time()
+        self.duration = (self.end_time - self.start_time) * 1000.0
 
 
     def get_variable_representation(self, variable):
@@ -105,10 +119,11 @@ class CITestResult:
         self.i_or_d += d_sep_verification
 
         format_string = (
-            "CI test {X:>3} ⊥ {Y:<3} | {Z:<10}: {i_or_d}"
+            "CI test {X:>12} ⊥ {Y:<12} | {Z:<16}: {i_or_d}"
             " @ {significance:6.4f}"
             " with {statistic}={statistic_value:<8.2f}"
-            " at p={p_value:<9.6f} on the {test_distribution} distribution"
+            " at p={p_value:<9.6f} on {test_distribution}"
+            ", Δt={duration}"
             )
 
         return format_string.format(**self.__dict__)

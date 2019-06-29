@@ -38,6 +38,9 @@ class G_test:
 
 
     def G_test_conditionally_independent(self, VarX, VarY, VarZ):
+        result = CITestResult()
+        result.start_timing()
+
         G = self.G_value(VarX, VarY, VarZ)
         DF = self.calculate_degrees_of_freedom(VarX, VarY)
 
@@ -48,7 +51,7 @@ class G_test:
         else:
             independent = False
 
-        result = CITestResult()
+        result.end_timing()
         result.set_independent(independent, self.significance)
         result.set_variables(VarX, VarY, VarZ)
         result.set_statistic('G', G, dict())
