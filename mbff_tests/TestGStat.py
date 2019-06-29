@@ -48,7 +48,7 @@ class TestGStat(TestBase):
         XRAY    = Variable(lungcancer.get_column_by_label('Y', 'XRAY'), 'XRAY')
 
         parameters = dict()
-        parameters['significance'] = 0.99
+        parameters['ci_test_significance'] = 0.99
         parameters['omega'] = Omega
 
         self.G_test = mbff.math.G_test__unoptimized.G_test(lungcancer, parameters)

@@ -27,15 +27,14 @@ def algorithm_IPCMB(datasetmatrix, parameters):
     # JMI tables.
     SepSetCache = SetCache()
 
-    # This is the test of conditional independence. It is a function that must
-    # be returned by the CI test builder provided as a parameter (the test
-    # builder is itself a function). The test of conditional independence is a
-    # function that receives three arguments: the variable indices X and Y and
-    # a set of indices Z. The test must return True if X and Y are
-    # conditionally independent given Z and False otherwise. In case the test
-    # cannot be performed, the exception CannotPerformCITestException should be
-    # thrown, which is handled by the algorithm as it sees fit.
-    conditionally_independent = parameters['ci_test_builder'](datasetmatrix, parameters)
+    # This is the test of conditional independence. It is a class that must be
+    # instantiated. The class must have a method called
+    # `conditionally_independent` that receives three arguments: the variable
+    # indices X and Y and a set of indices Z. The test must return True if X
+    # and Y are conditionally independent given Z and False otherwise. In case
+    # the test cannot be performed, the exception CannotPerformCITestException
+    # should be thrown, which is handled by the algorithm as it sees fit.
+    ci_test = parameters['ci_test_class'](datasetmatrix, parameters)
 
     debug = parameters.get('debug', False)
 
@@ -57,7 +56,7 @@ def algorithm_IPCMB(datasetmatrix, parameters):
                     Z = set(Z)
                     if debug: print('\t\tIterating over possible conditioning sets Z: {}'.format(Z))
                     if debug: print('\t\tTesting {} ̩⊥ {} | {}: '.format(T, X, Z))
-                    if conditionally_independent(X, T, Z):
+                    if ci_test.conditionally_independent(X, T, Z):
                         if debug: print('\t\t\tTrue')
                         NonPC.add(X)
                         if debug: print('\t\t\tNonPC is currently {}'.format(NonPC))
@@ -112,7 +111,7 @@ def algorithm_IPCMB(datasetmatrix, parameters):
                 if Y not in MB:
                     if debug: print('\t\t\tTesting if {} ⊥ {} |  ( {} ∪ {{ {} }} ):'.format(T, Y, SepSetCache.get(T, Y), X))
                     separation_set = SepSetCache.get(T, Y)
-                    if not conditionally_independent(T, Y, separation_set | {X}):
+                    if not ci_test.conditionally_independent(T, Y, separation_set | {X}):
                         MB.add(Y)
                         if debug: print('\t\t\t\tFalse, adding {} to the MB, which becomes {}'.format(Y, MB))
                     else:
