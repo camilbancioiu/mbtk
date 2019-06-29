@@ -11,7 +11,6 @@ from mbff.dataset.sources.SampledBayesianNetworkDatasetSource import SampledBaye
 from mbff.algorithms.mb.ipcmb import algorithm_IPCMB
 import mbff.math.G_test__unoptimized as G_test
 import mbff.utilities.functions as util
-import mbff.math.infotheory as infotheory
 
 
 class TestAlgorithmIPCMB(TestBase):

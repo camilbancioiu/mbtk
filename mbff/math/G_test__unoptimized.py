@@ -36,23 +36,6 @@ def ci_test_builder(datasetmatrix, parameters):
 
 
 
-def load_variables(X, Y, Z, datasetmatrix, omega):
-    VarX = datasetmatrix.get_variable('X', X)
-    VarY = datasetmatrix.get_variable('X', Y)
-    if len(Z) == 0:
-        VarZ = omega
-    else:
-        VarZ = datasetmatrix.get_variables('X', Z)
-
-    VarX.load_instances()
-    VarY.load_instances()
-    VarZ.load_instances()
-
-    return (VarX, VarY, VarZ)
-
-
-
-
 def G_test_conditionally_independent(significance, VarX, VarY, VarZ):
     G = G_value(VarX, VarY, VarZ)
     DF = calculate_degrees_of_freedom(VarX, VarY)
@@ -87,3 +70,19 @@ def G_value(VarX, VarY, VarZ):
 
 def calculate_degrees_of_freedom(VarX, VarY):
     return (len(VarX.values) - 1) * (len(VarY.values) - 1)
+
+
+
+def load_variables(X, Y, Z, datasetmatrix, omega):
+    VarX = datasetmatrix.get_variable('X', X)
+    VarY = datasetmatrix.get_variable('X', Y)
+    if len(Z) == 0:
+        VarZ = omega
+    else:
+        VarZ = datasetmatrix.get_variables('X', Z)
+
+    VarX.load_instances()
+    VarY.load_instances()
+    VarZ.load_instances()
+
+    return (VarX, VarY, VarZ)
