@@ -117,7 +117,7 @@ class TestExperimentRun(TestBase):
         definition.exds_definition = self.default_exds_definition(exds_folder, "test_exds_experimentrun_interrupted")
         definition.algorithm_run_configuration = {
                 'classifier': BernoulliNB,
-                'algorithm': algorithm_MockFaultyFS, # mock algorithm which breaks when requested.
+                'algorithm': AlgorithmMockFaultyFS, # mock algorithm which breaks when requested.
                 'label': Template('${algorithm_run_index}__MockFaultyFS')
                 }
         # Firstly, prepare the algorithm parameters (fill with defaults).
@@ -309,12 +309,18 @@ class TestExperimentRun(TestBase):
 
 
 
-def algorithm_MockFaultyFS(datasetmatrix, parameters):
-    if parameters['fail']:
-        raise FaultyFSAlgorithmException
-    if parameters['interrupt']:
-        raise KeyboardInterrupt
-    return [0, 3, 1]
+class AlgorithmMockFaultyFS:
+
+    def __init__(self, datasetmatrix, parameters):
+        self.parameters = parameters
+
+
+    def select_features(self):
+        if self.parameters['fail']:
+            raise FaultyFSAlgorithmException
+        if self.parameters['interrupt']:
+            raise KeyboardInterrupt
+        return [0, 3, 1]
 
 
 
