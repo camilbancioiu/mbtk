@@ -306,6 +306,39 @@ class TestDatasetMatrix(TestBase):
         self.assertEqual([2, 6, 10, 14], variable.values)
 
 
+    def test_getting_values_per_column(self):
+        dm = DatasetMatrix('testmatrix')
+        dm.X = scipy.sparse.csr_matrix(numpy.array([
+            [0,  1, 1, 2, 0, 3],
+            [1,  4, 1, 2, 0, 1],
+            [1,  5, 1, 0, 0, 3],
+            [2, 16, 1, 9, 0, 2],
+            [2, -5, 1, 3, 0, 1]
+            ]))
+        dm.Y = dm.X.transpose()
+
+        column_values_X = dm.get_values_per_column('X')
+        column_values_Y = dm.get_values_per_column('Y')
+
+        self.assertEqual([
+            [ 0, 1, 2],
+            [-5, 1, 4, 5, 16],
+            [1],
+            [0, 2, 3, 9],
+            [0],
+            [1, 2, 3]],
+            column_values_X)
+
+        self.assertEqual([
+            [0, 1, 2, 3],
+            [0, 1, 2, 4],
+            [0, 1, 3, 5],
+            [0, 1, 2, 9, 16],
+            [-5, 0, 1, 2, 3]],
+            column_values_Y)
+
+
+
     def default_matrix_X(self):
         return scipy.sparse.csr_matrix(numpy.array([
                 [ 1,  2,  3,  4],

@@ -62,6 +62,56 @@ class TestADTree(TestBase):
         self.assertEqual(children_count, len(adNode.Vary_children))
 
 
+    def test_making_cpmf(self):
+        (dataset, column_values) = self.default_small_dataset_2()
+        adtree = ADTree(dataset, column_values)
+
+        cpmf = adtree.make_cpmf([0])
+        self.assertEqual(
+                [(1, 1/2), (2, 1/2)],
+                sorted(list(cpmf.items()))
+                )
+
+        cpmf = adtree.make_cpmf([0], given=[1])
+        self.assertEqual(
+                [1, 2, 3, 4],
+                sorted(list(cpmf.conditional_probabilities.keys()))
+                )
+
+        self.assertEqual(
+                [(1, 1/2), (2, 1/2)],
+                sorted(list(cpmf.given(1).items()))
+                )
+
+        self.assertEqual(
+                [(1, 1/2), (2, 1/2)],
+                sorted(list(cpmf.given(2).items()))
+                )
+
+        self.assertEqual(
+                [(1, 1/2), (2, 1/2)],
+                sorted(list(cpmf.given(3).items()))
+                )
+
+        self.assertEqual(
+                [(1, 1/2), (2, 1/2)],
+                sorted(list(cpmf.given(4).items()))
+                )
+
+        cpmf = adtree.make_cpmf([0], given=[1, 2])
+        self.assertEqual(
+                [
+                    (1, 1), (1, 2),
+                    (2, 1), (2, 2),
+                    (3, 1), (3, 2),
+                    (4, 1), (4, 2)
+                ],
+                sorted(list(cpmf.conditional_probabilities.keys()))
+                )
+
+        # TODO
+
+
     def test_simple_ADTree_query_count(self):
         (dataset, column_values) = self.default_small_dataset()
         adtree = ADTree(dataset, column_values)
