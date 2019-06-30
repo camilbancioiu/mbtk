@@ -71,10 +71,12 @@ class CPMF(PMF):
 
     def __init__(self, variable, given):
         super().__init__(variable)
+        self.conditional_probabilities = dict()
 
-        self.conditioning_variable = given
-        self.conditional_probabilities = self.count_values_conditionally()
-        self.normalize_conditional_counts()
+        if not (variable is None) and not (given is None):
+            self.conditioning_variable = given
+            self.conditional_probabilities = self.count_values_conditionally()
+            self.normalize_conditional_counts()
 
 
     def __str__(self):
