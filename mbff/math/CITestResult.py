@@ -83,7 +83,7 @@ class CITestResult:
 
         if isinstance(variable, set) or isinstance(variable, list):
             if len(variable) == 0:
-                return '∅'
+                return 'Ω'
 
         try:
             return variable.simple_representation()

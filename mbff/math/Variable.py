@@ -74,7 +74,7 @@ class JointVariables(Variable):
 
         self.variables = self.flatten_variables_list(variables)
         self.ID = None
-        self.name = '(' + ', '.join([var.name for var in self.variables]) + ')'
+        self.name = '{' + ', '.join([var.name for var in self.variables]) + '}'
         self.variableIDs = [var.ID for var in self.variables]
         self.lazy_instances_loader = None
 
@@ -91,7 +91,7 @@ class JointVariables(Variable):
 
 
     def simple_representation(self):
-        return '(' + ', '.join([str(var.simple_representation()) for var in self.variables]) + ')'
+        return '{' + ', '.join([str(var.simple_representation()) for var in self.variables]) + '}'
 
 
     def lazy_joint_instances_loader(self):

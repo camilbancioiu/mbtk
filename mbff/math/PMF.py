@@ -12,8 +12,8 @@ class PMF:
             self.value_counts = self.count_values()
             self.probabilities = self.normalize_counts()
         else:
-            self.value_counts = {}
-            self.probabilities = {}
+            self.value_counts = dict()
+            self.probabilities = dict()
             self.total_count = 0
 
 
