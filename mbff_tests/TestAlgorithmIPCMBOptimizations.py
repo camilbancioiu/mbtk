@@ -13,6 +13,7 @@ import mbff.math.G_test__unoptimized
 import mbff.utilities.functions as util
 
 
+@unittest.skipIf(TestBase.tag_excluded('ipcmb_run'), 'Tests running IPC-MB are excluded')
 class TestAlgorithmIPCMBOptimizations(TestBase):
 
     ClassIsSetUp = False

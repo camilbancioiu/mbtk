@@ -14,7 +14,7 @@ if __name__ == '__main__':
     if test_profile == 'quick':
         TestBase.TestsTagsToExclude.append('sampling')
         TestBase.TestsTagsToExclude.append('conditional_independence')
-        TestBase.TestsTagsToExclude.append('ipcmb_run_with_dataset')
+        TestBase.TestsTagsToExclude.append('ipcmb_run')
         del sys.argv[1]
     elif test_profile == 'all':
         del sys.argv[1]

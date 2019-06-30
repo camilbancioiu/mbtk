@@ -14,6 +14,7 @@ import mbff.math.G_test__unoptimized
 import mbff.utilities.functions as util
 
 
+@unittest.skipIf(TestBase.tag_excluded('ipcmb_run'), 'Tests running IPC-MB are excluded')
 class TestAlgorithmIPCMB(TestBase):
 
     ClassIsSetUp = False
@@ -151,7 +152,6 @@ class TestAlgorithmIPCMB(TestBase):
                 }
 
 
-    @unittest.skipIf(TestBase.tag_excluded('ipcmb_run_with_dataset'), 'Tests running IPC-MB on datasets are excluded')
     def test_finding_Markov_blankets_in_datasetmatrix(self):
         Omega = TestAlgorithmIPCMB.Omega['survey']
         datasetmatrix = TestAlgorithmIPCMB.DatasetMatrices['survey']
