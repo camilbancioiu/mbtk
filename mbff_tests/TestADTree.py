@@ -65,12 +65,12 @@ class TestADTree(TestBase):
     def test_simple_ADTree_query_count(self):
         (dataset, column_values) = self.default_small_dataset()
         adtree = ADTree(dataset, column_values)
-        
+
         self.assertEqual(8, adtree.query_count({}))
         self.assertEqual(1, adtree.query_count({0:1}))
         self.assertEqual(3, adtree.query_count({0:2}))
         self.assertEqual(4, adtree.query_count({0:3}))
-        
+
         self.assertEqual(0, adtree.query_count({0:1, 1:1}))
         self.assertEqual(1, adtree.query_count({0:1, 1:2}))
 
@@ -98,7 +98,7 @@ class TestADTree(TestBase):
     def test_simple_ADTree_query(self):
         (dataset, column_values) = self.default_small_dataset()
         adtree = ADTree(dataset, column_values)
-        
+
         self.assertEqual(1/1, adtree.query({}))
 
         self.assertEqual(1/8, adtree.query({0:1}))
@@ -185,7 +185,7 @@ class TestADTree(TestBase):
         self.assertIsNone(child11)
 
         child12 = vary1.AD_children[1]
-        self.assertADNodeCorrect(child12, 0, 2, 8, 2) 
+        self.assertADNodeCorrect(child12, 0, 2, 8, 2)
 
         vary121 = child12.Vary_children[0]
         self.assertVaryNodeCorrect(vary121, 1, [1, 2, 3, 4], 1, 4)
@@ -248,7 +248,7 @@ class TestADTree(TestBase):
         self.assertIsNone(child2311)
         child2312 = vary231.AD_children[1]
         self.assertADNodeCorrect(child2312, 2, 2, 2, 0)
-        
+
         child24 = vary2.AD_children[3]
         self.assertADNodeCorrect(child24, 1, 4, 4, 1)
         vary241 = child24.Vary_children[0]

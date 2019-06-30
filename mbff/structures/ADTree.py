@@ -35,7 +35,7 @@ class ADTree:
     and more difficult to implement, due to the requirement to calculate
     missing values, which is done by performing multiple extra queries.
     """
-    
+
     def __init__(self, matrix, column_values):
         self.matrix = matrix
         self.column_values = column_values
