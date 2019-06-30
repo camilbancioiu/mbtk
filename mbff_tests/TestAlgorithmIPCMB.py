@@ -164,7 +164,7 @@ class TestAlgorithmIPCMB(TestBase):
         parameters['target'] = 3
         parameters['ci_test_class'] = mbff.math.G_test__unoptimized.G_test
         parameters['ci_test_significance'] = 0.99
-        parameters['debug'] = True
+        parameters['debug'] = False
         parameters['omega'] = Omega
         parameters['source_bayesian_network'] = bn
 
