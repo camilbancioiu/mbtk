@@ -11,6 +11,7 @@ from mbff.dataset.sources.SampledBayesianNetworkDatasetSource import SampledBaye
 from mbff.algorithms.mb.ipcmb import AlgorithmIPCMB
 import mbff.math.G_test__unoptimized
 import mbff.math.G_test__with_AD_tree
+import mbff.math.G_test__with_dcMI
 import mbff.utilities.functions as util
 
 
@@ -50,12 +51,41 @@ class TestAlgorithmIPCMBOptimizations(TestBase):
         parameters['omega'] = Omega
         parameters['source_bayesian_network'] = bn
 
+        print()
         ipcmb = AlgorithmIPCMB(datasetmatrix, parameters)
         ipcmb.select_features()
         computed_citrs = ipcmb.CITest.ci_test_results
 
-        self.assertEqual(reference_citrs, computed_citrs)
-        print('All ok')
+        self.print_ci_test_results(computed_citrs)
+        self.assert_ci_test_results_equal_to_reference(dm_label, computed_citrs)
+
+
+    def test_IPCMB_w_dcMI(self):
+        dm_label = 'survey'
+
+
+        Omega = TestAlgorithmIPCMBOptimizations.Omega[dm_label]
+        datasetmatrix = TestAlgorithmIPCMBOptimizations.DatasetMatrices[dm_label]
+
+        bif_file = Path('testfiles', 'bif_files', '{}.bif'.format(dm_label))
+        bn = util.read_bif_file(bif_file)
+        bn.finalize()
+
+        parameters = dict()
+        parameters['target'] = 3
+        parameters['ci_test_class'] = mbff.math.G_test__with_dcMI.G_test
+        parameters['ci_test_significance'] = 0.95
+        parameters['debug'] = True
+        parameters['omega'] = Omega
+        parameters['source_bayesian_network'] = bn
+
+        print()
+        ipcmb = AlgorithmIPCMB(datasetmatrix, parameters)
+        ipcmb.select_features()
+        computed_citrs = ipcmb.CITest.ci_test_results
+
+        self.print_ci_test_results(computed_citrs)
+        self.assert_ci_test_results_equal_to_reference(dm_label, computed_citrs)
 
 
     def prepare_reference_ci_test_results(self):
@@ -105,6 +135,16 @@ class TestAlgorithmIPCMBOptimizations(TestBase):
         print()
         print('Total: {} CI tests'.format(len(ci_test_results)))
 
+
+    def assert_ci_test_results_equal_to_reference(self, dm_label, computed_ci_test_results):
+        reference_ci_test_results = self.ReferenceCITestResults[dm_label]
+        for (ref_citr, comp_citr) in zip(reference_ci_test_results, computed_ci_test_results):
+            failMessage = (
+                'Differing CI test results:\n'
+                'REFERENCE: {}\n'
+                'COMPUTED:  {}\n'
+                ).format(ref_citr, comp_citr)
+            self.assertTrue(ref_citr == comp_citr)
 
 
     def configure_datasetmatrix(self, dm_label):
