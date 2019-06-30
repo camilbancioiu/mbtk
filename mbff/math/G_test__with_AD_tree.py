@@ -20,7 +20,7 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
     def __init__(self, datasetmatrix, parameters):
         super().__init__(datasetmatrix, parameters)
 
-        self.matrix = datasetmatrix.X
+        self.matrix = self.datasetmatrix.X
         self.column_values = self.datasetmatrix.get_values_per_column('X')
 
         self.AD_tree_build_start_time = 0
@@ -31,8 +31,8 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
         self.build_AD_tree()
 
 
-
     def build_AD_tree(self):
+        print("Building the AD-tree...")
         self.AD_tree_build_start_time = time.time()
         self.AD_tree = mbff.structures.ADTree.ADTree(self.matrix, self.column_values)
         self.AD_tree_build_end_time = time.time()
@@ -80,7 +80,6 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
         result.set_distribution('chi2', p, {'DoF': DF})
 
         return result
-
 
 
     def G_value(self, X, Y, Z):
