@@ -30,7 +30,7 @@ class AlgorithmRun:
         self.start_time = time.time()
         self.select_features()
         self.end_time = time.time()
-        self.duration = (self.end_time - self.start_time) * 1000.0
+        self.duration = (self.end_time - self.start_time)
 
 
     def select_features(self):

@@ -117,7 +117,7 @@ class CITestResult:
             else:
                 d_sep_verification = '✘'
         self.i_or_d += d_sep_verification
-        self.duration_in_seconds = self.duration / 1000
+        self.duration_in_seconds = self.duration
 
         format_string = (
             "CI test {X:>4} ⊥ {Y:<4} | {Z:<20}: {i_or_d}"
