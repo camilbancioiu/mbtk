@@ -148,13 +148,11 @@ class TestGStat(TestBase):
 
     def assertCondIndependent(self, X, Y, Z):
         result = self.G_test.G_test_conditionally_independent(X, Y, Z)
-        print(result)
         self.assertTrue(result.independent)
 
 
     def assertDependent(self, X, Y, Z):
         result = self.G_test.G_test_conditionally_independent(X, Y, Z)
-        print(result)
         self.assertFalse(result.independent)
 
 
