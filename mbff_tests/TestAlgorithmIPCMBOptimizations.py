@@ -29,7 +29,7 @@ class TestAlgorithmIPCMBOptimizations(TestBase):
             self.prepare_datasetmatrices()
             self.prepare_reference_ci_test_results()
 
-    
+
     def test_IPCMB_w_AD_tree(self):
         dm_label = 'survey'
 
@@ -77,7 +77,7 @@ class TestAlgorithmIPCMBOptimizations(TestBase):
     def build_reference_ci_test_results(self, dm_label):
         Omega = TestAlgorithmIPCMBOptimizations.Omega[dm_label]
         datasetmatrix = TestAlgorithmIPCMBOptimizations.DatasetMatrices[dm_label]
-        
+
         bif_file = Path('testfiles', 'bif_files', '{}.bif'.format(dm_label))
         bn = util.read_bif_file(bif_file)
         bn.finalize()
