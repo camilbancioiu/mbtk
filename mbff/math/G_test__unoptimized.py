@@ -13,6 +13,8 @@ from scipy.stats import chi2
 class G_test:
 
     def __init__(self, datasetmatrix, parameters):
+        self.parameters = parameters
+        self.debug = self.parameters.get('debug', False)
         self.datasetmatrix = datasetmatrix
         self.significance = parameters.get('ci_test_significance', 0)
         self.omega = parameters.get('omega', None)

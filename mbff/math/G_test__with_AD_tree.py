@@ -32,7 +32,7 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
 
 
     def build_AD_tree(self):
-        print("Building the AD-tree...")
+        if self.debug: print("Building the AD-tree...")
         self.AD_tree_build_start_time = time.time()
         self.AD_tree = mbff.structures.ADTree.ADTree(self.matrix, self.column_values)
         self.AD_tree_build_end_time = time.time()
@@ -42,7 +42,7 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
 
         import gc; gc.collect()
 
-        print("AD-tree built in {:>10.4f}s".format(self.AD_tree_build_duration))
+        if self.debug: print("AD-tree built in {:>10.4f}s".format(self.AD_tree_build_duration))
 
 
     def conditionally_independent(self, X, Y, Z):

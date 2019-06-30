@@ -79,14 +79,14 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
 
         try:
             H = self.JMI_cache[jmi_cache_key]
-            print('JMI cache hit: found H={:8.6f} for {}'.format(H, jmi_cache_key))
+            if self.debug: print('JMI cache hit: found H={:8.6f} for {}'.format(H, jmi_cache_key))
         except KeyError:
             joint_variables = self.datasetmatrix.get_variables('X', variable_set)
             joint_variables.load_instances()
             pmf = PMF(joint_variables)
             H = - pmf.expected_value(lambda v, p: math.log(p))
             self.JMI_cache[jmi_cache_key] = H
-            print('JMI cache miss and update: store H={:8.6f} for {}'.format(H, jmi_cache_key))
+            if self.debug: print('JMI cache miss and update: store H={:8.6f} for {}'.format(H, jmi_cache_key))
 
         return H
 
