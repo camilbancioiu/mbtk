@@ -33,49 +33,27 @@ class TestAlgorithmIPCMBOptimizations(TestBase):
 
     def test_IPCMB_w_AD_tree(self):
         dm_label = 'survey'
-
-        reference_citrs = self.ReferenceCITestResults[dm_label]
-
-        Omega = TestAlgorithmIPCMBOptimizations.Omega[dm_label]
-        datasetmatrix = TestAlgorithmIPCMBOptimizations.DatasetMatrices[dm_label]
-
-        bif_file = Path('testfiles', 'bif_files', '{}.bif'.format(dm_label))
-        bn = util.read_bif_file(bif_file)
-        bn.finalize()
-
-        parameters = dict()
-        parameters['target'] = 3
-        parameters['ci_test_class'] = mbff.math.G_test__with_AD_tree.G_test
-        parameters['ci_test_significance'] = 0.95
-        parameters['debug'] = True
-        parameters['omega'] = Omega
-        parameters['source_bayesian_network'] = bn
-
-        print()
-        ipcmb = AlgorithmIPCMB(datasetmatrix, parameters)
-        ipcmb.select_features()
-        computed_citrs = ipcmb.CITest.ci_test_results
-
-        self.print_ci_test_results(computed_citrs)
-        self.assert_ci_test_results_equal_to_reference(dm_label, computed_citrs)
+        ipcmb = self.run_IPCMB('survey', 3, mbff.math.G_test__with_AD_tree.G_test)
 
 
     def test_IPCMB_w_dcMI(self):
-        dm_label = 'survey'
+        ipcmb = self.run_IPCMB('survey', 3, mbff.math.G_test__with_dcMI.G_test)
 
 
+    def run_IPCMB(self, dm_label, target, ci_test_class, bif_file=None):
         Omega = TestAlgorithmIPCMBOptimizations.Omega[dm_label]
         datasetmatrix = TestAlgorithmIPCMBOptimizations.DatasetMatrices[dm_label]
 
-        bif_file = Path('testfiles', 'bif_files', '{}.bif'.format(dm_label))
+        if bif_file is None:
+            bif_file = Path('testfiles', 'bif_files', '{}.bif'.format(dm_label))
         bn = util.read_bif_file(bif_file)
         bn.finalize()
 
         parameters = dict()
-        parameters['target'] = 3
-        parameters['ci_test_class'] = mbff.math.G_test__with_dcMI.G_test
+        parameters['target'] = target
+        parameters['ci_test_class'] = ci_test_class
         parameters['ci_test_significance'] = 0.95
-        parameters['debug'] = True
+        parameters['debug'] = False
         parameters['omega'] = Omega
         parameters['source_bayesian_network'] = bn
 
@@ -83,9 +61,9 @@ class TestAlgorithmIPCMBOptimizations(TestBase):
         ipcmb = AlgorithmIPCMB(datasetmatrix, parameters)
         ipcmb.select_features()
         computed_citrs = ipcmb.CITest.ci_test_results
-
-        self.print_ci_test_results(computed_citrs)
         self.assert_ci_test_results_equal_to_reference(dm_label, computed_citrs)
+
+        return ipcmb
 
 
     def prepare_reference_ci_test_results(self):
@@ -116,7 +94,7 @@ class TestAlgorithmIPCMBOptimizations(TestBase):
         parameters['target'] = 3
         parameters['ci_test_class'] = mbff.math.G_test__unoptimized.G_test
         parameters['ci_test_significance'] = 0.95
-        parameters['debug'] = True
+        parameters['debug'] = False
         parameters['omega'] = Omega
         parameters['source_bayesian_network'] = bn
         parameters['ci_test_results'] = list()
