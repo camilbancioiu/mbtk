@@ -1,4 +1,7 @@
 import collections
+import itertools
+
+from mbff.math.PMF import PMF, CPMF
 
 INDENT = "|---"
 
@@ -37,6 +40,44 @@ class ADTree:
         self.matrix = matrix
         self.column_values = column_values
         self.root = ADNode(self, -1, '*', row_selection=None, level=0)
+
+
+    def make_cpmf(self, variables, given=list()):
+
+        conditioning_values = list()
+        for conditioning_variable in given:
+            conditioning_values.append(self.column_values[conditioning_variable])
+
+        variable_values = list()
+        for variable in variables:
+            variable_values.append(self.column_values[variable])
+
+        if len(given) > 0:
+            cpmf = CPMF(None, None)
+
+            for cvalues in itertools.product(*conditioning_values):
+                query_given = dict(zip(given, cvalues))
+                pmf = PMF(None)
+                for values in itertools.product(*variable_values):
+                    query_values = dict(zip(variables, values))
+                    p = self.p(query_values, query_given)
+                    if len(values) == 1: values = values[0]
+                    pmf.probabilities[values] = p
+
+                if len(cvalues) == 1: cvalues = cvalues[0]
+                cpmf.conditional_probabilities[cvalues] = pmf
+
+            return cpmf
+
+        else:
+            pmf = PMF(None)
+            for values in itertools.product(*variable_values):
+                query_values = dict(zip(variables, values))
+                p = self.p(query_values)
+                if len(values) == 1: values = values[0]
+                pmf.probabilities[values] = p
+
+            return pmf
 
 
     def p(self, values, given={}):

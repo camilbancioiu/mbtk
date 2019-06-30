@@ -212,6 +212,28 @@ class DatasetMatrix:
         return JointVariables(*variables)
 
 
+    def get_values_per_column(self, matrix_label):
+        matrix = None
+        if matrix_label == 'X':
+            matrix = self.X
+            column_getter = self.get_column_X
+        elif matrix_label == 'Y':
+            matrix = self.Y
+            column_getter = self.get_column_Y
+        else:
+            raise ValueError('Unknown matrix label. Only X and Y are allowed.')
+
+        column_count = matrix.get_shape()[1]
+
+        values_per_column = []
+        for c in range(column_count):
+            column = column_getter(c)
+            values = list(numpy.unique(column))
+            values_per_column.append(values)
+
+        return values_per_column
+
+
     def delete_row(self, r):
         """
         Delete the row at index ``r``. This results in the deletion of row
