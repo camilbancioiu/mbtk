@@ -10,6 +10,7 @@ from mbff.math.Variable import Variable, JointVariables, Omega
 from mbff.dataset.sources.SampledBayesianNetworkDatasetSource import SampledBayesianNetworkDatasetSource
 from mbff.algorithms.mb.ipcmb import AlgorithmIPCMB
 import mbff.math.G_test__unoptimized
+import mbff.math.G_test__with_AD_tree
 import mbff.utilities.functions as util
 
 
@@ -43,7 +44,7 @@ class TestAlgorithmIPCMBOptimizations(TestBase):
 
         parameters = dict()
         parameters['target'] = 3
-        parameters['ci_test_class'] = mbff.math.G_test__unoptimized.G_test
+        parameters['ci_test_class'] = mbff.math.G_test__with_AD_tree.G_test
         parameters['ci_test_significance'] = 0.95
         parameters['debug'] = True
         parameters['omega'] = Omega
