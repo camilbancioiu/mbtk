@@ -169,18 +169,7 @@ class TestAlgorithmIPCMB(TestBase):
         parameters['source_bayesian_network'] = bn
 
         ipcmb = AlgorithmIPCMB(datasetmatrix, parameters)
-
         mb = ipcmb.select_features()
-
-        ci_test_results = ipcmb.CITest.ci_test_results
-        print()
-        print('==========')
-        print('CI test trace:')
-        for result in ci_test_results:
-            print(result)
-        print()
-        print('Total: {} CI tests'.format(len(ci_test_results)))
-
         self.assertEqual([1, 2, 5], mb)
 
 
