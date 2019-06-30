@@ -98,8 +98,8 @@ class TestVariableAndPMF(TestBase):
         self.assertAlmostEqual(1.0, PrAnimals.expected_value(lambda v, p: 1))
 
         # Test calculations of base-e entropy and base-2 entropy.
-        self.assertAlmostEqual(-0.97431475, PrAnimals.expected_value(lambda v, p: math.log(p)))
-        self.assertAlmostEqual(-1.40563906, PrAnimals.expected_value(lambda v, p: math.log2(p)))
+        self.assertAlmostEqual(0.97431475, (-1) * PrAnimals.expected_value(lambda v, p: math.log(p)))
+        self.assertAlmostEqual(1.40563906, (-1) * PrAnimals.expected_value(lambda v, p: math.log2(p)))
 
         # Expected word length.
         self.assertEqual(3.25, PrAnimals.expected_value(lambda v, p: len(v)))
