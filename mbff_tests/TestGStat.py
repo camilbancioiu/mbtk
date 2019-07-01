@@ -98,7 +98,6 @@ class TestGStat(TestBase):
         parameters['omega'] = Omega
 
         self.G_test = mbff.math.G_test__unoptimized.G_test(survey, parameters)
-        print()
 
         self.assertDependent(R, EDU, AGE)
 

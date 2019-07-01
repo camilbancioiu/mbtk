@@ -100,7 +100,7 @@ class ADTree:
 
         return 1.0 * conditioned_count / conditioning_count
 
-    
+
     def query_count(self, values, query_node=None):
         """
         Query the tree, requesting the number of samples that the dataset has

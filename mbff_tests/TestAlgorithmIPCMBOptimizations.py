@@ -53,7 +53,6 @@ class TestAlgorithmIPCMBOptimizations(TestBase):
         parameters['omega'] = Omega
         parameters['source_bayesian_network'] = bn
 
-        print()
         ipcmb = AlgorithmIPCMB(datasetmatrix, parameters)
         ipcmb.select_features()
         computed_citrs = ipcmb.CITest.ci_test_results
