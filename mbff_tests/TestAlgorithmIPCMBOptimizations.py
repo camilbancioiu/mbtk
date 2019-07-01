@@ -18,17 +18,17 @@ import mbff.utilities.functions as util
 @unittest.skipIf(TestBase.tag_excluded('ipcmb_run'), 'Tests running IPC-MB are excluded')
 class TestAlgorithmIPCMBOptimizations(TestBase):
 
-    ClassIsSetUp = False
-    DatasetMatrices = None
-    Omega = None
-    ReferenceCITestResults = None
+    def initTestResources(self):
+        super().initTestResources()
+        self.DatasetsInUse = ['survey']
+        self.DatasetMatrixFolder = Path('testfiles', 'tmp', 'test_ipcmb_optimizations_dm')
+        self.ReferenceCITestResultsFolder = Path('testfiles', 'tmp', 'test_ipcmb_optimizations_ci_tests')
+        self.ReferenceCITestResults = None
 
 
-    def setUp(self):
-        self.DatasetMatricesInUse = ['survey']
-        if not TestAlgorithmIPCMBOptimizations.ClassIsSetUp:
-            self.prepare_datasetmatrices()
-            self.prepare_reference_ci_test_results()
+    def prepareTestResources(self):
+        super().prepareTestResources()
+        self.prepare_reference_ci_test_results()
 
 
     def test_IPCMB_w_AD_tree(self):
@@ -41,13 +41,9 @@ class TestAlgorithmIPCMBOptimizations(TestBase):
 
 
     def run_IPCMB(self, dm_label, target, ci_test_class, bif_file=None):
-        Omega = TestAlgorithmIPCMBOptimizations.Omega[dm_label]
-        datasetmatrix = TestAlgorithmIPCMBOptimizations.DatasetMatrices[dm_label]
-
-        if bif_file is None:
-            bif_file = Path('testfiles', 'bif_files', '{}.bif'.format(dm_label))
-        bn = util.read_bif_file(bif_file)
-        bn.finalize()
+        Omega = self.Omega[dm_label]
+        datasetmatrix = self.DatasetMatrices[dm_label]
+        bn = self.BayesianNetworks[dm_label]
 
         parameters = dict()
         parameters['target'] = target
@@ -69,11 +65,10 @@ class TestAlgorithmIPCMBOptimizations(TestBase):
     def prepare_reference_ci_test_results(self):
         self.ReferenceCITestResults = dict()
 
-        source_folder = Path('testfiles', 'tmp', 'test_ipcmb_optimizations_ci_tests')
-        source_folder.mkdir(parents=True, exist_ok=True)
-        for dm_label in self.DatasetMatricesInUse:
+        self.ReferenceCITestResultsFolder.mkdir(parents=True, exist_ok=True)
+        for dm_label in self.DatasetsInUse:
             try:
-                source_path = source_folder / 'ci_test_results__{}.pickle'.format(dm_label)
+                source_path = self.ReferenceCITestResultsFolder / 'ci_test_results__{}.pickle'.format(dm_label)
                 with source_path.open('rb') as f:
                     self.ReferenceCITestResults[dm_label] = pickle.load(f)
             except FileNotFoundError:
@@ -83,12 +78,9 @@ class TestAlgorithmIPCMBOptimizations(TestBase):
 
 
     def build_reference_ci_test_results(self, dm_label):
-        Omega = TestAlgorithmIPCMBOptimizations.Omega[dm_label]
-        datasetmatrix = TestAlgorithmIPCMBOptimizations.DatasetMatrices[dm_label]
-
-        bif_file = Path('testfiles', 'bif_files', '{}.bif'.format(dm_label))
-        bn = util.read_bif_file(bif_file)
-        bn.finalize()
+        Omega = self.Omega[dm_label]
+        datasetmatrix = self.DatasetMatrices[dm_label]
+        bn = self.BayesianNetworks[dm_label]
 
         parameters = dict()
         parameters['target'] = 3
@@ -125,14 +117,8 @@ class TestAlgorithmIPCMBOptimizations(TestBase):
             self.assertTrue(ref_citr == comp_citr)
 
 
-    def configure_datasetmatrix(self, dm_label):
+    def configure_dataset(self, dm_label):
         configuration = dict()
-        if dm_label == 'lungcancer':
-            configuration['sourcepath'] = Path('testfiles', 'bif_files', 'lungcancer.bif')
-            configuration['sample_count'] = int(5e4)
-            configuration['random_seed'] = 42*42
-            configuration['values_as_indices'] = True
-            configuration['objectives'] = []
 
         if dm_label == 'survey':
             configuration['sourcepath'] = Path('testfiles', 'bif_files', 'survey.bif')
@@ -141,30 +127,4 @@ class TestAlgorithmIPCMBOptimizations(TestBase):
             configuration['values_as_indices'] = True
             configuration['objectives'] = []
         return configuration
-
-
-    def prepare_datasetmatrices(self):
-        TestAlgorithmIPCMBOptimizations.DatasetMatrices = dict()
-        TestAlgorithmIPCMBOptimizations.Omega = dict()
-
-        dataset_folder = Path('testfiles', 'tmp', 'test_ipcmb_optimizations_dm')
-        for dm_label in self.DatasetMatricesInUse:
-            configuration = self.configure_datasetmatrix(dm_label)
-            try:
-                datasetmatrix = DatasetMatrix(dm_label)
-                datasetmatrix.load(dataset_folder)
-                TestAlgorithmIPCMBOptimizations.DatasetMatrices[dm_label] = datasetmatrix
-            except:
-                print('Cannot load DatasetMatrix {} from {}, must rebuild.'.format(dm_label, dataset_folder))
-                bayesian_network = util.read_bif_file(configuration['sourcepath'])
-                bayesian_network.finalize()
-                sbnds = SampledBayesianNetworkDatasetSource(configuration)
-                sbnds.reset_random_seed = True
-                datasetmatrix = sbnds.create_dataset_matrix(dm_label)
-                datasetmatrix.finalize()
-                datasetmatrix.save(dataset_folder)
-                TestAlgorithmIPCMBOptimizations.DatasetMatrices[dm_label] = datasetmatrix
-                print('Dataset rebuilt.')
-            TestAlgorithmIPCMBOptimizations.Omega[dm_label] = Omega(configuration['sample_count'])
-        TestAlgorithmIPCMBOptimizations.ClassIsSetUp = True
 

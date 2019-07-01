@@ -4,12 +4,9 @@ import unittest
 
 from pathlib import Path
 
-import mbff.utilities.functions as util
 
-from mbff.dataset.DatasetMatrix import DatasetMatrix
-from mbff.math.Variable import Variable, JointVariables, Omega
+from mbff.math.Variable import Variable, JointVariables
 from mbff.math.PMF import PMF, CPMF
-from mbff.dataset.sources.SampledBayesianNetworkDatasetSource import SampledBayesianNetworkDatasetSource
 import mbff.math.G_test__unoptimized
 
 
@@ -20,22 +17,16 @@ import scipy.stats
 @unittest.skipIf(TestBase.tag_excluded('conditional_independence'), 'Conditional independence tests excluded')
 class TestGStat(TestBase):
 
-    ClassIsSetUp = False
-    DatasetMatrix = None
-    Omega = None
-    DatasetMatricesInUse = ['survey', 'lungcancer']
-
-
-    def setUp(self):
-        if not TestGStat.ClassIsSetUp:
-            self.prepare_datasetmatrices()
+    def initTestResources(self):
+        super().initTestResources()
+        self.DatasetsInUse = ['survey', 'lungcancer']
+        self.DatasetMatrixFolder = Path('testfiles', 'tmp', 'test_gstat_dm')
         self.G_test = None
 
 
     def test_G_value__lungcancer(self):
-        Omega = TestGStat.Omega['lungcancer']
-        lungcancer = TestGStat.DatasetMatrix['lungcancer']
-
+        Omega = self.Omega['lungcancer']
+        lungcancer = self.DatasetMatrices['lungcancer']
 
         ASIA    = Variable(lungcancer.get_column_by_label('X', 'ASIA'), 'ASIA')
         TUB     = Variable(lungcancer.get_column_by_label('X', 'TUB'), 'TUB')
@@ -81,8 +72,8 @@ class TestGStat(TestBase):
 
 
     def test_G_value__survey(self):
-        Omega = TestGStat.Omega['survey']
-        survey = TestGStat.DatasetMatrix['survey']
+        Omega = self.Omega['survey']
+        survey = self.DatasetMatrices['survey']
 
         # VariableID: 0
         AGE = Variable(survey.get_column_by_label('X', 'AGE'), 'AGE')
@@ -156,7 +147,7 @@ class TestGStat(TestBase):
         self.assertFalse(result.independent)
 
 
-    def configure_datasetmatrix(self, dm_label):
+    def configure_dataset(self, dm_label):
         configuration = {}
         if dm_label == 'lungcancer':
             configuration['sourcepath'] = Path('testfiles', 'bif_files', 'lungcancer.bif')
@@ -171,29 +162,6 @@ class TestGStat(TestBase):
             configuration['random_seed'] = 42*42
             configuration['values_as_indices'] = False
             configuration['objectives'] = ['TRN']
+
         return configuration
 
-
-    def prepare_datasetmatrices(self):
-        TestGStat.DatasetMatrix = {}
-        TestGStat.Omega = {}
-
-        dataset_folder = Path('testfiles', 'tmp', 'test_gstat_dm')
-        for dm_label in self.DatasetMatricesInUse:
-            configuration = self.configure_datasetmatrix(dm_label)
-            try:
-                datasetmatrix = DatasetMatrix(dm_label)
-                datasetmatrix.load(dataset_folder)
-                TestGStat.DatasetMatrix[dm_label] = datasetmatrix
-            except:
-                bayesian_network = util.read_bif_file(configuration['sourcepath'])
-                bayesian_network.finalize()
-                sbnds = SampledBayesianNetworkDatasetSource(configuration)
-                sbnds.reset_random_seed = True
-                datasetmatrix = sbnds.create_dataset_matrix(dm_label)
-                datasetmatrix.finalize()
-                datasetmatrix.save(dataset_folder)
-                TestGStat.DatasetMatrix[dm_label] = datasetmatrix
-                print('Dataset rebuilt.')
-            TestGStat.Omega[dm_label] = Omega(configuration['sample_count'])
-        TestGStat.ClassIsSetUp = True

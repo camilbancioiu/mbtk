@@ -17,15 +17,10 @@ import mbff.utilities.functions as util
 @unittest.skipIf(TestBase.tag_excluded('ipcmb_run'), 'Tests running IPC-MB are excluded')
 class TestAlgorithmIPCMB(TestBase):
 
-    ClassIsSetUp = False
-    DatasetMatrices = None
-    Omega = None
-    DatasetMatricesInUse = ['survey']
-
-
-    def setUp(self):
-        if not TestAlgorithmIPCMB.ClassIsSetUp:
-            self.prepare_datasetmatrices()
+    def initTestResources(self):
+        super().initTestResources()
+        self.DatasetsInUse = ['survey']
+        self.DatasetMatrixFolder = Path('testfiles', 'tmp', 'test_ipcmb_dm')
 
 
     def test_finding_Markov_blankets_in_graphs(self):
@@ -153,12 +148,9 @@ class TestAlgorithmIPCMB(TestBase):
 
 
     def test_finding_Markov_blankets_in_datasetmatrix(self):
-        Omega = TestAlgorithmIPCMB.Omega['survey']
-        datasetmatrix = TestAlgorithmIPCMB.DatasetMatrices['survey']
-
-        bif_file = Path('testfiles', 'bif_files', 'survey.bif')
-        bn = util.read_bif_file(bif_file)
-        bn.finalize()
+        Omega = self.Omega['survey']
+        datasetmatrix = self.DatasetMatrices['survey']
+        bn = self.BayesianNetworks['survey']
 
         parameters = dict()
         parameters['target'] = 3
@@ -173,15 +165,8 @@ class TestAlgorithmIPCMB(TestBase):
         self.assertEqual([1, 2, 5], mb)
 
 
-    def configure_datasetmatrix(self, dm_label):
+    def configure_dataset(self, dm_label):
         configuration = {}
-        if dm_label == 'lungcancer':
-            configuration['sourcepath'] = Path('testfiles', 'bif_files', 'lungcancer.bif')
-            configuration['sample_count'] = int(5e5)
-            configuration['random_seed'] = 42*42
-            configuration['values_as_indices'] = True
-            configuration['objectives'] = []
-
         if dm_label == 'survey':
             configuration['sourcepath'] = Path('testfiles', 'bif_files', 'survey.bif')
             configuration['sample_count'] = int(1e6)
@@ -189,28 +174,4 @@ class TestAlgorithmIPCMB(TestBase):
             configuration['values_as_indices'] = True
             configuration['objectives'] = []
         return configuration
-
-
-    def prepare_datasetmatrices(self):
-        TestAlgorithmIPCMB.DatasetMatrices = {}
-        TestAlgorithmIPCMB.Omega = {}
-
-        dataset_folder = Path('testfiles', 'tmp', 'test_ipcmb_dm')
-        for dm_label in self.DatasetMatricesInUse:
-            configuration = self.configure_datasetmatrix(dm_label)
-            try:
-                datasetmatrix = DatasetMatrix(dm_label)
-                datasetmatrix.load(dataset_folder)
-                TestAlgorithmIPCMB.DatasetMatrices[dm_label] = datasetmatrix
-            except:
-                bayesian_network = util.read_bif_file(configuration['sourcepath'])
-                bayesian_network.finalize()
-                sbnds = SampledBayesianNetworkDatasetSource(configuration)
-                sbnds.reset_random_seed = True
-                datasetmatrix = sbnds.create_dataset_matrix(dm_label)
-                datasetmatrix.finalize()
-                datasetmatrix.save(dataset_folder)
-                TestAlgorithmIPCMB.DatasetMatrices[dm_label] = datasetmatrix
-            TestAlgorithmIPCMB.Omega[dm_label] = Omega(configuration['sample_count'])
-        TestAlgorithmIPCMB.ClassIsSetUp = True
 
