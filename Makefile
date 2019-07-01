@@ -33,3 +33,6 @@ doc-rebuild: doc-clean doc
 test: Makefile
 	@python3 test.py $(call args,all)
 	notify-send "Make" "Testing complete."
+
+test-clean:
+	rm -rf testfiles/tmp/*
