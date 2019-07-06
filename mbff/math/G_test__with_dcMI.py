@@ -29,6 +29,10 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
 
         self.ci_test_results.append(result)
 
+        if self.debug: print(result)
+        if self.debug: print()
+
+
         # Garbage collection required to deallocate variable instances.
         gc.collect()
 
@@ -54,9 +58,6 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
         result.set_variables(X, Y, Z)
         result.set_statistic('G', G, dict())
         result.set_distribution('chi2', p, {'DoF': DF})
-
-        if self.debug: print(result)
-        if self.debug: print()
 
         return result
 

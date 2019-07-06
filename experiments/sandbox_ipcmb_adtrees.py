@@ -3,6 +3,7 @@ import os
 from pathlib import Path
 from string import Template
 
+
 # Assume that the 'experiments' folder, which contains this file, is directly
 # near the 'mbff' package.
 EXPERIMENTS_ROOT = Path(os.getcwd())
@@ -13,6 +14,10 @@ from mbff.dataset.ExperimentalDatasetDefinition import ExperimentalDatasetDefini
 from mbff.dataset.ExperimentalDataset import ExperimentalDataset
 from mbff.dataset.sources.SampledBayesianNetworkDatasetSource import SampledBayesianNetworkDatasetSource
 from mbff.math.Variable import Omega
+
+import mbff.math.DSeparationCITest
+
+import mbff.utilities.functions as util
 
 import mbff.math.G_test__with_AD_tree
 import mbff.math.G_test__unoptimized
@@ -36,6 +41,18 @@ from mbff.experiment.AlgorithmRun import AlgorithmRun
 from mbff.experiment.AlgorithmRunDatapoint import AlgorithmRunDatapoint
 from mbff.algorithms.mb.ipcmb import AlgorithmIPCMB
 
+
+def make_algorithm_run_label(parameters):
+    if parameters['ci_test_class'] is mbff.math.DSeparationCITest.DSeparationCITest:
+        return Template('run_${algorithm_run_index}_T${target}__dsep')
+    if parameters['ci_test_class'] is mbff.math.G_test__unoptimized.G_test:
+        return Template('run_${algorithm_run_index}_T${target}__unoptimized')
+    if parameters['ci_test_class'] is mbff.math.G_test__with_AD_tree.G_test:
+        return Template('run_${algorithm_run_index}_T${target}__@LLT=${ci_test_ad_tree_leaf_list_threshold}')
+    if parameters['ci_test_class'] is mbff.math.G_test__with_dcMI.G_test:
+        return Template('run_${algorithm_run_index}_T${target}__dcMI')
+
+
 EXPRUN_REPO = EXPERIMENTS_ROOT / 'exprun_repository'
 
 IPCMB_ADTree_LLT_Eval_Definition = ExperimentDefinition(EXPRUN_REPO, 'IPCMB_ADTree_LLT_Eval')
@@ -47,7 +64,7 @@ IPCMB_ADTree_LLT_Eval_Definition.save_algorithm_run_datapoints = True
 IPCMB_ADTree_LLT_Eval_Definition.algorithm_run_log__stdout = True
 IPCMB_ADTree_LLT_Eval_Definition.algorithm_run_log__file = True
 IPCMB_ADTree_LLT_Eval_Definition.algorithm_run_configuration = {
-    'label': Template('run_${algorithm_run_index}_T${target}__@LLT=${ci_test_ad_tree_leaf_list_threshold}'),
+    'label': make_algorithm_run_label,
     'algorithm': AlgorithmIPCMB
 }
 
@@ -62,11 +79,27 @@ if __name__ == '__main__':
     ci_test_results_folder = Path('ci_test_results')
     ci_test_results_folder.mkdir(parents=True, exist_ok=True)
 
+    bayesian_network = util.read_bif_file(exdsDef.source_configuration['sourcepath'])
+    bayesian_network.finalize()
+
+    parameters_direct_d_separation_ci_test = [
+        {
+            'target': 3,
+            'debug': False,
+            'omega': omega,
+            'source_bayesian_network': bayesian_network,
+            'ci_test_class': mbff.math.DSeparationCITest.DSeparationCITest,
+            'ci_test_debug': True,
+            'ci_test_results_path__save': ci_test_results_folder / 'ci_test_results_{}_T3_dsep.pickle'.format(exdsDef.name)
+        }
+    ]
+
     parameters_unoptimized = [
         {
             'target': 3,
             'debug': False,
             'omega': omega,
+            'source_bayesian_network': bayesian_network,
             'ci_test_class': mbff.math.G_test__unoptimized.G_test,
             'ci_test_significance': 0.95,
             'ci_test_debug': True,
@@ -78,6 +111,7 @@ if __name__ == '__main__':
             'target': 3,
             'debug': False,
             'omega': omega,
+            'source_bayesian_network': bayesian_network,
             'ci_test_class': mbff.math.G_test__with_dcMI.G_test,
             'ci_test_significance': 0.95,
             'ci_test_debug': True,
@@ -90,6 +124,7 @@ if __name__ == '__main__':
             'target': 3,
             'debug': False,
             'omega': omega,
+            'source_bayesian_network': bayesian_network,
             'ci_test_class': mbff.math.G_test__with_AD_tree.G_test,
             'ci_test_significance': 0.95,
             'ci_test_debug': True,
