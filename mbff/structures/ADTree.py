@@ -109,7 +109,7 @@ class ADTree:
 
 
     def make_cpmf(self, variables, given=list()):
-        if self.debug: print('ADTree.make_cpmf: variables {}, given {}'.format(variables, given), end=" ")
+        if self.debug: print('ADTree.make_cpmf: variables {}, given {} in progress...'.format(variables, given))
         if self.debug: self.debug_reset_query_counts()
         if self.debug: self.n_cpmf += 1
         if self.debug: start_time = time.time()
@@ -152,7 +152,7 @@ class ADTree:
             result = pmf
 
         if self.debug: duration = time.time() - start_time
-        if self.debug: print("took {:.2f}s, done.".format(duration))
+        if self.debug: print("...took {:.2f}s, done.".format(duration))
         return result
 
 
