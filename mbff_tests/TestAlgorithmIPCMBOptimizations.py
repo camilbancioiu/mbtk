@@ -1,18 +1,12 @@
 import pickle
 import unittest
-from pprint import pprint
 from pathlib import Path
 
 from mbff_tests.TestBase import TestBase
-from mbff.dataset.DatasetMatrix import DatasetMatrix
-from mbff.math.BayesianNetwork import BayesianNetwork
-from mbff.math.Variable import Variable, JointVariables, Omega
-from mbff.dataset.sources.SampledBayesianNetworkDatasetSource import SampledBayesianNetworkDatasetSource
 from mbff.algorithms.mb.ipcmb import AlgorithmIPCMB
 import mbff.math.G_test__unoptimized
 import mbff.math.G_test__with_AD_tree
 import mbff.math.G_test__with_dcMI
-import mbff.utilities.functions as util
 
 
 @unittest.skipIf(TestBase.tag_excluded('ipcmb_run'), 'Tests running IPC-MB are excluded')
@@ -41,7 +35,7 @@ class TestAlgorithmIPCMBOptimizations(TestBase):
 
 
     def run_IPCMB(self, dm_label, target, ci_test_class, bif_file=None):
-        Omega = self.Omega[dm_label]
+        omega = self.Omega[dm_label]
         datasetmatrix = self.DatasetMatrices[dm_label]
         bn = self.BayesianNetworks[dm_label]
 
@@ -50,7 +44,7 @@ class TestAlgorithmIPCMBOptimizations(TestBase):
         parameters['ci_test_class'] = ci_test_class
         parameters['ci_test_significance'] = 0.95
         parameters['debug'] = False
-        parameters['omega'] = Omega
+        parameters['omega'] = omega
         parameters['source_bayesian_network'] = bn
 
         ipcmb = AlgorithmIPCMB(datasetmatrix, parameters)
@@ -77,7 +71,7 @@ class TestAlgorithmIPCMBOptimizations(TestBase):
 
 
     def build_reference_ci_test_results(self, dm_label):
-        Omega = self.Omega[dm_label]
+        omega = self.Omega[dm_label]
         datasetmatrix = self.DatasetMatrices[dm_label]
         bn = self.BayesianNetworks[dm_label]
 
@@ -86,7 +80,7 @@ class TestAlgorithmIPCMBOptimizations(TestBase):
         parameters['ci_test_class'] = mbff.math.G_test__unoptimized.G_test
         parameters['ci_test_significance'] = 0.95
         parameters['debug'] = False
-        parameters['omega'] = Omega
+        parameters['omega'] = omega
         parameters['source_bayesian_network'] = bn
         parameters['ci_test_results'] = list()
 
@@ -122,8 +116,7 @@ class TestAlgorithmIPCMBOptimizations(TestBase):
         if dm_label == 'survey':
             configuration['sourcepath'] = Path('testfiles', 'bif_files', 'survey.bif')
             configuration['sample_count'] = int(5e4)
-            configuration['random_seed'] = 42*42
+            configuration['random_seed'] = 42 * 42
             configuration['values_as_indices'] = True
             configuration['objectives'] = []
         return configuration
-

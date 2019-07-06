@@ -1,13 +1,11 @@
-import math
-import numpy
 
-from mbff.math.Variable import Variable, JointVariables, IndexVariable, validate_variable_instances_lengths
+from mbff.math.Variable import validate_variable_instances_lengths
 from mbff.math.CITestResult import CITestResult
-from mbff.math.Exceptions import VariableInstancesOfUnequalCount
 
 import mbff.math.infotheory as infotheory
 
 from scipy.stats import chi2
+import gc
 
 
 class G_test:
@@ -28,13 +26,13 @@ class G_test:
         (VarX, VarY, VarZ) = self.load_variables(X, Y, Z)
         result = self.G_test_conditionally_independent(VarX, VarY, VarZ)
 
-        if not self.source_bn is None:
+        if self.source_bn is not None:
             result.computed_d_separation = self.source_bn.d_separated(X, Z, Y)
 
         self.ci_test_results.append(result)
 
         # Garbage collection required to deallocate variable instances.
-        import gc; gc.collect()
+        gc.collect()
 
         return result.independent
 

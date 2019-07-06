@@ -1,5 +1,5 @@
 import time
-import mbff.math.Variable
+
 
 class CITestResult:
 
@@ -24,7 +24,7 @@ class CITestResult:
 
 
     def __eq__(self, other):
-        return  (
+        return (
                 self.independent == other.independent
             and self.dependent == other.dependent
             and self.X == other.X
@@ -38,7 +38,7 @@ class CITestResult:
             and self.p_value == self.p_value
             and self.significance == self.significance
             and self.computed_d_separation == self.computed_d_separation
-            )
+        )
 
 
     def set_independent(self, independent, significance):
@@ -111,7 +111,7 @@ class CITestResult:
             self.i_or_d = 'D'
 
         d_sep_verification = ''
-        if not self.computed_d_separation is None:
+        if self.computed_d_separation is not None:
             if self.independent == self.computed_d_separation:
                 d_sep_verification = '✔'
             else:

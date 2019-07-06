@@ -2,6 +2,7 @@ import time
 import numpy
 from string import Template
 
+
 class AlgorithmRun:
 
     def __init__(self, exds, configuration, parameters):
@@ -31,10 +32,11 @@ class AlgorithmRun:
         self.select_features()
         self.end_time = time.time()
         self.duration = (self.end_time - self.start_time)
+        gc.collect()
 
 
     def select_features(self):
-        if not self.exds is None:
+        if self.exds is not None:
             self.algorithm_instance = self.algorithm(self.exds.matrix, self.parameters)
         else:
             self.algorithm_instance = self.algorithm(None, self.parameters)

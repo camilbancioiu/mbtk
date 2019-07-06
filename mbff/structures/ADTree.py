@@ -62,10 +62,12 @@ class ADTree:
                 for values in itertools.product(*variable_values):
                     query_values = dict(zip(variables, values))
                     p = self.p(query_values, query_given)
-                    if len(values) == 1: values = values[0]
+                    if len(values) == 1:
+                        values = values[0]
                     pmf.probabilities[values] = p
 
-                if len(cvalues) == 1: cvalues = cvalues[0]
+                if len(cvalues) == 1:
+                    cvalues = cvalues[0]
                 cpmf.conditional_probabilities[cvalues] = pmf
 
             return cpmf
@@ -75,7 +77,8 @@ class ADTree:
             for values in itertools.product(*variable_values):
                 query_values = dict(zip(variables, values))
                 p = self.p(query_values)
-                if len(values) == 1: values = values[0]
+                if len(values) == 1:
+                    values = values[0]
                 pmf.probabilities[values] = p
 
             return pmf
@@ -217,7 +220,7 @@ class ADNode:
     def create_Vary_children(self):
         column_count = self.tree.matrix.get_shape()[1]
         for column_index in range(self.column_index + 1, column_count):
-            varyNode = VaryNode(self.tree, column_index, self.row_selection, level=self.level+1)
+            varyNode = VaryNode(self.tree, column_index, self.row_selection, level=self.level + 1)
             self.Vary_children.append(varyNode)
 
 
@@ -227,12 +230,12 @@ class ADNode:
                 return child
         return None
 
-    
+
     def __str__(self):
         children = self.children_to_string()
         if len(children) > 0:
             children = "\n" + children
-        return "{}AD col{}={} ({}){}".format(INDENT*(self.level), self.column_index, self.value, self.count, children)
+        return "{}AD col{}={} ({}){}".format(INDENT * (self.level), self.column_index, self.value, self.count, children)
 
 
     def children_to_string(self):
@@ -264,7 +267,7 @@ class VaryNode:
             row_selection = self.row_subselections[value]
             adNode = None
             if len(row_selection) > 0 and value != self.most_common_value:
-                adNode = ADNode(self.tree, self.column_index, value, row_selection, level=self.level+1)
+                adNode = ADNode(self.tree, self.column_index, value, row_selection, level=self.level + 1)
             self.AD_children.append(adNode)
 
 
@@ -308,14 +311,14 @@ class VaryNode:
 
 
     def discoverMCV(self):
-        return max(self.values, key=lambda v: len(self.row_subselections[v])) 
+        return max(self.values, key=lambda v: len(self.row_subselections[v]))
 
 
     def __str__(self):
         children = self.children_to_string()
         if len(children) > 0:
             children = "\n" + children
-        return "{}Vary col{} (MCV={}){}".format(INDENT*(self.level), self.column_index, self.most_common_value, children)
+        return "{}Vary col{} (MCV={}){}".format(INDENT * (self.level), self.column_index, self.most_common_value, children)
 
 
     def children_to_string(self):
@@ -324,10 +327,9 @@ class VaryNode:
             if value != self.most_common_value:
                 child = self.get_AD_child_for_value(value)
                 if child is None:
-                    rendered_children.append("{}AD col{}={} (0) NULL".format(INDENT*(self.level+1), self.column_index, value))
+                    rendered_children.append("{}AD col{}={} (0) NULL".format(INDENT * (self.level + 1), self.column_index, value))
                 else:
                     rendered_children.append(str(child))
             else:
-                rendered_children.append("{}AD col{}={} (MCV) NULL".format(INDENT*(self.level+1), self.column_index, value))
+                rendered_children.append("{}AD col{}={} (MCV) NULL".format(INDENT * (self.level + 1), self.column_index, value))
         return "\n".join(rendered_children)
-
