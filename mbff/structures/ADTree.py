@@ -4,6 +4,9 @@ import itertools
 import os
 
 from mbff.math.PMF import PMF, CPMF
+from mbff.structures.Exceptions import ADTreeCannotDescend_MCVNode
+from mbff.structures.Exceptions import ADTreeCannotDescend_LeafListNode
+from mbff.structures.Exceptions import ADTreeCannotDescend_ZeroCountNode
 
 INDENT = "|---"
 
@@ -106,6 +109,102 @@ class ADTree:
             print('Leaf list node count', self.leaf_list_nodes)
             if isinstance(node, ADNode):
                 print("ADNode added to bin", count_bin)
+
+
+    def make_cpmf_2(self, variables, given=list(), node=None):
+        result = None
+        if self.debug: print('ADTree.make_cpmf_quick: variables {}, given {} in progress...'.format(variables, given))
+        if self.debug: self.debug_reset_query_counts()
+        if self.debug: self.n_cpmf += 1
+        if self.debug: start_time = time.time()
+
+        if node is None:
+            node = self.root
+
+        conditioning_values = list()
+        for conditioning_variable in given:
+            conditioning_values.append(self.column_values[conditioning_variable])
+
+        variable_values = list()
+        for variable in variables:
+            variable_values.append(self.column_values[variable])
+
+        if len(given) > 0:
+            cpmf = CPMF(None, None)
+
+            for cvalues in itertools.product(*conditioning_values):
+                query_given = dict(zip(given, cvalues))
+                try:
+                    conditioning_node = self.find_node_for_values(query_given, node)
+                    conditioning_count = conditioning_node.count
+
+                    pmf = PMF(None)
+                    for values in itertools.product(*variable_values):
+                        count = self.query_count(values, conditioning_node)
+                        p = count / conditioning_count
+                        if len(values) == 1:
+                            values = values[0]
+                        pmf.probabilities[values] = p
+                except ADTreeCannotDescend_LeafListNode as exLeafListNode:
+                    # TODO create PMF here
+                    pass
+                except ADTreeCannotDescend_MCVNode as exMCVNode:
+                    # TODO create PMF here
+                    pass
+                except ADTreeCannotDescend_ZeroCountNode as exZeroNode:
+                    # TODO create PMF here
+                    pass
+
+                cpmf.conditional_probabilities[cvalues] = pmf
+
+        if self.debug: duration = time.time() - start_time
+        if self.debug: print("...took {:.2f}s, done.".format(duration))
+        return result
+
+
+    def find_node_for_values(self, values, current_node=None):
+        if current_node is None:
+            current_node = self.root
+
+        if len(values) == 0:
+            return current_node
+
+        if current_node.leaf_list_node is True:
+            raise ADTreeCannotDescend_LeafListNode(self, values, current_node)
+
+        # Retrieve the column index we are currently on, within the tree, and
+        # what value has been requested in the query for that column index.
+        column_indices = sorted(list(values.keys()))
+        column_index = column_indices[0]
+        value = values[column_index]
+
+        # Retrieve the Vary node among our immediate children that represents
+        # the current column index.
+        vary = current_node.get_Vary_child_for_column(column_index)
+
+        # Retrieve the ADNode among the children of the aforementioned Vary
+        # node which represents the value that was requested in the query for
+        # the current column index.
+        child = vary.get_AD_child_for_value(value)
+
+        # Prepare the query that will be passed down to the descendants, which
+        # has the current column index removed from it (but otherwise identical).
+        next_values = values.copy()
+        next_values.pop(column_index)
+
+        # We previously retrieved the ADNode that represents the current piece
+        # of the query we're processing (i.e. current column index and its
+        # value from the query). Now we must see whether this ADNode is None or
+        # not, because 'None' has special meaning in an AD-tree.
+        if child is not None:
+            # The ADNode for the current value exists, query it deeper.
+            return self.find_node_for_values(next_values, child)
+        else:
+            if vary.most_common_value != value:
+                # The ADNode is None, because of zero count.
+                raise ADTreeCannotDescend_ZeroCountNode(self, values)
+            else:
+                raise ADTreeCannotDescend_MCVNode(self, values)
 
 
     def make_cpmf(self, variables, given=list()):
