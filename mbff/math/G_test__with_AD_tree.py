@@ -33,8 +33,9 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
 
     def build_AD_tree(self):
         if self.debug: print("Building the AD-tree...")
+        leaf_list_threshold = self.parameters['ci_test_ad_tree_leaf_list_threshold']
         self.AD_tree_build_start_time = time.time()
-        self.AD_tree = mbff.structures.ADTree.ADTree(self.matrix, self.column_values)
+        self.AD_tree = mbff.structures.ADTree.ADTree(self.matrix, self.column_values, leaf_list_threshold)
         self.AD_tree_build_end_time = time.time()
         self.AD_tree_build_duration = self.AD_tree_build_end_time - self.AD_tree_build_start_time
 

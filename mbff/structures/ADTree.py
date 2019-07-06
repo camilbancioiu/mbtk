@@ -36,9 +36,10 @@ class ADTree:
     missing values, which is done by performing multiple extra queries.
     """
 
-    def __init__(self, matrix, column_values):
+    def __init__(self, matrix, column_values, leaf_list_threshold=0):
         self.matrix = matrix
         self.column_values = column_values
+        self.leaf_list_threshold = leaf_list_threshold
         self.root = ADNode(self, -1, '*', row_selection=None, level=0)
 
 
@@ -106,11 +107,16 @@ class ADTree:
         Query the tree, requesting the number of samples that the dataset has
         for a specific combination of attributes-to-values.
         """
+        if self.debug: self.n_queries += 1
+
         if query_node is None:
             query_node = self.root
 
         if len(values) == 0:
             return query_node.count
+
+        if query_node.leaf_list_node:
+            return self.query_count_in_leaf_list_node(values, query_node)
 
         # Retrieve the column index we are currently on, within the tree, and
         # what value has been requested in the query for that column index.
@@ -125,7 +131,7 @@ class ADTree:
         # Retrieve the ADNode among the children of the aforementioned Vary
         # node which represents the value that was requested in the query for
         # the current column index.
-        node = vary.get_AD_child_for_value(value)
+        child = vary.get_AD_child_for_value(value)
 
         # Prepare the query that will be passed down to the descendants, which
         # has the current column index removed from it (but otherwise identical).
@@ -136,9 +142,9 @@ class ADTree:
         # of the query we're processing (i.e. current column index and its
         # value from the query). Now we must see whether this ADNode is None or
         # not, because 'None' has special meaning in an AD-tree.
-        if node is not None:
+        if child is not None:
             # The ADNode for the current value exists, query it deeper.
-            return self.query_count(next_values, node)
+            return self.query_count(next_values, child)
         else:
             if vary.most_common_value != value:
                 # The ADNode is None, because of zero count.
@@ -169,6 +175,19 @@ class ADTree:
                     return query_count_in_parent - query_count_in_siblings
 
 
+    def query_count_in_leaf_list_node(self, values, query_node):
+        if self.debug: self.n_queries_ll += 1
+        count = 0
+        for row_index in query_node.row_selection:
+            match = True
+            for column_index, value in values.items():
+                if self.matrix[row_index, column_index] != value:
+                    match = False
+            if match:
+                count += 1
+        return count
+
+
     def __str__(self):
         return str(self.root)
 
@@ -185,9 +204,14 @@ class ADNode:
             self.count = len(self.row_selection)
         self.column_index = column_index
         self.value = value
+        self.leaf_list_node = False
         self.Vary_children = []
 
-        self.create_Vary_children()
+        if self.count < self.tree.leaf_list_threshold:
+            self.leaf_list_node = True
+
+        if not self.leaf_list_node:
+            self.create_Vary_children()
 
 
     def create_Vary_children(self):
