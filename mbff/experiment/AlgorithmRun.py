@@ -24,6 +24,10 @@ class AlgorithmRun:
 
         # self.label could be a Template string.
         self.label = self.configuration['label']
+
+        if callable(self.label):
+            self.label = self.label(self.parameters)
+
         if isinstance(self.label, Template):
             self.label = self.label.safe_substitute(self.parameters)
 

@@ -41,6 +41,18 @@ from mbff.experiment.AlgorithmRun import AlgorithmRun
 from mbff.experiment.AlgorithmRunDatapoint import AlgorithmRunDatapoint
 from mbff.algorithms.mb.ipcmb import AlgorithmIPCMB
 
+
+def make_algorithm_run_label(parameters):
+    if parameters['ci_test_class'] is mbff.math.DSeparationCITest.DSeparationCITest:
+        return Template('run_${algorithm_run_index}_T${target}__dsep')
+    if parameters['ci_test_class'] is mbff.math.G_test__unoptimized.G_test:
+        return Template('run_${algorithm_run_index}_T${target}__unoptimized')
+    if parameters['ci_test_class'] is mbff.math.G_test__with_AD_tree.G_test:
+        return Template('run_${algorithm_run_index}_T${target}__@LLT=${ci_test_ad_tree_leaf_list_threshold}')
+    if parameters['ci_test_class'] is mbff.math.G_test__with_dcMI.G_test:
+        return Template('run_${algorithm_run_index}_T${target}__dcMI')
+
+
 EXPRUN_REPO = EXPERIMENTS_ROOT / 'exprun_repository'
 
 IPCMB_ADTree_LLT_Eval_Definition = ExperimentDefinition(EXPRUN_REPO, 'IPCMB_ADTree_LLT_Eval')
@@ -52,7 +64,7 @@ IPCMB_ADTree_LLT_Eval_Definition.save_algorithm_run_datapoints = True
 IPCMB_ADTree_LLT_Eval_Definition.algorithm_run_log__stdout = True
 IPCMB_ADTree_LLT_Eval_Definition.algorithm_run_log__file = True
 IPCMB_ADTree_LLT_Eval_Definition.algorithm_run_configuration = {
-    'label': Template('run_${algorithm_run_index}_T${target}__@LLT=${ci_test_ad_tree_leaf_list_threshold}'),
+    'label': make_algorithm_run_label,
     'algorithm': AlgorithmIPCMB
 }
 
