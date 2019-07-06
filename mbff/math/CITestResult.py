@@ -3,6 +3,15 @@ import time
 
 class CITestResult:
 
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
     def __init__(self):
         self.independent = None
         self.dependent = None
@@ -105,11 +114,16 @@ class CITestResult:
 
 
     def __str__(self):
-        self.i_or_d = ''
+        view = dict()
+        view.update(self.__dict__)
+        view['startcode'] = ''
+        view['endcode'] = ''
+
+        view['i_or_d'] = ''
         if self.independent:
-            self.i_or_d = 'I'
+            view['i_or_d'] = 'I'
         else:
-            self.i_or_d = 'D'
+            view['i_or_d'] = 'D'
 
         d_sep_verification = ''
         if self.computed_d_separation is not None:
@@ -117,18 +131,22 @@ class CITestResult:
                 d_sep_verification = '✔'
             else:
                 d_sep_verification = '✘'
-        self.i_or_d += d_sep_verification
-        self.duration_in_seconds = self.duration
+                view['startcode'] = self.WARNING
+                view['endcode'] = self.ENDC
+        view['i_or_d'] += d_sep_verification
+        view['duration_in_seconds'] = self.duration
 
         format_string = (
+            "{startcode}"
             "CI test {X:>4} ⊥ {Y:<4} | {Z:<20}: {i_or_d}"
             " @ {significance:6.4f}"
             " with {statistic}={statistic_value:>8.2f}"
             " at p={p_value:<8.6f} on {test_distribution}"
             ", Δt={duration_in_seconds:>10.4f}s"
+            "{endcode}"
         )
 
-        output = format_string.format(**self.__dict__)
+        output = format_string.format(**view)
         if self.extra_info is not None:
             output += self.extra_info
 
