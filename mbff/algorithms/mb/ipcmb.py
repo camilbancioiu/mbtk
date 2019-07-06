@@ -44,6 +44,7 @@ class AlgorithmIPCMB:
 
     def select_features(self):
         selected_features = sorted(list(self.IPCMB(self.target)))
+        self.CITest.end()
         return selected_features
 
 

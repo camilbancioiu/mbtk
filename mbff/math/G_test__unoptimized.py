@@ -1,3 +1,4 @@
+import pickle
 
 from mbff.math.Variable import validate_variable_instances_lengths
 from mbff.math.CITestResult import CITestResult
@@ -87,3 +88,10 @@ class G_test:
 
     def calculate_degrees_of_freedom(self, VarX, VarY):
         return (len(VarX.values) - 1) * (len(VarY.values) - 1)
+
+
+    def end(self):
+        save_path = self.parameters.get('ci_test_results_path__save', None)
+        if save_path is not None:
+            with save_path.open('wb') as f:
+                pickle.dump(self.ci_test_results, f)
