@@ -1,5 +1,7 @@
+import time
 import collections
 import itertools
+import os
 
 from mbff.math.PMF import PMF, CPMF
 
@@ -36,14 +38,81 @@ class ADTree:
     missing values, which is done by performing multiple extra queries.
     """
 
-    def __init__(self, matrix, column_values, leaf_list_threshold=0):
+    def __init__(self, matrix, column_values, leaf_list_threshold=0, debug_options=(False, False)):
         self.matrix = matrix
         self.column_values = column_values
+        self.ad_node_count = 0
+        self.vary_node_count = 0
         self.leaf_list_threshold = leaf_list_threshold
-        self.root = ADNode(self, -1, '*', row_selection=None, level=0)
+        self.start_time = 0
+        self.end_time = 0
+        self.duration = 0.0
+        self.size = 0
+
+        (self.debug, self.debug_to_stdout) = debug_options
+
+        if self.debug:
+            self.debug_prepare__building()
+            self.debug_prepare__querying()
+            self.start_time = time.time()
+            self.root = ADNode(self, -1, '*', row_selection=None, level=0)
+            if self.debug_to_stdout:
+                os.system('clear')
+            self.end_time = time.time()
+            self.duration = self.end_time - self.start_time
+        else:
+            self.root = ADNode(self, -1, '*', row_selection=None, level=0)
+
+
+    def debug_prepare__building(self):
+        self.count_stats = dict()
+        self.count_bins = 50
+        for i in range(self.count_bins):
+            self.count_stats[i] = 0
+        self.sample_count = self.matrix.get_shape()[0]
+        self.bin_size = int(self.sample_count / self.count_bins)
+        self.leaf_list_nodes = 0
+
+
+    def debug_prepare__querying(self):
+        self.n_queries = 0
+        self.n_queries_ll = 0
+        self.n_cpmf = 0
+
+
+    def debug_reset_query_counts(self):
+        self.n_queries = 0
+        self.n_queries_ll = 0
+
+
+    def debug_node(self, node):
+        count_bin = -1
+        if isinstance(node, ADNode):
+            if node.count == self.sample_count:
+                return
+            count_bin = int(self.count_bins * node.count / self.sample_count)
+            self.count_stats[count_bin] += 1
+
+            if node.leaf_list_node:
+                self.leaf_list_nodes += 1
+
+        if self.debug_to_stdout:
+            os.system('clear')
+            for i in range(self.count_bins):
+                c = self.count_stats[i]
+                print('{:>8} ({:2}): {}'.format(self.bin_size * (i + 1), i, c))
+            print('AD-Node count', self.ad_node_count)
+            print('Vary Node count', self.vary_node_count)
+            print('Leaf list node count', self.leaf_list_nodes)
+            if isinstance(node, ADNode):
+                print("ADNode added to bin", count_bin)
 
 
     def make_cpmf(self, variables, given=list()):
+        if self.debug: print('ADTree.make_cpmf: variables {}, given {}'.format(variables, given), end=" ")
+        if self.debug: self.debug_reset_query_counts()
+        if self.debug: self.n_cpmf += 1
+        if self.debug: start_time = time.time()
 
         conditioning_values = list()
         for conditioning_variable in given:
@@ -70,8 +139,7 @@ class ADTree:
                     cvalues = cvalues[0]
                 cpmf.conditional_probabilities[cvalues] = pmf
 
-            return cpmf
-
+            result = cpmf
         else:
             pmf = PMF(None)
             for values in itertools.product(*variable_values):
@@ -81,7 +149,11 @@ class ADTree:
                     values = values[0]
                 pmf.probabilities[values] = p
 
-            return pmf
+            result = pmf
+
+        if self.debug: duration = time.time() - start_time
+        if self.debug: print("took {:.2f}s, done.".format(duration))
+        return result
 
 
     def p(self, values, given={}):
@@ -95,6 +167,7 @@ class ADTree:
         specific combination of attributes-to-values, given a separate
         combination of attributes-to-values.
         """
+
         joint_query = {}
         joint_query.update(given)
         joint_query.update(values)
@@ -210,8 +283,13 @@ class ADNode:
         self.leaf_list_node = False
         self.Vary_children = []
 
+        self.tree.ad_node_count += 1
+
         if self.count < self.tree.leaf_list_threshold:
             self.leaf_list_node = True
+
+        if self.tree.debug:
+            self.tree.debug_node(self)
 
         if not self.leaf_list_node:
             self.create_Vary_children()
@@ -259,6 +337,12 @@ class VaryNode:
         self.create_row_subselections_by_value()
         self.values = self.tree.column_values[column_index]
         self.most_common_value = self.discoverMCV()
+
+        self.tree.vary_node_count += 1
+
+        if self.tree.debug:
+            self.tree.debug_node(self)
+
         self.create_AD_children()
 
 

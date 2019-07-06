@@ -13,7 +13,7 @@ class G_test:
 
     def __init__(self, datasetmatrix, parameters):
         self.parameters = parameters
-        self.debug = self.parameters.get('debug', False)
+        self.debug = self.parameters.get('ci_test_debug', False)
         self.datasetmatrix = datasetmatrix
         self.significance = parameters.get('ci_test_significance', 0)
         self.omega = parameters.get('omega', None)
@@ -57,6 +57,9 @@ class G_test:
         result.set_variables(VarX, VarY, VarZ)
         result.set_statistic('G', G, dict())
         result.set_distribution('chi2', p, {'DoF': DF})
+
+        if self.debug: print(result)
+        if self.debug: print()
 
         return result
 

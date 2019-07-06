@@ -17,6 +17,7 @@ class CITestResult:
         self.p_value = None
         self.significance = None
         self.computed_d_separation = None
+        self.extra_info = None
 
         self.start_time = 0
         self.end_time = 0
@@ -125,8 +126,10 @@ class CITestResult:
             " with {statistic}={statistic_value:>8.2f}"
             " at p={p_value:<8.6f} on {test_distribution}"
             ", Δt={duration_in_seconds:>10.4f}s"
-            )
+        )
 
-        return format_string.format(**self.__dict__)
+        output = format_string.format(**self.__dict__)
+        if self.extra_info is not None:
+            output += self.extra_info
 
-
+        return output
