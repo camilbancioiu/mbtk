@@ -8,6 +8,10 @@ import mbff.math.G_test__unoptimized
 import mbff.math.G_test__with_AD_tree
 import mbff.math.G_test__with_dcMI
 
+import pympler.asizeof
+import humanize
+import time
+
 
 @unittest.skipIf(TestBase.tag_excluded('ipcmb_run'), 'Tests running IPC-MB are excluded')
 class TestAlgorithmIPCMBOptimizations(TestBase):
@@ -26,12 +30,17 @@ class TestAlgorithmIPCMBOptimizations(TestBase):
 
 
     def test_IPCMB_w_AD_tree(self):
-        dm_label = 'survey'
         ipcmb = self.run_IPCMB('survey', 3, mbff.math.G_test__with_AD_tree.G_test)
+        AD_tree = ipcmb.CITest.AD_tree
+        size = pympler.asizeof.asizeof(AD_tree)
+        print("AD-tree size: {}".format(humanize.naturalsize(size)))
 
 
     def test_IPCMB_w_dcMI(self):
         ipcmb = self.run_IPCMB('survey', 3, mbff.math.G_test__with_dcMI.G_test)
+        jmi_cache = ipcmb.CITest.JMI_cache
+        size = pympler.asizeof.asizeof(jmi_cache)
+        print("JMI_cache size: {}".format(humanize.naturalsize(size)))
 
 
     def run_IPCMB(self, dm_label, target, ci_test_class, bif_file=None):
@@ -43,12 +52,17 @@ class TestAlgorithmIPCMBOptimizations(TestBase):
         parameters['target'] = target
         parameters['ci_test_class'] = ci_test_class
         parameters['ci_test_significance'] = 0.95
+        parameters['ci_test_ad_tree_leaf_list_threshold'] = 5000
         parameters['debug'] = False
         parameters['omega'] = omega
         parameters['source_bayesian_network'] = bn
 
+        print()
+        start_time = time.time()
         ipcmb = AlgorithmIPCMB(datasetmatrix, parameters)
         ipcmb.select_features()
+        end_time = time.time()
+        print("Algorithm run duration: {:.2f}s".format(end_time - start_time))
         computed_citrs = ipcmb.CITest.ci_test_results
         self.assert_ci_test_results_equal_to_reference(dm_label, computed_citrs)
 
@@ -84,8 +98,11 @@ class TestAlgorithmIPCMBOptimizations(TestBase):
         parameters['source_bayesian_network'] = bn
         parameters['ci_test_results'] = list()
 
+        start_time = time.time()
         ipcmb = AlgorithmIPCMB(datasetmatrix, parameters)
         ipcmb.select_features()
+        end_time = time.time()
+        print("Reference run duration: {:.2f}s".format(end_time - start_time))
         return ipcmb.CITest.ci_test_results
 
 
@@ -106,8 +123,8 @@ class TestAlgorithmIPCMBOptimizations(TestBase):
                 'Differing CI test results:\n'
                 'REFERENCE: {}\n'
                 'COMPUTED:  {}\n'
-                ).format(ref_citr, comp_citr)
-            self.assertTrue(ref_citr == comp_citr)
+            ).format(ref_citr, comp_citr)
+            self.assertTrue(ref_citr == comp_citr, failMessage)
 
 
     def configure_dataset(self, dm_label):
@@ -115,7 +132,7 @@ class TestAlgorithmIPCMBOptimizations(TestBase):
 
         if dm_label == 'survey':
             configuration['sourcepath'] = Path('testfiles', 'bif_files', 'survey.bif')
-            configuration['sample_count'] = int(5e4)
+            configuration['sample_count'] = int(5e5)
             configuration['random_seed'] = 42 * 42
             configuration['values_as_indices'] = True
             configuration['objectives'] = []
