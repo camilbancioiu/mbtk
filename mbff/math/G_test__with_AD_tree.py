@@ -76,6 +76,9 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
 
         self.ci_test_results.append(result)
 
+        if self.debug: print(result)
+        if self.debug: print()
+
         # Garbage collection required to deallocate variable instances.
         gc.collect()
 
@@ -109,9 +112,6 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
                 ' queries {n_queries},'
                 ' of which leaf-list queries {n_queries_ll}'
             ).format(**self.AD_tree.__dict__)
-
-        if self.debug: print(result)
-        if self.debug: print()
 
         return result
 
