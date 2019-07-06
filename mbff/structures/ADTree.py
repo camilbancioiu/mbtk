@@ -111,55 +111,112 @@ class ADTree:
                 print("ADNode added to bin", count_bin)
 
 
-    def make_cpmf_2(self, variables, given=list(), node=None):
-        result = None
-        if self.debug: print('ADTree.make_cpmf_quick: variables {}, given {} in progress...'.format(variables, given))
+    def request_cpmf(self, variables, given=list()):
         if self.debug: self.debug_reset_query_counts()
         if self.debug: self.n_cpmf += 1
         if self.debug: start_time = time.time()
 
-        if node is None:
-            node = self.root
+        cpmf = CPMF(None, None)
+
+        variables = sorted(variables)
 
         conditioning_values = list()
         for conditioning_variable in given:
             conditioning_values.append(self.column_values[conditioning_variable])
 
+        for cvalues in itertools.product(*conditioning_values):
+            cpmf.conditional_probabilities[cvalues] = self.make_pmf(variables, cvalues)
+
+        return cpmf
+
+
+    def make_pmf_2(self, variables=list(), current_values_key=list(), node=None):
+        if node is None:
+            node = self.root
+
+        if len(variables) == 0:
+            pmf = dict()
+            pmf[node.value] = node.count
+            return pmf
+
+        variables = sorted(variables)
+
+        # Retrieve the column index we are currently on, within the tree, and
+        # what value has been requested in the query for that column index.
+        column_indices = variables
+        column_index = column_indices[0]
+
+        # Retrieve the Vary node among our immediate children that represents
+        # the current column index.
+        vary = node.get_Vary_child_for_column(column_index)
+
+        next_values = values.copy()
+        next_values.pop(column_index)
+
+        for value in vary.values:
+            if value != vary.most_common_value:
+                child = vary.get_AD_child_for_value(value)
+                pmf = 
+
+
+
+    def make_pmf(self, variables, cvalues, current_values_key=list(), node=None):
+        if node is None:
+            node = self.root
+            current_values_key=()
+
         variable_values = list()
         for variable in variables:
             variable_values.append(self.column_values[variable])
 
-        if len(given) > 0:
-            cpmf = CPMF(None, None)
+        cpmf = CPMF(None, None)
 
-            for cvalues in itertools.product(*conditioning_values):
-                query_given = dict(zip(given, cvalues))
-                try:
-                    conditioning_node = self.find_node_for_values(query_given, node)
-                    conditioning_count = conditioning_node.count
+        try:
+            conditioning_node = self.find_node_for_values(cvalues, node)
+            conditioning_count = conditioning_node.count
 
-                    pmf = PMF(None)
-                    for values in itertools.product(*variable_values):
-                        count = self.query_count(values, conditioning_node)
-                        p = count / conditioning_count
-                        if len(values) == 1:
-                            values = values[0]
-                        pmf.probabilities[values] = p
-                except ADTreeCannotDescend_LeafListNode as exLeafListNode:
-                    # TODO create PMF here
-                    pass
-                except ADTreeCannotDescend_MCVNode as exMCVNode:
-                    # TODO create PMF here
-                    pass
-                except ADTreeCannotDescend_ZeroCountNode as exZeroNode:
-                    # TODO create PMF here
-                    pass
 
-                cpmf.conditional_probabilities[cvalues] = pmf
+        except ADTreeCannotDescend_LeafListNode as exLeafListNode:
+            conditioning_node = exLeafListNode.leaf_list_node
+            conditioning_count = conditioning_node.count
+
+            pmf = PMF(None)
+
+        except ADTreeCannotDescend_MCVNode as exMCVNode:
+            # TODO create PMF here
+            pass
+        except ADTreeCannotDescend_ZeroCountNode as exZeroNode:
+            # TODO create PMF here
+            pass
+
+        cpmf.conditional_probabilities[cvalues] = pmf
 
         if self.debug: duration = time.time() - start_time
         if self.debug: print("...took {:.2f}s, done.".format(duration))
         return result
+
+
+    def make_cpmf_2(self, variables, node=None):
+        if node is None:
+            node = self.root
+
+        # Retrieve the column index we are currently on, within the tree, and
+        # what value has been requested in the query for that column index.
+        column_indices = variables
+        column_index = column_indices[0]
+
+        # Retrieve the Vary node among our immediate children that represents
+        # the current column index.
+        vary = node.get_Vary_child_for_column(column_index)
+
+        next_values = values.copy()
+        next_values.pop(column_index)
+
+        for value in vary.values:
+            if value != vary.most_common_value:
+                child = vary.get_AD_child_for_value(value)
+
+
 
 
     def find_node_for_values(self, values, current_node=None):
@@ -204,6 +261,8 @@ class ADTree:
                 # The ADNode is None, because of zero count.
                 raise ADTreeCannotDescend_ZeroCountNode(self, values)
             else:
+                # The ADNode is None, because it would represent the most
+                # common value.
                 raise ADTreeCannotDescend_MCVNode(self, values)
 
 
@@ -420,6 +479,62 @@ class ADNode:
         for child in self.Vary_children:
             rendered_children.append(str(child))
         return "\n".join(rendered_children)
+
+
+    def make_pmf(self, columns=list()):
+        if len(columns) == 0:
+            return { self.value: self.count }
+
+        if self.leaf_list_node:
+            return self.get_pmf_from_leaf_list(self, columns)
+
+        non_mcv_pmf = dict()
+        next_column = columns[0]
+        vary = self.get_Vary_child_for_column(next_column)
+
+        for value in vary.values:
+            if value != vary.most_common_value:
+                child = vary.get_AD_child_for_value(value)
+                if child is None:
+                    non_mcv_pmf[(self.value, value)] = 0
+                else:
+                    child_pmf = child.make_pmf(columns[1:])
+                    self.concatenate_pmfs(non_mcv_pmf, self.value, child_pmf)
+
+        sub_pmf = self.make_pmf(columns[1:])
+        self.deduct_pmf(sub_pmf, non_mcv_pmf)
+
+        return sub_pmf
+
+
+    def get_pmf_from_leaf_list(self, columns):
+        count = 0
+        pmf = dict()
+
+        matrix = self.tree.matrix
+
+        for row_index in self.row_selection:
+            key = []
+            for column_index in columns:
+                value = matrix[row_index, column_index]
+                key.append(value)
+            key = tuple(key)
+            try:
+                pmf[key] += 1
+            except KeyError:
+                pmf[key] = 1
+        return pmf
+
+
+    def concatenate_pmfs(self, left_pmf, value, right_pmf):
+        for key, count in right_pmf.items():
+            full_key = tuple([value] + list(key))
+            left_pmf[full_key] = count
+
+
+    def deduct_pmf(self, left_pmf, right_pmf):
+        for key in left_pmf:
+            left_pmf[key] -= right_pmf[key]
 
 
 

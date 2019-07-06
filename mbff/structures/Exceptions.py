@@ -21,8 +21,10 @@ class ADTreeCannotDescend_ZeroCountNode(Exception):
 
 class ADTreeCannotDescend_MCVNode(Exception):
 
-    def __init__(self, adtree, values):
+    def __init__(self, adtree, values, parent_node, next_values):
         self.adtree = adtree
         self.values = values
+        self.parent_node = parent_node
+        self.next_values = next_values
         self.message = "Cannot descend into an MCV node."
         super().__init__(self.message)
