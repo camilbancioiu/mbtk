@@ -1,5 +1,6 @@
 import time
 import numpy
+import gc
 from string import Template
 
 
