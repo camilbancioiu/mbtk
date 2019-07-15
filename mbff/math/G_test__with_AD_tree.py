@@ -47,25 +47,24 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
 
 
     def build_AD_tree(self):
-        if self.debug: print("Building the AD-tree...")
+        if self.debug >= 1: print("Building the AD-tree...")
         leaf_list_threshold = self.parameters['ci_test_ad_tree_leaf_list_threshold']
         self.AD_tree_build_start_time = time.time()
-        self.AD_tree = mbff.structures.ADTree.ADTree(self.matrix, self.column_values, leaf_list_threshold, (self.debug, self.debug))
+        self.AD_tree = mbff.structures.ADTree.ADTree(self.matrix, self.column_values, leaf_list_threshold, self.debug - 1)
         self.AD_tree_build_end_time = time.time()
         self.AD_tree_build_duration = self.AD_tree_build_end_time - self.AD_tree_build_start_time
-        if self.debug: print("AD-tree built in {:>10.4f}s".format(self.AD_tree_build_duration))
+        if self.debug >= 1: print("AD-tree built in {:>10.4f}s".format(self.AD_tree_build_duration))
 
 
     def load_AD_tree(self, adtree_load_path):
-        if self.debug: print("Loading the AD-tree from {} ...".format(adtree_load_path))
+        if self.debug >= 1: print("Loading the AD-tree from {} ...".format(adtree_load_path))
         with adtree_load_path.open('rb') as f:
             self.AD_tree = pickle.load(f)
 
-        self.AD_tree.debug = self.debug
-        self.AD_tree.debug_to_stdout = self.debug
-        if self.AD_tree.debug:
+        self.AD_tree.debug = self.debug - 1
+        if self.AD_tree.debug >= 1:
             self.AD_tree.debug_prepare__querying()
-        if self.debug: print('AD-tree loaded.')
+        if self.debug >= 1: print('AD-tree loaded.')
 
 
     def conditionally_independent(self, X, Y, Z):
@@ -76,8 +75,8 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
 
         self.ci_test_results.append(result)
 
-        if self.debug: print(result)
-        if self.debug: print()
+        if self.debug >= 1: print(result)
+        if self.debug >= 1: print()
 
         # Garbage collection required to deallocate variable instances.
         gc.collect()
@@ -105,10 +104,10 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
         result.set_statistic('G', G, dict())
         result.set_distribution('chi2', p, {'DoF': DF})
 
-        if self.AD_tree.debug:
+        if self.AD_tree.debug >= 1:
             result.extra_info = (
                 '\nAD-Tree:'
-                ' CPMFs {n_cpmf},'
+                ' total of {n_pmf} contingency tables; currently {n_pmf_ll} contingency tables from leaf-lists;'
                 ' queries {n_queries},'
                 ' of which leaf-list queries {n_queries_ll}'
             ).format(**self.AD_tree.__dict__)

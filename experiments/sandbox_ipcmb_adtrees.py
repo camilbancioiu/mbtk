@@ -88,8 +88,9 @@ if __name__ == '__main__':
             'debug': False,
             'omega': omega,
             'source_bayesian_network': bayesian_network,
+            'algorithm_debug': 1,
             'ci_test_class': mbff.math.DSeparationCITest.DSeparationCITest,
-            'ci_test_debug': True,
+            'ci_test_debug': 1,
             'ci_test_results_path__save': ci_test_results_folder / 'ci_test_results_{}_T3_dsep.pickle'.format(exdsDef.name)
         }
     ]
@@ -100,9 +101,10 @@ if __name__ == '__main__':
             'debug': False,
             'omega': omega,
             'source_bayesian_network': bayesian_network,
+            'algorithm_debug': 1,
             'ci_test_class': mbff.math.G_test__unoptimized.G_test,
             'ci_test_significance': 0.95,
-            'ci_test_debug': True,
+            'ci_test_debug': 1,
             'ci_test_results_path__save': ci_test_results_folder / 'ci_test_results_{}_T3_unoptimized.pickle'.format(exdsDef.name)
         }
     ]
@@ -112,9 +114,10 @@ if __name__ == '__main__':
             'debug': False,
             'omega': omega,
             'source_bayesian_network': bayesian_network,
+            'algorithm_debug': 1,
             'ci_test_class': mbff.math.G_test__with_dcMI.G_test,
             'ci_test_significance': 0.95,
-            'ci_test_debug': True,
+            'ci_test_debug': 1,
             'ci_test_results_path__save': ci_test_results_folder / 'ci_test_results_{}_T3_dcMI.pickle'.format(exdsDef.name)
         }
     ]
@@ -125,9 +128,10 @@ if __name__ == '__main__':
             'debug': False,
             'omega': omega,
             'source_bayesian_network': bayesian_network,
+            'algorithm_debug': 1,
             'ci_test_class': mbff.math.G_test__with_AD_tree.G_test,
             'ci_test_significance': 0.95,
-            'ci_test_debug': True,
+            'ci_test_debug': 1,
             'ci_test_ad_tree_leaf_list_threshold': LLT,
             'ci_test_ad_tree_path__load': adtree_folder / 'adtree_{}_llt{}.pickle'.format(exdsDef.name, LLT),
             'ci_test_ad_tree_path__save': adtree_folder / 'adtree_{}_llt{}.pickle'.format(exdsDef.name, LLT),

@@ -13,7 +13,7 @@ class AlgorithmIPCMB:
 
     def __init__(self, datasetmatrix, parameters):
         self.parameters = parameters
-        self.debug = self.parameters.get('debug', False)
+        self.debug = self.parameters.get('algorithm_debug', 0)
         self.datasetmatrix = datasetmatrix
 
         # The 'target' is the index of a column in datasetmatrix.X.
@@ -53,7 +53,7 @@ class AlgorithmIPCMB:
         The main function of the IPC-MB algorithm. See the IPC-MB article for
         details.
         """
-        if self.debug: print('Begin IPCMB')
+        if self.debug >= 1: print('Begin IPCMB')
         CandidatePC_T = self.RecognizePC(T, self.U - {T})
 
         PC = set()
@@ -69,29 +69,29 @@ class AlgorithmIPCMB:
         # the parents and children of a node, instead of the entire Markov blanket.
         pc_only = self.parameters.get('pc_only', False)
         if pc_only:
-            if self.debug: print('Returning only PC: {}'.format(PC))
+            if self.debug >= 1: print('Returning only PC: {}'.format(PC))
             return PC
         else:
-            if self.debug: print('\tCurrent PC before adding spouses: {}'.format(PC))
+            if self.debug >= 2: print('\tCurrent PC before adding spouses: {}'.format(PC))
 
-        if self.debug: print('\tCurrent SepSetCache before adding spouses:')
-        if self.debug: pprint(self.SepSetCache.cache)
+        if self.debug >= 2: print('\tCurrent SepSetCache before adding spouses:')
+        if self.debug >= 2: pprint(self.SepSetCache.cache)
 
         MB = PC.copy()
         for X in PC:
-            if self.debug: print('\tIterating over PC to find spouses: {}'.format(X))
+            if self.debug >= 2: print('\tIterating over PC to find spouses: {}'.format(X))
             for Y in CandidateSpouses.get(T, X):
-                if self.debug: print('\t\tIterating over candidate spouses if {} were a child: {}'.format(X, Y))
+                if self.debug >= 2: print('\t\tIterating over candidate spouses if {} were a child: {}'.format(X, Y))
                 if Y not in MB:
-                    if self.debug: print('\t\t\tTesting if {} ⊥ {} |  ( {} ∪ {{ {} }} ):'.format(T, Y, self.SepSetCache.get(T, Y), X))
+                    if self.debug >= 2: print('\t\t\tTesting if {} ⊥ {} |  ( {} ∪ {{ {} }} ):'.format(T, Y, self.SepSetCache.get(T, Y), X))
                     separation_set = self.SepSetCache.get(T, Y)
                     if not self.CITest.conditionally_independent(T, Y, separation_set | {X}):
                         MB.add(Y)
-                        if self.debug: print('\t\t\t\tFalse, adding {} to the MB, which becomes {}'.format(Y, MB))
+                        if self.debug >= 2: print('\t\t\t\tFalse, adding {} to the MB, which becomes {}'.format(Y, MB))
                     else:
-                        if self.debug: print('\t\t\t\tTrue, thus {} is not a spouse of {}'.format(Y, T))
+                        if self.debug >= 2: print('\t\t\t\tTrue, thus {} is not a spouse of {}'.format(Y, T))
 
-        if self.debug: print('Returning the entire MB: {}'.format(MB))
+        if self.debug >= 1: print('Returning the entire MB: {}'.format(MB))
         return MB
 
 
@@ -104,26 +104,26 @@ class AlgorithmIPCMB:
         NonPC = set()
         CutSetSize = 0
         if self.debug: print()
-        if self.debug: print('Begin RecognizePC')
+        if self.debug >= 2: print('Begin RecognizePC')
         while True:
-            if self.debug: print()
-            if self.debug: print('CutSetSize {}'.format(CutSetSize))
-            if self.debug: print('Target {}, AdjacentNodes {}'.format(T, AdjacentNodes))
+            if self.debug >= 2: print()
+            if self.debug >= 2: print('CutSetSize {}'.format(CutSetSize))
+            if self.debug >= 2: print('Target {}, AdjacentNodes {}'.format(T, AdjacentNodes))
             for X in AdjacentNodes:
-                if self.debug: print('\tIterating over X ∈ AdjacentNodes: {}'.format(X))
+                if self.debug >= 2: print('\tIterating over X ∈ AdjacentNodes: {}'.format(X))
                 for Z in itertools.combinations(AdjacentNodes - {X}, CutSetSize):
                     Z = set(Z)
-                    if self.debug: print('\t\tIterating over possible conditioning sets Z: {}'.format(Z))
-                    if self.debug: print('\t\tTesting {} ̩⊥ {} | {}: '.format(T, X, Z))
+                    if self.debug >= 2: print('\t\tIterating over possible conditioning sets Z: {}'.format(Z))
+                    if self.debug >= 2: print('\t\tTesting {} ̩⊥ {} | {}: '.format(T, X, Z))
                     if self.CITest.conditionally_independent(X, T, Z):
-                        if self.debug: print('\t\t\tTrue')
+                        if self.debug >= 2: print('\t\t\tTrue')
                         NonPC.add(X)
-                        if self.debug: print('\t\t\tNonPC is currently {}'.format(NonPC))
+                        if self.debug >= 2: print('\t\t\tNonPC is currently {}'.format(NonPC))
                         self.SepSetCache.add(Z, T, X)
                         break
                     else:
-                        if self.debug: print('\t\t\tFalse')
-                        if self.debug: print('\t\t\tNonPC remains {}'.format(NonPC))
+                        if self.debug >= 2: print('\t\t\tFalse')
+                        if self.debug >= 2: print('\t\t\tNonPC remains {}'.format(NonPC))
                 if not self.SepSetCache.contains(T, X):
                     self.SepSetCache.add(set(), T, X)
             AdjacentNodes = AdjacentNodes - NonPC
@@ -131,8 +131,8 @@ class AlgorithmIPCMB:
             CutSetSize += 1
             if len(AdjacentNodes) <= CutSetSize:
                 break
-        if self.debug: print()
-        if self.debug: print('RecognizePC result: {}'.format(AdjacentNodes))
+        if self.debug >= 2: print()
+        if self.debug >= 2: print('RecognizePC result: {}'.format(AdjacentNodes))
         return AdjacentNodes
 
 

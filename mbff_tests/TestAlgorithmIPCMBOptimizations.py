@@ -30,20 +30,22 @@ class TestAlgorithmIPCMBOptimizations(TestBase):
 
 
     def test_IPCMB_w_AD_tree(self):
-        ipcmb = self.run_IPCMB('survey', 3, mbff.math.G_test__with_AD_tree.G_test)
+        parameters = {'ci_test_debug': 2}
+        ipcmb = self.run_IPCMB('survey', 3, mbff.math.G_test__with_AD_tree.G_test, extra_parameters=parameters)
         AD_tree = ipcmb.CITest.AD_tree
         size = pympler.asizeof.asizeof(AD_tree)
         print("AD-tree size: {}".format(humanize.naturalsize(size)))
 
 
     def test_IPCMB_w_dcMI(self):
-        ipcmb = self.run_IPCMB('survey', 3, mbff.math.G_test__with_dcMI.G_test)
+        parameters = {'ci_test_debug': 1}
+        ipcmb = self.run_IPCMB('survey', 3, mbff.math.G_test__with_dcMI.G_test, extra_parameters=parameters)
         jmi_cache = ipcmb.CITest.JMI_cache
         size = pympler.asizeof.asizeof(jmi_cache)
         print("JMI_cache size: {}".format(humanize.naturalsize(size)))
 
 
-    def run_IPCMB(self, dm_label, target, ci_test_class, bif_file=None):
+    def run_IPCMB(self, dm_label, target, ci_test_class, bif_file=None, extra_parameters=dict()):
         omega = self.Omega[dm_label]
         datasetmatrix = self.DatasetMatrices[dm_label]
         bn = self.BayesianNetworks[dm_label]
@@ -54,14 +56,16 @@ class TestAlgorithmIPCMBOptimizations(TestBase):
         parameters = dict()
         parameters['target'] = target
         parameters['ci_test_class'] = ci_test_class
-        parameters['ci_test_debug'] = True
+        parameters['ci_test_debug'] = 1
         parameters['ci_test_significance'] = 0.95
         parameters['ci_test_ad_tree_leaf_list_threshold'] = 5000
         parameters['ci_test_ad_tree_path__save'] = ad_tree_path / (dm_label + '.pickle')
         parameters['ci_test_ad_tree_path__load'] = ad_tree_path / (dm_label + '.pickle')
-        parameters['debug'] = False
+        parameters['algorithm_debug'] = 1
         parameters['omega'] = omega
         parameters['source_bayesian_network'] = bn
+
+        parameters.update(extra_parameters)
 
         print()
         start_time = time.time()
@@ -99,8 +103,8 @@ class TestAlgorithmIPCMBOptimizations(TestBase):
         parameters['target'] = 3
         parameters['ci_test_class'] = mbff.math.G_test__unoptimized.G_test
         parameters['ci_test_significance'] = 0.95
-        parameters['ci_test_debug'] = True
-        parameters['debug'] = False
+        parameters['ci_test_debug'] = 1
+        parameters['algorithm_debug'] = 1
         parameters['omega'] = omega
         parameters['source_bayesian_network'] = bn
         parameters['ci_test_results'] = list()

@@ -13,7 +13,7 @@ class G_test:
 
     def __init__(self, datasetmatrix, parameters):
         self.parameters = parameters
-        self.debug = self.parameters.get('ci_test_debug', False)
+        self.debug = self.parameters.get('ci_test_debug', 0)
         self.datasetmatrix = datasetmatrix
         self.significance = parameters.get('ci_test_significance', 0)
         self.omega = parameters.get('omega', None)
@@ -32,8 +32,8 @@ class G_test:
 
         self.ci_test_results.append(result)
 
-        if self.debug: print(result)
-        if self.debug: print()
+        if self.debug >= 1: print(result)
+        if self.debug >= 1: print()
 
         # Garbage collection required to deallocate variable instances.
         gc.collect()
@@ -98,3 +98,4 @@ class G_test:
         if save_path is not None:
             with save_path.open('wb') as f:
                 pickle.dump(self.ci_test_results, f)
+        if self.debug >= 1: print('CI test results saved to {}'.format(save_path))

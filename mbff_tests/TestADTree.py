@@ -83,7 +83,7 @@ class TestADTree(TestBase):
     def test_making_pmf_larger_dataset(self):
         dm = self.DatasetMatrices['survey']
         adtree = self.ADTrees['survey']
-        adtree.debug = False
+        adtree.debug = 0
 
         self.assert_pmf_adtree_vs_dm(dm, adtree, [0])
         self.assert_pmf_adtree_vs_dm(dm, adtree, [1])
@@ -108,18 +108,16 @@ class TestADTree(TestBase):
         bn = self.BayesianNetworks[dm_label]
 
         parameters = dict()
-        parameters['ci_test_debug'] = False
+        parameters['ci_test_debug'] = 1
         parameters['ci_test_significance'] = 0.95
         parameters['ci_test_ad_tree_leaf_list_threshold'] = 100
         parameters['omega'] = omega
         parameters['source_bayesian_network'] = bn
 
+        print()
+
         self.G_unoptimized = mbff.math.G_test__unoptimized.G_test(datasetmatrix, parameters)
         self.G_with_AD_tree = mbff.math.G_test__with_AD_tree.G_test(datasetmatrix, parameters)
-        self.G_unoptimized.debug = True
-        self.G_with_AD_tree.debug = True
-
-        print()
 
         self.assertGTestEqual(0, 1, set())
         self.assertGTestEqual(4, 3, set())
@@ -134,7 +132,6 @@ class TestADTree(TestBase):
 
         citr_u = self.G_unoptimized.ci_test_results[-1:][0]
         citr_adt = self.G_with_AD_tree.ci_test_results[-1:][0]
-        print(citr_u.diff(citr_adt))
         self.assertTrue(citr_u == citr_adt)
 
 

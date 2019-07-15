@@ -29,8 +29,8 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
 
         self.ci_test_results.append(result)
 
-        if self.debug: print(result)
-        if self.debug: print()
+        if self.debug >= 1: print(result)
+        if self.debug >= 1: print()
 
 
         # Garbage collection required to deallocate variable instances.
@@ -77,14 +77,14 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
 
         try:
             H = self.JMI_cache[jmi_cache_key]
-            if self.debug: print('\tJMI cache hit: found H={:8.6f} for {}'.format(H, jmi_cache_key))
+            if self.debug >= 2: print('\tJMI cache hit: found H={:8.6f} for {}'.format(H, jmi_cache_key))
         except KeyError:
             joint_variables = self.datasetmatrix.get_variables('X', variable_set)
             joint_variables.load_instances()
             pmf = PMF(joint_variables)
             H = - pmf.expected_value(lambda v, p: math.log(p))
             self.JMI_cache[jmi_cache_key] = H
-            if self.debug: print('\tJMI cache miss and update: store H={:8.6f} for {}'.format(H, jmi_cache_key))
+            if self.debug >= 2: print('\tJMI cache miss and update: store H={:8.6f} for {}'.format(H, jmi_cache_key))
 
         return H
 

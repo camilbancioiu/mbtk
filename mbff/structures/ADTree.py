@@ -41,7 +41,7 @@ class ADTree:
     missing values, which is done by performing multiple extra queries.
     """
 
-    def __init__(self, matrix, column_values, leaf_list_threshold=0, debug_options=(False, False)):
+    def __init__(self, matrix, column_values, leaf_list_threshold=0, debug=0):
         self.matrix = matrix
         self.column_values = column_values
         self.ad_node_count = 0
@@ -52,14 +52,14 @@ class ADTree:
         self.duration = 0.0
         self.size = 0
 
-        (self.debug, self.debug_to_stdout) = debug_options
+        self.debug = debug
 
-        if self.debug:
+        if self.debug >= 1:
             self.debug_prepare__building()
             self.debug_prepare__querying()
             self.start_time = time.time()
             self.root = ADNode(self, -1, -1, row_selection=None, level=0)
-            if self.debug_to_stdout:
+            if self.debug >= 3:
                 os.system('clear')
             self.end_time = time.time()
             self.duration = self.end_time - self.start_time
@@ -80,12 +80,14 @@ class ADTree:
     def debug_prepare__querying(self):
         self.n_queries = 0
         self.n_queries_ll = 0
-        self.n_cpmf = 0
+        self.n_pmf = 0
+        self.n_pmf_ll = 0
 
 
     def debug_reset_query_counts(self):
         self.n_queries = 0
         self.n_queries_ll = 0
+        self.n_pmf_ll = 0
 
 
     def debug_node(self, node):
@@ -99,7 +101,7 @@ class ADTree:
             if node.leaf_list_node:
                 self.leaf_list_nodes += 1
 
-        if self.debug_to_stdout:
+        if self.debug >= 3:
             os.system('clear')
             for i in range(self.count_bins):
                 c = self.count_stats[i]
@@ -159,10 +161,10 @@ class ADTree:
 
 
     def make_pmf(self, variables):
-        if self.debug: print('ADTree.make_pmf: variables {}, in progress...'.format(variables))
-        if self.debug: self.debug_reset_query_counts()
-        if self.debug: self.n_cpmf += 1
-        if self.debug: start_time = time.time()
+        if self.debug >= 2: print('ADTree.make_pmf: variables {}, in progress...'.format(variables))
+        if self.debug >= 1: self.debug_reset_query_counts()
+        if self.debug >= 1: self.n_pmf += 1
+        if self.debug >= 2: start_time = time.time()
 
         result = None
 
@@ -177,8 +179,8 @@ class ADTree:
 
         result = pmf
 
-        if self.debug: duration = time.time() - start_time
-        if self.debug: print("...took {:.2f}s, done.".format(duration))
+        if self.debug >= 2: duration = time.time() - start_time
+        if self.debug >= 2: print("...took {:.2f}s, done.".format(duration))
         return result
 
 
@@ -209,7 +211,7 @@ class ADTree:
         Query the tree, requesting the number of samples that the dataset has
         for a specific combination of attributes-to-values.
         """
-        if self.debug: self.n_queries += 1
+        if self.debug >= 1: self.n_queries += 1
 
         if query_node is None:
             query_node = self.root
@@ -278,7 +280,7 @@ class ADTree:
 
 
     def query_count_in_leaf_list_node(self, values, query_node):
-        if self.debug: self.n_queries_ll += 1
+        if self.debug >= 1: self.n_queries_ll += 1
         count = 0
         for row_index in query_node.row_selection:
             match = True
@@ -315,7 +317,7 @@ class ADNode:
         if self.count < self.tree.leaf_list_threshold:
             self.leaf_list_node = True
 
-        if self.tree.debug:
+        if self.tree.debug >= 1:
             self.tree.debug_node(self)
 
         if not self.leaf_list_node:
@@ -398,6 +400,7 @@ class ADNode:
                 value = matrix[row_index, column_index]
                 key.append(value)
             ct.add_count_to_leaf(columns, key, 1)
+        if self.tree.debug >= 1: self.tree.n_pmf_ll += 1
         return ct
 
 
@@ -418,7 +421,7 @@ class VaryNode:
 
         self.tree.vary_node_count += 1
 
-        if self.tree.debug:
+        if self.tree.debug >= 1:
             self.tree.debug_node(self)
 
         self.create_AD_children()
