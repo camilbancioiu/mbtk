@@ -28,6 +28,9 @@ class CITestResult:
         self.computed_d_separation = None
         self.extra_info = None
 
+        self.tolerance__statistic_value = 1e-11
+        self.tolerance__p_value = 1e-11
+
         self.start_time = 0
         self.end_time = 0
         self.duration = 0.0
@@ -40,15 +43,44 @@ class CITestResult:
             self.X == other.X and
             self.Y == other.Y and
             self.Z == other.Z and
-            self.statistic == self.statistic and
-            self.statistic_value == self.statistic_value and
-            self.statistic_parameters == self.statistic_parameters and
-            self.test_distribution == self.test_distribution and
-            self.test_distribution_parameters == self.test_distribution_parameters and
-            self.p_value == self.p_value and
-            self.significance == self.significance and
-            self.computed_d_separation == self.computed_d_separation
+            self.statistic == other.statistic and
+            abs(self.statistic_value - other.statistic_value) <= self.tolerance__statistic_value and
+            self.statistic_parameters == other.statistic_parameters and
+            self.test_distribution == other.test_distribution and
+            self.test_distribution_parameters == other.test_distribution_parameters and
+            abs(self.p_value - other.p_value) <= self.tolerance__p_value and
+            self.significance == other.significance and
+            self.computed_d_separation == other.computed_d_separation
         )
+
+
+    def diff(self, other):
+        if self.independent != other.independent:
+            return 'Differring \'independent\': {} vs {}'.format(self.independent, other.independent)
+        if self.dependent != other.dependent:
+            return 'Differing \'dependent\': {} vs {}'.format(self.dependent, other.dependent)
+        if self.X != other.X:
+            return 'Differing \'X\': {} vs {}'.format(self.X, other.X)
+        if self.Y != other.Y:
+            return 'Differing \'Y\': {} vs {}'.format(self.Y, other.Y)
+        if self.Z != other.Z:
+            return 'Differing \'Z\': {} vs {}'.format(self.Z, other.Z)
+        if self.statistic != other.statistic:
+            return 'Differing \'statistic\': {} vs {}'.format(self.statistic, other.statistic)
+        if abs(self.statistic_value - other.statistic_value) > self.tolerance__statistic_value:
+            return 'Differing \'statistic_value\': {} vs {}'.format(self.statistic_value, other.statistic_value)
+        if self.statistic_parameters != other.statistic_parameters:
+            return 'Differing \'statistic_parameters\': {} vs {}'.format(self.statistic_parameters, other.statistic_parameters)
+        if self.test_distribution != other.test_distribution:
+            return 'Differing \'test_distribution\': {} vs {}'.format(self.test_distribution, other.test_distribution)
+        if self.test_distribution_parameters != other.test_distribution_parameters:
+            return 'Differing \'test_distribution_parameters\': {} vs {}'.format(self.test_distribution_parameters, other.test_distribution_parameters)
+        if abs(self.p_value - other.p_value) > self.tolerance__p_value:
+            return 'Differing \'p_value\': {} vs {}'.format(self.p_value, other.p_value)
+        if self.significance != other.significance:
+            return 'Differing \'significance\': {} vs {}'.format(self.significance, other.significance)
+        if self.computed_d_separation != other.computed_d_separation:
+            return 'Differing \'computed_d_separation\': {} vs {}'.format(self.computed_d_separation, other.computed_d_separation)
 
 
     def set_independent(self, independent, significance):
