@@ -1,4 +1,3 @@
-import numpy
 from collections import Counter
 from mbff.utilities import functions as util
 
@@ -7,7 +6,7 @@ class PMF:
 
     def __init__(self, variable):
         self.variable = variable
-        if not variable is None:
+        if variable is not None:
             self.total_count = len(self.variable.instances)
             self.value_counts = self.count_values()
             self.probabilities = self.normalize_counts()
@@ -35,6 +34,15 @@ class PMF:
 
     def values(self):
         return self.probabilities.values()
+
+
+    def remove_zeros(self):
+        keys_to_delete = list()
+        for key, p in self.probabilities.items():
+            if p == 0.0:
+                keys_to_delete.append(key)
+        for key in keys_to_delete:
+            del self.probabilities[key]
 
 
     def p(self, *args):
