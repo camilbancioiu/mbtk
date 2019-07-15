@@ -186,8 +186,6 @@ class DatasetMatrix:
         else:
             raise ValueError('Unknown matrix label. Only X and Y are allowed.')
 
-        datasetmatrix = self
-
         def lazy_instances_loader():
             return column_getter(column)
 
@@ -204,6 +202,10 @@ class DatasetMatrix:
 
         if isinstance(columns, int):
             column = columns
+            return self.get_variable(matrix_label, column)
+
+        if isinstance(columns, list) and len(columns) == 1:
+            column = columns[0]
             return self.get_variable(matrix_label, column)
 
         variables = []

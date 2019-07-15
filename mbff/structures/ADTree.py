@@ -1,9 +1,12 @@
 import time
 import collections
-import itertools
 import os
 
-from mbff.math.PMF import PMF, CPMF
+from mbff.math.PMF import PMF
+from mbff.structures.ContingencyTree import ContingencyTreeNode
+from mbff.structures.Exceptions import ADTreeCannotDescend_MCVNode
+from mbff.structures.Exceptions import ADTreeCannotDescend_LeafListNode
+from mbff.structures.Exceptions import ADTreeCannotDescend_ZeroCountNode
 
 INDENT = "|---"
 
@@ -55,13 +58,13 @@ class ADTree:
             self.debug_prepare__building()
             self.debug_prepare__querying()
             self.start_time = time.time()
-            self.root = ADNode(self, -1, '*', row_selection=None, level=0)
+            self.root = ADNode(self, -1, -1, row_selection=None, level=0)
             if self.debug_to_stdout:
                 os.system('clear')
             self.end_time = time.time()
             self.duration = self.end_time - self.start_time
         else:
-            self.root = ADNode(self, -1, '*', row_selection=None, level=0)
+            self.root = ADNode(self, -1, -1, row_selection=None, level=0)
 
 
     def debug_prepare__building(self):
@@ -108,48 +111,71 @@ class ADTree:
                 print("ADNode added to bin", count_bin)
 
 
-    def make_cpmf(self, variables, given=list()):
-        if self.debug: print('ADTree.make_cpmf: variables {}, given {} in progress...'.format(variables, given))
+    def find_node_for_values(self, values, current_node=None):
+        if current_node is None:
+            current_node = self.root
+
+        if len(values) == 0:
+            return current_node
+
+        if current_node.leaf_list_node is True:
+            raise ADTreeCannotDescend_LeafListNode(self, values, current_node)
+
+        # Retrieve the column index we are currently on, within the tree, and
+        # what value has been requested in the query for that column index.
+        column_indices = sorted(list(values.keys()))
+        column_index = column_indices[0]
+        value = values[column_index]
+
+        # Retrieve the Vary node among our immediate children that represents
+        # the current column index.
+        vary = current_node.get_Vary_child_for_column(column_index)
+
+        # Retrieve the ADNode among the children of the aforementioned Vary
+        # node which represents the value that was requested in the query for
+        # the current column index.
+        child = vary.get_AD_child_for_value(value)
+
+        # Prepare the query that will be passed down to the descendants, which
+        # has the current column index removed from it (but otherwise identical).
+        next_values = values.copy()
+        next_values.pop(column_index)
+
+        # We previously retrieved the ADNode that represents the current piece
+        # of the query we're processing (i.e. current column index and its
+        # value from the query). Now we must see whether this ADNode is None or
+        # not, because 'None' has special meaning in an AD-tree.
+        if child is not None:
+            # The ADNode for the current value exists, query it deeper.
+            return self.find_node_for_values(next_values, child)
+        else:
+            if vary.most_common_value != value:
+                # The ADNode is None, because of zero count.
+                raise ADTreeCannotDescend_ZeroCountNode(self, values)
+            else:
+                # The ADNode is None, because it would represent the most
+                # common value.
+                raise ADTreeCannotDescend_MCVNode(self, values)
+
+
+    def make_pmf(self, variables):
+        if self.debug: print('ADTree.make_pmf: variables {}, in progress...'.format(variables))
         if self.debug: self.debug_reset_query_counts()
         if self.debug: self.n_cpmf += 1
         if self.debug: start_time = time.time()
 
-        conditioning_values = list()
-        for conditioning_variable in given:
-            conditioning_values.append(self.column_values[conditioning_variable])
+        result = None
 
-        variable_values = list()
-        for variable in variables:
-            variable_values.append(self.column_values[variable])
+        variables = sorted(variables)
 
-        if len(given) > 0:
-            cpmf = CPMF(None, None)
+        joint_ct = self.root.make_contingency_table(variables)
 
-            for cvalues in itertools.product(*conditioning_values):
-                query_given = dict(zip(given, cvalues))
-                pmf = PMF(None)
-                for values in itertools.product(*variable_values):
-                    query_values = dict(zip(variables, values))
-                    p = self.p(query_values, query_given)
-                    if len(values) == 1:
-                        values = values[0]
-                    pmf.probabilities[values] = p
+        pmf = PMF(None)
+        total_count = 1.0 * self.root.count
+        for key, count in joint_ct.items():
+            pmf.probabilities[key] = count / total_count
 
-                if len(cvalues) == 1:
-                    cvalues = cvalues[0]
-                cpmf.conditional_probabilities[cvalues] = pmf
-
-            result = cpmf
-        else:
-            pmf = PMF(None)
-            for values in itertools.product(*variable_values):
-                query_values = dict(zip(variables, values))
-                p = self.p(query_values)
-                if len(values) == 1:
-                    values = values[0]
-                pmf.probabilities[values] = p
-
-            result = pmf
+        result = pmf
 
         if self.debug: duration = time.time() - start_time
         if self.debug: print("...took {:.2f}s, done.".format(duration))
@@ -268,6 +294,7 @@ class ADTree:
         return str(self.root)
 
 
+
 class ADNode:
 
     def __init__(self, tree, column_index, value, row_selection=None, level=0):
@@ -321,6 +348,57 @@ class ADNode:
         for child in self.Vary_children:
             rendered_children.append(str(child))
         return "\n".join(rendered_children)
+
+
+    def make_contingency_table(self, columns=list()):
+        contingency_tree = self.make_contingency_tree(columns)
+        contingency_table = contingency_tree.convert_to_dictionary()
+        return contingency_table
+
+
+    def make_contingency_tree(self, columns=list()):
+        if len(columns) == 0:
+            return ContingencyTreeNode(self.column_index, self.value, self.count)
+
+        if self.leaf_list_node:
+            return self.make_contingency_tree_from_leaf_list(columns)
+
+        non_mcv_ct = ContingencyTreeNode(self.column_index, self.value, None)
+        next_column = columns[0]
+        vary = self.get_Vary_child_for_column(next_column)
+
+        for value in vary.values:
+            if value != vary.most_common_value:
+                child = vary.get_AD_child_for_value(value)
+                if child is not None:
+                    child_ct = child.make_contingency_tree(columns[1:])
+                    non_mcv_ct.append_child(child_ct)
+
+        mcv_child_ct = self.make_contingency_tree(columns[1:])
+        mcv_child_ct.column = next_column
+        mcv_child_ct.value = vary.most_common_value
+
+        for value, child in non_mcv_ct.children.items():
+            mcv_child_ct = mcv_child_ct.subtract(child)
+
+        contingency_tree = non_mcv_ct
+        contingency_tree.append_child(mcv_child_ct)
+
+        return contingency_tree
+
+
+    def make_contingency_tree_from_leaf_list(self, columns):
+        matrix = self.tree.matrix
+        ct = ContingencyTreeNode(self.column_index, self.value, None)
+
+        # TODO try to optimize this loop
+        for row_index in self.row_selection:
+            key = []
+            for column_index in columns:
+                value = matrix[row_index, column_index]
+                key.append(value)
+            ct.add_count_to_leaf(columns, key, 1)
+        return ct
 
 
 

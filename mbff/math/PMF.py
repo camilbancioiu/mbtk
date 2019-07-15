@@ -1,4 +1,3 @@
-import numpy
 from collections import Counter
 from mbff.utilities import functions as util
 
@@ -7,7 +6,7 @@ class PMF:
 
     def __init__(self, variable):
         self.variable = variable
-        if not variable is None:
+        if variable is not None:
             self.total_count = len(self.variable.instances)
             self.value_counts = self.count_values()
             self.probabilities = self.normalize_counts()
@@ -37,6 +36,15 @@ class PMF:
         return self.probabilities.values()
 
 
+    def remove_zeros(self):
+        keys_to_delete = list()
+        for key, p in self.probabilities.items():
+            if p == 0.0:
+                keys_to_delete.append(key)
+        for key in keys_to_delete:
+            del self.probabilities[key]
+
+
     def p(self, *args):
         key = process_pmf_key(args)
 
@@ -64,6 +72,10 @@ class PMF:
 
     def expected_value(self, f):
         return sum([p * f(v, p) for (v, p) in self.probabilities.items()])
+
+
+    def __eq__(self, other):
+        return self.probabilities == other.probabilities
 
 
 
@@ -111,6 +123,20 @@ class CPMF(PMF):
     def normalize_conditional_counts(self):
         for cv, pmf in self.conditional_probabilities.items():
             pmf.normalize_counts(update_probabilities=True)
+
+
+    def __eq__(self, other):
+        selfkeyset = set(self.conditional_probabilities.keys())
+        otherkeyset = set(other.conditional_probabilities.keys())
+        keys_equal = (selfkeyset == otherkeyset)
+        if keys_equal is False:
+            return False
+        for key in self.conditional_probabilities:
+            selfpmf = self.given(key)
+            otherpmf = other.given(key)
+            if selfpmf != otherpmf:
+                return False
+        return True
 
 
 

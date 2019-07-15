@@ -1,8 +1,8 @@
 import math
-import numpy
 
 from mbff.math.PMF import PMF, CPMF
 from mbff.math.Variable import JointVariables
+
 
 def mutual_information(PrXY, PrX, PrY, base=2):
     logarithm = create_logarithm_function(base)
