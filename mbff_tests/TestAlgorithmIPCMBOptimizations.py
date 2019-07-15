@@ -58,7 +58,7 @@ class TestAlgorithmIPCMBOptimizations(TestBase):
         parameters['ci_test_class'] = ci_test_class
         parameters['ci_test_debug'] = 1
         parameters['ci_test_significance'] = 0.95
-        parameters['ci_test_ad_tree_leaf_list_threshold'] = 5000
+        parameters['ci_test_ad_tree_leaf_list_threshold'] = 1000
         parameters['ci_test_ad_tree_path__save'] = ad_tree_path / (dm_label + '.pickle')
         parameters['ci_test_ad_tree_path__load'] = ad_tree_path / (dm_label + '.pickle')
         parameters['algorithm_debug'] = 1

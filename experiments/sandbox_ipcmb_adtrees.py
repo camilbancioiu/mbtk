@@ -137,7 +137,7 @@ if __name__ == '__main__':
             'ci_test_ad_tree_path__save': adtree_folder / 'adtree_{}_llt{}.pickle'.format(exdsDef.name, LLT),
             'ci_test_results_path__save': ci_test_results_folder / 'ci_test_results_{}_T3_ADtree_LLT{}.pickle'.format(exdsDef.name, LLT)
         }
-        for LLT in [16384, 4096, 8192, 2048, 1024]
+        for LLT in [4096, 8192, 2048, 1024]
     ]
 
     IPCMB_ADTree_LLT_Eval_Definition.algorithm_run_parameters = [] \
