@@ -124,22 +124,23 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
 
     def calculate_pmf_from_AD_tree(self, X, Y, Z):
         if len(Z) == 0:
-            PrXY = self.AD_tree.make_cpmf([X, Y], list())
-            PrX = self.AD_tree.make_cpmf([X], list())
-            PrY = self.AD_tree.make_cpmf([Y], list())
-            PrXYcZ = self.make_cpmf_from_pmf(PrXY)
-            PrXcZ = self.make_cpmf_from_pmf(PrX)
-            PrYcZ = self.make_cpmf_from_pmf(PrY)
+            PrXY = self.AD_tree.make_pmf(sorted([X, Y]))
+            PrX = self.AD_tree.make_pmf([X])
+            PrY = self.AD_tree.make_pmf([Y])
+            PrXYcZ = self.make_omega_cpmf_from_pmf(PrXY)
+            PrXcZ = self.make_omega_cpmf_from_pmf(PrX)
+            PrYcZ = self.make_omega_cpmf_from_pmf(PrY)
             PrZ = self.make_omega_pmf()
         else:
-            PrXYcZ = self.AD_tree.make_cpmf([X, Y], list(Z))
-            PrXcZ = self.AD_tree.make_cpmf([X], list(Z))
-            PrYcZ = self.AD_tree.make_cpmf([Y], list(Z))
-            PrZ = self.AD_tree.make_cpmf(list(Z), list())
+            Z = sorted(list(Z))
+            PrZ = self.AD_tree.make_pmf(Z)
+            PrXYcZ = self.make_cpmf_PrXYcZ(X, Y, Z, PrZ)
+            PrXcZ = self.make_cpmf_PrXcZ(X, Z, PrZ)
+            PrYcZ = self.make_cpmf_PrYcZ(Y, Z, PrZ)
         return (PrXYcZ, PrXcZ, PrYcZ, PrZ)
 
 
-    def make_cpmf_from_pmf(self, pmf):
+    def make_omega_cpmf_from_pmf(self, pmf):
         cpmf = CPMF(None, None)
         cpmf.conditional_probabilities[1] = pmf
         return cpmf
@@ -149,6 +150,64 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
         pmf = PMF(None)
         pmf.probabilities[1] = 1.0
         return pmf
+
+
+    def make_cpmf_PrXYcZ(self, X, Y, Z, PrZ=None):
+        if PrZ is None:
+            PrZ = self.AD_tree.make_pmf(list(Z))
+
+        unsorted_variables = [X, Y] + Z
+        joint_variables = sorted(unsorted_variables)
+        index = {var: joint_variables.index(var) for var in joint_variables}
+
+        PrXYZ = self.AD_tree.make_pmf(joint_variables)
+
+        PrXYcZ = CPMF(None, None)
+
+        for joint_key, joint_p in PrXYZ.items():
+            zkey = tuple([joint_key[index[zvar]] for zvar in Z])
+            varkey = tuple([joint_key[index[var]] for var in unsorted_variables if var not in Z])
+            if len(zkey) == 1:
+                zkey = zkey[0]
+            try:
+                pmf = PrXYcZ.conditional_probabilities[zkey]
+            except KeyError:
+                pmf = PMF(None)
+                PrXYcZ.conditional_probabilities[zkey] = pmf
+            pmf.probabilities[varkey] = joint_p / PrZ.p(zkey)
+
+        return PrXYcZ
+
+
+    def make_cpmf_PrXcZ(self, X, Z, PrZ=None):
+        if PrZ is None:
+            PrZ = self.AD_tree.make_pmf(list(Z))
+
+        unsorted_variables = [X] + Z
+        joint_variables = sorted(unsorted_variables)
+        index = {var: joint_variables.index(var) for var in joint_variables}
+
+        PrXZ = self.AD_tree.make_pmf(joint_variables)
+
+        PrXcZ = CPMF(None, None)
+
+        for joint_key, joint_p in PrXZ.items():
+            zkey = tuple([joint_key[index[zvar]] for zvar in Z])
+            varkey = [joint_key[index[var]] for var in unsorted_variables if var not in Z][0]
+            if len(zkey) == 1:
+                zkey = zkey[0]
+            try:
+                pmf = PrXcZ.conditional_probabilities[zkey]
+            except KeyError:
+                pmf = PMF(None)
+                PrXcZ.conditional_probabilities[zkey] = pmf
+            pmf.probabilities[varkey] = joint_p / PrZ.p(zkey)
+
+        return PrXcZ
+
+
+    def make_cpmf_PrYcZ(self, Y, Z, PrZ=None):
+        return self.make_cpmf_PrXcZ(Y, Z, PrZ)
 
 
     def calculate_degrees_of_freedom(self, X, Y):
