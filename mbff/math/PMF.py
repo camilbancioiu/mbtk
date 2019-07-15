@@ -66,6 +66,10 @@ class PMF:
         return sum([p * f(v, p) for (v, p) in self.probabilities.items()])
 
 
+    def __eq__(self, other):
+        return self.probabilities == other.probabilities
+
+
 
 class CPMF(PMF):
 
@@ -111,6 +115,20 @@ class CPMF(PMF):
     def normalize_conditional_counts(self):
         for cv, pmf in self.conditional_probabilities.items():
             pmf.normalize_counts(update_probabilities=True)
+
+
+    def __eq__(self, other):
+        selfkeyset = set(self.conditional_probabilities.keys())
+        otherkeyset = set(other.conditional_probabilities.keys())
+        keys_equal = (selfkeyset == otherkeyset)
+        if keys_equal is False:
+            return False
+        for key in self.conditional_probabilities:
+            selfpmf = self.given(key)
+            otherpmf = other.given(key)
+            if selfpmf != otherpmf:
+                return False
+        return True
 
 
 

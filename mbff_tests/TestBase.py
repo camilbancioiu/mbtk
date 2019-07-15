@@ -1,5 +1,5 @@
 import unittest
-import os
+import gc
 import shutil
 from pathlib import Path
 
@@ -7,6 +7,7 @@ from mbff.dataset.DatasetMatrix import DatasetMatrix
 from mbff.math.Variable import Omega
 import mbff.utilities.functions as util
 from mbff.dataset.sources.SampledBayesianNetworkDatasetSource import SampledBayesianNetworkDatasetSource
+
 
 class TestBase(unittest.TestCase):
 
@@ -39,13 +40,13 @@ class TestBase(unittest.TestCase):
 
 
     def prepareTestResources(self):
-        self.prepare_Bayesian_networks();
+        self.prepare_Bayesian_networks()
         self.prepare_datasetmatrices()
         self.prepare_omega_variables()
 
 
     def tearDown(self):
-        import gc; gc.collect()
+        gc.collect()
 
 
     def ensure_tmp_subfolder(self, subfolder):
@@ -81,18 +82,21 @@ class TestBase(unittest.TestCase):
         self.DatasetMatrices = dict()
 
         for dm_label in self.DatasetsInUse:
-            configuration = self.configure_dataset(dm_label)
-            try:
-                datasetmatrix = DatasetMatrix(dm_label)
-                datasetmatrix.load(self.DatasetMatrixFolder)
-                self.DatasetMatrices[dm_label] = datasetmatrix
-            except:
-                sbnds = SampledBayesianNetworkDatasetSource(configuration)
-                sbnds.reset_random_seed = True
-                datasetmatrix = sbnds.create_dataset_matrix(dm_label)
-                datasetmatrix.finalize()
-                datasetmatrix.save(self.DatasetMatrixFolder)
-                self.DatasetMatrices[dm_label] = datasetmatrix
+            self.DatasetMatrices[dm_label] = self.prepare_datasetmatrix(dm_label)
+
+
+    def prepare_datasetmatrix(self, label):
+        configuration = self.configure_dataset(label)
+        try:
+            datasetmatrix = DatasetMatrix(label)
+            datasetmatrix.load(self.DatasetMatrixFolder)
+        except:
+            sbnds = SampledBayesianNetworkDatasetSource(configuration)
+            sbnds.reset_random_seed = True
+            datasetmatrix = sbnds.create_dataset_matrix(label)
+            datasetmatrix.finalize()
+            datasetmatrix.save(self.DatasetMatrixFolder)
+        return datasetmatrix
 
 
     def prepare_omega_variables(self):
@@ -100,4 +104,3 @@ class TestBase(unittest.TestCase):
         for dm_label in self.DatasetsInUse:
             configuration = self.configure_dataset(dm_label)
             self.Omega[dm_label] = Omega(configuration['sample_count'])
-

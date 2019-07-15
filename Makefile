@@ -31,7 +31,11 @@ doc-rebuild: doc-clean doc
 	@notify-send "Make" "Sphinx documentation rebuilt."
 
 test: Makefile
-	@python3 test.py $(call args,all)
+	@python3 test.py
+	notify-send "Make" "Testing complete."
+
+test-quick: Makefile
+	@python3 test.py quick
 	notify-send "Make" "Testing complete."
 
 test-clean:

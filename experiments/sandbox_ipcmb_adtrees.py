@@ -137,9 +137,10 @@ if __name__ == '__main__':
     ]
 
     IPCMB_ADTree_LLT_Eval_Definition.algorithm_run_parameters = [] \
+        + parameters_direct_d_separation_ci_test \
+        + parameters_with_AD_tree \
         + parameters_with_dcMI \
-        + parameters_unoptimized \
-        + parameters_with_AD_tree
+        + parameters_unoptimized
 
     IPCMB_ADTree_LLT_Eval = IPCMB_ADTree_LLT_Eval_Definition.create_experiment_run()
     IPCMB_ADTree_LLT_Eval.run()

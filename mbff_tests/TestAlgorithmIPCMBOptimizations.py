@@ -51,6 +51,7 @@ class TestAlgorithmIPCMBOptimizations(TestBase):
         parameters = dict()
         parameters['target'] = target
         parameters['ci_test_class'] = ci_test_class
+        parameters['ci_test_debug'] = True
         parameters['ci_test_significance'] = 0.95
         parameters['ci_test_ad_tree_leaf_list_threshold'] = 5000
         parameters['debug'] = False

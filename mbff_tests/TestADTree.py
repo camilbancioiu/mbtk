@@ -1,65 +1,133 @@
-import unittest
 import numpy
 import scipy
+import pickle
 
-from mbff.dataset.DatasetMatrix import DatasetMatrix
-from mbff.structures.ADTree import ADTree, ADNode, VaryNode
+from pathlib import Path
 
+from mbff.structures.ADTree import ADTree
+from mbff.math.PMF import PMF, CPMF
+import mbff.math.G_test__unoptimized
+import mbff.math.G_test__with_AD_tree
+
+import mbff.math.infotheory as infotheory
 from mbff_tests.TestBase import TestBase
+
 
 class TestADTree(TestBase):
 
-    def default_small_dataset(self):
-        dataset = scipy.sparse.csr_matrix(numpy.array([
-            [1, 2, 3, 2, 2, 3, 3, 3],
-            [2, 1, 1, 2, 1, 2, 2, 2]]).transpose())
-
-        column_values = {
-                0: [1, 2, 3],
-                1: [1, 2]}
-        return (dataset, column_values)
-
-
-    def default_small_dataset_2(self):
-        dataset = scipy.sparse.csr_matrix(numpy.array([
-            [1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2],
-            [1, 1, 2, 2, 3, 3, 4, 4, 1, 1, 2, 2, 3, 3, 4, 4],
-            [1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2]]).transpose())
-
-        column_values = {
-                0: [1, 2],
-                1: [1, 2, 3, 4],
-                2: [1, 2]}
-        return (dataset, column_values)
+    def initTestResources(self):
+        super().initTestResources()
+        self.DatasetsInUse = ['survey']
+        self.DatasetMatrixFolder = Path('testfiles', 'tmp', 'test_adtree_dm')
+        self.ADTreesInUse = ['survey']
+        self.ADTrees = None
+        self.ADTreesFolder = Path('testfiles', 'tmp', 'test_adtree_adtrees')
+        self.ADTreesFolder.mkdir(parents=True, exist_ok=True)
+        self.ADTreeDebug = True
 
 
-    def default_small_dataset_3(self):
-        dataset = scipy.sparse.csr_matrix(numpy.array([
-            [1, 1, 2, 1, 1, 2, 1, 2, 2, 2, 2, 2, 1, 2, 2, 2],
-            [2, 2, 1, 3, 3, 2, 2, 1, 1, 2, 3, 3, 1, 1, 2, 3],
-            [1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2]]).transpose())
-
-        column_values = {
-                0: [1, 2],
-                1: [1, 2, 3, 4],
-                2: [1, 2]}
-        return (dataset, column_values)
+    def prepareTestResources(self):
+        super().prepareTestResources()
+        self.prepare_AD_trees()
 
 
-    def assertVaryNodeCorrect(self, vary, column_index, values, mcv, children_count):
-        self.assertIsNotNone(vary)
-        self.assertEqual(column_index, vary.column_index)
-        self.assertEqual(values, vary.values)
-        self.assertEqual(mcv, vary.most_common_value)
-        self.assertEqual(children_count, len(vary.AD_children))
+    def prepare_AD_trees(self):
+        self.ADTrees = dict()
+        for label in self.ADTreesInUse:
+            self.ADTrees[label] = self.prepare_AD_tree(label)
 
 
-    def assertADNodeCorrect(self, adNode, column_index, value, count, children_count):
-        self.assertIsNotNone(adNode)
-        self.assertEqual(column_index, adNode.column_index)
-        self.assertEqual(value, adNode.value)
-        self.assertEqual(count, adNode.count)
-        self.assertEqual(children_count, len(adNode.Vary_children))
+    def prepare_AD_tree(self, label):
+        configuration = self.configure_adtree(label)
+        path = self.ADTreesFolder / (label + '.pickle')
+        adtree = None
+        if path.exists():
+            with path.open('rb') as f:
+                adtree = pickle.load(f)
+            adtree.debug = configuration['debug']
+            adtree.debug_to_stdout = configuration['debug_to_stdout']
+            if adtree.debug:
+                adtree.debug_prepare__querying()
+        else:
+            datasetmatrix = self.DatasetMatrices[label]
+            matrix = datasetmatrix.X
+            column_values = datasetmatrix.get_values_per_column('X')
+            leaf_list_threshold = configuration['leaf_list_threshold']
+            debug_config = (configuration['debug'], configuration['debug_to_stdout'])
+            adtree = ADTree(matrix, column_values, leaf_list_threshold, debug_config)
+            if path is not None:
+                with path.open('wb') as f:
+                    pickle.dump(adtree, f)
+        return adtree
+
+
+    def configure_adtree(self, label):
+        configuration = dict()
+        if label == 'survey':
+            configuration['leaf_list_threshold'] = 100
+            configuration['debug'] = True
+            configuration['debug_to_stdout'] = True
+        return configuration
+
+
+    def configure_dataset(self, label):
+        configuration = dict()
+        if label == 'survey':
+            configuration['sourcepath'] = Path('testfiles', 'bif_files', 'survey.bif')
+            configuration['sample_count'] = int(5e3)
+            configuration['random_seed'] = 42 * 42
+            configuration['values_as_indices'] = True
+            configuration['objectives'] = []
+        return configuration
+
+
+    def test_making_cpmf_larger_dataset(self):
+        dm = self.DatasetMatrices['survey']
+        adtree = self.ADTrees['survey']
+        adtree.debug = False
+
+        self.assert_pmf_adtree_vs_dm(dm, adtree, [2, 3])
+        self.assert_cpmf_adtree_vs_dm(dm, adtree, [2, 3], [0])
+        self.assert_cpmf_adtree_vs_dm(dm, adtree, [4, 3], [1])
+
+
+    def test_compare_g_tests(self):
+        dm_label = 'survey'
+        omega = self.Omega[dm_label]
+        datasetmatrix = self.DatasetMatrices[dm_label]
+        bn = self.BayesianNetworks[dm_label]
+
+        parameters = dict()
+        parameters['ci_test_debug'] = False
+        parameters['ci_test_significance'] = 0.95
+        parameters['ci_test_ad_tree_leaf_list_threshold'] = 100
+        parameters['omega'] = omega
+        parameters['source_bayesian_network'] = bn
+
+        G_unoptimized = mbff.math.G_test__unoptimized.G_test(datasetmatrix, parameters)
+
+        G_with_AD_tree = mbff.math.G_test__with_AD_tree.G_test(datasetmatrix, parameters)
+
+        X = 4
+        Y = 3
+        Z = {1}
+        G_unoptimized.conditionally_independent(X, Y, Z)
+        G_with_AD_tree.conditionally_independent(X, Y, Z)
+
+        (VarX, VarY, VarZ) = G_unoptimized.load_variables(X, Y, Z)
+        pmfs_u = infotheory.calculate_pmf_for_cmi(VarX, VarY, VarZ)
+        cmi_u = infotheory.conditional_mutual_information(*pmfs_u, base='e')
+        (PrXYcZ, PrXcZ, PrYcZ, PrZ) = pmfs_u
+
+        pmfs_adt = G_with_AD_tree.calculate_pmf_from_AD_tree(X, Y, Z)
+        cmi_adt = infotheory.conditional_mutual_information(*pmfs_adt, base='e')
+        (PrXYcZ, PrXcZ, PrYcZ, PrZ) = pmfs_adt
+
+        citr_u = G_unoptimized.ci_test_results[0]
+        citr_adt = G_with_AD_tree.ci_test_results[0]
+        self.assertEqual(citr_u, citr_adt)
+        self.assertAlmostEqual(cmi_u, cmi_adt)
+
 
 
     def test_making_cpmf(self):
@@ -68,48 +136,46 @@ class TestADTree(TestBase):
 
         cpmf = adtree.make_cpmf([0])
         self.assertEqual(
-                [(1, 1/2), (2, 1/2)],
-                sorted(list(cpmf.items()))
-                )
+            [(1, 1 / 2), (2, 1 / 2)],
+            sorted(list(cpmf.items()))
+        )
 
         cpmf = adtree.make_cpmf([0], given=[1])
         self.assertEqual(
-                [1, 2, 3, 4],
-                sorted(list(cpmf.conditional_probabilities.keys()))
-                )
+            [1, 2, 3, 4],
+            sorted(list(cpmf.conditional_probabilities.keys()))
+        )
 
         self.assertEqual(
-                [(1, 1/2), (2, 1/2)],
-                sorted(list(cpmf.given(1).items()))
-                )
+            [(1, 1 / 2), (2, 1 / 2)],
+            sorted(list(cpmf.given(1).items()))
+        )
 
         self.assertEqual(
-                [(1, 1/2), (2, 1/2)],
-                sorted(list(cpmf.given(2).items()))
-                )
+            [(1, 1 / 2), (2, 1 / 2)],
+            sorted(list(cpmf.given(2).items()))
+        )
 
         self.assertEqual(
-                [(1, 1/2), (2, 1/2)],
-                sorted(list(cpmf.given(3).items()))
-                )
+            [(1, 1 / 2), (2, 1 / 2)],
+            sorted(list(cpmf.given(3).items()))
+        )
 
         self.assertEqual(
-                [(1, 1/2), (2, 1/2)],
-                sorted(list(cpmf.given(4).items()))
-                )
+            [(1, 1 / 2), (2, 1 / 2)],
+            sorted(list(cpmf.given(4).items()))
+        )
 
         cpmf = adtree.make_cpmf([0], given=[1, 2])
         self.assertEqual(
-                [
-                    (1, 1), (1, 2),
-                    (2, 1), (2, 2),
-                    (3, 1), (3, 2),
-                    (4, 1), (4, 2)
-                ],
-                sorted(list(cpmf.conditional_probabilities.keys()))
-                )
-
-        # TODO
+            [
+                (1, 1), (1, 2),
+                (2, 1), (2, 2),
+                (3, 1), (3, 2),
+                (4, 1), (4, 2)
+            ],
+            sorted(list(cpmf.conditional_probabilities.keys()))
+        )
 
 
     def test_simple_ADTree_query_count(self):
@@ -117,21 +183,21 @@ class TestADTree(TestBase):
         adtree = ADTree(dataset, column_values)
 
         self.assertEqual(8, adtree.query_count({}))
-        self.assertEqual(1, adtree.query_count({0:1}))
-        self.assertEqual(3, adtree.query_count({0:2}))
-        self.assertEqual(4, adtree.query_count({0:3}))
+        self.assertEqual(1, adtree.query_count({0: 1}))
+        self.assertEqual(3, adtree.query_count({0: 2}))
+        self.assertEqual(4, adtree.query_count({0: 3}))
 
-        self.assertEqual(0, adtree.query_count({0:1, 1:1}))
-        self.assertEqual(1, adtree.query_count({0:1, 1:2}))
+        self.assertEqual(0, adtree.query_count({0: 1, 1: 1}))
+        self.assertEqual(1, adtree.query_count({0: 1, 1: 2}))
 
-        self.assertEqual(2, adtree.query_count({0:2, 1:1}))
-        self.assertEqual(1, adtree.query_count({0:2, 1:2}))
+        self.assertEqual(2, adtree.query_count({0: 2, 1: 1}))
+        self.assertEqual(1, adtree.query_count({0: 2, 1: 2}))
 
-        self.assertEqual(1, adtree.query_count({0:3, 1:1}))
-        self.assertEqual(3, adtree.query_count({0:3, 1:2}))
+        self.assertEqual(1, adtree.query_count({0: 3, 1: 1}))
+        self.assertEqual(3, adtree.query_count({0: 3, 1: 2}))
 
-        self.assertEqual(3, adtree.query_count({1:1}))
-        self.assertEqual(5, adtree.query_count({1:2}))
+        self.assertEqual(3, adtree.query_count({1: 1}))
+        self.assertEqual(5, adtree.query_count({1: 2}))
 
 
     def test_simple_ADTree_query_count2(self):
@@ -139,42 +205,42 @@ class TestADTree(TestBase):
         adtree = ADTree(dataset, column_values)
 
         self.assertEqual(16, adtree.query_count({}))
-        self.assertEqual(6, adtree.query_count({0:1}))
-        self.assertEqual(5, adtree.query_count({1:3}))
-        self.assertEqual(3, adtree.query_count({0:2, 1:3}))
-        self.assertEqual(1, adtree.query_count({0:2, 1:2, 2:1}))
+        self.assertEqual(6, adtree.query_count({0: 1}))
+        self.assertEqual(5, adtree.query_count({1: 3}))
+        self.assertEqual(3, adtree.query_count({0: 2, 1: 3}))
+        self.assertEqual(1, adtree.query_count({0: 2, 1: 2, 2: 1}))
 
 
     def test_simple_ADTree_query(self):
         (dataset, column_values) = self.default_small_dataset()
         adtree = ADTree(dataset, column_values)
 
-        self.assertEqual(1/1, adtree.query({}))
+        self.assertEqual(1 / 1, adtree.query({}))
 
-        self.assertEqual(1/8, adtree.query({0:1}))
-        self.assertEqual(3/8, adtree.query({0:2}))
-        self.assertEqual(4/8, adtree.query({0:3}))
+        self.assertEqual(1 / 8, adtree.query({0: 1}))
+        self.assertEqual(3 / 8, adtree.query({0: 2}))
+        self.assertEqual(4 / 8, adtree.query({0: 3}))
 
-        self.assertEqual(0/8, adtree.query({0:1, 1:1}))
-        self.assertEqual(1/8, adtree.query({0:1, 1:2}))
+        self.assertEqual(0 / 8, adtree.query({0: 1, 1: 1}))
+        self.assertEqual(1 / 8, adtree.query({0: 1, 1: 2}))
 
-        self.assertEqual(2/8, adtree.query({0:2, 1:1}))
-        self.assertEqual(1/8, adtree.query({0:2, 1:2}))
+        self.assertEqual(2 / 8, adtree.query({0: 2, 1: 1}))
+        self.assertEqual(1 / 8, adtree.query({0: 2, 1: 2}))
 
-        self.assertEqual(1/8, adtree.query({0:3, 1:1}))
-        self.assertEqual(3/8, adtree.query({0:3, 1:2}))
+        self.assertEqual(1 / 8, adtree.query({0: 3, 1: 1}))
+        self.assertEqual(3 / 8, adtree.query({0: 3, 1: 2}))
 
-        self.assertEqual(3/8, adtree.query({1:1}))
-        self.assertEqual(5/8, adtree.query({1:2}))
+        self.assertEqual(3 / 8, adtree.query({1: 1}))
+        self.assertEqual(5 / 8, adtree.query({1: 2}))
 
-        self.assertEqual(0/1, adtree.query({1:1}, given={0:1}))
-        self.assertEqual(1/1, adtree.query({1:2}, given={0:1}))
+        self.assertEqual(0 / 1, adtree.query({1: 1}, given={0: 1}))
+        self.assertEqual(1 / 1, adtree.query({1: 2}, given={0: 1}))
 
-        self.assertEqual(2/3, adtree.query({1:1}, given={0:2}))
-        self.assertEqual(1/3, adtree.query({1:2}, given={0:2}))
+        self.assertEqual(2 / 3, adtree.query({1: 1}, given={0: 2}))
+        self.assertEqual(1 / 3, adtree.query({1: 2}, given={0: 2}))
 
-        self.assertEqual(1/4, adtree.query({1:1}, given={0:3}))
-        self.assertEqual(3/4, adtree.query({1:2}, given={0:3}))
+        self.assertEqual(1 / 4, adtree.query({1: 1}, given={0: 3}))
+        self.assertEqual(3 / 4, adtree.query({1: 2}, given={0: 3}))
 
 
     def test_simple_ADTree_structure(self):
@@ -314,3 +380,101 @@ class TestADTree(TestBase):
         self.assertIsNone(child31)
         child32 = vary3.AD_children[1]
         self.assertADNodeCorrect(child32, 2, 2, 8, 0)
+
+
+    def assert_pmf_adtree_vs_dm(self, dm, adtree, variables):
+        if isinstance(variables, int):
+            variables = [variables]
+
+        failure_message = 'AD-tree produces wrong PMF for {}'.format(variables)
+
+        calculated_pmf = adtree.make_cpmf(variables)
+
+        variables = dm.get_variables('X', variables)
+        variables.load_instances()
+
+        expected_pmf = PMF(variables)
+
+        eq = (expected_pmf == calculated_pmf)
+        self.assertTrue(eq, failure_message)
+
+
+    def assert_cpmf_adtree_vs_dm(self, dm, adtree, cd_vars, cn_vars):
+        if isinstance(cd_vars, int):
+            cd_vars = [cd_vars]
+
+        if isinstance(cn_vars, int):
+            cn_vars = [cn_vars]
+
+        failure_message = 'AD-tree produces wrong CPMF for {} given {}'.format(cd_vars, cn_vars)
+
+        calculated_cpmf = adtree.make_cpmf(cd_vars, cn_vars)
+
+        cd_vars = dm.get_variables('X', cd_vars)
+        cn_vars = dm.get_variables('X', cn_vars)
+
+        cd_vars.load_instances()
+        cn_vars.load_instances()
+
+        expected_cpmf = CPMF(cd_vars, cn_vars)
+
+        eq = (expected_cpmf == calculated_cpmf)
+        if eq is False:
+            print()
+            print(expected_cpmf)
+            print()
+            print(calculated_cpmf)
+        self.assertTrue(eq, failure_message)
+
+
+    def assertVaryNodeCorrect(self, vary, column_index, values, mcv, children_count):
+        self.assertIsNotNone(vary)
+        self.assertEqual(column_index, vary.column_index)
+        self.assertEqual(values, vary.values)
+        self.assertEqual(mcv, vary.most_common_value)
+        self.assertEqual(children_count, len(vary.AD_children))
+
+
+    def assertADNodeCorrect(self, adNode, column_index, value, count, children_count):
+        self.assertIsNotNone(adNode)
+        self.assertEqual(column_index, adNode.column_index)
+        self.assertEqual(value, adNode.value)
+        self.assertEqual(count, adNode.count)
+        self.assertEqual(children_count, len(adNode.Vary_children))
+
+
+    def default_small_dataset(self):
+        dataset = scipy.sparse.csr_matrix(numpy.array([
+            [1, 2, 3, 2, 2, 3, 3, 3],
+            [2, 1, 1, 2, 1, 2, 2, 2]]).transpose())
+
+        column_values = {
+            0: [1, 2, 3],
+            1: [1, 2]}
+        return (dataset, column_values)
+
+
+    def default_small_dataset_2(self):
+        dataset = scipy.sparse.csr_matrix(numpy.array([
+            [1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2],
+            [1, 1, 2, 2, 3, 3, 4, 4, 1, 1, 2, 2, 3, 3, 4, 4],
+            [1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2]]).transpose())
+
+        column_values = {
+            0: [1, 2],
+            1: [1, 2, 3, 4],
+            2: [1, 2]}
+        return (dataset, column_values)
+
+
+    def default_small_dataset_3(self):
+        dataset = scipy.sparse.csr_matrix(numpy.array([
+            [1, 1, 2, 1, 1, 2, 1, 2, 2, 2, 2, 2, 1, 2, 2, 2],
+            [2, 2, 1, 3, 3, 2, 2, 1, 1, 2, 3, 3, 1, 1, 2, 3],
+            [1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2]]).transpose())
+
+        column_values = {
+            0: [1, 2],
+            1: [1, 2, 3, 4],
+            2: [1, 2]}
+        return (dataset, column_values)
