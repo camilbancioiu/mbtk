@@ -25,6 +25,21 @@ class ContingencyTreeNode:
                 raise
 
 
+    def add_count_to_leaf(self, columns, values, count):
+        if len(values) == 0:
+            try:
+                self.count += count
+            except TypeError:
+                self.count = count
+        else:
+            try:
+                next_child = self.get(values[0])
+            except (TypeError, KeyError):
+                next_child = ContingencyTreeNode(columns[0], values[0], None)
+                self.append_child(next_child)
+            next_child.add_count_to_leaf(columns[1:], values[1:], count)
+
+
     def sum_with_existing_child(self, child):
         self.children[child.value].sum(child)
 
@@ -70,10 +85,13 @@ class ContingencyTreeNode:
             else:
                 dict_key = key[0]
             dictionary[dict_key] = self.count
-            key.pop()
         else:
             for value, child in self.children.items():
                 child.convert_to_dictionary(key, dictionary)
+        try:
+            key.pop()
+        except IndexError:
+            pass
         return dictionary
 
 
@@ -100,7 +118,12 @@ class ContingencyTreeNode:
 
         sum_node = ContingencyTreeNode(self.column, self.value, None)
         for child_value in self.children:
-            sum_child = self.children[child_value].sum(other.children[child_value])
+            sum_child = self.children[child_value]
+            try:
+                other_child = other.children[child_value]
+                sum_child = sum_child.sum(other_child)
+            except KeyError:
+                pass
             sum_node.append_child(sum_child)
 
         return sum_node
@@ -112,7 +135,12 @@ class ContingencyTreeNode:
 
         sum_node = ContingencyTreeNode(self.column, self.value, None)
         for child_value in self.children:
-            sum_child = self.children[child_value].subtract(other.children[child_value])
+            sum_child = self.children[child_value]
+            try:
+                other_child = other.children[child_value]
+                sum_child = sum_child.subtract(other_child)
+            except KeyError:
+                pass
             sum_node.append_child(sum_child)
 
         return sum_node
