@@ -125,6 +125,12 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
     def calculate_pmf_from_AD_tree(self, X, Y, Z):
         if len(Z) == 0:
             PrXY = self.AD_tree.make_pmf(sorted([X, Y]))
+            if [X, Y] != sorted([X, Y]):
+                new_probabilities = dict()
+                for key, p in PrXY.items():
+                    new_key = tuple(reversed(key))
+                    new_probabilities[new_key] = p
+                PrXY.probabilities = new_probabilities
             PrX = self.AD_tree.make_pmf([X])
             PrY = self.AD_tree.make_pmf([Y])
             PrXYcZ = self.make_omega_cpmf_from_pmf(PrXY)

@@ -122,6 +122,7 @@ class TestADTree(TestBase):
         print()
 
         self.assertGTestEqual(0, 1, set())
+        self.assertGTestEqual(4, 3, set())
         self.assertGTestEqual(4, 3, {1})
         self.assertGTestEqual(5, 3, {1, 2})
         self.assertGTestEqual(0, 1, {2, 3, 4, 5})
@@ -133,6 +134,7 @@ class TestADTree(TestBase):
 
         citr_u = self.G_unoptimized.ci_test_results[-1:][0]
         citr_adt = self.G_with_AD_tree.ci_test_results[-1:][0]
+        print(citr_u.diff(citr_adt))
         self.assertTrue(citr_u == citr_adt)
 
 

@@ -48,12 +48,17 @@ class TestAlgorithmIPCMBOptimizations(TestBase):
         datasetmatrix = self.DatasetMatrices[dm_label]
         bn = self.BayesianNetworks[dm_label]
 
+        ad_tree_path = Path('testfiles', 'tmp', 'test_ipcmb_optimizations_ad_trees')
+        ad_tree_path.mkdir(parents=True, exist_ok=True)
+
         parameters = dict()
         parameters['target'] = target
         parameters['ci_test_class'] = ci_test_class
         parameters['ci_test_debug'] = True
         parameters['ci_test_significance'] = 0.95
         parameters['ci_test_ad_tree_leaf_list_threshold'] = 5000
+        parameters['ci_test_ad_tree_path__save'] = ad_tree_path / (dm_label + '.pickle')
+        parameters['ci_test_ad_tree_path__load'] = ad_tree_path / (dm_label + '.pickle')
         parameters['debug'] = False
         parameters['omega'] = omega
         parameters['source_bayesian_network'] = bn
@@ -94,11 +99,14 @@ class TestAlgorithmIPCMBOptimizations(TestBase):
         parameters['target'] = 3
         parameters['ci_test_class'] = mbff.math.G_test__unoptimized.G_test
         parameters['ci_test_significance'] = 0.95
+        parameters['ci_test_debug'] = True
         parameters['debug'] = False
         parameters['omega'] = omega
         parameters['source_bayesian_network'] = bn
         parameters['ci_test_results'] = list()
 
+        print()
+        print('Building reference CI test results...')
         start_time = time.time()
         ipcmb = AlgorithmIPCMB(datasetmatrix, parameters)
         ipcmb.select_features()
@@ -120,11 +128,14 @@ class TestAlgorithmIPCMBOptimizations(TestBase):
     def assert_ci_test_results_equal_to_reference(self, dm_label, computed_ci_test_results):
         reference_ci_test_results = self.ReferenceCITestResults[dm_label]
         for (ref_citr, comp_citr) in zip(reference_ci_test_results, computed_ci_test_results):
+            ref_citr.tolerance__statistic_value = 1e-8
+            ref_citr.tolerance__p_value = 1e-9
             failMessage = (
                 'Differing CI test results:\n'
                 'REFERENCE: {}\n'
                 'COMPUTED:  {}\n'
-            ).format(ref_citr, comp_citr)
+                '{}\n'
+            ).format(ref_citr, comp_citr, ref_citr.diff(comp_citr))
             self.assertTrue(ref_citr == comp_citr, failMessage)
 
 
