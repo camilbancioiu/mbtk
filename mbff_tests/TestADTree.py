@@ -9,7 +9,6 @@ from mbff.math.PMF import PMF, CPMF
 import mbff.math.G_test__unoptimized
 import mbff.math.G_test__with_AD_tree
 
-import mbff.math.infotheory as infotheory
 from mbff_tests.TestBase import TestBase
 
 
@@ -81,14 +80,25 @@ class TestADTree(TestBase):
         return configuration
 
 
-    def test_making_cpmf_larger_dataset(self):
+    def test_making_pmf_larger_dataset(self):
         dm = self.DatasetMatrices['survey']
         adtree = self.ADTrees['survey']
         adtree.debug = False
 
+        self.assert_pmf_adtree_vs_dm(dm, adtree, [0])
+        self.assert_pmf_adtree_vs_dm(dm, adtree, [1])
+        self.assert_pmf_adtree_vs_dm(dm, adtree, [2])
+        self.assert_pmf_adtree_vs_dm(dm, adtree, [3])
+        self.assert_pmf_adtree_vs_dm(dm, adtree, [4])
+        self.assert_pmf_adtree_vs_dm(dm, adtree, [5])
+        self.assert_pmf_adtree_vs_dm(dm, adtree, [1, 2])
         self.assert_pmf_adtree_vs_dm(dm, adtree, [2, 3])
-        self.assert_cpmf_adtree_vs_dm(dm, adtree, [2, 3], [0])
-        self.assert_cpmf_adtree_vs_dm(dm, adtree, [4, 3], [1])
+        self.assert_pmf_adtree_vs_dm(dm, adtree, [3, 4])
+        self.assert_pmf_adtree_vs_dm(dm, adtree, [4, 5])
+        self.assert_pmf_adtree_vs_dm(dm, adtree, [0, 2, 3])
+        self.assert_pmf_adtree_vs_dm(dm, adtree, [1, 3, 4])
+        self.assert_pmf_adtree_vs_dm(dm, adtree, [1, 4, 5])
+        self.assert_pmf_adtree_vs_dm(dm, adtree, [0, 1, 2, 3, 4, 5])
 
 
     def test_compare_g_tests(self):
@@ -104,78 +114,44 @@ class TestADTree(TestBase):
         parameters['omega'] = omega
         parameters['source_bayesian_network'] = bn
 
-        G_unoptimized = mbff.math.G_test__unoptimized.G_test(datasetmatrix, parameters)
+        self.G_unoptimized = mbff.math.G_test__unoptimized.G_test(datasetmatrix, parameters)
+        self.G_with_AD_tree = mbff.math.G_test__with_AD_tree.G_test(datasetmatrix, parameters)
+        self.G_unoptimized.debug = True
+        self.G_with_AD_tree.debug = True
 
-        G_with_AD_tree = mbff.math.G_test__with_AD_tree.G_test(datasetmatrix, parameters)
+        print()
 
-        X = 4
-        Y = 3
-        Z = {1}
-        G_unoptimized.conditionally_independent(X, Y, Z)
-        G_with_AD_tree.conditionally_independent(X, Y, Z)
+        self.assertGTestEqual(0, 1, set())
+        self.assertGTestEqual(4, 3, {1})
+        self.assertGTestEqual(5, 3, {1, 2})
+        self.assertGTestEqual(0, 1, {2, 3, 4, 5})
 
-        (VarX, VarY, VarZ) = G_unoptimized.load_variables(X, Y, Z)
-        pmfs_u = infotheory.calculate_pmf_for_cmi(VarX, VarY, VarZ)
-        cmi_u = infotheory.conditional_mutual_information(*pmfs_u, base='e')
-        (PrXYcZ, PrXcZ, PrYcZ, PrZ) = pmfs_u
 
-        pmfs_adt = G_with_AD_tree.calculate_pmf_from_AD_tree(X, Y, Z)
-        cmi_adt = infotheory.conditional_mutual_information(*pmfs_adt, base='e')
-        (PrXYcZ, PrXcZ, PrYcZ, PrZ) = pmfs_adt
+    def assertGTestEqual(self, X, Y, Z):
+        self.G_unoptimized.conditionally_independent(X, Y, Z)
+        self.G_with_AD_tree.conditionally_independent(X, Y, Z)
 
-        citr_u = G_unoptimized.ci_test_results[0]
-        citr_adt = G_with_AD_tree.ci_test_results[0]
-        self.assertEqual(citr_u, citr_adt)
-        self.assertAlmostEqual(cmi_u, cmi_adt)
+        citr_u = self.G_unoptimized.ci_test_results[-1:][0]
+        citr_adt = self.G_with_AD_tree.ci_test_results[-1:][0]
+        self.assertTrue(citr_u == citr_adt)
 
 
 
-    def test_making_cpmf(self):
+    def test_making_pmf(self):
         (dataset, column_values) = self.default_small_dataset_2()
         adtree = ADTree(dataset, column_values)
 
-        cpmf = adtree.make_cpmf([0])
+        pmf = adtree.make_pmf([0])
         self.assertEqual(
             [(1, 1 / 2), (2, 1 / 2)],
-            sorted(list(cpmf.items()))
+            sorted(list(pmf.items()))
         )
 
-        cpmf = adtree.make_cpmf([0], given=[1])
-        self.assertEqual(
-            [1, 2, 3, 4],
-            sorted(list(cpmf.conditional_probabilities.keys()))
-        )
-
-        self.assertEqual(
-            [(1, 1 / 2), (2, 1 / 2)],
-            sorted(list(cpmf.given(1).items()))
-        )
-
-        self.assertEqual(
-            [(1, 1 / 2), (2, 1 / 2)],
-            sorted(list(cpmf.given(2).items()))
-        )
-
-        self.assertEqual(
-            [(1, 1 / 2), (2, 1 / 2)],
-            sorted(list(cpmf.given(3).items()))
-        )
-
-        self.assertEqual(
-            [(1, 1 / 2), (2, 1 / 2)],
-            sorted(list(cpmf.given(4).items()))
-        )
-
-        cpmf = adtree.make_cpmf([0], given=[1, 2])
-        self.assertEqual(
-            [
-                (1, 1), (1, 2),
-                (2, 1), (2, 2),
-                (3, 1), (3, 2),
-                (4, 1), (4, 2)
-            ],
-            sorted(list(cpmf.conditional_probabilities.keys()))
-        )
+        pmf = adtree.make_pmf([0, 1])
+        expected_keys = sorted(zip([1] * 4 + [2] * 4, [1, 2, 3, 4] * 2))
+        expected_pmf = {k: 2 / 16 for k in expected_keys}
+        self.assertEqual(expected_keys, sorted(list(pmf.probabilities.keys())))
+        self.assertEqual(expected_pmf, pmf.probabilities)
 
 
     def test_simple_ADTree_query_count(self):
@@ -386,17 +362,17 @@ class TestADTree(TestBase):
         if isinstance(variables, int):
             variables = [variables]
 
-        failure_message = 'AD-tree produces wrong PMF for {}'.format(variables)
+        # failure_message = 'AD-tree produces wrong PMF for {}'.format(variables)
 
-        calculated_pmf = adtree.make_cpmf(variables)
+        calculated_pmf = adtree.make_pmf(variables)
+        calculated_pmf.remove_zeros()
 
         variables = dm.get_variables('X', variables)
         variables.load_instances()
 
         expected_pmf = PMF(variables)
 
-        eq = (expected_pmf == calculated_pmf)
-        self.assertTrue(eq, failure_message)
+        self.assertEqual(expected_pmf.probabilities, calculated_pmf.probabilities)
 
 
     def assert_cpmf_adtree_vs_dm(self, dm, adtree, cd_vars, cn_vars):
