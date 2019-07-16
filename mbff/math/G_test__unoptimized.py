@@ -56,6 +56,7 @@ class G_test:
             independent = False
 
         result.end_timing()
+        result.index = len(self.ci_test_results)
         result.set_independent(independent, self.significance)
         result.set_variables(VarX, VarY, VarZ)
         result.set_statistic('G', G, dict())

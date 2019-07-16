@@ -17,6 +17,7 @@ class DSeparationCITest:
         independent = self.source_bn.conditionally_independent(X, Y, Z)
         result.end_timing()
 
+        result.index = len(self.ci_test_results)
         result.set_independent(independent, 0)
         result.set_variables(X, Y, Z)
         result.computed_d_separation = independent

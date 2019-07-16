@@ -54,10 +54,13 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
             independent = False
 
         result.end_timing()
+        result.index = len(self.ci_test_results)
         result.set_independent(independent, self.significance)
         result.set_variables(X, Y, Z)
         result.set_statistic('G', G, dict())
         result.set_distribution('chi2', p, {'DoF': DF})
+
+        result.extra_info = '\nDoF {}'.format(DF)
 
         return result
 

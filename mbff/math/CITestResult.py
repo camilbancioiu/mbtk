@@ -13,6 +13,7 @@ class CITestResult:
     UNDERLINE = '\033[4m'
 
     def __init__(self):
+        self.index = -1
         self.independent = None
         self.dependent = None
         self.X = None
@@ -167,10 +168,11 @@ class CITestResult:
                 view['endcode'] = self.ENDC
         view['i_or_d'] += d_sep_verification
         view['duration_in_seconds'] = self.duration
+        view['index'] = self.index
 
         format_string = (
             "{startcode}"
-            "CI test {X:>4} ⊥ {Y:<4} | {Z:<20}: {i_or_d}"
+            "CI test {index}: {X:>4} ⊥ {Y:<4} | {Z:<20}: {i_or_d}"
             " @ {significance:6.4f}"
             " with {statistic}={statistic_value:>8.2f}"
             " at p={p_value:<8.6f} on {test_distribution}"
