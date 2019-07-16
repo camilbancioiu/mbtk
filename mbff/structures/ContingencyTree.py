@@ -40,35 +40,6 @@ class ContingencyTreeNode:
             next_child.add_count_to_leaf(columns[1:], values[1:], count)
 
 
-    def sum_with_existing_child(self, child):
-        self.children[child.value].sum(child)
-
-
-    def sum_with_child(self, child):
-        try:
-            self.children[child.value].sum(child)
-        except KeyError:
-            self.children[child.value] = child
-        except TypeError:
-            if self.children is None:
-                self.children = {child.value: child}
-            else:
-                raise
-
-
-    def sum_children(self):
-        sum_tree = ContingencyTreeNode(self.column, self.value, None)
-        for value, child in self.children.items():
-            for subvalue, subchild in child.children.items():
-                sum_tree.sum_with_child(subchild)
-
-        return sum_tree
-
-
-    def get(self, value):
-        return self.children[value]
-
-
     def convert_to_dictionary(self, key=None, dictionary=None):
         if key is None:
             key = collections.deque()
@@ -93,23 +64,6 @@ class ContingencyTreeNode:
         except IndexError:
             pass
         return dictionary
-
-
-    def disallow_mismatching_node(self, other):
-        if self.column != other.column or self.value != other.value:
-            raise ValueError("Cannot operate on mismatching nodes: {} + {}".format(self, other))
-
-
-    def disallow_mismatching_node_children(self, other):
-        if (
-            (not (self.children is None and other.children is None)) or
-            (set(self.children.keys()) != set(other.children.keys()))
-        ):
-            raise ValueError((
-                "Cannot operate on nodes with mismatching children:\n"
-                "\tLeft: {} with children: {}\n"
-                "\tRight: {} with children: {}\n"
-            ).format(self, other, self.children, other.children))
 
 
     def sum(self, other):
@@ -146,16 +100,29 @@ class ContingencyTreeNode:
         return sum_node
 
 
-    def __add__(self, other):
-        self.disallow_mismatching_node(other)
-        self.disallow_mismatching_node_children(other)
+    def sum_in_place(self, other):
+        if self.children is None:
+            self.count += other.count
+            return
 
-        return self.sum(other)
+        for child_value in self.children:
+            child = self.children[child_value]
+            try:
+                other_child = other.children[child_value]
+                child.sum_in_place(other_child)
+            except KeyError:
+                pass
 
 
+    def subtract_in_place(self, other):
+        if self.children is None:
+            self.count -= other.count
+            return
 
-    def __sub__(self, other):
-        self.disallow_mismatching_node(other)
-        self.disallow_mismatching_node_children(other)
-
-        return self.subtract(other)
+        for child_value in self.children:
+            child = self.children[child_value]
+            try:
+                other_child = other.children[child_value]
+                child.subtract_in_place(other_child)
+            except KeyError:
+                pass
