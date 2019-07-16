@@ -161,6 +161,7 @@ class TestADTree(TestBase):
         self.assertGTestEqual(0, 1, {2, 3, 4, 5})
 
         self.assertGTestEqual(1, 3, {28, 33})
+        self.assertGTestEqual(33, 3, {2, 28, 36})
 
 
     def assertGTestEqual(self, X, Y, Z):
