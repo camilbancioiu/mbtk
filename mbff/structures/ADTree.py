@@ -381,7 +381,7 @@ class ADNode:
         mcv_child_ct.value = vary.most_common_value
 
         for value, child in non_mcv_ct.children.items():
-            mcv_child_ct = mcv_child_ct.subtract(child)
+            mcv_child_ct.subtract_in_place(child)
 
         contingency_tree = non_mcv_ct
         contingency_tree.append_child(mcv_child_ct)
@@ -393,13 +393,16 @@ class ADNode:
         matrix = self.tree.matrix
         ct = ContingencyTreeNode(self.column_index, self.value, None)
 
-        # TODO try to optimize this loop
-        for row_index in self.row_selection:
-            key = []
-            for column_index in columns:
-                value = matrix[row_index, column_index]
-                key.append(value)
-            ct.add_count_to_leaf(columns, key, 1)
+        if len(columns) == 1:
+            column = matrix.getcol(columns[0]).toarray()
+            for row_index in self.row_selection:
+                key = [column[row_index, 0]]
+                ct.add_count_to_leaf(columns, key, 1)
+        else:
+            # TODO try to optimize this loop
+            for row_index in self.row_selection:
+                key = [matrix[row_index, column_index] for column_index in columns]
+                ct.add_count_to_leaf(columns, key, 1)
         if self.tree.debug >= 1: self.tree.n_pmf_ll += 1
         return ct
 
