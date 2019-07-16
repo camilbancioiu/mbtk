@@ -20,7 +20,6 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
         super().__init__(datasetmatrix, parameters)
 
         self.matrix = self.datasetmatrix.X
-        self.column_values = self.datasetmatrix.get_values_per_column('X')
 
         self.AD_tree_build_start_time = 0
         self.AD_tree_build_end_time = 0
@@ -89,7 +88,7 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
         result.start_timing()
 
         G = self.G_value(X, Y, Z)
-        DF = self.calculate_degrees_of_freedom(X, Y)
+        DF = self.calculate_degrees_of_freedom(X, Y, Z)
 
         p = chi2.cdf(G, DF)
         independent = None
@@ -214,9 +213,3 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
 
     def make_cpmf_PrYcZ(self, Y, Z, PrZ=None):
         return self.make_cpmf_PrXcZ(Y, Z, PrZ)
-
-
-    def calculate_degrees_of_freedom(self, X, Y):
-        X_val = len(self.column_values[X])
-        Y_val = len(self.column_values[Y])
-        return (X_val - 1) * (Y_val - 1)

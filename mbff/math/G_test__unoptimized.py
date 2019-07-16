@@ -15,6 +15,7 @@ class G_test:
         self.parameters = parameters
         self.debug = self.parameters.get('ci_test_debug', 0)
         self.datasetmatrix = datasetmatrix
+        self.column_values = self.datasetmatrix.get_values_per_column('X')
         self.significance = parameters.get('ci_test_significance', 0)
         self.omega = parameters.get('omega', None)
         self.source_bn = parameters.get('source_bayesian_network', None)
@@ -25,7 +26,7 @@ class G_test:
         # Load the actual variable instances (samples) from the
         # datasetmatrix.
         (VarX, VarY, VarZ) = self.load_variables(X, Y, Z)
-        result = self.G_test_conditionally_independent(VarX, VarY, VarZ)
+        result = self.G_test_conditionally_independent(VarX, VarY, VarZ, X, Y, Z)
 
         if self.source_bn is not None:
             result.computed_d_separation = self.source_bn.d_separated(X, Z, Y)
@@ -41,12 +42,12 @@ class G_test:
         return result.independent
 
 
-    def G_test_conditionally_independent(self, VarX, VarY, VarZ):
+    def G_test_conditionally_independent(self, VarX, VarY, VarZ, X, Y, Z):
         result = CITestResult()
         result.start_timing()
 
         G = self.G_value(VarX, VarY, VarZ)
-        DF = self.calculate_degrees_of_freedom(VarX, VarY)
+        DF = self.calculate_degrees_of_freedom(X, Y, Z)
 
         p = chi2.cdf(G, DF)
         independent = None
@@ -90,8 +91,14 @@ class G_test:
         return (VarX, VarY, VarZ)
 
 
-    def calculate_degrees_of_freedom(self, VarX, VarY):
-        return (len(VarX.values) - 1) * (len(VarY.values) - 1)
+    def calculate_degrees_of_freedom(self, X, Y, Z):
+        X_val = len(self.column_values[X])
+        Y_val = len(self.column_values[Y])
+
+        Z_val = 1
+        for z in Z:
+            Z_val *= len(self.column_values[z])
+        return (X_val - 1) * (Y_val - 1) * Z_val
 
 
     def end(self):

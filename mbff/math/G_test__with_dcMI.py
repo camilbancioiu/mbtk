@@ -16,7 +16,6 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
 
         self.matrix = self.datasetmatrix.X
         self.N = self.matrix.get_shape()[0]
-        self.column_values = self.datasetmatrix.get_values_per_column('X')
 
         self.JMI_cache = dict()
 
@@ -44,7 +43,7 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
         result.start_timing()
 
         G = self.G_value(X, Y, Z)
-        DF = self.calculate_degrees_of_freedom(X, Y)
+        DF = self.calculate_degrees_of_freedom(X, Y, Z)
 
         p = chi2.cdf(G, DF)
         independent = None
@@ -103,9 +102,3 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
                 variable_set.update(variable)
 
         return variable_set
-
-
-    def calculate_degrees_of_freedom(self, X, Y):
-        X_val = len(self.column_values[X])
-        Y_val = len(self.column_values[Y])
-        return (X_val - 1) * (Y_val - 1)
