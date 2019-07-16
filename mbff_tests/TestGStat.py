@@ -1,27 +1,44 @@
-from pprint import pprint
-import numpy
 import unittest
 
 from pathlib import Path
 
-
 from mbff.math.Variable import Variable, JointVariables
-from mbff.math.PMF import PMF, CPMF
 import mbff.math.G_test__unoptimized
-
 
 from mbff_tests.TestBase import TestBase
 
-import scipy.stats
 
 @unittest.skipIf(TestBase.tag_excluded('conditional_independence'), 'Conditional independence tests excluded')
 class TestGStat(TestBase):
 
     def initTestResources(self):
         super().initTestResources()
-        self.DatasetsInUse = ['survey', 'lungcancer']
+        self.DatasetsInUse = ['survey', 'lungcancer', 'alarm']
+        self.DatasetsInUse = ['alarm']
         self.DatasetMatrixFolder = Path('testfiles', 'tmp', 'test_gstat_dm')
         self.G_test = None
+
+
+    def test_G_value__alarm(self):
+        Omega = self.Omega['alarm']
+        dataset = self.DatasetMatrices['alarm']
+
+        parameters = dict()
+        parameters['ci_test_significance'] = 0.95
+        parameters['ci_test_debug'] = 4
+        parameters['omega'] = Omega
+
+        X = 35
+        Y = 3
+        Z = {32, 1, 34, 36}
+
+        print()
+
+        self.G_test = mbff.math.G_test__unoptimized.G_test(dataset, parameters)
+        self.G_test.conditionally_independent(X, Y, Z)
+
+        citr = self.G_test.ci_test_results[-1:][0]
+        print(citr.test_distribution_parameters)
 
 
     def test_G_value__lungcancer(self):
@@ -151,16 +168,21 @@ class TestGStat(TestBase):
         if dm_label == 'lungcancer':
             configuration['sourcepath'] = Path('testfiles', 'bif_files', 'lungcancer.bif')
             configuration['sample_count'] = int(5e5)
-            configuration['random_seed'] = 42*42
+            configuration['random_seed'] = 42 * 42
             configuration['values_as_indices'] = False
             configuration['objectives'] = ['DYSP', 'XRAY']
 
         if dm_label == 'survey':
             configuration['sourcepath'] = Path('testfiles', 'bif_files', 'survey.bif')
             configuration['sample_count'] = int(1e6)
-            configuration['random_seed'] = 42*42
+            configuration['random_seed'] = 42 * 42
             configuration['values_as_indices'] = False
             configuration['objectives'] = ['TRN']
 
+        if dm_label == 'alarm':
+            configuration['sourcepath'] = Path('testfiles', 'bif_files', 'alarm.bif')
+            configuration['sample_count'] = int(8e4)
+            configuration['random_seed'] = 128
+            configuration['values_as_indices'] = True
+            configuration['objectives'] = []
         return configuration
-

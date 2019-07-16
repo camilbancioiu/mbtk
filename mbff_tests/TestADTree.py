@@ -16,9 +16,9 @@ class TestADTree(TestBase):
 
     def initTestResources(self):
         super().initTestResources()
-        self.DatasetsInUse = ['survey']
+        self.DatasetsInUse = ['survey', 'alarm']
         self.DatasetMatrixFolder = Path('testfiles', 'tmp', 'test_adtree_dm')
-        self.ADTreesInUse = ['survey']
+        self.ADTreesInUse = ['survey', 'alarm']
         self.ADTrees = None
         self.ADTreesFolder = Path('testfiles', 'tmp', 'test_adtree_adtrees')
         self.ADTreesFolder.mkdir(parents=True, exist_ok=True)
@@ -44,16 +44,15 @@ class TestADTree(TestBase):
             with path.open('rb') as f:
                 adtree = pickle.load(f)
             adtree.debug = configuration['debug']
-            adtree.debug_to_stdout = configuration['debug_to_stdout']
-            if adtree.debug:
+            if adtree.debug >= 1:
                 adtree.debug_prepare__querying()
         else:
             datasetmatrix = self.DatasetMatrices[label]
             matrix = datasetmatrix.X
             column_values = datasetmatrix.get_values_per_column('X')
             leaf_list_threshold = configuration['leaf_list_threshold']
-            debug_config = (configuration['debug'], configuration['debug_to_stdout'])
-            adtree = ADTree(matrix, column_values, leaf_list_threshold, debug_config)
+            debug = configuration['debug']
+            adtree = ADTree(matrix, column_values, leaf_list_threshold, debug)
             if path is not None:
                 with path.open('wb') as f:
                     pickle.dump(adtree, f)
@@ -64,8 +63,11 @@ class TestADTree(TestBase):
         configuration = dict()
         if label == 'survey':
             configuration['leaf_list_threshold'] = 100
-            configuration['debug'] = True
-            configuration['debug_to_stdout'] = True
+            configuration['debug'] = 3
+
+        if label == 'alarm':
+            configuration['leaf_list_threshold'] = 4096
+            configuration['debug'] = 3
         return configuration
 
 
@@ -75,6 +77,13 @@ class TestADTree(TestBase):
             configuration['sourcepath'] = Path('testfiles', 'bif_files', 'survey.bif')
             configuration['sample_count'] = int(5e3)
             configuration['random_seed'] = 42 * 42
+            configuration['values_as_indices'] = True
+            configuration['objectives'] = []
+
+        if label == 'alarm':
+            configuration['sourcepath'] = Path('testfiles', 'bif_files', 'alarm.bif')
+            configuration['sample_count'] = int(8e4)
+            configuration['random_seed'] = 128
             configuration['values_as_indices'] = True
             configuration['objectives'] = []
         return configuration
@@ -101,7 +110,7 @@ class TestADTree(TestBase):
         self.assert_pmf_adtree_vs_dm(dm, adtree, [0, 1, 2, 3, 4, 5])
 
 
-    def test_compare_g_tests(self):
+    def test_compare_g_tests__survey(self):
         dm_label = 'survey'
         omega = self.Omega[dm_label]
         datasetmatrix = self.DatasetMatrices[dm_label]
@@ -124,6 +133,34 @@ class TestADTree(TestBase):
         self.assertGTestEqual(4, 3, {1})
         self.assertGTestEqual(5, 3, {1, 2})
         self.assertGTestEqual(0, 1, {2, 3, 4, 5})
+
+
+    def test_compare_g_tests__alarm(self):
+        dm_label = 'alarm'
+        omega = self.Omega[dm_label]
+        datasetmatrix = self.DatasetMatrices[dm_label]
+        bn = self.BayesianNetworks[dm_label]
+
+        parameters = dict()
+        parameters['ci_test_debug'] = 3
+        parameters['ci_test_significance'] = 0.95
+        parameters['ci_test_ad_tree_leaf_list_threshold'] = 4096
+        parameters['ci_test_ad_tree_path__load'] = self.ADTreesFolder / 'alarm.pickle'
+        parameters['omega'] = omega
+        parameters['source_bayesian_network'] = bn
+
+        print()
+
+        self.G_unoptimized = mbff.math.G_test__unoptimized.G_test(datasetmatrix, parameters)
+        self.G_with_AD_tree = mbff.math.G_test__with_AD_tree.G_test(datasetmatrix, parameters)
+
+        self.assertGTestEqual(0, 1, set())
+        self.assertGTestEqual(4, 3, set())
+        self.assertGTestEqual(4, 3, {1})
+        self.assertGTestEqual(5, 3, {1, 2})
+        self.assertGTestEqual(0, 1, {2, 3, 4, 5})
+
+        self.assertGTestEqual(1, 3, {28, 33})
 
 
     def assertGTestEqual(self, X, Y, Z):
