@@ -179,7 +179,10 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
             except KeyError:
                 pmf = PMF(None)
                 PrXYcZ.conditional_probabilities[zkey] = pmf
-            pmf.probabilities[varkey] = joint_p / PrZ.p(zkey)
+            try:
+                pmf.probabilities[varkey] = joint_p / PrZ.p(zkey)
+            except ZeroDivisionError:
+                pass
 
         return PrXYcZ
 
@@ -206,7 +209,10 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
             except KeyError:
                 pmf = PMF(None)
                 PrXcZ.conditional_probabilities[zkey] = pmf
-            pmf.probabilities[varkey] = joint_p / PrZ.p(zkey)
+            try:
+                pmf.probabilities[varkey] = joint_p / PrZ.p(zkey)
+            except ZeroDivisionError:
+                pass
 
         return PrXcZ
 
