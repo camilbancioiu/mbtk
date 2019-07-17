@@ -76,11 +76,13 @@ if __name__ == '__main__':
     adtree_folder = Path('adtrees')
     adtree_folder.mkdir(parents=True, exist_ok=True)
 
-    ci_test_results_folder = Path('ci_test_results')
+    ci_test_results_folder = IPCMB_ADTree_LLT_Eval_Definition.path / Path('ci_test_results')
     ci_test_results_folder.mkdir(parents=True, exist_ok=True)
 
     bayesian_network = util.read_bif_file(exdsDef.source_configuration['sourcepath'])
     bayesian_network.finalize()
+
+    significance = 0.95
 
     parameters_direct_d_separation_ci_test = [
         {
@@ -103,7 +105,7 @@ if __name__ == '__main__':
             'source_bayesian_network': bayesian_network,
             'algorithm_debug': 1,
             'ci_test_class': mbff.math.G_test__unoptimized.G_test,
-            'ci_test_significance': 0.95,
+            'ci_test_significance': significance,
             'ci_test_debug': 1,
             'ci_test_results_path__save': ci_test_results_folder / 'ci_test_results_{}_T3_unoptimized.pickle'.format(exdsDef.name)
         }
@@ -116,7 +118,7 @@ if __name__ == '__main__':
             'source_bayesian_network': bayesian_network,
             'algorithm_debug': 1,
             'ci_test_class': mbff.math.G_test__with_dcMI.G_test,
-            'ci_test_significance': 0.95,
+            'ci_test_significance': significance,
             'ci_test_debug': 1,
             'ci_test_results_path__save': ci_test_results_folder / 'ci_test_results_{}_T3_dcMI.pickle'.format(exdsDef.name)
         }
@@ -130,7 +132,7 @@ if __name__ == '__main__':
             'source_bayesian_network': bayesian_network,
             'algorithm_debug': 1,
             'ci_test_class': mbff.math.G_test__with_AD_tree.G_test,
-            'ci_test_significance': 0.95,
+            'ci_test_significance': significance,
             'ci_test_debug': 1,
             'ci_test_ad_tree_leaf_list_threshold': LLT,
             'ci_test_ad_tree_path__load': adtree_folder / 'adtree_{}_llt{}.pickle'.format(exdsDef.name, LLT),
@@ -143,8 +145,9 @@ if __name__ == '__main__':
     IPCMB_ADTree_LLT_Eval_Definition.algorithm_run_parameters = [] \
         + parameters_direct_d_separation_ci_test \
         + parameters_with_AD_tree \
+        + parameters_unoptimized \
         + parameters_with_dcMI \
-        + parameters_unoptimized
+        + []
 
     IPCMB_ADTree_LLT_Eval = IPCMB_ADTree_LLT_Eval_Definition.create_experiment_run()
     IPCMB_ADTree_LLT_Eval.run()
