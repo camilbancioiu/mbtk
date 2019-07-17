@@ -33,7 +33,7 @@ class ContingencyTreeNode:
                 self.count = count
         else:
             try:
-                next_child = self.get(values[0])
+                next_child = self.children[values[0]]
             except (TypeError, KeyError):
                 next_child = ContingencyTreeNode(columns[0], values[0], None)
                 self.append_child(next_child)
