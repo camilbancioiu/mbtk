@@ -40,8 +40,8 @@ class TestAlgorithmIPCMBOptimizations(TestBase):
     def test_IPCMB_w_dcMI(self):
         parameters = {'ci_test_debug': 1}
         ipcmb = self.run_IPCMB('survey', 3, mbff.math.G_test__with_dcMI.G_test, extra_parameters=parameters)
-        jmi_cache = ipcmb.CITest.JMI_cache
-        size = pympler.asizeof.asizeof(jmi_cache)
+        jht = ipcmb.CITest.JHT
+        size = pympler.asizeof.asizeof(jht)
         print("JMI_cache size: {}".format(humanize.naturalsize(size)))
 
 

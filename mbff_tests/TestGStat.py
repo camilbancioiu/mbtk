@@ -3,6 +3,7 @@ import unittest
 from pathlib import Path
 
 from mbff.math.Variable import Variable, JointVariables
+import mbff.math.Variable
 import mbff.math.G_test__unoptimized
 
 from mbff_tests.TestBase import TestBase
@@ -44,14 +45,14 @@ class TestGStat(TestBase):
         Omega = self.Omega['lungcancer']
         lungcancer = self.DatasetMatrices['lungcancer']
 
-        ASIA = Variable(lungcancer.get_column_by_label('X', 'ASIA'), 'ASIA')
-        TUB = Variable(lungcancer.get_column_by_label('X', 'TUB'), 'TUB')
-        EITHER = Variable(lungcancer.get_column_by_label('X', 'EITHER'), 'EITHER')
-        LUNG = Variable(lungcancer.get_column_by_label('X', 'LUNG'), 'LUNG')
-        SMOKE = Variable(lungcancer.get_column_by_label('X', 'SMOKE'), 'SMOKE')
-        BRONC = Variable(lungcancer.get_column_by_label('X', 'BRONC'), 'BRONC')
-        DYSP = Variable(lungcancer.get_column_by_label('Y', 'DYSP'), 'DYSP')
-        XRAY = Variable(lungcancer.get_column_by_label('Y', 'XRAY'), 'XRAY')
+        ASIA = lungcancer.get_variable('X', 0)
+        BRONC = lungcancer.get_variable('X', 1)
+        DYSP = lungcancer.get_variable('X', 2)
+        EITHER = lungcancer.get_variable('X', 3)
+        LUNG = lungcancer.get_variable('X', 4)
+        SMOKE = lungcancer.get_variable('X', 5)
+        TUB = lungcancer.get_variable('X', 6)
+        XRAY = lungcancer.get_variable('X', 7)
 
         parameters = dict()
         parameters['ci_test_significance'] = 0.99
@@ -92,22 +93,22 @@ class TestGStat(TestBase):
         survey = self.DatasetMatrices['survey']
 
         # VariableID: 0
-        AGE = Variable(survey.get_column_by_label('X', 'AGE'), 'AGE')
+        AGE = survey.get_variable('X', 0)
 
         # VariableID: 4
-        SEX = Variable(survey.get_column_by_label('X', 'SEX'), 'SEX')
+        SEX = survey.get_variable('X', 4)
 
         # VariableID: 1
-        EDU = Variable(survey.get_column_by_label('X', 'EDU'), 'EDU')
+        EDU = survey.get_variable('X', 1)
 
         # VariableID: 2
-        OCC = Variable(survey.get_column_by_label('X', 'OCC'), 'OCC')
+        OCC = survey.get_variable('X', 2)
 
         # VariableID: 3
-        R = Variable(survey.get_column_by_label('X', 'R'), 'R')
+        R = survey.get_variable('X', 3)
 
         # VariableID: 5
-        TRN = Variable(survey.get_column_by_label('Y', 'TRN'), 'TRN')
+        TRN = survey.get_variable('X', 5)
 
         parameters = dict()
         parameters['ci_test_significance'] = 0.99
@@ -131,11 +132,9 @@ class TestGStat(TestBase):
 
         self.assertCondIndependent(OCC, AGE, EDU)
         self.assertCondIndependent(OCC, SEX, EDU)
-        self.assertCondIndependent(OCC, JointVariables(AGE, SEX), EDU)
 
         self.assertCondIndependent(R, AGE, EDU)
         self.assertCondIndependent(R, SEX, EDU)
-        self.assertCondIndependent(R, JointVariables(AGE, SEX), EDU)
 
         self.assertDependent(TRN, OCC, Omega)
         self.assertDependent(TRN, R, Omega)
@@ -153,12 +152,26 @@ class TestGStat(TestBase):
 
 
     def assertCondIndependent(self, X, Y, Z):
-        result = self.G_test.G_test_conditionally_independent(X, Y, Z)
+        if isinstance(Z, mbff.math.Variable.Omega):
+            Z_ID = []
+        elif isinstance(Z, JointVariables):
+            Z_ID = Z.variableIDs
+        elif isinstance(Z, Variable):
+            Z_ID = [Z.ID]
+
+        result = self.G_test.G_test_conditionally_independent(X, Y, Z, X.ID, Y.ID, Z_ID)
         self.assertTrue(result.independent)
 
 
     def assertDependent(self, X, Y, Z):
-        result = self.G_test.G_test_conditionally_independent(X, Y, Z)
+        if isinstance(Z, mbff.math.Variable.Omega):
+            Z_ID = []
+        elif isinstance(Z, JointVariables):
+            Z_ID = Z.variableIDs
+        elif isinstance(Z, Variable):
+            Z_ID = [Z.ID]
+
+        result = self.G_test.G_test_conditionally_independent(X, Y, Z, X.ID, Y.ID, Z_ID)
         self.assertFalse(result.independent)
 
 
@@ -169,14 +182,14 @@ class TestGStat(TestBase):
             configuration['sample_count'] = int(5e5)
             configuration['random_seed'] = 42 * 42
             configuration['values_as_indices'] = False
-            configuration['objectives'] = ['DYSP', 'XRAY']
+            configuration['objectives'] = []
 
         if dm_label == 'survey':
             configuration['sourcepath'] = Path('testfiles', 'bif_files', 'survey.bif')
             configuration['sample_count'] = int(1e6)
             configuration['random_seed'] = 42 * 42
             configuration['values_as_indices'] = False
-            configuration['objectives'] = ['TRN']
+            configuration['objectives'] = []
 
         if dm_label == 'alarm':
             configuration['sourcepath'] = Path('testfiles', 'bif_files', 'alarm.bif')
