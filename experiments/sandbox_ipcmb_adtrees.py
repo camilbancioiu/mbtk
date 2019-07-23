@@ -156,6 +156,37 @@ AlgorithmRunParameters = [] \
     + Parameters_with_dcMI \
     + []
 
+# Quick and dirty experiment on multiple targets
+Targets = [0, 1, 2, 3, 4]
+del DefaultParameters['target']
+Parameters_with_dcMI = [
+    {
+        'target': target,
+        'ci_test_jht_path__save': ExperimentDef.path / 'JHT.pickle',
+        'ci_test_jht_path__load': ExperimentDef.path / 'JHT.pickle',
+        'ci_test_class': mbff.math.G_test__with_dcMI.G_test,
+        'ci_test_results_path__save': CITestResult_repo / 'ci_test_results_{}_T{}_dcMI.pickle'.format(ExdsDef.name, target)
+    }
+    for target in Targets
+]
+LLT = 1024
+Parameters_with_AD_tree = [
+    {
+        'target': target,
+        'ci_test_class': mbff.math.G_test__with_AD_tree.G_test,
+        'ci_test_ad_tree_leaf_list_threshold': LLT,
+        'ci_test_ad_tree_path__load': ADTree_repo / 'adtree_{}_llt{}.pickle'.format(ExdsDef.name, LLT),
+        'ci_test_ad_tree_path__save': ADTree_repo / 'adtree_{}_llt{}.pickle'.format(ExdsDef.name, LLT),
+        'ci_test_results_path__save': CITestResult_repo / 'ci_test_results_{}_T{}_ADtree_LLT{}.pickle'.format(ExdsDef.name, target, LLT)
+    }
+    for target in Targets
+]
+AlgorithmRunParameters = [] \
+    + Parameters_with_AD_tree \
+    + Parameters_with_dcMI \
+    + []
+
+
 for parameters in AlgorithmRunParameters:
     parameters.update(DefaultParameters)
 
@@ -186,7 +217,7 @@ def command_list_algrun(arguments):
 
 def command_list_algrun_datapoints(arguments):
     datapoints_folder = ExperimentDef.subfolder('algorithm_run_datapoints')
-    datapoint_files = list(datapoints_folder.iterdir())
+    datapoint_files = sorted(list(datapoints_folder.iterdir()))
 
     try:
         specific_algrun_parameters_index = int(arguments[0])
@@ -278,7 +309,7 @@ def command_plot(arguments):
     PlotPath = ExperimentDef.path / 'plots'
     PlotPath.mkdir(parents=True, exist_ok=True)
 
-    citr = load_citr()
+    citr = load_citr_custom()
     data = dict()
 
     try:
@@ -297,7 +328,8 @@ def command_plot(arguments):
             data[key] = durations_cummulative
             print(key, data[key][-1])
 
-    Xaxis = list(range(len(citr['unoptimized'])))
+    # Xaxis = list(range(len(citr['unoptimized'])))
+    Xaxis = list(range(len(citr['dcMI'])))
 
     Plotter.figure(figsize=(10, 6))
     # Plotter.clf()
@@ -309,18 +341,16 @@ def command_plot(arguments):
     Plotter.xlabel('CI Test number')
     Plotter.ylabel('Time (s)')
 
-    runs = ['unoptimized', 'dcMI', 'adtree_8192', 'adtree_4096', 'adtree_2048', 'adtree_1024']
-    # runs = ['unoptimized', 'dcMI', 'adtree_1024']
+    runs = ['dcMI', 'adtree_1024']
     for run in runs:
         Plotter.plot(Xaxis, data[run], lw=1.5)
 
     legend = list()
-    legend.append('unoptimized')
     legend.append('dcMI')
 
     from humanize import naturalsize, naturaldelta
     from datetime import timedelta
-    treekeys = ['adtree_8192', 'adtree_4096', 'adtree_2048', 'adtree_1024']
+    treekeys = ['adtree_1024']
     treedata = load_adtrees_analysis(Parameters_with_AD_tree)
     for key in treekeys:
         data = treedata[key]
@@ -353,6 +383,36 @@ def load_citr():
         key = 'adtree_{}'.format(parameters['ci_test_ad_tree_leaf_list_threshold'])
         with parameters['ci_test_results_path__save'].open('rb') as f:
             citr[key] = pickle.load(f)
+
+    return citr
+
+
+
+def load_citr_custom():
+    citr = dict()
+    citr['dcMI'] = list()
+    citr['adtree_1024'] = list()
+
+    for parameters in Parameters_with_dcMI:
+        with parameters['ci_test_results_path__save'].open('rb') as f:
+            results = pickle.load(f)
+        citr['dcMI'].extend(results)
+
+    for parameters in Parameters_with_AD_tree:
+        with parameters['ci_test_results_path__save'].open('rb') as f:
+            results = pickle.load(f)
+        citr['adtree_1024'].extend(results)
+
+    for lcitr, rcitr in zip(citr['dcMI'], citr['adtree_1024']):
+        lcitr.tolerance__p_value = 1e-9
+        lcitr.tolerance__statistic_value = 1e-8
+        if lcitr != rcitr:
+            print(lcitr)
+            print(lcitr.p_value)
+            print(rcitr)
+            print(rcitr.p_value)
+            print(lcitr.diff(rcitr))
+            raise ValueError
 
     return citr
 
