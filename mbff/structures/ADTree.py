@@ -103,6 +103,7 @@ class ADTree:
 
         if self.debug >= 3:
             os.system('clear')
+            print('Building AD-tree with LLT={}'.format(self.leaf_list_threshold))
             for i in range(self.count_bins):
                 c = self.count_stats[i]
                 print('{:>8} ({:2}): {}'.format(self.bin_size * (i + 1), i, c))
