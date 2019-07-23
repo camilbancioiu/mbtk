@@ -159,8 +159,6 @@ AlgorithmRunParameters = [] \
 for parameters in AlgorithmRunParameters:
     parameters.update(DefaultParameters)
 
-ExperimentDef.algorithm_run_parameters = AlgorithmRunParameters
-
 
 # Command-line interface
 
@@ -191,16 +189,18 @@ def command_list_algrun_datapoints(arguments):
     datapoint_files = list(datapoints_folder.iterdir())
 
     try:
-        datapoint_files_to_list = [datapoint_files[arguments[0]]]
-    except:
+        specific_algrun_parameters_index = int(arguments[0])
+        datapoint_files_to_list = [datapoint_files[specific_algrun_parameters_index]]
+    except IndexError:
         datapoint_files_to_list = datapoint_files
-
-    from pprint import pprint
 
     for datapoint_file in datapoint_files_to_list:
         with datapoint_file.open('rb') as f:
             datapoint = pickle.load(f)
-        pprint(datapoint)
+        print(datapoint)
+        print()
+
+    print('Total: {} AlgorithmRun datapoints'.format(len(datapoint_files_to_list)))
 
 
 
@@ -213,7 +213,7 @@ def command_build_adtree(arguments):
     try:
         specific_algrun_parameters_index = int(arguments[0])
         algrun_parameters_to_build_trees_for = [AlgorithmRunParameters[specific_algrun_parameters_index]]
-    except:
+    except IndexError:
         algrun_parameters_to_build_trees_for = Parameters_with_AD_tree
 
     for parameters in algrun_parameters_to_build_trees_for:
@@ -237,7 +237,7 @@ def command_build_adtree_analysis(arguments):
     try:
         specific_algrun_parameters_index = int(arguments[0])
         algrun_parameters_to_analyze_trees_for = [AlgorithmRunParameters[specific_algrun_parameters_index]]
-    except:
+    except IndexError:
         algrun_parameters_to_analyze_trees_for = Parameters_with_AD_tree
 
     from pympler.asizeof import asizeof
@@ -281,9 +281,6 @@ def command_plot(arguments):
     citr = load_citr()
     data = dict()
 
-    for key, results in citr.items():
-        print(key, len(results))
-
     try:
         plot_what = arguments[0]
     except:
@@ -292,11 +289,13 @@ def command_plot(arguments):
     if plot_what == 'duration':
         for key, results in citr.items():
             data[key] = [result.duration for result in results]
+            print(key, sum(data[key]))
     if plot_what == 'duration-cummulative':
         for key, results in citr.items():
             durations = [result.duration for result in results]
             durations_cummulative = list(itertools.accumulate(durations))
             data[key] = durations_cummulative
+            print(key, data[key][-1])
 
     Xaxis = list(range(len(citr['unoptimized'])))
 
@@ -377,6 +376,11 @@ def load_adtrees_analysis(algrun_parameters):
 
 
 def command_run_experiment(arguments):
+    try:
+        specific_algrun_parameters_index = int(arguments[0])
+        ExperimentDef.algorithm_run_parameters = [AlgorithmRunParameters[specific_algrun_parameters_index]]
+    except IndexError:
+        ExperimentDef.algorithm_run_parameters = AlgorithmRunParameters
     Experiment = ExperimentDef.create_experiment_run()
     Experiment.run()
 
