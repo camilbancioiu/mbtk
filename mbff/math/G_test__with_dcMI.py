@@ -1,4 +1,5 @@
 import math
+import pickle
 
 from mbff.math.CITestResult import CITestResult
 from mbff.math.PMF import PMF
@@ -17,7 +18,22 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
         self.matrix = self.datasetmatrix.X
         self.N = self.matrix.get_shape()[0]
 
-        self.JMI_cache = dict()
+        self.JHT = dict()
+        self.JHT_reads = 0
+        self.JHT_hits = 0
+
+        self.prepare_JHT()
+
+
+    def prepare_JHT(self):
+        jht_load_path = self.parameters.get('ci_test_jht_path__load', None)
+        if jht_load_path is not None and jht_load_path.exists():
+            if self.debug >= 1: print('Loading the JHT from {} ...'.format(jht_load_path))
+            with jht_load_path.open('rb') as f:
+                self.JHT = pickle.load(f)
+            self.JHT_reads = self.JHT['reads']
+            self.JHT_hits = self.JHT['hits']
+            if self.debug >= 1: print('JHT loaded.')
 
 
     def conditionally_independent(self, X, Y, Z):
@@ -75,18 +91,23 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
 
     def get_joint_entropy_term(self, *variables):
         variable_set = self.create_flat_variable_set(*variables)
-        jmi_cache_key = frozenset(variable_set)
+        if len(variable_set) == 0:
+            return 0
+
+        jht_key = frozenset(variable_set)
+
+        self.JHT_reads += 1
 
         try:
-            H = self.JMI_cache[jmi_cache_key]
-            if self.debug >= 2: print('\tJMI cache hit: found H={:8.6f} for {}'.format(H, jmi_cache_key))
+            H = self.JHT[jht_key]
+            self.JHT_hits += 1
+            if self.debug >= 2: print('\tJMI cache hit: found H={:8.6f} for {}'.format(H, jht_key))
         except KeyError:
             joint_variables = self.datasetmatrix.get_variables('X', variable_set)
-            joint_variables.load_instances()
             pmf = PMF(joint_variables)
             H = - pmf.expected_value(lambda v, p: math.log(p))
-            self.JMI_cache[jmi_cache_key] = H
-            if self.debug >= 2: print('\tJMI cache miss and update: store H={:8.6f} for {}'.format(H, jmi_cache_key))
+            self.JHT[jht_key] = H
+            if self.debug >= 2: print('\tJMI cache miss and update: store H={:8.6f} for {}'.format(H, jht_key))
 
         return H
 
@@ -102,3 +123,14 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
                 variable_set.update(variable)
 
         return variable_set
+
+
+    def end(self):
+        super().end()
+        jht_save_path = self.parameters.get('ci_test_jht_path__save', None)
+        if jht_save_path is not None:
+            self.JHT['reads'] = self.JHT_reads
+            self.JHT['hits'] = self.JHT_hits
+            with jht_save_path.open('wb') as f:
+                pickle.dump(self.JHT, f)
+        if self.debug >= 1: print('JHT has been saved to {}'.format(jht_save_path))
