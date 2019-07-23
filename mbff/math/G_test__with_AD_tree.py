@@ -39,10 +39,6 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
 
         self.N = self.AD_tree.query_count(dict())
 
-        adtree_save_path = self.parameters.get('ci_test_ad_tree_path__save', None)
-        if adtree_save_path is not None:
-            with adtree_save_path.open('wb') as f:
-                pickle.dump(self.AD_tree, f)
 
 
     def build_AD_tree(self):
@@ -53,6 +49,12 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
         self.AD_tree_build_end_time = time.time()
         self.AD_tree_build_duration = self.AD_tree_build_end_time - self.AD_tree_build_start_time
         if self.debug >= 1: print("AD-tree built in {:>10.4f}s".format(self.AD_tree_build_duration))
+
+        adtree_save_path = self.parameters.get('ci_test_ad_tree_path__save', None)
+        if adtree_save_path is not None:
+            with adtree_save_path.open('wb') as f:
+                pickle.dump(self.AD_tree, f)
+        if self.debug >= 1: print("AD-tree saved to", adtree_save_path)
 
 
     def load_AD_tree(self, adtree_load_path):
