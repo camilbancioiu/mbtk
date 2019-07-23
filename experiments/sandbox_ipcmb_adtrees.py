@@ -20,6 +20,7 @@ EXPRUN_REPO = None
 
 ExdsDef = None
 ExperimentDef = None
+AlgorithmRunConfiguration = None
 AlgorithmRunParameters = None
 
 
@@ -76,12 +77,14 @@ IPCMB_ADTree_LLT_Eval_Definition.exds_definition = ExdsDef
 IPCMB_ADTree_LLT_Eval_Definition.save_algorithm_run_datapoints = True
 IPCMB_ADTree_LLT_Eval_Definition.algorithm_run_log__stdout = True
 IPCMB_ADTree_LLT_Eval_Definition.algorithm_run_log__file = True
-IPCMB_ADTree_LLT_Eval_Definition.algorithm_run_configuration = {
+
+AlgorithmRunConfiguration = {
     'label': make_algorithm_run_label,
     'algorithm': AlgorithmIPCMB
 }
 
 ExperimentDef = IPCMB_ADTree_LLT_Eval_Definition
+ExperimentDef.algorithm_run_configuration = AlgorithmRunConfiguration
 
 
 # Create AlgorithmRun parameters
@@ -99,58 +102,40 @@ BayesianNetwork = util.read_bif_file(ExdsDef.source_configuration['sourcepath'])
 BayesianNetwork.finalize()
 CITest_Significance = 0.95
 
+DefaultParameters = {
+    'target': 3,
+    'debug': False,
+    'omega': Omega,
+    'source_bayesian_network': BayesianNetwork,
+    'algorithm_debug': 1,
+    'ci_test_debug': 1,
+    'ci_test_significance': CITest_Significance,
+}
 
 parameters_direct_d_separation_ci_test = [
     {
-        'target': 3,
-        'debug': False,
-        'omega': Omega,
-        'source_bayesian_network': BayesianNetwork,
-        'algorithm_debug': 1,
         'ci_test_class': mbff.math.DSeparationCITest.DSeparationCITest,
-        'ci_test_debug': 1,
         'ci_test_results_path__save': CITestResult_repo / 'ci_test_results_{}_T3_dsep.pickle'.format(ExdsDef.name)
     }
 ]
 
 parameters_unoptimized = [
     {
-        'target': 3,
-        'debug': False,
-        'omega': Omega,
-        'source_bayesian_network': BayesianNetwork,
-        'algorithm_debug': 1,
         'ci_test_class': mbff.math.G_test__unoptimized.G_test,
-        'ci_test_significance': CITest_Significance,
-        'ci_test_debug': 1,
         'ci_test_results_path__save': CITestResult_repo / 'ci_test_results_{}_T3_unoptimized.pickle'.format(ExdsDef.name)
     }
 ]
 
 parameters_with_dcMI = [
     {
-        'target': 3,
-        'debug': False,
-        'omega': Omega,
-        'source_bayesian_network': BayesianNetwork,
-        'algorithm_debug': 1,
         'ci_test_class': mbff.math.G_test__with_dcMI.G_test,
-        'ci_test_significance': CITest_Significance,
-        'ci_test_debug': 1,
         'ci_test_results_path__save': CITestResult_repo / 'ci_test_results_{}_T3_dcMI.pickle'.format(ExdsDef.name)
     }
 ]
 
 parameters_with_AD_tree = [
     {
-        'target': 3,
-        'debug': False,
-        'omega': Omega,
-        'source_bayesian_network': BayesianNetwork,
-        'algorithm_debug': 1,
         'ci_test_class': mbff.math.G_test__with_AD_tree.G_test,
-        'ci_test_significance': CITest_Significance,
-        'ci_test_debug': 1,
         'ci_test_ad_tree_leaf_list_threshold': LLT,
         'ci_test_ad_tree_path__load': ADTree_repo / 'adtree_{}_llt{}.pickle'.format(ExdsDef.name, LLT),
         'ci_test_ad_tree_path__save': ADTree_repo / 'adtree_{}_llt{}.pickle'.format(ExdsDef.name, LLT),
@@ -166,10 +151,14 @@ AlgorithmRunParameters = [] \
     + parameters_with_dcMI \
     + []
 
+for parameters in AlgorithmRunParameters:
+    parameters.update(DefaultParameters)
+
 ExperimentDef.algorithm_run_parameters = AlgorithmRunParameters
 
 
 
 if __name__ == '__main__':
-    Experiment = ExperimentDef.create_experiment_run()
-    Experiment.run()
+    print(sys.argv)
+    # Experiment = ExperimentDef.create_experiment_run()
+    # Experiment.run()
