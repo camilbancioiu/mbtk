@@ -14,7 +14,6 @@ class TestGStat(TestBase):
     def initTestResources(self):
         super().initTestResources()
         self.DatasetsInUse = ['survey', 'lungcancer', 'alarm']
-        self.DatasetsInUse = ['alarm']
         self.DatasetMatrixFolder = Path('testfiles', 'tmp', 'test_gstat_dm')
         self.G_test = None
 
@@ -45,14 +44,14 @@ class TestGStat(TestBase):
         Omega = self.Omega['lungcancer']
         lungcancer = self.DatasetMatrices['lungcancer']
 
-        ASIA    = Variable(lungcancer.get_column_by_label('X', 'ASIA'), 'ASIA')
-        TUB     = Variable(lungcancer.get_column_by_label('X', 'TUB'), 'TUB')
-        EITHER  = Variable(lungcancer.get_column_by_label('X', 'EITHER'), 'EITHER')
-        LUNG    = Variable(lungcancer.get_column_by_label('X', 'LUNG'), 'LUNG')
-        SMOKE   = Variable(lungcancer.get_column_by_label('X', 'SMOKE'), 'SMOKE')
-        BRONC   = Variable(lungcancer.get_column_by_label('X', 'BRONC'), 'BRONC')
-        DYSP    = Variable(lungcancer.get_column_by_label('Y', 'DYSP'), 'DYSP')
-        XRAY    = Variable(lungcancer.get_column_by_label('Y', 'XRAY'), 'XRAY')
+        ASIA = Variable(lungcancer.get_column_by_label('X', 'ASIA'), 'ASIA')
+        TUB = Variable(lungcancer.get_column_by_label('X', 'TUB'), 'TUB')
+        EITHER = Variable(lungcancer.get_column_by_label('X', 'EITHER'), 'EITHER')
+        LUNG = Variable(lungcancer.get_column_by_label('X', 'LUNG'), 'LUNG')
+        SMOKE = Variable(lungcancer.get_column_by_label('X', 'SMOKE'), 'SMOKE')
+        BRONC = Variable(lungcancer.get_column_by_label('X', 'BRONC'), 'BRONC')
+        DYSP = Variable(lungcancer.get_column_by_label('Y', 'DYSP'), 'DYSP')
+        XRAY = Variable(lungcancer.get_column_by_label('Y', 'XRAY'), 'XRAY')
 
         parameters = dict()
         parameters['ci_test_significance'] = 0.99
