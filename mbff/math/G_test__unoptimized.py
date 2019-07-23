@@ -19,6 +19,8 @@ class G_test:
         self.significance = parameters.get('ci_test_significance', 0)
         self.omega = parameters.get('omega', None)
         self.source_bn = parameters.get('source_bayesian_network', None)
+        self.ci_test_name = '.'.join([self.__module__, self.__name__])
+        self.parameters['ci_test_name'] = self.ci_test_name
         self.ci_test_results = []
 
 

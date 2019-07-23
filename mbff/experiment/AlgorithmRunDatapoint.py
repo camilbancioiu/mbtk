@@ -1,3 +1,8 @@
+import humanize
+from datetime import timedelta
+import pprint
+
+
 class AlgorithmRunDatapoint:
     def __init__(self, algorithm_run):
         self.parameters = self.pickleable_parameters(algorithm_run.parameters)
@@ -13,8 +18,27 @@ class AlgorithmRunDatapoint:
     def pickleable_parameters(self, parameters):
         newparameters = parameters.copy()
         for k, v in newparameters.items():
-            if callable(v):
+            if not callable(v):
                 newparameters[k] = str(v)
+
+        return newparameters
+
+
+    def __str__(self):
+        view = dict()
+        view['label'] = self.label
+        view['ID'] = self.ID
+        view['algorithm_name'] = self.algorithm_name
+        view['parameters'] = pprint.pformat(self.parameters)
+        view['select_features'] = pprint.pformat(self.selected_features, indent=2)
+        view['duration'] = humanize.naturaldelta(timedelta(seconds=self.duration))
+        view['exact_duration'] = self.duration
+        format_string = (
+            '{ID}\n'
+            '{algorithm_name}, with parameters:\n'
+            '{parameters}\n'
+            'Duration: {exact_duration:.2f}s ({duration})')
+        return format_string.format(**view)
 
 
 
