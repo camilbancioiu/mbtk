@@ -295,14 +295,15 @@ class TestDatasetMatrix(TestBase):
         variable = dm.get_variable('X', 1)
         self.assertEqual(1, variable.ID)
         self.assertEqual('colx1', variable.name)
-        self.assertIsNone(variable.instances)
+        self.assertIsNone(variable.instances_list)
         self.assertIsNone(variable.values)
         self.assertIsNotNone(variable.lazy_instances_loader)
 
         variable.load_instances()
-        self.assertIsNotNone(variable.instances)
-        self.assertEqual(4, len(variable.instances))
-        self.assertEqual(dm.get_column('X', 1).tolist(), variable.instances.tolist())
+        self.assertIsNotNone(variable.instances_list)
+        self.assertEqual(4, len(variable))
+        self.assertEqual(dm.get_column('X', 1).tolist(), variable.instances().tolist())
+        variable.update_values()
         self.assertEqual([2, 6, 10, 14], variable.values)
 
 

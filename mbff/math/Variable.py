@@ -1,4 +1,3 @@
-import numpy
 import operator
 import itertools
 from collections import Counter
@@ -11,21 +10,29 @@ class Variable:
     def __init__(self, instances, name='unnamed'):
         self.ID = -1
         self.name = name
-        self.instances = instances
+        self.instances_list = instances
         self.lazy_instances_loader = None
         self.values = None
-        self.update_values()
+
+
+    def __len__(self):
+        return len(self.instances())
+
+
+    def instances(self):
+        if self.instances_list is None:
+            self.load_instances()
+        return self.instances_list
 
 
     def load_instances(self):
-        if not self.lazy_instances_loader is None:
-            self.instances = self.lazy_instances_loader()
-        self.update_values()
+        if self.lazy_instances_loader is not None:
+            self.instances_list = self.lazy_instances_loader()
 
 
     def update_values(self):
-        if not self.instances is None:
-            self.values = sorted(list(Counter(self.instances).keys()))
+        if self.instances is not None:
+            self.values = sorted(list(Counter(self.instances()).keys()))
 
 
     def simple_representation(self):
@@ -42,24 +49,16 @@ class Omega(Variable):
         super().__init__(None)
         self.ID = -1024
         self.name = 'Ω'
-        self.instances = UniformInstances(1, instance_count)
         self.values = [1]
+        self.instance_count = instance_count
+
+
+    def instances(self):
+        return itertools.repeat(1, times=self.instance_count)
 
 
     def simple_representation(self):
         return self.name
-
-
-
-class UniformInstances:
-
-    def __init__(self, value, instance_count):
-        self.value = value
-        self.instance_count = instance_count
-
-
-    def __iter__(self):
-        return itertools.repeat(self.value, times=self.instance_count)
 
 
     def __len__(self):
@@ -76,36 +75,30 @@ class JointVariables(Variable):
         self.ID = None
         self.name = '{' + ', '.join([var.name for var in self.variables]) + '}'
         self.variableIDs = [var.ID for var in self.variables]
-        self.lazy_instances_loader = None
-
-        self.lazy_instances_loader = self.lazy_joint_instances_loader
 
         if self.all_variables_have_instances():
             self.validate_variables()
-            self.instances = self.lazy_joint_instances_loader()
-            self.values = None
-            self.update_values()
-        else:
-            self.instances = None
-            self.values = None
+
+        self.values = None
 
 
     def simple_representation(self):
         return '{' + ', '.join([str(var.simple_representation()) for var in self.variables]) + '}'
 
 
-    def lazy_joint_instances_loader(self):
-        for variable in self.variables:
-            variable.load_instances()
-        self.validate_variables()
+    def instances(self):
         if len(self.variables) == 1:
-            return self.variables[0].instances
-        return list(zip(*[var.instances for var in self.variables]))
+            return self.variables[0].instances()
+        return zip(*[var.instances() for var in self.variables])
+
+
+    def __len__(self):
+        return len(self.variables[0])
 
 
     def all_variables_have_instances(self):
         for var in self.variables:
-            if var.instances is None:
+            if var.instances_list is None:
                 return False
         return True
 
@@ -121,7 +114,7 @@ class JointVariables(Variable):
 
 
     def validate_variables(self):
-        validate_variable_instances_lengths(self.variables)
+        validate_variable_lengths(self.variables)
 
 
 
@@ -151,15 +144,14 @@ class IndexVariable(Variable):
 
 
     def update_values(self):
-        if not self.source_variable.values is None:
+        if self.source_variable.values is not None:
             self.values_index = dict(enumerate(self.source_variable.values))
             self.values = sorted(list(self.values_index.keys()))
 
 
 
-def validate_variable_instances_lengths(variables):
-    lengths = [len(var.instances) for var in variables]
+def validate_variable_lengths(variables):
+    lengths = [len(var) for var in variables]
     for i in range(len(lengths) - 1):
-        if lengths[i] != lengths[i+1]:
-            raise VariableInstancesOfUnequalCount([variables[i], variables[i+1]])
-
+        if lengths[i] != lengths[i + 1]:
+            raise VariableInstancesOfUnequalCount([variables[i], variables[i + 1]])

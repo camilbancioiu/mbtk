@@ -405,7 +405,6 @@ class TestADTree(TestBase):
         calculated_pmf.remove_zeros()
 
         variables = dm.get_variables('X', variables)
-        variables.load_instances()
 
         expected_pmf = PMF(variables)
 
@@ -425,9 +424,6 @@ class TestADTree(TestBase):
 
         cd_vars = dm.get_variables('X', cd_vars)
         cn_vars = dm.get_variables('X', cn_vars)
-
-        cd_vars.load_instances()
-        cn_vars.load_instances()
 
         expected_cpmf = CPMF(cd_vars, cn_vars)
 

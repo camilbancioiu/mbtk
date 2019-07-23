@@ -7,7 +7,7 @@ class PMF:
     def __init__(self, variable):
         self.variable = variable
         if variable is not None:
-            self.total_count = len(self.variable.instances)
+            self.total_count = len(self.variable)
             self.value_counts = self.count_values()
             self.probabilities = self.normalize_counts()
         else:
@@ -55,7 +55,7 @@ class PMF:
 
 
     def count_values(self):
-        counter = Counter(self.variable.instances)
+        counter = Counter(self.variable.instances())
         return counter
 
 
@@ -111,7 +111,7 @@ class CPMF(PMF):
 
     def count_values_conditionally(self):
         conditional_counts = {}
-        for (v, cv) in zip(self.variable.instances, self.conditioning_variable.instances):
+        for (v, cv) in zip(self.variable.instances(), self.conditioning_variable.instances()):
             try:
                 conditional_counts[cv].count_instance(v)
             except KeyError:

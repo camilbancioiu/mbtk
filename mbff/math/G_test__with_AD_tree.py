@@ -40,7 +40,6 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
         self.N = self.AD_tree.query_count(dict())
 
 
-
     def build_AD_tree(self):
         if self.debug >= 1: print("Building the AD-tree...")
         leaf_list_threshold = self.parameters['ci_test_ad_tree_leaf_list_threshold']
