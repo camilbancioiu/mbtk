@@ -7,8 +7,6 @@ from mbff.math.PMF import PMF
 import mbff.math.G_test__unoptimized
 from scipy.stats import chi2
 
-import gc
-
 
 class G_test(mbff.math.G_test__unoptimized.G_test):
 
@@ -46,10 +44,6 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
 
         if self.debug >= 1: print(result)
         if self.debug >= 1: print()
-
-
-        # Garbage collection required to deallocate variable instances.
-        gc.collect()
 
         return result.independent
 

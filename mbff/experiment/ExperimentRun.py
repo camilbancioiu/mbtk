@@ -3,6 +3,7 @@ import sys
 import time
 import contextlib
 import pickle
+import gc
 
 from pathlib import Path
 from string import Template
@@ -58,6 +59,7 @@ class ExperimentRun:
             algorithm_run_parameters = self.definition.algorithm_run_parameters[algrun_index]
             self.save_checkpoint(algrun_index)
             self.run_algorithm(algrun_index, algorithm_run_parameters)
+            gc.collect()
 
         self.end_time = time.time()
         self.duration = self.end_time - self.start_time
