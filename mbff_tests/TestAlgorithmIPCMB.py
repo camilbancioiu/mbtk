@@ -4,7 +4,7 @@ from pathlib import Path
 
 from mbff_tests.TestBase import TestBase
 
-from mbff.math.BayesianNetwork import BayesianNetwork
+from mbff.structures.BayesianNetwork import BayesianNetwork
 from mbff.math.DSeparationCITest import DSeparationCITest
 from mbff.algorithms.mb.ipcmb import AlgorithmIPCMB
 import mbff.math.G_test__unoptimized

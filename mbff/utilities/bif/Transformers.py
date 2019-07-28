@@ -1,7 +1,8 @@
 from collections import OrderedDict
 from lark import Transformer
 
-from mbff.math.BayesianNetwork import *
+from mbff.structures.BayesianNetwork import BayesianNetwork, VariableNode, ProbabilityDistributionOfVariableNode
+
 
 def get_transformer_chain():
     basic = BIFTransformerBasic()
@@ -142,7 +143,3 @@ class BIFTransformerNetwork(Transformer):
                     pd.conditioning_variable_nodes[varname] = bn.variable_nodes[varname]
 
         return bn
-
-
-
-

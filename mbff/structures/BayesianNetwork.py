@@ -7,13 +7,13 @@ import numpy
 
 from collections import OrderedDict
 
-from mbff.math.Exceptions import BayesianNetworkFinalizedError, BayesianNetworkNotFinalizedError
+from mbff.structures.Exceptions import BayesianNetworkNotFinalizedError
 
 
 def finalization_required(func):
     def wrapper_guard_finalized(*args, **kwargs):
         instance = args[0]
-        if instance.finalized == False:
+        if instance.finalized is False:
             raise BayesianNetworkNotFinalizedError(instance, "Cannot call method {}()".format(func.__name__))
         else:
             return func(*args, **kwargs)
@@ -154,12 +154,12 @@ class BayesianNetwork:
             if len(cond_nodes) > 0:
                 for cnode in cond_nodes:
                     try:
-                        if not node.ID in graph[cnode.ID]:
+                        if node.ID not in graph[cnode.ID]:
                             graph[cnode.ID].append(node.ID)
                     except KeyError:
                         graph[cnode.ID] = [node.ID]
                     try:
-                        if not cnode.ID in graph[node.ID]:
+                        if cnode.ID not in graph[node.ID]:
                             graph[node.ID].append(cnode.ID)
                     except KeyError:
                         graph[node.ID] = [cnode.ID]
@@ -187,12 +187,12 @@ class BayesianNetwork:
                     # from `node` to `descendant`, and one from `descendant` to
                     # `node`.
                     try:
-                        if not descendant in self.graph_u[node]:
+                        if descendant not in self.graph_u[node]:
                             self.graph_u[node].append(descendant)
                     except KeyError:
                         self.graph_u[node] = [descendant]
                     try:
-                        if not node in self.graph_u[descendant]:
+                        if node not in self.graph_u[descendant]:
                             self.graph_u[descendant].append(node)
                     except KeyError:
                         self.graph_u[descendant] = [node]
@@ -266,7 +266,7 @@ class BayesianNetwork:
         path = path + [start]
         if start == end:
             return [path]
-        if not start in graph:
+        if start not in graph:
             return []
         paths = []
         for node in graph[start]:
@@ -366,7 +366,6 @@ class VariableNode:
 
         unsampled_conditioning_variables = []
         for varname in unsampled_conditioning_variable_names:
-            unsampled_variable = self.probdist.conditioning_variable_nodes[varname]
             unsampled_conditioning_variables.append(varname)
 
         return unsampled_conditioning_variables

@@ -8,8 +8,8 @@ import unittest
 from mbff_tests.TestBase import TestBase
 
 import mbff.utilities.functions as util
-from mbff.math.BayesianNetwork import BayesianNetwork, VariableNode, ProbabilityDistributionOfVariableNode
-from mbff.math.Exceptions import BayesianNetworkNotFinalizedError
+from mbff.structures.BayesianNetwork import BayesianNetwork, VariableNode, ProbabilityDistributionOfVariableNode
+from mbff.structures.Exceptions import BayesianNetworkNotFinalizedError
 
 
 class TestBayesianNetwork(TestBase):
