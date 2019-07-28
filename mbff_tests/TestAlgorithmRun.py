@@ -1,4 +1,3 @@
-import scipy
 import numpy
 
 from string import Template
@@ -10,6 +9,7 @@ from mbff.dataset.ExperimentalDatasetDefinition import ExperimentalDatasetDefini
 from mbff.dataset.ModelBuildingExperimentalDataset import ModelBuildingExperimentalDataset
 from mbff.experiment.AlgorithmRun import AlgorithmAndClassifierRun
 from mbff.algorithms.basic.IGt import AlgorithmIGt
+
 
 class TestAlgorithmRun(TestBase):
 
@@ -26,14 +26,14 @@ class TestAlgorithmRun(TestBase):
 
         # Prepare an AlgorithmRun instance.
         configuration = {
-                'label': 'test_algrun',
-                'classifier': MockBernouliClassifier,
-                'algorithm': AlgorithmIGt,
-                }
+            'label': 'test_algrun',
+            'classifier': MockBernouliClassifier,
+            'algorithm': AlgorithmIGt,
+        }
         parameters = {
-                'Q': 4,
-                'objective_index': 0
-                }
+            'Q': 4,
+            'objective_index': 0
+        }
         algrun = AlgorithmAndClassifierRun(exds, configuration, parameters)
 
         # We run the algorithm at the specified parameters, on the specified
@@ -47,25 +47,25 @@ class TestAlgorithmRun(TestBase):
         self.assertLess(0, algrun.duration)
 
         expected_classifier_evaluation = {
-                'TP': 1,
-                'TN': 1,
-                'FP': 1,
-                'FN': 2
-                }
+            'TP': 1,
+            'TN': 1,
+            'FP': 1,
+            'FN': 2
+        }
         self.assertDictEqual(expected_classifier_evaluation, algrun.classifier_evaluation)
 
 
     def test_algorithm_run_configuration(self):
         # Prepare an AlgorithmRun instance.
         configuration = {
-                'label': Template('${nosubstitution}__test_AlgorithmIGt_Q${Q}_Obj${objective_index}'),
-                'classifier': MockBernouliClassifier,
-                'algorithm': AlgorithmIGt,
-                }
+            'label': Template('${nosubstitution}__test_AlgorithmIGt_Q${Q}_Obj${objective_index}'),
+            'classifier': MockBernouliClassifier,
+            'algorithm': AlgorithmIGt,
+        }
         parameters = {
-                'Q': 4,
-                'objective_index': 0
-                }
+            'Q': 4,
+            'objective_index': 0
+        }
         algrun = AlgorithmAndClassifierRun(None, configuration, parameters)
 
         self.assertEqual('${nosubstitution}__test_AlgorithmIGt_Q4_Obj0', algrun.label)
@@ -79,19 +79,11 @@ class TestAlgorithmRun(TestBase):
         definition.exds_class = ModelBuildingExperimentalDataset
         definition.source = MockDatasetSource
         definition.source_configuration = {}
-        definition.options['training_subset_size'] = 3/8
+        definition.options['training_subset_size'] = 3 / 8
         definition.options['random_seed'] = 42
         definition.after_save__auto_lock = True
         definition.tags = []
         return definition
-
-
-    def default_datasetmatrix_train(self):
-        pass
-
-
-    def default_samples_train(self):
-        pass
 
 
 
@@ -106,7 +98,4 @@ class MockBernouliClassifier:
 
 
     def predict(self, samples):
-        return numpy.array([ 1, 1, 0, 0, 0 ])
-
-
-
+        return numpy.array([1, 1, 0, 0, 0])

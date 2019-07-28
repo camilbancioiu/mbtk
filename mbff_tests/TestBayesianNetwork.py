@@ -8,8 +8,8 @@ import unittest
 from mbff_tests.TestBase import TestBase
 
 import mbff.utilities.functions as util
-from mbff.math.BayesianNetwork import *
-from mbff.math.Exceptions import *
+from mbff.math.BayesianNetwork import BayesianNetwork, VariableNode, ProbabilityDistributionOfVariableNode
+from mbff.math.Exceptions import BayesianNetworkNotFinalizedError
 
 
 class TestBayesianNetwork(TestBase):
@@ -65,7 +65,7 @@ class TestBayesianNetwork(TestBase):
         AGEpd = self.calculate_probdist(samples[:, 0])
         EDUpd = self.calculate_probdist(samples[:, 1])
         OCCpd = self.calculate_probdist(samples[:, 2])
-        Rpd   = self.calculate_probdist(samples[:, 3])
+        Rpd = self.calculate_probdist(samples[:, 3])
         SEXpd = self.calculate_probdist(samples[:, 4])
         TRNpd = self.calculate_probdist(samples[:, 5])
 
@@ -79,62 +79,62 @@ class TestBayesianNetwork(TestBase):
         self.assertAlmostEqual(0.51, SEXpd[1], delta=delta)   # Pr(SEX = F) = 0.51
 
         EDU_p_highschool = (
-                0.3 * 0.49 * 0.75
-              + 0.5 * 0.49 * 0.72
-              + 0.2 * 0.49 * 0.88
-              + 0.3 * 0.51 * 0.64
-              + 0.5 * 0.51 * 0.7
-              + 0.2 * 0.51 * 0.9 )
+            0.3 * 0.49 * 0.75 +
+            0.5 * 0.49 * 0.72 +
+            0.2 * 0.49 * 0.88 +
+            0.3 * 0.51 * 0.64 +
+            0.5 * 0.51 * 0.7 +
+            0.2 * 0.51 * 0.9)
         self.assertAlmostEqual(EDU_p_highschool, EDUpd[0], delta=delta)
 
         EDU_p_uni = (
-                0.3 * 0.49 * 0.25
-              + 0.5 * 0.49 * 0.28
-              + 0.2 * 0.49 * 0.12
-              + 0.3 * 0.51 * 0.36
-              + 0.5 * 0.51 * 0.3
-              + 0.2 * 0.51 * 0.1 )
+            0.3 * 0.49 * 0.25 +
+            0.5 * 0.49 * 0.28 +
+            0.2 * 0.49 * 0.12 +
+            0.3 * 0.51 * 0.36 +
+            0.5 * 0.51 * 0.3 +
+            0.2 * 0.51 * 0.1)
         self.assertAlmostEqual(EDU_p_uni, EDUpd[1], delta=delta)
 
         OCC_p_emp = (
-                EDU_p_highschool * 0.96
-              + EDU_p_uni        * 0.92)
+            EDU_p_highschool * 0.96 +
+            EDU_p_uni * 0.92)
         self.assertAlmostEqual(OCC_p_emp, OCCpd[0], delta=delta)
 
         OCC_p_self = (
-                EDU_p_highschool * 0.04
-              + EDU_p_uni        * 0.08)
+            EDU_p_highschool * 0.04 +
+            EDU_p_uni * 0.08)
         self.assertAlmostEqual(OCC_p_self, OCCpd[1], delta=delta)
 
         R_p_small = (
-                EDU_p_highschool * 0.25
-              + EDU_p_uni        * 0.2 )
+            EDU_p_highschool * 0.25 +
+            EDU_p_uni * 0.2)
         self.assertAlmostEqual(R_p_small, Rpd[0], delta=delta)
 
         R_p_big = (
-                EDU_p_highschool * 0.75
-              + EDU_p_uni        * 0.8 )
+            EDU_p_highschool * 0.75 +
+            EDU_p_uni * 0.8)
         self.assertAlmostEqual(R_p_big, Rpd[1], delta=delta)
 
         TRN_p_car = (
-                OCC_p_emp   * R_p_small * 0.48
-              + OCC_p_self  * R_p_small * 0.56
-              + OCC_p_emp   * R_p_big   * 0.58
-              + OCC_p_self  * R_p_big   * 0.70)
+            OCC_p_emp * R_p_small * 0.48 +
+            OCC_p_self * R_p_small * 0.56 +
+            OCC_p_emp * R_p_big * 0.58 +
+            OCC_p_self * R_p_big * 0.70)
         self.assertAlmostEqual(TRN_p_car, TRNpd[0], delta=delta)
 
         TRN_p_train = (
-                OCC_p_emp   * R_p_small * 0.42
-              + OCC_p_self  * R_p_small * 0.36
-              + OCC_p_emp   * R_p_big   * 0.24
-              + OCC_p_self  * R_p_big   * 0.21)
+            OCC_p_emp * R_p_small * 0.42 +
+            OCC_p_self * R_p_small * 0.36 +
+            OCC_p_emp * R_p_big * 0.24 +
+            OCC_p_self * R_p_big * 0.21)
         self.assertAlmostEqual(TRN_p_train, TRNpd[1], delta=delta)
 
         TRN_p_other = (
-                OCC_p_emp   * R_p_small * 0.10
-              + OCC_p_self  * R_p_small * 0.08
-              + OCC_p_emp   * R_p_big   * 0.18
-              + OCC_p_self  * R_p_big   * 0.09)
+            OCC_p_emp * R_p_small * 0.10 +
+            OCC_p_self * R_p_small * 0.08 +
+            OCC_p_emp * R_p_big * 0.18 +
+            OCC_p_self * R_p_big * 0.09)
 
         self.assertAlmostEqual(TRN_p_other, TRNpd[2], delta=delta)
 
@@ -165,16 +165,16 @@ class TestBayesianNetwork(TestBase):
         alarm_bif = Path('testfiles', 'bif_files', 'alarm.bif')
         bn = util.read_bif_file(alarm_bif)
         bn.finalize()
-        self.assertEqual(0,  bn.variable_nodes['ANAPHYLAXIS'].ID)
-        self.assertEqual(1,  bn.variable_nodes['ARTCO2'].ID)
-        self.assertEqual(2,  bn.variable_nodes['BP'].ID)
-        self.assertEqual(3,  bn.variable_nodes['CATECHOL'].ID)
-        self.assertEqual(4,  bn.variable_nodes['CO'].ID)
-        self.assertEqual(5,  bn.variable_nodes['CVP'].ID)
-        self.assertEqual(6,  bn.variable_nodes['DISCONNECT'].ID)
-        self.assertEqual(7,  bn.variable_nodes['ERRCAUTER'].ID)
-        self.assertEqual(8,  bn.variable_nodes['ERRLOWOUTPUT'].ID)
-        self.assertEqual(9,  bn.variable_nodes['EXPCO2'].ID)
+        self.assertEqual(0, bn.variable_nodes['ANAPHYLAXIS'].ID)
+        self.assertEqual(1, bn.variable_nodes['ARTCO2'].ID)
+        self.assertEqual(2, bn.variable_nodes['BP'].ID)
+        self.assertEqual(3, bn.variable_nodes['CATECHOL'].ID)
+        self.assertEqual(4, bn.variable_nodes['CO'].ID)
+        self.assertEqual(5, bn.variable_nodes['CVP'].ID)
+        self.assertEqual(6, bn.variable_nodes['DISCONNECT'].ID)
+        self.assertEqual(7, bn.variable_nodes['ERRCAUTER'].ID)
+        self.assertEqual(8, bn.variable_nodes['ERRLOWOUTPUT'].ID)
+        self.assertEqual(9, bn.variable_nodes['EXPCO2'].ID)
         self.assertEqual(10, bn.variable_nodes['FIO2'].ID)
         self.assertEqual(11, bn.variable_nodes['HISTORY'].ID)
         self.assertEqual(12, bn.variable_nodes['HR'].ID)
@@ -209,87 +209,87 @@ class TestBayesianNetwork(TestBase):
         bn = util.read_bif_file(survey_bif)
         bn.finalize()
         expected_directed_graph = {
-                0: [1],
-                1: [2, 3],
-                2: [5],
-                3: [5],
-                4: [1],
-                5: []
-                }
+            0: [1],
+            1: [2, 3],
+            2: [5],
+            3: [5],
+            4: [1],
+            5: []
+        }
         self.assertEqual(expected_directed_graph, bn.graph_d)
 
         lungcancer_bif = Path('testfiles', 'bif_files', 'lungcancer.bif')
         bn = util.read_bif_file(lungcancer_bif)
         bn.finalize()
         expected_directed_graph = {
-                0: [6],
-                1: [2],
-                2: [],
-                3: [2, 7],
-                4: [3],
-                5: [1, 4],
-                6: [3],
-                7: []
-                }
+            0: [6],
+            1: [2],
+            2: [],
+            3: [2, 7],
+            4: [3],
+            5: [1, 4],
+            6: [3],
+            7: []
+        }
         self.assertDictEqual(expected_directed_graph, bn.graph_d)
 
         alarm_bif = Path('testfiles', 'bif_files', 'alarm.bif')
         bn = util.read_bif_file(alarm_bif)
         bn.finalize()
         expected_directed_graph = {
-                 0: [32],
-                 1: [3, 9],
-                 2: [],
-                 3: [12],
-                 4: [2],
-                 5: [],
-                 6: [36],
-                 7: [14, 15],
-                 8: [13],
-                 9: [],
-                10: [28],
-                11: [],
-                12: [4, 13, 14, 15],
-                13: [],
-                14: [],
-                15: [],
-                16: [20, 31],
-                17: [3],
-                18: [22, 26, 30, 33, 34],
-                19: [26, 34],
-                20: [5, 25],
-                21: [11, 20, 31],
-                22: [],
-                23: [35],
-                24: [],
-                25: [],
-                26: [],
-                27: [24, 30],
-                28: [29],
-                29: [3],
-                30: [29],
-                31: [4],
-                32: [2, 3],
-                33: [1, 28],
-                34: [9, 22, 33],
-                35: [36],
-                36: [26, 34],
-                }
+            0: [32],
+            1: [3, 9],
+            2: [],
+            3: [12],
+            4: [2],
+            5: [],
+            6: [36],
+            7: [14, 15],
+            8: [13],
+            9: [],
+            10: [28],
+            11: [],
+            12: [4, 13, 14, 15],
+            13: [],
+            14: [],
+            15: [],
+            16: [20, 31],
+            17: [3],
+            18: [22, 26, 30, 33, 34],
+            19: [26, 34],
+            20: [5, 25],
+            21: [11, 20, 31],
+            22: [],
+            23: [35],
+            24: [],
+            25: [],
+            26: [],
+            27: [24, 30],
+            28: [29],
+            29: [3],
+            30: [29],
+            31: [4],
+            32: [2, 3],
+            33: [1, 28],
+            34: [9, 22, 33],
+            35: [36],
+            36: [26, 34],
+        }
         self.assertDictEqual(expected_directed_graph, bn.graph_d)
 
         expected_paths = [
-                [0, 32, 2],
-                [0, 32, 3, 12, 4, 2]
-                ]
+            [0, 32, 2],
+            [0, 32, 3, 12, 4, 2]
+        ]
         self.assertEqual(expected_paths, bn.find_all_directed_paths(0, 2))
 
         expected_paths = [
-                [18, 30, 29, 3, 12, 4],
-                [18, 33, 1, 3, 12, 4],
-                [18, 33, 28, 29, 3, 12, 4],
-                [18, 34, 33, 1, 3, 12, 4],
-                [18, 34, 33, 28, 29, 3, 12, 4]
-                ]
+            [18, 30, 29, 3, 12, 4],
+            [18, 33, 1, 3, 12, 4],
+            [18, 33, 28, 29, 3, 12, 4],
+            [18, 34, 33, 1, 3, 12, 4],
+            [18, 34, 33, 28, 29, 3, 12, 4]
+        ]
         self.assertEqual(expected_paths, bn.find_all_directed_paths(18, 4))
 
         expected_paths = []
@@ -304,146 +304,146 @@ class TestBayesianNetwork(TestBase):
         bn = util.read_bif_file(alarm_bif)
         bn.finalize()
         expected_undirected_graph = {
-                 0: [32],
-                 1: [3, 9, 33],
-                 2: [4, 32],
-                 3: [1, 12, 17, 29, 32],
-                 4: [2, 12, 31],
-                 5: [20],
-                 6: [36],
-                 7: [14, 15],
-                 8: [13],
-                 9: [1, 34],
-                10: [28],
-                11: [21],
-                12: [3, 4, 13, 14, 15],
-                13: [8, 12],
-                14: [7, 12],
-                15: [7, 12],
-                16: [20, 31],
-                17: [3],
-                18: [22, 26, 30, 33, 34],
-                19: [26, 34],
-                20: [5, 16, 21, 25], 
-                21: [11, 20, 31], 
-                22: [18, 34],
-                23: [35],
-                24: [27],
-                25: [20],
-                26: [18, 19, 36],
-                27: [24, 30],
-                28: [10, 29, 33],
-                29: [3, 28, 30],
-                30: [18, 27, 29],
-                31: [4, 16, 21],
-                32: [0, 2, 3],
-                33: [1, 18, 28, 34],
-                34: [9, 18, 19, 22, 33, 36],
-                35: [23, 36],
-                36: [6, 26, 34, 35],
-                }
+            0: [32],
+            1: [3, 9, 33],
+            2: [4, 32],
+            3: [1, 12, 17, 29, 32],
+            4: [2, 12, 31],
+            5: [20],
+            6: [36],
+            7: [14, 15],
+            8: [13],
+            9: [1, 34],
+            10: [28],
+            11: [21],
+            12: [3, 4, 13, 14, 15],
+            13: [8, 12],
+            14: [7, 12],
+            15: [7, 12],
+            16: [20, 31],
+            17: [3],
+            18: [22, 26, 30, 33, 34],
+            19: [26, 34],
+            20: [5, 16, 21, 25],
+            21: [11, 20, 31],
+            22: [18, 34],
+            23: [35],
+            24: [27],
+            25: [20],
+            26: [18, 19, 36],
+            27: [24, 30],
+            28: [10, 29, 33],
+            29: [3, 28, 30],
+            30: [18, 27, 29],
+            31: [4, 16, 21],
+            32: [0, 2, 3],
+            33: [1, 18, 28, 34],
+            34: [9, 18, 19, 22, 33, 36],
+            35: [23, 36],
+            36: [6, 26, 34, 35],
+        }
         self.assertDictEqual(expected_undirected_graph, bn.graph_u)
 
 
     def test_building_from_directed_graph(self):
         self.maxDiff = None
         graph = {
-                 0: [32],
-                 1: [3, 9],
-                 2: [],
-                 3: [12],
-                 4: [2],
-                 5: [],
-                 6: [36],
-                 7: [14, 15],
-                 8: [13],
-                 9: [],
-                10: [28],
-                11: [],
-                12: [4, 13, 14, 15],
-                13: [],
-                14: [],
-                15: [],
-                16: [20, 31],
-                17: [3],
-                18: [22, 26, 30, 33, 34],
-                19: [26, 34],
-                20: [5, 25],
-                21: [11, 20, 31],
-                22: [],
-                23: [35],
-                24: [],
-                25: [],
-                26: [],
-                27: [24, 30],
-                28: [29],
-                29: [3],
-                30: [29],
-                31: [4],
-                32: [2, 3],
-                33: [1, 28],
-                34: [9, 22, 33],
-                35: [36],
-                36: [26, 34],
-                }
+            0: [32],
+            1: [3, 9],
+            2: [],
+            3: [12],
+            4: [2],
+            5: [],
+            6: [36],
+            7: [14, 15],
+            8: [13],
+            9: [],
+            10: [28],
+            11: [],
+            12: [4, 13, 14, 15],
+            13: [],
+            14: [],
+            15: [],
+            16: [20, 31],
+            17: [3],
+            18: [22, 26, 30, 33, 34],
+            19: [26, 34],
+            20: [5, 25],
+            21: [11, 20, 31],
+            22: [],
+            23: [35],
+            24: [],
+            25: [],
+            26: [],
+            27: [24, 30],
+            28: [29],
+            29: [3],
+            30: [29],
+            31: [4],
+            32: [2, 3],
+            33: [1, 28],
+            34: [9, 22, 33],
+            35: [36],
+            36: [26, 34],
+        }
         expected_undirected_graph = {
-                 0: [32],
-                 1: [3, 9, 33],
-                 2: [4, 32],
-                 3: [1, 12, 17, 29, 32],
-                 4: [2, 12, 31],
-                 5: [20],
-                 6: [36],
-                 7: [14, 15],
-                 8: [13],
-                 9: [1, 34],
-                10: [28],
-                11: [21],
-                12: [3, 4, 13, 14, 15],
-                13: [8, 12],
-                14: [7, 12],
-                15: [7, 12],
-                16: [20, 31],
-                17: [3],
-                18: [22, 26, 30, 33, 34],
-                19: [26, 34],
-                20: [5, 16, 21, 25],
-                21: [11, 20, 31],
-                22: [18, 34],
-                23: [35],
-                24: [27],
-                25: [20],
-                26: [18, 19, 36],
-                27: [24, 30],
-                28: [10, 29, 33],
-                29: [3, 28, 30],
-                30: [18, 27, 29],
-                31: [4, 16, 21],
-                32: [0, 2, 3],
-                33: [1, 18, 28, 34],
-                34: [9, 18, 19, 22, 33, 36],
-                35: [23, 36],
-                36: [6, 26, 34, 35],
-                }
+            0: [32],
+            1: [3, 9, 33],
+            2: [4, 32],
+            3: [1, 12, 17, 29, 32],
+            4: [2, 12, 31],
+            5: [20],
+            6: [36],
+            7: [14, 15],
+            8: [13],
+            9: [1, 34],
+            10: [28],
+            11: [21],
+            12: [3, 4, 13, 14, 15],
+            13: [8, 12],
+            14: [7, 12],
+            15: [7, 12],
+            16: [20, 31],
+            17: [3],
+            18: [22, 26, 30, 33, 34],
+            19: [26, 34],
+            20: [5, 16, 21, 25],
+            21: [11, 20, 31],
+            22: [18, 34],
+            23: [35],
+            24: [27],
+            25: [20],
+            26: [18, 19, 36],
+            27: [24, 30],
+            28: [10, 29, 33],
+            29: [3, 28, 30],
+            30: [18, 27, 29],
+            31: [4, 16, 21],
+            32: [0, 2, 3],
+            33: [1, 18, 28, 34],
+            34: [9, 18, 19, 22, 33, 36],
+            35: [23, 36],
+            36: [6, 26, 34, 35],
+        }
         bn = BayesianNetwork('testnet_graph')
         bn.from_directed_graph(graph)
         self.assertEqual(graph, bn.graph_d)
         self.assertEqual(expected_undirected_graph, bn.graph_u)
 
         graph = {
-                1: [2, 3],
-                2: [4],
-                3: [4],
-                4: [5],
-                5: []
-                }
+            1: [2, 3],
+            2: [4],
+            3: [4],
+            4: [5],
+            5: []
+        }
         expected_undirected_graph = {
-                1: [2, 3],
-                2: [1, 4],
-                3: [1, 4],
-                4: [2, 3, 5],
-                5: [4]
-                }
+            1: [2, 3],
+            2: [1, 4],
+            3: [1, 4],
+            4: [2, 3, 5],
+            5: [4]
+        }
 
         bn = BayesianNetwork('testnet_graph')
         bn.from_directed_graph(graph)
@@ -455,12 +455,12 @@ class TestBayesianNetwork(TestBase):
         # Simple graph, from "Probabilistic Reasoning in Intelligent Systems"
         # by Judea Pearl, 1988
         graph = {
-                1: [2, 3],
-                2: [4],
-                3: [4],
-                4: [5],
-                5: []
-                }
+            1: [2, 3],
+            2: [4],
+            3: [4],
+            4: [5],
+            5: []
+        }
         bn = BayesianNetwork('testnet')
         bn.from_directed_graph(graph)
 
@@ -484,15 +484,16 @@ class TestBayesianNetwork(TestBase):
         # Simple graph imitating the 'survey' Bayesian network, from
         # http://www.bnlearn.com/bnrepository/discrete-small.html#survey
         graph = {
-                0: [1],
-                4: [1],
-                1: [2, 3],
-                2: [5],
-                3: [5]
-                }
+            0: [1],
+            4: [1],
+            1: [2, 3],
+            2: [5],
+            3: [5]
+        }
         bn = BayesianNetwork('testnet')
         bn.from_directed_graph(graph)
 
+        self.assertFalse(bn.d_separated(3, [0], 1))
         self.assertFalse(bn.d_separated(3, [], 2))
         self.assertFalse(bn.d_separated(3, [5], 2))
         self.assertTrue(bn.d_separated(3, [1], 2))
@@ -500,12 +501,12 @@ class TestBayesianNetwork(TestBase):
         # Simple graph taken from the PCMB article, where authors provide
         # examples to illustrate the flaws found in MMMB and HITON.
         graph_a = {
-                0: [1, 2],
-                1: [3],
-                2: [3],
-                3: [],
-                4: [1]
-                }
+            0: [1, 2],
+            1: [3],
+            2: [3],
+            3: [],
+            4: [1]
+        }
         bn = BayesianNetwork('testnet_a')
         bn.from_directed_graph(graph_a)
         bn.debug = True
@@ -543,6 +544,15 @@ class TestBayesianNetwork(TestBase):
         self.assertFalse(bn.d_separated(10, [29, 19, 36], 26))
         self.assertTrue(bn.d_separated(10, [18, 29, 19, 36], 26))
 
+        # Another simple graph, as generated by the 'asia' (or 'lungcancer')
+        # Bayesian network, from
+        # http://www.bnlearn.com/bnrepository/discrete-medium.html#alarm
+        alarm_bif = Path('testfiles', 'bif_files', 'lungcancer.bif')
+        bn = util.read_bif_file(alarm_bif)
+        bn.finalize()
+
+        self.assertFalse(bn.d_separated(0, [], 6))
+
 
     def calculate_probdist(self, column):
         counter = Counter()
@@ -557,7 +567,7 @@ class TestBayesianNetwork(TestBase):
         variable = VariableNode('ASDF')
         variable.values = ['rocket', 'carbohydrate', 'albatross', 'oxygen']
         variable.probdist = ProbabilityDistributionOfVariableNode(variable)
-        variable.probdist.probabilities = {'<unconditioned>' : [0.2, 0.1, 0.5, 0.2]}
+        variable.probdist.probabilities = {'<unconditioned>': [0.2, 0.1, 0.5, 0.2]}
         return variable
 
 
@@ -568,5 +578,5 @@ class TestBayesianNetwork(TestBase):
         self.assertIn(sample['SEX'], ['M', 'F'])
         self.assertIn(sample['EDU'], ['highschool', 'uni'])
         self.assertIn(sample['OCC'], ['emp', 'self'])
-        self.assertIn(sample['R'],   ['small', 'big'])
+        self.assertIn(sample['R'], ['small', 'big'])
         self.assertIn(sample['TRN'], ['car', 'train', 'other'])

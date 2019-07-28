@@ -9,37 +9,6 @@ from mbff.dataset.DatasetMatrix import DatasetMatrix
 
 class TestAlgorithmIGt(TestBase):
 
-    def test_selecting_features(self):
-        datasetmatrix = self.default_dataset()
-
-        # Select the two best features.
-        parameters = {
-                'Q': 2,
-                'objective_index': 0
-                }
-        expected_features = [0, 4]
-        computed_features = AlgorithmIGt(datasetmatrix, parameters).select_features()
-        self.assertListEqual(expected_features, computed_features)
-
-        # Select the top four features.
-        parameters = {
-                'Q': 4,
-                'objective_index': 0
-                }
-        expected_features = [0, 4, 1, 5]
-        computed_features = AlgorithmIGt(datasetmatrix, parameters).select_features()
-        self.assertListEqual(expected_features, computed_features)
-
-        # Select all features, thus seeing them sorted by MI.
-        parameters = {
-                'Q': 8,
-                'objective_index': 0
-                }
-        expected_features = [0, 4, 1, 5, 6, 2, 3, 7]
-        computed_features = AlgorithmIGt(datasetmatrix, parameters).select_features()
-        self.assertListEqual(expected_features, computed_features)
-
-
     def default_dataset(self):
         sample_count = 8
         feature_count = 8
@@ -56,7 +25,7 @@ class TestAlgorithmIGt(TestBase):
             [0],
             [1],
             [0]
-            ]))
+        ]))
         datasetmatrix.X = scipy.sparse.csr_matrix(numpy.array([
             [1, 1, 1, 1, 0, 1, 0, 1],
             [0, 1, 1, 1, 1, 0, 0, 1],
@@ -66,5 +35,36 @@ class TestAlgorithmIGt(TestBase):
             [0, 0, 0, 1, 1, 1, 0, 1],
             [1, 1, 1, 1, 0, 0, 1, 0],
             [0, 0, 0, 1, 1, 1, 1, 0]
-            ]))
+        ]))
         return datasetmatrix
+
+
+    def test_selecting_features(self):
+        datasetmatrix = self.default_dataset()
+
+        # Select the two best features.
+        parameters = {
+            'Q': 2,
+            'objective_index': 0
+        }
+        expected_features = [0, 4]
+        computed_features = AlgorithmIGt(datasetmatrix, parameters).select_features()
+        self.assertListEqual(expected_features, computed_features)
+
+        # Select the top four features.
+        parameters = {
+            'Q': 4,
+            'objective_index': 0
+        }
+        expected_features = [0, 4, 1, 5]
+        computed_features = AlgorithmIGt(datasetmatrix, parameters).select_features()
+        self.assertListEqual(expected_features, computed_features)
+
+        # Select all features, thus seeing them sorted by MI.
+        parameters = {
+            'Q': 8,
+            'objective_index': 0
+        }
+        expected_features = [0, 4, 1, 5, 6, 2, 3, 7]
+        computed_features = AlgorithmIGt(datasetmatrix, parameters).select_features()
+        self.assertListEqual(expected_features, computed_features)

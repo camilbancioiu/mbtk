@@ -31,11 +31,11 @@ class TestExperimentRun(TestBase):
 
         # Define the parameters to be passed to each AlgorithmRun, in order in which they should run.
         algorithm_run_parameters = [
-                {'Q': 2, 'objective_index': 0},
-                {'Q': 4, 'objective_index': 0},
-                {'Q': 6, 'objective_index': 0},
-                {'Q': 8, 'objective_index': 0},
-                ]
+            {'Q': 2, 'objective_index': 0},
+            {'Q': 4, 'objective_index': 0},
+            {'Q': 6, 'objective_index': 0},
+            {'Q': 8, 'objective_index': 0},
+        ]
 
         # Prepare the experiment
         experiment_definition = self.default_experiment_definition(experiments_folder, exds_folder, algorithm_run_parameters)
@@ -48,11 +48,11 @@ class TestExperimentRun(TestBase):
         log_folder = experiments_folder + '/test_experiment_run/algorithm_run_logs'
         self.assertTrue(Path(log_folder).exists())
         expected_log_files = [
-                '0__test_AlgorithmIGt_BernoulliNB__Q2_Obj0.log',
-                '1__test_AlgorithmIGt_BernoulliNB__Q4_Obj0.log',
-                '2__test_AlgorithmIGt_BernoulliNB__Q6_Obj0.log',
-                '3__test_AlgorithmIGt_BernoulliNB__Q8_Obj0.log'
-                ]
+            '0__test_AlgorithmIGt_BernoulliNB__Q2_Obj0.log',
+            '1__test_AlgorithmIGt_BernoulliNB__Q4_Obj0.log',
+            '2__test_AlgorithmIGt_BernoulliNB__Q6_Obj0.log',
+            '3__test_AlgorithmIGt_BernoulliNB__Q8_Obj0.log'
+        ]
         created_log_files = sorted([f for f in os.listdir(log_folder) if os.path.isfile(log_folder + '/' + f)])
         self.assertListEqual(expected_log_files, created_log_files)
 
@@ -60,11 +60,11 @@ class TestExperimentRun(TestBase):
         datapoints_folder = experiments_folder + '/test_experiment_run/algorithm_run_datapoints'
         self.assertTrue(Path(datapoints_folder).exists())
         expected_datapoints_files = [
-                '0__test_AlgorithmIGt_BernoulliNB__Q2_Obj0.pickle',
-                '1__test_AlgorithmIGt_BernoulliNB__Q4_Obj0.pickle',
-                '2__test_AlgorithmIGt_BernoulliNB__Q6_Obj0.pickle',
-                '3__test_AlgorithmIGt_BernoulliNB__Q8_Obj0.pickle'
-                ]
+            '0__test_AlgorithmIGt_BernoulliNB__Q2_Obj0.pickle',
+            '1__test_AlgorithmIGt_BernoulliNB__Q4_Obj0.pickle',
+            '2__test_AlgorithmIGt_BernoulliNB__Q6_Obj0.pickle',
+            '3__test_AlgorithmIGt_BernoulliNB__Q8_Obj0.pickle'
+        ]
         created_datapoints_files = sorted([f for f in os.listdir(datapoints_folder) if os.path.isfile(datapoints_folder + '/' + f)])
         self.assertListEqual(expected_datapoints_files, created_datapoints_files)
 
@@ -116,21 +116,21 @@ class TestExperimentRun(TestBase):
         definition.algorithm_run_datapoint_class = AlgorithmAndClassifierRunDatapoint
         definition.exds_definition = self.default_exds_definition(exds_folder, "test_exds_experimentrun_interrupted")
         definition.algorithm_run_configuration = {
-                'classifier': BernoulliNB,
-                'algorithm': AlgorithmMockFaultyFS, # mock algorithm which breaks when requested.
-                'label': Template('${algorithm_run_index}__MockFaultyFS')
-                }
+            'classifier': BernoulliNB,
+            'algorithm': AlgorithmMockFaultyFS,  # mock algorithm which breaks when requested.
+            'label': Template('${algorithm_run_index}__MockFaultyFS')
+        }
         # Firstly, prepare the algorithm parameters (fill with defaults).
         definition.algorithm_run_parameters = [
-                {'fail': False, 'interrupt': False, 'objective_index': 0},
-                {'fail': False, 'interrupt': False, 'objective_index': 0},
-                {'fail': False, 'interrupt': False, 'objective_index': 0},
-                {'fail': False, 'interrupt': False, 'objective_index': 0},
-                {'fail': False, 'interrupt': False, 'objective_index': 0},
-                {'fail': False, 'interrupt': False, 'objective_index': 0},
-                {'fail': False, 'interrupt': False, 'objective_index': 0},
-                {'fail': False, 'interrupt': False, 'objective_index': 0},
-                ]
+            {'fail': False, 'interrupt': False, 'objective_index': 0},
+            {'fail': False, 'interrupt': False, 'objective_index': 0},
+            {'fail': False, 'interrupt': False, 'objective_index': 0},
+            {'fail': False, 'interrupt': False, 'objective_index': 0},
+            {'fail': False, 'interrupt': False, 'objective_index': 0},
+            {'fail': False, 'interrupt': False, 'objective_index': 0},
+            {'fail': False, 'interrupt': False, 'objective_index': 0},
+            {'fail': False, 'interrupt': False, 'objective_index': 0},
+        ]
         definition.save_algorithm_run_datapoints = True
         definition.algorithm_run_log__stdout = True
         definition.algorithm_run_log__file = True
@@ -154,10 +154,10 @@ class TestExperimentRun(TestBase):
         log_folder = experiments_folder + '/test_experiment_run__interrupted/algorithm_run_logs'
         self.assertTrue(Path(log_folder).exists())
         expected_log_files = [
-                '0__MockFaultyFS.log',
-                '1__MockFaultyFS.log',
-                '2__MockFaultyFS.log',
-                ]
+            '0__MockFaultyFS.log',
+            '1__MockFaultyFS.log',
+            '2__MockFaultyFS.log',
+        ]
         created_log_files = sorted([f for f in os.listdir(log_folder) if os.path.isfile(log_folder + '/' + f)])
         self.assertListEqual(expected_log_files, created_log_files)
 
@@ -167,9 +167,9 @@ class TestExperimentRun(TestBase):
         datapoints_folder = experiments_folder + '/test_experiment_run__interrupted/algorithm_run_datapoints'
         self.assertTrue(Path(datapoints_folder).exists())
         expected_datapoints_files = [
-                '0__MockFaultyFS.pickle',
-                '1__MockFaultyFS.pickle',
-                ]
+            '0__MockFaultyFS.pickle',
+            '1__MockFaultyFS.pickle',
+        ]
         created_datapoints_files = sorted([f for f in os.listdir(datapoints_folder) if os.path.isfile(datapoints_folder + '/' + f)])
         self.assertListEqual(expected_datapoints_files, created_datapoints_files)
 
@@ -197,27 +197,27 @@ class TestExperimentRun(TestBase):
         log_folder = experiments_folder + '/test_experiment_run__interrupted/algorithm_run_logs'
         self.assertTrue(Path(log_folder).exists())
         expected_log_files = [
-                '0__MockFaultyFS.log',
-                '1__MockFaultyFS.log',
-                '2__MockFaultyFS.log',
-                '3__MockFaultyFS.log',
-                '4__MockFaultyFS.log',
-                '5__MockFaultyFS.log',
-                '6__MockFaultyFS.log',
-                ]
+            '0__MockFaultyFS.log',
+            '1__MockFaultyFS.log',
+            '2__MockFaultyFS.log',
+            '3__MockFaultyFS.log',
+            '4__MockFaultyFS.log',
+            '5__MockFaultyFS.log',
+            '6__MockFaultyFS.log',
+        ]
         created_log_files = sorted([f for f in os.listdir(log_folder) if os.path.isfile(log_folder + '/' + f)])
         self.assertListEqual(expected_log_files, created_log_files)
 
         datapoints_folder = experiments_folder + '/test_experiment_run__interrupted/algorithm_run_datapoints'
         self.assertTrue(Path(datapoints_folder).exists())
         expected_datapoints_files = [
-                '0__MockFaultyFS.pickle',
-                '1__MockFaultyFS.pickle',
-                '2__MockFaultyFS.pickle',
-                '3__MockFaultyFS.pickle',
-                '4__MockFaultyFS.pickle',
-                '5__MockFaultyFS.pickle',
-                ]
+            '0__MockFaultyFS.pickle',
+            '1__MockFaultyFS.pickle',
+            '2__MockFaultyFS.pickle',
+            '3__MockFaultyFS.pickle',
+            '4__MockFaultyFS.pickle',
+            '5__MockFaultyFS.pickle',
+        ]
         created_datapoints_files = sorted([f for f in os.listdir(datapoints_folder) if os.path.isfile(datapoints_folder + '/' + f)])
         self.assertListEqual(expected_datapoints_files, created_datapoints_files)
 
@@ -238,30 +238,30 @@ class TestExperimentRun(TestBase):
         log_folder = experiments_folder + '/test_experiment_run__interrupted/algorithm_run_logs'
         self.assertTrue(Path(log_folder).exists())
         expected_log_files = [
-                '0__MockFaultyFS.log',
-                '1__MockFaultyFS.log',
-                '2__MockFaultyFS.log',
-                '3__MockFaultyFS.log',
-                '4__MockFaultyFS.log',
-                '5__MockFaultyFS.log',
-                '6__MockFaultyFS.log',
-                '7__MockFaultyFS.log',
-                ]
+            '0__MockFaultyFS.log',
+            '1__MockFaultyFS.log',
+            '2__MockFaultyFS.log',
+            '3__MockFaultyFS.log',
+            '4__MockFaultyFS.log',
+            '5__MockFaultyFS.log',
+            '6__MockFaultyFS.log',
+            '7__MockFaultyFS.log',
+        ]
         created_log_files = sorted([f for f in os.listdir(log_folder) if os.path.isfile(log_folder + '/' + f)])
         self.assertListEqual(expected_log_files, created_log_files)
 
         datapoints_folder = experiments_folder + '/test_experiment_run__interrupted/algorithm_run_datapoints'
         self.assertTrue(Path(datapoints_folder).exists())
         expected_datapoints_files = [
-                '0__MockFaultyFS.pickle',
-                '1__MockFaultyFS.pickle',
-                '2__MockFaultyFS.pickle',
-                '3__MockFaultyFS.pickle',
-                '4__MockFaultyFS.pickle',
-                '5__MockFaultyFS.pickle',
-                '6__MockFaultyFS.pickle',
-                '7__MockFaultyFS.pickle',
-                ]
+            '0__MockFaultyFS.pickle',
+            '1__MockFaultyFS.pickle',
+            '2__MockFaultyFS.pickle',
+            '3__MockFaultyFS.pickle',
+            '4__MockFaultyFS.pickle',
+            '5__MockFaultyFS.pickle',
+            '6__MockFaultyFS.pickle',
+            '7__MockFaultyFS.pickle',
+        ]
         created_datapoints_files = sorted([f for f in os.listdir(datapoints_folder) if os.path.isfile(datapoints_folder + '/' + f)])
         self.assertListEqual(expected_datapoints_files, created_datapoints_files)
 
@@ -281,10 +281,10 @@ class TestExperimentRun(TestBase):
         definition.algorithm_run_datapoint_class = AlgorithmAndClassifierRunDatapoint
         definition.exds_definition = self.default_exds_definition(exds_folder, "test_exds_experimentrun")
         definition.algorithm_run_configuration = {
-                'classifier': BernoulliNB,
-                'algorithm': AlgorithmIGt,
-                'label': Template('${algorithm_run_index}__test_AlgorithmIGt_BernoulliNB__Q${Q}_Obj${objective_index}')
-                }
+            'classifier': BernoulliNB,
+            'algorithm': AlgorithmIGt,
+            'label': Template('${algorithm_run_index}__test_AlgorithmIGt_BernoulliNB__Q${Q}_Obj${objective_index}')
+        }
         definition.algorithm_run_parameters = algorithm_run_parameters
 
         definition.save_algorithm_run_datapoints = True
@@ -300,7 +300,7 @@ class TestExperimentRun(TestBase):
         definition.exds_class = ModelBuildingExperimentalDataset
         definition.source = MockDatasetSource
         definition.source_configuration = {}
-        definition.options['training_subset_size'] = 3/8
+        definition.options['training_subset_size'] = 3 / 8
         definition.options['random_seed'] = 42
         definition.after_save__auto_lock = True
         definition.tags = []

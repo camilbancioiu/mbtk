@@ -4,7 +4,8 @@ from pathlib import Path
 from mbff_tests.TestBase import TestBase
 
 import mbff.utilities.functions as util
-from mbff.math.BayesianNetwork import *
+from mbff.math.BayesianNetwork import BayesianNetwork, VariableNode, ProbabilityDistributionOfVariableNode
+
 
 class TestBIFReading(TestBase):
 
@@ -47,17 +48,17 @@ class TestBIFReading(TestBase):
     def default_Bayesian_network(self):
         AGE = VariableNode('AGE')
         AGE.values = ['young', 'adult', 'old']
-        AGE.properties = {'label' : 'age'}
+        AGE.properties = {'label': 'age'}
         AGE.probdist = ProbabilityDistributionOfVariableNode(AGE)
         AGE.probdist.conditioning_variable_nodes = OrderedDict()
-        AGE.probdist.probabilities = { '<unconditioned>' : [0.3, 0.5, 0.2] }
+        AGE.probdist.probabilities = {'<unconditioned>': [0.3, 0.5, 0.2]}
 
         SEX = VariableNode('SEX')
         SEX.values = ['M', 'F']
-        SEX.properties = {'label' : 'sex'}
+        SEX.properties = {'label': 'sex'}
         SEX.probdist = ProbabilityDistributionOfVariableNode(SEX)
         SEX.probdist.conditioning_variable_nodes = OrderedDict()
-        SEX.probdist.probabilities = { '<unconditioned>' : [0.49, 0.51] }
+        SEX.probdist.probabilities = {'<unconditioned>': [0.49, 0.51]}
 
         EDU = VariableNode('EDU')
         EDU.values = ['highschool', 'uni']
@@ -65,57 +66,55 @@ class TestBIFReading(TestBase):
         EDU.probdist = ProbabilityDistributionOfVariableNode(AGE)
         EDU.probdist.conditioning_variable_nodes = OrderedDict([('AGE', AGE), ('SEX', SEX)])
         EDU.probdist.probabilities = {
-                ('young', 'M')    : [0.75, 0.25],
-                ('young', 'F')    : [0.64, 0.36],
-                ('adult', 'M')    : [0.72, 0.28],
-                ('adult', 'F')    : [0.70, 0.30],
-                ('old', 'M')  : [0.88, 0.12],
-                ('old', 'F')  : [0.90, 0.10]
-                }
+            ('young', 'M'): [0.75, 0.25],
+            ('young', 'F'): [0.64, 0.36],
+            ('adult', 'M'): [0.72, 0.28],
+            ('adult', 'F'): [0.70, 0.30],
+            ('old', 'M'): [0.88, 0.12],
+            ('old', 'F'): [0.90, 0.10]
+        }
 
         OCC = VariableNode('OCC')
         OCC.values = ['emp', 'self']
-        OCC.properties = {'label' : 'occupation'}
+        OCC.properties = {'label': 'occupation'}
         OCC.probdist = ProbabilityDistributionOfVariableNode(OCC)
         OCC.probdist.conditioning_variable_nodes = OrderedDict([('EDU', EDU)])
         OCC.probdist.probabilities = {
-                ('highschool',) : [0.96, 0.04],
-                ('uni',)  : [0.92, 0.08]
-                }
+            ('highschool',): [0.96, 0.04],
+            ('uni',): [0.92, 0.08]
+        }
 
         R = VariableNode('R')
         R.values = ['small', 'big']
-        R.properties = {'label' : 'unknown'}
+        R.properties = {'label': 'unknown'}
         R.probdist = ProbabilityDistributionOfVariableNode(R)
         R.probdist.conditioning_variable_nodes = OrderedDict([('EDU', EDU)])
         R.probdist.probabilities = {
-                ('highschool',) : [0.25, 0.75],
-                ('uni',)  : [0.2, 0.8]
-                }
+            ('highschool',): [0.25, 0.75],
+            ('uni',): [0.2, 0.8]
+        }
 
         TRN = VariableNode('TRN')
         TRN.values = ['car', 'train', 'other']
-        TRN.properties = {'label' : 'transportation'}
+        TRN.properties = {'label': 'transportation'}
         TRN.probdist = ProbabilityDistributionOfVariableNode(TRN)
         TRN.probdist.conditioning_variable_nodes = OrderedDict([('OCC', OCC), ('R', R)])
         TRN.probdist.probabilities = {
-                ('emp', 'small')  : [0.48, 0.42, 0.10],
-                ('self', 'small') : [0.56, 0.36, 0.08],
-                ('emp', 'big')    : [0.58, 0.24, 0.18],
-                ('self', 'big')  : [0.70, 0.21, 0.09]
-                }
+            ('emp', 'small'): [0.48, 0.42, 0.10],
+            ('self', 'small'): [0.56, 0.36, 0.08],
+            ('emp', 'big'): [0.58, 0.24, 0.18],
+            ('self', 'big'): [0.70, 0.21, 0.09]
+        }
 
         BN = BayesianNetwork('survey')
-        BN.properties = { 'testing' : 'yes' }
+        BN.properties = {'testing': 'yes'}
         BN.variable_nodes = {
-                'AGE' : AGE,
-                'SEX' : SEX,
-                'EDU' : EDU,
-                'OCC' : OCC,
-                'R'   : R,
-                'TRN' : TRN
-                }
+            'AGE': AGE,
+            'SEX': SEX,
+            'EDU': EDU,
+            'OCC': OCC,
+            'R': R,
+            'TRN': TRN
+        }
 
         return BN
-
-

@@ -1,9 +1,9 @@
-import unittest
 import numpy
 
 from mbff_tests.TestBase import TestBase
 
 from mbff.dataset.sources.BinarySyntheticDatasetSource import BinarySyntheticDatasetSource
+
 
 class TestBinarySyntheticDatasetSource(TestBase):
 
@@ -40,7 +40,7 @@ class TestBinarySyntheticDatasetSource(TestBase):
         # equality with an expected sorted list of 0 and 1. For example, pick
         # column 3.
         test_column = sorted(datasetmatrix.get_column_X(3).tolist())
-        expected_column = [0] * 95 + [1] * 5;
+        expected_column = [0] * 95 + [1] * 5
         self.assertListEqual(expected_column, test_column)
 
         # Ensure that the features and objectives have been put in the matrix
@@ -53,25 +53,25 @@ class TestBinarySyntheticDatasetSource(TestBase):
         # Sorted:
         # almond carbohydrate firefly galaxy oxygen polyrhythm python rocket
         probabilities = {
-                    'galaxy':       5,
-                    'almond':       20,
-                    'python':       0,
-                    'rocket':       10,
-                    'carbohydrate': 20,
-                    'oxygen':       100,
-                    'polyrhythm':   10,
-                    'firefly':      20
-                }
+            'galaxy': 5,
+            'almond': 20,
+            'python': 0,
+            'rocket': 10,
+            'carbohydrate': 20,
+            'oxygen': 100,
+            'polyrhythm': 10,
+            'firefly': 20
+        }
         return probabilities
 
 
     def default_expected_sample_counts__per_objective(self):
         probabilities = {
-                'arboreal': 20,
-                'encoded':  10,
-                'sidereal': 100,
-                'unknown':  0
-                }
+            'arboreal': 20,
+            'encoded': 10,
+            'sidereal': 100,
+            'unknown': 0
+        }
         return probabilities
 
     def default_configuration(self):
@@ -79,23 +79,23 @@ class TestBinarySyntheticDatasetSource(TestBase):
         # used by the TestRCV1v2DatasetSource class. They are the same words
         # indeed, but there is no real connection.
         configuration = {
-                'random_seed': 42,
-                'row_count': 100,
-                'features': {
-                    'galaxy':       1/20,
-                    'almond':       1/5,
-                    'python':       0/1,
-                    'rocket':       1/10,
-                    'carbohydrate': 1/5,
-                    'oxygen':       1/1,
-                    'polyrhythm':   1/10,
-                    'firefly':      1/5
-                },
-                'objectives': {
-                    'arboreal':     1/5,
-                    'encoded':      1/10,
-                    'sidereal':     1/1,
-                    'unknown':      0/1
-                }
+            'random_seed': 42,
+            'row_count': 100,
+            'features': {
+                'galaxy': 1 / 20,
+                'almond': 1 / 5,
+                'python': 0 / 1,
+                'rocket': 1 / 10,
+                'carbohydrate': 1 / 5,
+                'oxygen': 1 / 1,
+                'polyrhythm': 1 / 10,
+                'firefly': 1 / 5
+            },
+            'objectives': {
+                'arboreal': 1 / 5,
+                'encoded': 1 / 10,
+                'sidereal': 1 / 1,
+                'unknown': 0 / 1
             }
+        }
         return configuration

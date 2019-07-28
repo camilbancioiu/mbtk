@@ -1,14 +1,11 @@
 import unittest
-from pprint import pprint
 from pathlib import Path
+
 
 from mbff_tests.TestBase import TestBase
 
-from mbff.dataset.DatasetMatrix import DatasetMatrix
 from mbff.math.BayesianNetwork import BayesianNetwork
 from mbff.math.DSeparationCITest import DSeparationCITest
-from mbff.math.Variable import Variable, JointVariables, Omega
-from mbff.dataset.sources.SampledBayesianNetworkDatasetSource import SampledBayesianNetworkDatasetSource
 from mbff.algorithms.mb.ipcmb import AlgorithmIPCMB
 import mbff.math.G_test__unoptimized
 import mbff.utilities.functions as util
@@ -17,22 +14,53 @@ import mbff.utilities.functions as util
 @unittest.skipIf(TestBase.tag_excluded('ipcmb_run'), 'Tests running IPC-MB are excluded')
 class TestAlgorithmIPCMB(TestBase):
 
-    def initTestResources(self):
-        super().initTestResources()
-        self.DatasetsInUse = ['survey']
-        self.DatasetMatrixFolder = Path('testfiles', 'tmp', 'test_ipcmb_dm')
+    @classmethod
+    def initTestResources(testClass):
+        super(TestAlgorithmIPCMB, testClass).initTestResources()
+        testClass.DatasetsInUse = ['survey']
+        testClass.DatasetMatrixFolder = Path('testfiles', 'tmp', 'test_ipcmb_dm')
+
+
+    @classmethod
+    def configure_dataset(testClass, dm_label):
+        configuration = {}
+        if dm_label == 'survey':
+            configuration['sourcepath'] = Path('testfiles', 'bif_files', 'survey.bif')
+            configuration['sample_count'] = int(2e4)
+            configuration['random_seed'] = 42 * 42
+            configuration['values_as_indices'] = True
+            configuration['objectives'] = []
+        return configuration
+
+
+    def test_finding_Markov_blankets_in_datasetmatrix(self):
+        Omega = self.OmegaVariables['survey']
+        datasetmatrix = self.DatasetMatrices['survey']
+        bn = self.BayesianNetworks['survey']
+
+        parameters = dict()
+        parameters['target'] = 3
+        parameters['ci_test_class'] = mbff.math.G_test__unoptimized.G_test
+        parameters['ci_test_significance'] = 0.90
+        parameters['ci_test_debug'] = 0
+        parameters['omega'] = Omega
+        parameters['source_bayesian_network'] = bn
+
+        ipcmb = AlgorithmIPCMB(datasetmatrix, parameters)
+        mb = ipcmb.select_features()
+        self.assertEqual([1, 2, 5], mb)
 
 
     def test_finding_Markov_blankets_in_graphs(self):
         # Simple graph imitating the 'survey' Bayesian network, from
         # http://www.bnlearn.com/bnrepository/discrete-small.html#survey
         graph = {
-                0: [1],
-                4: [1],
-                1: [2, 3],
-                2: [5],
-                3: [5]
-                }
+            0: [1],
+            4: [1],
+            1: [2, 3],
+            2: [5],
+            3: [5]
+        }
         bn = BayesianNetwork('testnet')
         bn.from_directed_graph(graph)
 
@@ -73,12 +101,12 @@ class TestAlgorithmIPCMB(TestBase):
         # Test IPC-MB with the graphs proposed in the PCMB article, used to
         # illustrate the flaws of MMMB and HITON.
         graph_a = {
-                0: [1, 2],
-                1: [3],
-                2: [3],
-                3: [],
-                4: [1]
-                }
+            0: [1, 2],
+            1: [3],
+            2: [3],
+            3: [],
+            4: [1]
+        }
         bn = BayesianNetwork('testnet_a')
         bn.from_directed_graph(graph_a)
 
@@ -123,14 +151,6 @@ class TestAlgorithmIPCMB(TestBase):
         mb = AlgorithmIPCMB(None, parameters).select_features()
         self.assertEqual([27], mb)
 
-        parameters = self.make_parameters(20, bn)
-        mb = AlgorithmIPCMB(None, parameters).select_features()
-        self.assertEqual([5, 16, 21, 25], mb)
-
-        parameters = self.make_parameters(16, bn)
-        mb = AlgorithmIPCMB(None, parameters).select_features()
-        self.assertEqual([20, 21, 31], mb)
-
         parameters = self.make_parameters(34, bn)
         mb = AlgorithmIPCMB(None, parameters).select_features()
         self.assertEqual([1, 9, 18, 19, 22, 33, 36], mb)
@@ -138,40 +158,10 @@ class TestAlgorithmIPCMB(TestBase):
 
     def make_parameters(self, target, bn):
         return {
-                'target': target,
-                'all_variables': sorted(list(bn.graph_d.keys())),
-                'ci_test_class': DSeparationCITest,
-                'source_bayesian_network': bn,
-                'pc_only': False,
-                'debug': False
-                }
-
-
-    def test_finding_Markov_blankets_in_datasetmatrix(self):
-        Omega = self.Omega['survey']
-        datasetmatrix = self.DatasetMatrices['survey']
-        bn = self.BayesianNetworks['survey']
-
-        parameters = dict()
-        parameters['target'] = 3
-        parameters['ci_test_class'] = mbff.math.G_test__unoptimized.G_test
-        parameters['ci_test_significance'] = 0.99
-        parameters['debug'] = False
-        parameters['omega'] = Omega
-        parameters['source_bayesian_network'] = bn
-
-        ipcmb = AlgorithmIPCMB(datasetmatrix, parameters)
-        mb = ipcmb.select_features()
-        self.assertEqual([1, 2, 5], mb)
-
-
-    def configure_dataset(self, dm_label):
-        configuration = {}
-        if dm_label == 'survey':
-            configuration['sourcepath'] = Path('testfiles', 'bif_files', 'survey.bif')
-            configuration['sample_count'] = int(1e6)
-            configuration['random_seed'] = 42*42
-            configuration['values_as_indices'] = True
-            configuration['objectives'] = []
-        return configuration
-
+            'target': target,
+            'all_variables': sorted(list(bn.graph_d.keys())),
+            'ci_test_class': DSeparationCITest,
+            'source_bayesian_network': bn,
+            'pc_only': False,
+            'debug': False
+        }

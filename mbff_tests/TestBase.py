@@ -24,25 +24,75 @@ class TestBase(unittest.TestCase):
         return tag in TestBase.TestsTagsToExclude
 
 
-    def setUp(self):
-        if not self.ResourcesSetUp:
-            self.prepareTestResources()
-            self.ResourcesSetUp = True
+    @classmethod
+    def setUpClass(testClass):
+        if not testClass.ResourcesSetUp:
+            testClass.initTestResources()
+            testClass.prepareTestResources()
+            testClass.ResourcesSetUp = True
 
 
-    def initTestResources(self):
-        self.DatasetsInUse = list()
-        self.DatasetMatrixFolder = Path('testfiles', 'tmp', 'test_dm')
-        self.DatasetMatrices = None
-        self.Omega = None
-        self.BayesianNetworks = None
-        self.ResourcesSetUp = False
+    @classmethod
+    def initTestResources(testClass):
+        testClass.DatasetsInUse = list()
+        testClass.DatasetMatrixFolder = Path('testfiles', 'tmp', 'test_dm')
+        testClass.DatasetMatrices = None
+        testClass.OmegaVariables = None
+        testClass.BayesianNetworks = None
+        testClass.ResourcesSetUp = False
 
 
-    def prepareTestResources(self):
-        self.prepare_Bayesian_networks()
-        self.prepare_datasetmatrices()
-        self.prepare_omega_variables()
+    @classmethod
+    def prepareTestResources(testClass):
+        testClass.prepare_Bayesian_networks()
+        testClass.prepare_datasetmatrices()
+        testClass.prepare_omega_variables()
+
+
+    @classmethod
+    def configure_dataset(testClass, dm_label):
+        return dict()
+
+
+    @classmethod
+    def prepare_Bayesian_networks(testClass):
+        testClass.BayesianNetworks = dict()
+        for dm_label in testClass.DatasetsInUse:
+            configuration = testClass.configure_dataset(dm_label)
+            bayesian_network = util.read_bif_file(configuration['sourcepath'])
+            bayesian_network.finalize()
+            testClass.BayesianNetworks[dm_label] = bayesian_network
+
+
+    @classmethod
+    def prepare_datasetmatrices(testClass):
+        testClass.DatasetMatrices = dict()
+
+        for dm_label in testClass.DatasetsInUse:
+            testClass.DatasetMatrices[dm_label] = testClass.prepare_datasetmatrix(dm_label)
+
+
+    @classmethod
+    def prepare_datasetmatrix(testClass, label):
+        configuration = testClass.configure_dataset(label)
+        try:
+            datasetmatrix = DatasetMatrix(label)
+            datasetmatrix.load(testClass.DatasetMatrixFolder)
+        except:
+            sbnds = SampledBayesianNetworkDatasetSource(configuration)
+            sbnds.reset_random_seed = True
+            datasetmatrix = sbnds.create_dataset_matrix(label)
+            datasetmatrix.finalize()
+            datasetmatrix.save(testClass.DatasetMatrixFolder)
+        return datasetmatrix
+
+
+    @classmethod
+    def prepare_omega_variables(testClass):
+        testClass.OmegaVariables = dict()
+        for dm_label in testClass.DatasetsInUse:
+            configuration = testClass.configure_dataset(dm_label)
+            testClass.OmegaVariables[dm_label] = Omega(configuration['sample_count'])
 
 
     def tearDown(self):
@@ -63,44 +113,3 @@ class TestBase(unittest.TestCase):
         path = Path(TestBase.TestFilesRootFolder + '/' + subfolder)
         path.mkdir(parents=True, exist_ok=True)
         return path
-
-
-    def configure_dataset(self, dm_label):
-        return dict()
-
-
-    def prepare_Bayesian_networks(self):
-        self.BayesianNetworks = dict()
-        for dm_label in self.DatasetsInUse:
-            configuration = self.configure_dataset(dm_label)
-            bayesian_network = util.read_bif_file(configuration['sourcepath'])
-            bayesian_network.finalize()
-            self.BayesianNetworks[dm_label] = bayesian_network
-
-
-    def prepare_datasetmatrices(self):
-        self.DatasetMatrices = dict()
-
-        for dm_label in self.DatasetsInUse:
-            self.DatasetMatrices[dm_label] = self.prepare_datasetmatrix(dm_label)
-
-
-    def prepare_datasetmatrix(self, label):
-        configuration = self.configure_dataset(label)
-        try:
-            datasetmatrix = DatasetMatrix(label)
-            datasetmatrix.load(self.DatasetMatrixFolder)
-        except:
-            sbnds = SampledBayesianNetworkDatasetSource(configuration)
-            sbnds.reset_random_seed = True
-            datasetmatrix = sbnds.create_dataset_matrix(label)
-            datasetmatrix.finalize()
-            datasetmatrix.save(self.DatasetMatrixFolder)
-        return datasetmatrix
-
-
-    def prepare_omega_variables(self):
-        self.Omega = dict()
-        for dm_label in self.DatasetsInUse:
-            configuration = self.configure_dataset(dm_label)
-            self.Omega[dm_label] = Omega(configuration['sample_count'])

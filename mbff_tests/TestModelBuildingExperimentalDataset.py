@@ -1,5 +1,3 @@
-import unittest
-
 from pathlib import Path
 
 from mbff_tests.TestBase import TestBase
@@ -8,6 +6,7 @@ from mbff.dataset.DatasetMatrix import DatasetMatrix
 from mbff.dataset.ExperimentalDatasetDefinition import ExperimentalDatasetDefinition
 from mbff.dataset.ModelBuildingExperimentalDataset import ModelBuildingExperimentalDataset
 from mbff.dataset.sources.RCV1v2DatasetSource import RCV1v2DatasetSource
+
 
 class TestModelBuildingExperimentalDataset(TestBase):
 
@@ -96,10 +95,10 @@ class TestModelBuildingExperimentalDataset(TestBase):
         definition.exds_class = ModelBuildingExperimentalDataset
         definition.source = RCV1v2DatasetSource
         definition.source_configuration = {
-                'sourcepath': Path('testfiles/rcv1v2_test_dataset'),
-                'filters': {},
-                'feature_type': 'binary'
-                }
+            'sourcepath': Path('testfiles/rcv1v2_test_dataset'),
+            'filters': {},
+            'feature_type': 'binary'
+        }
         definition.exds_folder = exds_folder
         definition.options['training_subset_size'] = 0.25
         definition.options['random_seed'] = 42
@@ -107,4 +106,3 @@ class TestModelBuildingExperimentalDataset(TestBase):
         definition.tags = []
 
         return definition
-

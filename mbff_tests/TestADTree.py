@@ -1,4 +1,5 @@
 import numpy
+import unittest
 import scipy
 import pickle
 
@@ -14,31 +15,35 @@ from mbff_tests.TestBase import TestBase
 
 class TestADTree(TestBase):
 
-    def initTestResources(self):
-        super().initTestResources()
-        self.DatasetsInUse = ['survey', 'alarm']
-        self.DatasetMatrixFolder = Path('testfiles', 'tmp', 'test_adtree_dm')
-        self.ADTreesInUse = ['survey', 'alarm']
-        self.ADTrees = None
-        self.ADTreesFolder = Path('testfiles', 'tmp', 'test_adtree_adtrees')
-        self.ADTreesFolder.mkdir(parents=True, exist_ok=True)
-        self.ADTreeDebug = True
+    @classmethod
+    def initTestResources(testClass):
+        super(TestADTree, testClass).initTestResources()
+        testClass.DatasetsInUse = ['survey', 'alarm']
+        testClass.DatasetMatrixFolder = Path('testfiles', 'tmp', 'test_adtree_dm')
+        testClass.ADTreesInUse = ['survey', 'alarm']
+        testClass.ADTrees = None
+        testClass.ADTreesFolder = Path('testfiles', 'tmp', 'test_adtree_adtrees')
+        testClass.ADTreesFolder.mkdir(parents=True, exist_ok=True)
 
 
-    def prepareTestResources(self):
-        super().prepareTestResources()
-        self.prepare_AD_trees()
+    @classmethod
+    def prepareTestResources(testClass):
+        super(TestADTree, testClass).prepareTestResources()
+        testClass.prepare_AD_trees()
 
 
-    def prepare_AD_trees(self):
-        self.ADTrees = dict()
-        for label in self.ADTreesInUse:
-            self.ADTrees[label] = self.prepare_AD_tree(label)
+    @classmethod
+    def prepare_AD_trees(testClass):
+        testClass.ADTrees = dict()
+        for label in testClass.ADTreesInUse:
+            testClass.ADTrees[label] = testClass.prepare_AD_tree(label)
+        testClass.prepare_small_AD_trees()
 
 
-    def prepare_AD_tree(self, label):
-        configuration = self.configure_adtree(label)
-        path = self.ADTreesFolder / (label + '.pickle')
+    @classmethod
+    def prepare_AD_tree(testClass, label):
+        configuration = testClass.configure_adtree(label)
+        path = testClass.ADTreesFolder / (label + '.pickle')
         adtree = None
         if path.exists():
             with path.open('rb') as f:
@@ -47,7 +52,7 @@ class TestADTree(TestBase):
             if adtree.debug >= 1:
                 adtree.debug_prepare__querying()
         else:
-            datasetmatrix = self.DatasetMatrices[label]
+            datasetmatrix = testClass.DatasetMatrices[label]
             matrix = datasetmatrix.X
             column_values = datasetmatrix.get_values_per_column('X')
             leaf_list_threshold = configuration['leaf_list_threshold']
@@ -59,34 +64,92 @@ class TestADTree(TestBase):
         return adtree
 
 
-    def configure_adtree(self, label):
+    @classmethod
+    def prepare_small_AD_trees(testClass):
+        (dataset, column_values) = testClass.default_small_dataset()
+        adtree = ADTree(dataset, column_values)
+        testClass.ADTrees['default'] = adtree
+
+        (dataset, column_values) = testClass.default_small_dataset_2()
+        adtree = ADTree(dataset, column_values)
+        testClass.ADTrees['default_2'] = adtree
+
+        (dataset, column_values) = testClass.default_small_dataset_3()
+        adtree = ADTree(dataset, column_values)
+        testClass.ADTrees['default_3'] = adtree
+
+
+    @classmethod
+    def configure_adtree(testClass, label):
         configuration = dict()
         if label == 'survey':
-            configuration['leaf_list_threshold'] = 100
-            configuration['debug'] = 3
+            configuration['leaf_list_threshold'] = 20
+            configuration['debug'] = 0
 
         if label == 'alarm':
-            configuration['leaf_list_threshold'] = 4096
-            configuration['debug'] = 3
+            configuration['leaf_list_threshold'] = 20
+            configuration['debug'] = 0
         return configuration
 
 
-    def configure_dataset(self, label):
+    @classmethod
+    def configure_dataset(testClass, label):
         configuration = dict()
         if label == 'survey':
             configuration['sourcepath'] = Path('testfiles', 'bif_files', 'survey.bif')
-            configuration['sample_count'] = int(5e3)
+            configuration['sample_count'] = int(5e2)
             configuration['random_seed'] = 42 * 42
             configuration['values_as_indices'] = True
             configuration['objectives'] = []
 
         if label == 'alarm':
             configuration['sourcepath'] = Path('testfiles', 'bif_files', 'alarm.bif')
-            configuration['sample_count'] = int(8e4)
+            configuration['sample_count'] = int(5e2)
             configuration['random_seed'] = 128
             configuration['values_as_indices'] = True
             configuration['objectives'] = []
         return configuration
+
+
+    @classmethod
+    def default_small_dataset(testClass):
+        dataset = scipy.sparse.csr_matrix(numpy.array([
+            [1, 2, 3, 2, 2, 3, 3, 3],
+            [2, 1, 1, 2, 1, 2, 2, 2]]).transpose())
+
+        column_values = {
+            0: [1, 2, 3],
+            1: [1, 2]}
+
+        return (dataset, column_values)
+
+
+    @classmethod
+    def default_small_dataset_2(testClass):
+        dataset = scipy.sparse.csr_matrix(numpy.array([
+            [1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2],
+            [1, 1, 2, 2, 3, 3, 4, 4, 1, 1, 2, 2, 3, 3, 4, 4],
+            [1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2]]).transpose())
+
+        column_values = {
+            0: [1, 2],
+            1: [1, 2, 3, 4],
+            2: [1, 2]}
+        return (dataset, column_values)
+
+
+    @classmethod
+    def default_small_dataset_3(testClass):
+        dataset = scipy.sparse.csr_matrix(numpy.array([
+            [1, 1, 2, 1, 1, 2, 1, 2, 2, 2, 2, 2, 1, 2, 2, 2],
+            [2, 2, 1, 3, 3, 2, 2, 1, 1, 2, 3, 3, 1, 1, 2, 3],
+            [1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2]]).transpose())
+
+        column_values = {
+            0: [1, 2],
+            1: [1, 2, 3, 4],
+            2: [1, 2]}
+        return (dataset, column_values)
 
 
     def test_making_pmf_larger_dataset(self):
@@ -110,46 +173,20 @@ class TestADTree(TestBase):
         self.assert_pmf_adtree_vs_dm(dm, adtree, [0, 1, 2, 3, 4, 5])
 
 
-    def test_compare_g_tests__survey(self):
-        dm_label = 'survey'
-        omega = self.Omega[dm_label]
-        datasetmatrix = self.DatasetMatrices[dm_label]
-        bn = self.BayesianNetworks[dm_label]
-
-        parameters = dict()
-        parameters['ci_test_debug'] = 1
-        parameters['ci_test_significance'] = 0.95
-        parameters['ci_test_ad_tree_leaf_list_threshold'] = 100
-        parameters['omega'] = omega
-        parameters['source_bayesian_network'] = bn
-
-        print()
-
-        self.G_unoptimized = mbff.math.G_test__unoptimized.G_test(datasetmatrix, parameters)
-        self.G_with_AD_tree = mbff.math.G_test__with_AD_tree.G_test(datasetmatrix, parameters)
-
-        self.assertGTestEqual(0, 1, set())
-        self.assertGTestEqual(4, 3, set())
-        self.assertGTestEqual(4, 3, {1})
-        self.assertGTestEqual(5, 3, {1, 2})
-        self.assertGTestEqual(0, 1, {2, 3, 4, 5})
-
-
+    @unittest.skipIf(TestBase.tag_excluded('conditional_independence'), 'Conditional independence tests excluded')
     def test_compare_g_tests__alarm(self):
         dm_label = 'alarm'
-        omega = self.Omega[dm_label]
+        omega = self.OmegaVariables[dm_label]
         datasetmatrix = self.DatasetMatrices[dm_label]
         bn = self.BayesianNetworks[dm_label]
 
         parameters = dict()
-        parameters['ci_test_debug'] = 3
+        parameters['ci_test_debug'] = 0
         parameters['ci_test_significance'] = 0.95
-        parameters['ci_test_ad_tree_leaf_list_threshold'] = 4096
+        parameters['ci_test_ad_tree_leaf_list_threshold'] = 20
         parameters['ci_test_ad_tree_path__load'] = self.ADTreesFolder / 'alarm.pickle'
         parameters['omega'] = omega
         parameters['source_bayesian_network'] = bn
-
-        print()
 
         self.G_unoptimized = mbff.math.G_test__unoptimized.G_test(datasetmatrix, parameters)
         self.G_with_AD_tree = mbff.math.G_test__with_AD_tree.G_test(datasetmatrix, parameters)
@@ -164,6 +201,30 @@ class TestADTree(TestBase):
         self.assertGTestEqual(33, 3, {2, 28, 36})
 
 
+    @unittest.skipIf(TestBase.tag_excluded('conditional_independence'), 'Conditional independence tests excluded')
+    def test_compare_g_tests__survey(self):
+        dm_label = 'survey'
+        omega = self.OmegaVariables[dm_label]
+        datasetmatrix = self.DatasetMatrices[dm_label]
+        bn = self.BayesianNetworks[dm_label]
+
+        parameters = dict()
+        parameters['ci_test_debug'] = 0
+        parameters['ci_test_significance'] = 0.95
+        parameters['ci_test_ad_tree_leaf_list_threshold'] = 20
+        parameters['omega'] = omega
+        parameters['source_bayesian_network'] = bn
+
+        self.G_unoptimized = mbff.math.G_test__unoptimized.G_test(datasetmatrix, parameters)
+        self.G_with_AD_tree = mbff.math.G_test__with_AD_tree.G_test(datasetmatrix, parameters)
+
+        self.assertGTestEqual(0, 1, set())
+        self.assertGTestEqual(4, 3, set())
+        self.assertGTestEqual(4, 3, {1})
+        self.assertGTestEqual(5, 3, {1, 2})
+        self.assertGTestEqual(0, 1, {2, 3, 4, 5})
+
+
     def assertGTestEqual(self, X, Y, Z):
         self.G_unoptimized.conditionally_independent(X, Y, Z)
         self.G_with_AD_tree.conditionally_independent(X, Y, Z)
@@ -171,7 +232,6 @@ class TestADTree(TestBase):
         citr_u = self.G_unoptimized.ci_test_results[-1:][0]
         citr_adt = self.G_with_AD_tree.ci_test_results[-1:][0]
         self.assertTrue(citr_u == citr_adt)
-
 
 
     def test_making_pmf(self):
@@ -192,8 +252,7 @@ class TestADTree(TestBase):
 
 
     def test_simple_ADTree_query_count(self):
-        (dataset, column_values) = self.default_small_dataset()
-        adtree = ADTree(dataset, column_values)
+        adtree = self.ADTrees['default']
 
         self.assertEqual(8, adtree.query_count({}))
         self.assertEqual(1, adtree.query_count({0: 1}))
@@ -214,8 +273,7 @@ class TestADTree(TestBase):
 
 
     def test_simple_ADTree_query_count2(self):
-        (dataset, column_values) = self.default_small_dataset_3()
-        adtree = ADTree(dataset, column_values)
+        adtree = self.ADTrees['default_3']
 
         self.assertEqual(16, adtree.query_count({}))
         self.assertEqual(6, adtree.query_count({0: 1}))
@@ -225,8 +283,7 @@ class TestADTree(TestBase):
 
 
     def test_simple_ADTree_query(self):
-        (dataset, column_values) = self.default_small_dataset()
-        adtree = ADTree(dataset, column_values)
+        adtree = self.ADTrees['default']
 
         self.assertEqual(1 / 1, adtree.query({}))
 
@@ -257,8 +314,7 @@ class TestADTree(TestBase):
 
 
     def test_simple_ADTree_structure(self):
-        (dataset, column_values) = self.default_small_dataset()
-        adtree = ADTree(dataset, column_values)
+        adtree = self.ADTrees['default']
 
         self.assertIsNotNone(adtree.root)
         self.assertEqual(8, adtree.root.count)
@@ -300,8 +356,7 @@ class TestADTree(TestBase):
 
 
     def test_simple_ADTree2_structure(self):
-        (dataset, column_values) = self.default_small_dataset_2()
-        adtree = ADTree(dataset, column_values)
+        adtree = self.ADTrees['default_2']
 
         self.assertIsNotNone(adtree.root)
         self.assertEqual(16, adtree.root.count)
@@ -450,40 +505,3 @@ class TestADTree(TestBase):
         self.assertEqual(value, adNode.value)
         self.assertEqual(count, adNode.count)
         self.assertEqual(children_count, len(adNode.Vary_children))
-
-
-    def default_small_dataset(self):
-        dataset = scipy.sparse.csr_matrix(numpy.array([
-            [1, 2, 3, 2, 2, 3, 3, 3],
-            [2, 1, 1, 2, 1, 2, 2, 2]]).transpose())
-
-        column_values = {
-            0: [1, 2, 3],
-            1: [1, 2]}
-        return (dataset, column_values)
-
-
-    def default_small_dataset_2(self):
-        dataset = scipy.sparse.csr_matrix(numpy.array([
-            [1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2],
-            [1, 1, 2, 2, 3, 3, 4, 4, 1, 1, 2, 2, 3, 3, 4, 4],
-            [1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2]]).transpose())
-
-        column_values = {
-            0: [1, 2],
-            1: [1, 2, 3, 4],
-            2: [1, 2]}
-        return (dataset, column_values)
-
-
-    def default_small_dataset_3(self):
-        dataset = scipy.sparse.csr_matrix(numpy.array([
-            [1, 1, 2, 1, 1, 2, 1, 2, 2, 2, 2, 2, 1, 2, 2, 2],
-            [2, 2, 1, 3, 3, 2, 2, 1, 1, 2, 3, 3, 1, 1, 2, 3],
-            [1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2]]).transpose())
-
-        column_values = {
-            0: [1, 2],
-            1: [1, 2, 3, 4],
-            2: [1, 2]}
-        return (dataset, column_values)

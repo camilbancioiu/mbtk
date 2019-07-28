@@ -1,12 +1,11 @@
-import unittest
 import numpy
 
 from mbff_tests.TestBase import TestBase
 
-from mbff.dataset.DatasetMatrix import DatasetMatrix
 from mbff.dataset.ExperimentalDatasetDefinition import ExperimentalDatasetDefinition
 from mbff.dataset.BinaryExperimentalDataset import BinaryExperimentalDataset
 from mbff.dataset.sources.BinarySyntheticDatasetSource import BinarySyntheticDatasetSource
+
 
 class TestBinaryExperimentalDataset(TestBase):
 
@@ -16,8 +15,8 @@ class TestBinaryExperimentalDataset(TestBase):
 
         definition.options['remove_features_by_p_thresholds'] = True
         definition.options['remove_objectives_by_p_thresholds'] = True
-        definition.options['probability_thresholds__features'] = { }
-        definition.options['probability_thresholds__objectives'] = { }
+        definition.options['probability_thresholds__features'] = {}
+        definition.options['probability_thresholds__objectives'] = {}
         exds = definition.create_exds()
 
         # There should be no change made to exds.matrix, exds.matrix_train and
@@ -42,9 +41,9 @@ class TestBinaryExperimentalDataset(TestBase):
         # But we do configure thresholds for features, to be able to verify
         # what the exds would remove, if allowed to.
         definition.options['probability_thresholds__features'] = {
-                'full': (0.1, 0.8)
-                }
-        definition.options['probability_thresholds__objectives'] = { }
+            'full': (0.1, 0.8)
+        }
+        definition.options['probability_thresholds__objectives'] = {}
         exds = definition.create_exds()
         exds.build()
         self.assertExDsDimensions(exds, 25, 75, 8, 4)
@@ -52,11 +51,11 @@ class TestBinaryExperimentalDataset(TestBase):
         # Only when analysing the full matrix should we see features to be
         # removed, since we specified thresholds only for 'full'.
         expected_features_to_remove = {
-                3: 'galaxy',
-                4: 'oxygen',
-                5: 'polyrhythm',
-                6: 'python'
-                }
+            3: 'galaxy',
+            4: 'oxygen',
+            5: 'polyrhythm',
+            6: 'python'
+        }
         self.assertThresholdedFeaturesToRemove(exds, expected_features_to_remove, ['full'])
         self.assertThresholdedObjectivesToRemove(exds, {}, [])
 
@@ -64,9 +63,9 @@ class TestBinaryExperimentalDataset(TestBase):
         folder = str(self.ensure_empty_tmp_subfolder('test_binary_exds_repository__test_feature_removal__full'))
         definition = self.default_exds_definition(folder)
         definition.options['probability_thresholds__features'] = {
-                'full': (0.1, 0.8)
-                }
-        definition.options['probability_thresholds__objectives'] = { }
+            'full': (0.1, 0.8)
+        }
+        definition.options['probability_thresholds__objectives'] = {}
         definition.options['remove_features_by_p_thresholds'] = True
         definition.options['remove_objectives_by_p_thresholds'] = True
         exds = definition.create_exds()
@@ -87,9 +86,9 @@ class TestBinaryExperimentalDataset(TestBase):
         # But we do configure thresholds for features, to be able to verify
         # what the exds would remove, if allowed to.
         definition.options['probability_thresholds__features'] = {
-                'train': (0.1, 0.8)
-                }
-        definition.options['probability_thresholds__objectives'] = { }
+            'train': (0.1, 0.8)
+        }
+        definition.options['probability_thresholds__objectives'] = {}
         exds = definition.create_exds()
         exds.build()
         self.assertExDsDimensions(exds, 25, 75, 8, 4)
@@ -97,12 +96,12 @@ class TestBinaryExperimentalDataset(TestBase):
         # Only when analysing the full matrix should we see features to be
         # removed, since we specified thresholds only for 'train'.
         expected_features_to_remove = {
-                3: 'galaxy',
-                4: 'oxygen',
-                5: 'polyrhythm',
-                6: 'python',
-                7: 'rocket'
-                }
+            3: 'galaxy',
+            4: 'oxygen',
+            5: 'polyrhythm',
+            6: 'python',
+            7: 'rocket'
+        }
         self.assertThresholdedFeaturesToRemove(exds, expected_features_to_remove, ['train'])
         self.assertThresholdedObjectivesToRemove(exds, {}, [])
 
@@ -110,9 +109,9 @@ class TestBinaryExperimentalDataset(TestBase):
         folder = str(self.ensure_empty_tmp_subfolder('test_binary_exds_repository__test_feature_removal__train'))
         definition = self.default_exds_definition(folder)
         definition.options['probability_thresholds__features'] = {
-                'train': (0.1, 0.8)
-                }
-        definition.options['probability_thresholds__objectives'] = { }
+            'train': (0.1, 0.8)
+        }
+        definition.options['probability_thresholds__objectives'] = {}
         definition.options['remove_features_by_p_thresholds'] = True
         definition.options['remove_objectives_by_p_thresholds'] = True
         exds = definition.create_exds()
@@ -133,9 +132,9 @@ class TestBinaryExperimentalDataset(TestBase):
         # But we do configure thresholds for features, to be able to verify
         # what the exds would remove, if allowed to.
         definition.options['probability_thresholds__features'] = {
-                'test': (0.1, 0.9)
-                }
-        definition.options['probability_thresholds__objectives'] = { }
+            'test': (0.1, 0.9)
+        }
+        definition.options['probability_thresholds__objectives'] = {}
         exds = definition.create_exds()
         exds.build()
         self.assertExDsDimensions(exds, 25, 75, 8, 4)
@@ -143,10 +142,10 @@ class TestBinaryExperimentalDataset(TestBase):
         # Only when analysing the full matrix should we see features to be
         # removed, since we specified thresholds only for 'test'.
         expected_features_to_remove = {
-                3: 'galaxy',
-                4: 'oxygen',
-                6: 'python'
-                }
+            3: 'galaxy',
+            4: 'oxygen',
+            6: 'python'
+        }
         self.assertThresholdedFeaturesToRemove(exds, expected_features_to_remove, ['test'])
         self.assertThresholdedObjectivesToRemove(exds, {}, [])
 
@@ -154,9 +153,9 @@ class TestBinaryExperimentalDataset(TestBase):
         folder = str(self.ensure_empty_tmp_subfolder('test_binary_exds_repository__test_feature_removal__test'))
         definition = self.default_exds_definition(folder)
         definition.options['probability_thresholds__features'] = {
-                'test': (0.1, 0.9)
-                }
-        definition.options['probability_thresholds__objectives'] = { }
+            'test': (0.1, 0.9)
+        }
+        definition.options['probability_thresholds__objectives'] = {}
         definition.options['remove_features_by_p_thresholds'] = True
         definition.options['remove_objectives_by_p_thresholds'] = True
         exds = definition.create_exds()
@@ -177,10 +176,10 @@ class TestBinaryExperimentalDataset(TestBase):
         definition.options['remove_objectives_by_p_thresholds'] = False
         # But we do configure thresholds for objectives, to be able to verify
         # what the exds would remove, if allowed to.
-        definition.options['probability_thresholds__features'] = { }
+        definition.options['probability_thresholds__features'] = {}
         definition.options['probability_thresholds__objectives'] = {
-                'full': (0.1, 0.9)
-                }
+            'full': (0.1, 0.9)
+        }
         exds = definition.create_exds()
         exds.build()
         self.assertExDsDimensions(exds, 25, 75, 8, 4)
@@ -188,19 +187,19 @@ class TestBinaryExperimentalDataset(TestBase):
         # Only when analysing the full matrix should we see objectives to be
         # removed, since we specified thresholds only for 'full'.
         expected_objectives_to_remove = {
-                2: 'sidereal',
-                3: 'unknown'
-                }
+            2: 'sidereal',
+            3: 'unknown'
+        }
         self.assertThresholdedFeaturesToRemove(exds, {}, [])
         self.assertThresholdedObjectivesToRemove(exds, expected_objectives_to_remove, ['full'])
 
         # Now we rebuild the exds, but with feature removal enabled.
         folder = str(self.ensure_empty_tmp_subfolder('test_binary_exds_repository__test_objective_removal__full'))
         definition = self.default_exds_definition(folder)
-        definition.options['probability_thresholds__features'] = { }
+        definition.options['probability_thresholds__features'] = {}
         definition.options['probability_thresholds__objectives'] = {
-                'full': (0.1, 0.9)
-                }
+            'full': (0.1, 0.9)
+        }
         definition.options['remove_features_by_p_thresholds'] = True
         definition.options['remove_objectives_by_p_thresholds'] = True
         exds = definition.create_exds()
@@ -220,10 +219,10 @@ class TestBinaryExperimentalDataset(TestBase):
         definition.options['remove_objectives_by_p_thresholds'] = False
         # But we do configure thresholds for objectives, to be able to verify
         # what the exds would remove, if allowed to.
-        definition.options['probability_thresholds__features'] = { }
+        definition.options['probability_thresholds__features'] = {}
         definition.options['probability_thresholds__objectives'] = {
-                'train': (0.2, 0.8)
-                }
+            'train': (0.2, 0.8)
+        }
         exds = definition.create_exds()
         exds.build()
         self.assertExDsDimensions(exds, 25, 75, 8, 4)
@@ -231,20 +230,20 @@ class TestBinaryExperimentalDataset(TestBase):
         # Only when analysing the full matrix should we see objectives to be
         # removed, since we specified thresholds only for 'train'.
         expected_objectives_to_remove = {
-                1: 'encoded',
-                2: 'sidereal',
-                3: 'unknown'
-                }
+            1: 'encoded',
+            2: 'sidereal',
+            3: 'unknown'
+        }
         self.assertThresholdedFeaturesToRemove(exds, {}, [])
         self.assertThresholdedObjectivesToRemove(exds, expected_objectives_to_remove, ['train'])
 
         # Now we rebuild the exds, but with feature removal enabled.
         folder = str(self.ensure_empty_tmp_subfolder('test_binary_exds_repository__test_objective_removal__train'))
         definition = self.default_exds_definition(folder)
-        definition.options['probability_thresholds__features'] = { }
+        definition.options['probability_thresholds__features'] = {}
         definition.options['probability_thresholds__objectives'] = {
-                'train': (0.2, 0.8)
-                }
+            'train': (0.2, 0.8)
+        }
         definition.options['remove_features_by_p_thresholds'] = True
         definition.options['remove_objectives_by_p_thresholds'] = True
         exds = definition.create_exds()
@@ -264,10 +263,10 @@ class TestBinaryExperimentalDataset(TestBase):
         definition.options['remove_objectives_by_p_thresholds'] = False
         # But we do configure thresholds for objectives, to be able to verify
         # what the exds would remove, if allowed to.
-        definition.options['probability_thresholds__features'] = { }
+        definition.options['probability_thresholds__features'] = {}
         definition.options['probability_thresholds__objectives'] = {
-                'test': (0.0, 0.5)
-                }
+            'test': (0.0, 0.5)
+        }
         exds = definition.create_exds()
         exds.build()
         self.assertExDsDimensions(exds, 25, 75, 8, 4)
@@ -275,18 +274,18 @@ class TestBinaryExperimentalDataset(TestBase):
         # Only when analysing the full matrix should we see objectives to be
         # removed, since we specified thresholds only for 'train'.
         expected_objectives_to_remove = {
-                2: 'sidereal'
-                }
+            2: 'sidereal'
+        }
         self.assertThresholdedFeaturesToRemove(exds, {}, [])
         self.assertThresholdedObjectivesToRemove(exds, expected_objectives_to_remove, ['test'])
 
         # Now we rebuild the exds, but with feature removal enabled.
         folder = str(self.ensure_empty_tmp_subfolder('test_binary_exds_repository__test_objective_removal__test'))
         definition = self.default_exds_definition(folder)
-        definition.options['probability_thresholds__features'] = { }
+        definition.options['probability_thresholds__features'] = {}
         definition.options['probability_thresholds__objectives'] = {
-                'test': (0.0, 0.5)
-                }
+            'test': (0.0, 0.5)
+        }
         definition.options['remove_features_by_p_thresholds'] = True
         definition.options['remove_objectives_by_p_thresholds'] = True
         exds = definition.create_exds()
@@ -337,7 +336,7 @@ class TestBinaryExperimentalDataset(TestBase):
             if matrix_label in matrices:
                 expected = expected_features_to_remove
             else:
-                expected = { }
+                expected = {}
             computed = exds.thresholded_features_to_remove(matrix_label)
             self.assertDictEqual(expected, computed)
 
@@ -348,7 +347,7 @@ class TestBinaryExperimentalDataset(TestBase):
             if matrix_label in matrices:
                 expected = expected_objectives_to_remove
             else:
-                expected = { }
+                expected = {}
             computed = exds.thresholded_objectives_to_remove(matrix_label)
             self.assertDictEqual(expected, computed)
 
@@ -393,25 +392,25 @@ class TestBinaryExperimentalDataset(TestBase):
         # used by the TestRCV1v2DatasetSource class. They are the same words
         # indeed, but there is no real connection.
         configuration = {
-                'random_seed': 42,
-                'row_count': 100,
-                'features': {
-                    'galaxy':       1/20,
-                    'almond':       1/5,
-                    'python':       0/1,
-                    'rocket':       1/10,
-                    'carbohydrate': 1/5,
-                    'oxygen':       1/1,
-                    'polyrhythm':   85/100,
-                    'firefly':      1/5
-                },
-                'objectives': {
-                    'arboreal':     1/5,
-                    'encoded':      1/10,
-                    'sidereal':     1/1,
-                    'unknown':      0/1
-                }
+            'random_seed': 42,
+            'row_count': 100,
+            'features': {
+                'galaxy': 1 / 20,
+                'almond': 1 / 5,
+                'python': 0 / 1,
+                'rocket': 1 / 10,
+                'carbohydrate': 1 / 5,
+                'oxygen': 1 / 1,
+                'polyrhythm': 85 / 100,
+                'firefly': 1 / 5
+            },
+            'objectives': {
+                'arboreal': 1 / 5,
+                'encoded': 1 / 10,
+                'sidereal': 1 / 1,
+                'unknown': 0 / 1
             }
+        }
         return configuration
 
 
@@ -433,4 +432,3 @@ class TestBinaryExperimentalDataset(TestBase):
         print("Test Y")
         print(self.compute_counts_per_objective_columns(exds.matrix_test))
         print()
-
