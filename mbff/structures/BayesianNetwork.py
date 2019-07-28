@@ -80,9 +80,11 @@ class BayesianNetwork:
 
 
     @finalization_required
-    def sample_matrix(self, n=1):
+    def sample_matrix(self, n=1, dtype=None):
+        if dtype is None:
+            dtype = numpy.int8
         samples = self.samples(n, as_list=True, values_as_indices=True)
-        return numpy.asarray(list(samples))
+        return numpy.asarray(list(samples), dtype=dtype)
 
 
     def sample_values_to_indices(self, sample):

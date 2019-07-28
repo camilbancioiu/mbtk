@@ -7,7 +7,7 @@ from mbff.dataset.DatasetMatrix import DatasetMatrix
 import mbff.utilities.functions as util
 
 
-class SampledBayesianNetworkDatasetSource():
+class SampledBayesianNetworkDatasetSource(DatasetSource):
     """
     A dataset source which loads a specified Bayesian Network from a BIF file,
     then samples it a specified number of times.
@@ -33,10 +33,12 @@ class SampledBayesianNetworkDatasetSource():
         objective_names = sorted(self.configuration.get('objectives', []))
         feature_names = list(sorted(list(set(self.bayesian_network.variable_node_names()) - set(objective_names))))
 
-        sample_matrix = self.bayesian_network.sample_matrix(sample_count)
+        numpy_datatype = self.configuration.get('numpy_datatype', numpy.int8)
 
-        X = numpy.empty((sample_count, 0), dtype=numpy.int8)
-        Y = numpy.empty((sample_count, 0), dtype=numpy.int8)
+        sample_matrix = self.bayesian_network.sample_matrix(sample_count, dtype=numpy_datatype)
+
+        X = numpy.empty((sample_count, 0), dtype=numpy_datatype)
+        Y = numpy.empty((sample_count, 0), dtype=numpy_datatype)
 
         for varname in feature_names:
             varindex = self.bayesian_network.variable_nodes_index(varname)
