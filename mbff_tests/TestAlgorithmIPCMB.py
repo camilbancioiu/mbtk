@@ -163,5 +163,6 @@ class TestAlgorithmIPCMB(TestBase):
             'ci_test_class': DSeparationCITest,
             'source_bayesian_network': bn,
             'pc_only': False,
-            'debug': False
+            'ci_test_debug': 0,
+            'algorithm_debug': 0
         }
