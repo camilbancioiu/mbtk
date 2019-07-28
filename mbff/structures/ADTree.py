@@ -381,8 +381,9 @@ class ADNode:
         mcv_child_ct.column = next_column
         mcv_child_ct.value = vary.most_common_value
 
-        for value, child in non_mcv_ct.children.items():
-            mcv_child_ct.subtract_in_place(child)
+        if non_mcv_ct.children is not None:
+            for value, child in non_mcv_ct.children.items():
+                mcv_child_ct.subtract_in_place(child)
 
         contingency_tree = non_mcv_ct
         contingency_tree.append_child(mcv_child_ct)
