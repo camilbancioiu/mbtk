@@ -1,10 +1,10 @@
 import numpy
 import scipy
 import scipy.io
-import pickle
 import mbff.utilities.functions as util
 from mbff.math.Variable import Variable, JointVariables
 from mbff.dataset.Exceptions import DatasetMatrixNotFinalizedError, DatasetMatrixFinalizedError
+
 
 class DatasetMatrix:
     """
@@ -247,7 +247,7 @@ class DatasetMatrix:
         :raises DatasetMatrixFinalizedError: if :py:meth:`finalize` has already
             been called.
         """
-        if self.final == True:
+        if self.final:
             raise DatasetMatrixFinalizedError(self, "Cannot delete any row.")
         self.X = DatasetMatrix.delete_rows_cols(self.X, row_indices=[r]).tocsr()
         self.Y = DatasetMatrix.delete_rows_cols(self.Y, row_indices=[r]).tocsr()
@@ -268,7 +268,7 @@ class DatasetMatrix:
         :raises DatasetMatrixFinalizedError: if :py:meth:`finalize` has already
             been called.
         """
-        if self.final == True:
+        if self.final:
             raise DatasetMatrixFinalizedError(self, "Cannot delete any row.")
         if not isinstance(rows_to_keep, list):
             raise TypeError("Argument 'rows_to_keep' must be a non-empty list")
@@ -310,8 +310,8 @@ class DatasetMatrix:
 
         new_dataset_matrix = DatasetMatrix(new_label)
 
-        new_dataset_matrix.X = self.X[rows_to_keep,]
-        new_dataset_matrix.Y = self.Y[rows_to_keep,]
+        new_dataset_matrix.X = self.X[rows_to_keep, ]
+        new_dataset_matrix.Y = self.Y[rows_to_keep, ]
         new_dataset_matrix.row_labels = [self.row_labels[i] for i in rows_to_keep]
         new_dataset_matrix.column_labels_X = self.column_labels_X.copy()
         new_dataset_matrix.column_labels_Y = self.column_labels_Y.copy()
@@ -348,7 +348,7 @@ class DatasetMatrix:
 
         new_dataset_matrix = DatasetMatrix(new_label)
 
-        new_dataset_matrix.X = self.X[:,columns_to_keep]
+        new_dataset_matrix.X = self.X[:, columns_to_keep]
         new_dataset_matrix.Y = self.Y.copy()
         new_dataset_matrix.row_labels = self.row_labels.copy()
         new_dataset_matrix.column_labels_X = [self.column_labels_X[i] for i in columns_to_keep]
@@ -369,7 +369,7 @@ class DatasetMatrix:
         :raises DatasetMatrixFinalizedError: if :py:meth:`finalize` has already
             been called.
         """
-        if self.final == True:
+        if self.final:
             raise DatasetMatrixFinalizedError(self, "Cannot delete any X column.")
         columns_to_delete = sorted(columns_to_delete)
         self.X = DatasetMatrix.delete_rows_cols(self.X, col_indices=columns_to_delete).tocsr()
@@ -388,7 +388,7 @@ class DatasetMatrix:
         :raises DatasetMatrixFinalizedError: if :py:meth:`finalize` has already
             been called.
         """
-        if self.final == True:
+        if self.final:
             raise DatasetMatrixFinalizedError(self, "Cannot delete any Y column.")
         columns_to_delete = sorted(columns_to_delete)
         self.Y = DatasetMatrix.delete_rows_cols(self.Y, col_indices=columns_to_delete).tocsr()
@@ -407,7 +407,7 @@ class DatasetMatrix:
         :raises DatasetMatrixFinalizedError: if :py:meth:`finalize` has already
             been called.
         """
-        if self.final == True:
+        if self.final:
             raise DatasetMatrixFinalizedError(self, "Cannot delete any X column.")
         self.X = DatasetMatrix.delete_rows_cols(self.X, col_indices=[c]).tocsr()
         del self.column_labels_X[c]
@@ -425,7 +425,7 @@ class DatasetMatrix:
         :raises DatasetMatrixFinalizedError: if :py:meth:`finalize` has already
             been called.
         """
-        if self.final == True:
+        if self.final:
             raise DatasetMatrixFinalizedError(self, "Cannot delete any Y column.")
         self.Y = DatasetMatrix.delete_rows_cols(self.Y, col_indices=[c]).tocsr()
         del self.column_labels_Y[c]
@@ -445,7 +445,7 @@ class DatasetMatrix:
             to create the subfolder named ``[self.label]`` in which to save.
         :return: Nothing
         """
-        if self.final == False:
+        if self.final:
             raise DatasetMatrixNotFinalizedError(self, "Cannot save.")
 
         matrix_path = path / self.label
@@ -501,7 +501,7 @@ class DatasetMatrix:
 
         :return: Nothing
         """
-        if self.final == True:
+        if self.final:
             return
 
         self.X.eliminate_zeros()
@@ -625,7 +625,7 @@ class DatasetMatrix:
             row_mask[rows] = False
             col_mask = numpy.ones(mat.shape[1], dtype=bool)
             col_mask[cols] = False
-            return mat[row_mask][:,col_mask]
+            return mat[row_mask][:, col_mask]
         elif len(rows) > 0:
             mask = numpy.ones(mat.shape[0], dtype=bool)
             mask[rows] = False
@@ -633,8 +633,6 @@ class DatasetMatrix:
         elif len(cols) > 0:
             mask = numpy.ones(mat.shape[1], dtype=bool)
             mask[cols] = False
-            return mat[:,mask]
+            return mat[:, mask]
         else:
             return mat
-
-
