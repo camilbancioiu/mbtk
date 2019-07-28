@@ -249,8 +249,8 @@ class DatasetMatrix:
         """
         if self.final:
             raise DatasetMatrixFinalizedError(self, "Cannot delete any row.")
-        self.X = DatasetMatrix.delete_rows_cols(self.X, row_indices=[r]).tocsr()
-        self.Y = DatasetMatrix.delete_rows_cols(self.Y, row_indices=[r]).tocsr()
+        self.X = self.delete_rows_cols('X', row_indices=[r]).tocsr()
+        self.Y = self.delete_rows_cols('Y', row_indices=[r]).tocsr()
         del self.row_labels[r]
 
 
@@ -277,8 +277,8 @@ class DatasetMatrix:
 
         all_rows = range(self.X.get_shape()[0])
         rows_to_delete = list(set(all_rows) - set(rows_to_keep))
-        self.X = DatasetMatrix.delete_rows_cols(self.X, row_indices=rows_to_delete).tocsr()
-        self.Y = DatasetMatrix.delete_rows_cols(self.Y, row_indices=rows_to_delete).tocsr()
+        self.X = self.delete_rows_cols('X', row_indices=rows_to_delete).tocsr()
+        self.Y = self.delete_rows_cols('Y', row_indices=rows_to_delete).tocsr()
 
         row_labels_to_keep = [self.row_labels[r] for r in rows_to_keep]
         self.row_labels = row_labels_to_keep
@@ -372,7 +372,7 @@ class DatasetMatrix:
         if self.final:
             raise DatasetMatrixFinalizedError(self, "Cannot delete any X column.")
         columns_to_delete = sorted(columns_to_delete)
-        self.X = DatasetMatrix.delete_rows_cols(self.X, col_indices=columns_to_delete).tocsr()
+        self.X = self.delete_rows_cols('X', col_indices=columns_to_delete).tocsr()
         self.column_labels_X = [self.column_labels_X[c] for c in range(len(self.column_labels_X)) if c not in columns_to_delete]
 
 
@@ -391,7 +391,7 @@ class DatasetMatrix:
         if self.final:
             raise DatasetMatrixFinalizedError(self, "Cannot delete any Y column.")
         columns_to_delete = sorted(columns_to_delete)
-        self.Y = DatasetMatrix.delete_rows_cols(self.Y, col_indices=columns_to_delete).tocsr()
+        self.Y = self.delete_rows_cols('Y', col_indices=columns_to_delete).tocsr()
         self.column_labels_Y = [self.column_labels_Y[c] for c in range(len(self.column_labels_Y)) if c not in columns_to_delete]
 
 
@@ -409,7 +409,7 @@ class DatasetMatrix:
         """
         if self.final:
             raise DatasetMatrixFinalizedError(self, "Cannot delete any X column.")
-        self.X = DatasetMatrix.delete_rows_cols(self.X, col_indices=[c]).tocsr()
+        self.X = self.delete_rows_cols('X', col_indices=[c]).tocsr()
         del self.column_labels_X[c]
 
 
@@ -427,7 +427,7 @@ class DatasetMatrix:
         """
         if self.final:
             raise DatasetMatrixFinalizedError(self, "Cannot delete any Y column.")
-        self.Y = DatasetMatrix.delete_rows_cols(self.Y, col_indices=[c]).tocsr()
+        self.Y = self.delete_rows_cols('Y', col_indices=[c]).tocsr()
         del self.column_labels_Y[c]
 
 
@@ -445,7 +445,7 @@ class DatasetMatrix:
             to create the subfolder named ``[self.label]`` in which to save.
         :return: Nothing
         """
-        if self.final:
+        if not self.final:
             raise DatasetMatrixNotFinalizedError(self, "Cannot save.")
 
         matrix_path = path / self.label
@@ -593,15 +593,17 @@ class DatasetMatrix:
 
 
     # Taken from https://stackoverflow.com/a/45486349/583574
-    def delete_rows_cols(mat, row_indices=[], col_indices=[]):
+    def delete_rows_cols(self, matrix_label, row_indices=[], col_indices=[]):
         """
-        Remove multiple rows and columns simultaneously from the CSR sparse matrix ``mat``.
+        Remove multiple rows and columns simultaneously from the requested CSR
+        sparse matrix.
+
         WARNING: Indices of altered axes are reset in the returned matrix.
 
         See `this StackOverflow answer <https://stackoverflow.com/a/45486349/583574>`_.
 
-        :param scipy.sparse.csr_matrix mat: The Scipy CSR matrix to delete rows
-            and columns from.
+        :param string matrix_label: The label of the matrix to delete rows and
+            columns from.
         :param list(int) row_indices: A list of 0-based integer indices of the
             rows to delete.
         :param list(int) col_indices: A list of 0-based integer indices of the
@@ -610,7 +612,8 @@ class DatasetMatrix:
             specified rows and columns.
         :rtype: scipy.sparse.csr_matrix
         """
-        if not isinstance(mat, scipy.sparse.csr_matrix):
+        matrix = self.get_matrix(matrix_label)
+        if not isinstance(matrix, scipy.sparse.csr_matrix):
             raise ValueError("works only for CSR format -- use .tocsr() first")
 
         rows = []
@@ -621,18 +624,18 @@ class DatasetMatrix:
             cols = list(col_indices)
 
         if len(rows) > 0 and len(cols) > 0:
-            row_mask = numpy.ones(mat.shape[0], dtype=bool)
+            row_mask = numpy.ones(matrix.shape[0], dtype=bool)
             row_mask[rows] = False
-            col_mask = numpy.ones(mat.shape[1], dtype=bool)
+            col_mask = numpy.ones(matrix.shape[1], dtype=bool)
             col_mask[cols] = False
-            return mat[row_mask][:, col_mask]
+            return matrix[row_mask][:, col_mask]
         elif len(rows) > 0:
-            mask = numpy.ones(mat.shape[0], dtype=bool)
+            mask = numpy.ones(matrix.shape[0], dtype=bool)
             mask[rows] = False
-            return mat[mask]
+            return matrix[mask]
         elif len(cols) > 0:
-            mask = numpy.ones(mat.shape[1], dtype=bool)
+            mask = numpy.ones(matrix.shape[1], dtype=bool)
             mask[cols] = False
-            return mat[:, mask]
+            return matrix[:, mask]
         else:
-            return mat
+            return matrix
