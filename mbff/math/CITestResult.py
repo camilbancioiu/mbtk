@@ -146,6 +146,13 @@ class CITestResult:
         self.test_distribution_parameters = params
 
 
+    def accurate(self):
+        if self.computed_d_separation is not None:
+            return self.independent == self.computed_d_separation
+        else:
+            return None
+
+
     def __str__(self):
         view = dict()
         view.update(self.__dict__)
@@ -159,8 +166,9 @@ class CITestResult:
             view['i_or_d'] = 'D'
 
         d_sep_verification = ''
-        if self.computed_d_separation is not None:
-            if self.independent == self.computed_d_separation:
+        accurate = self.accurate()
+        if accurate is not None:
+            if accurate:
                 d_sep_verification = '✔'
             else:
                 d_sep_verification = '✘'
