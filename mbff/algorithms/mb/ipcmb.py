@@ -103,7 +103,7 @@ class AlgorithmIPCMB:
         """
         NonPC = set()
         CutSetSize = 0
-        if self.debug: print()
+        if self.debug >= 2: print()
         if self.debug >= 2: print('Begin RecognizePC')
         while True:
             if self.debug >= 2: print()
