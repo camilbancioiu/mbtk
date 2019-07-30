@@ -18,8 +18,6 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
     def __init__(self, datasetmatrix, parameters):
         super().__init__(datasetmatrix, parameters)
 
-        self.matrix = self.datasetmatrix.X
-
         self.AD_tree_build_start_time = 0
         self.AD_tree_build_end_time = 0
         self.AD_tree_build_duration = 0.0

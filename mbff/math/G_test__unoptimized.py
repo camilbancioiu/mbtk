@@ -15,6 +15,8 @@ class G_test:
         self.parameters = parameters
         self.debug = self.parameters.get('ci_test_debug', 0)
         self.datasetmatrix = datasetmatrix
+        self.matrix = self.datasetmatrix.X
+        self.N = self.matrix.get_shape()[0]
         self.column_values = self.datasetmatrix.get_values_per_column('X')
         self.significance = parameters.get('ci_test_significance', 0)
         self.omega = parameters.get('omega', None)
@@ -28,6 +30,7 @@ class G_test:
         # Load the actual variable instances (samples) from the
         # datasetmatrix.
         (VarX, VarY, VarZ) = self.load_variables(X, Y, Z)
+
         result = self.G_test_conditionally_independent(VarX, VarY, VarZ, X, Y, Z)
 
         if self.source_bn is not None:

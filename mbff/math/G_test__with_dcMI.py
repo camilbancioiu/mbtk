@@ -13,8 +13,6 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
     def __init__(self, datasetmatrix, parameters):
         super().__init__(datasetmatrix, parameters)
 
-        self.matrix = self.datasetmatrix.X
-        self.N = self.matrix.get_shape()[0]
 
         self.JHT = dict()
         self.JHT_reads = 0

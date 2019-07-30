@@ -20,6 +20,10 @@ class PMF:
         return str(self.probabilities)
 
 
+    def __len__(self):
+        return len(self.probabilities)
+
+
     def items(self):
         return self.probabilities.items()
 
@@ -98,6 +102,10 @@ class CPMF(PMF):
             for pmfkey, cp in pmf.items():
                 output += '\t{}: {}\n'.format(pmfkey, cp)
         return output
+
+
+    def items(self):
+        return self.conditional_probabilities.items()
 
 
     def given(self, *args):

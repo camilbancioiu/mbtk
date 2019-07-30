@@ -19,15 +19,6 @@ def mutual_information(PrXY, PrX, PrY, base=2):
 
 
 
-def calculate_pmf_for_mi(X, Y):
-    PrXY = PMF(JointVariables(X, Y))
-    PrX = PMF(X)
-    PrY = PMF(Y)
-
-    return (PrXY, PrX, PrY)
-
-
-
 def conditional_mutual_information(PrXYcZ, PrXcZ, PrYcZ, PrZ, base=2):
     logarithm = create_logarithm_function(base)
     cMI = 0.0
@@ -41,6 +32,15 @@ def conditional_mutual_information(PrXYcZ, PrXcZ, PrYcZ, PrZ, base=2):
                     pcMI = pz * pxycz * logarithm(pxycz / (pxcz * pycz))
                     cMI += pcMI
     return cMI
+
+
+
+def calculate_pmf_for_mi(X, Y):
+    PrXY = PMF(JointVariables(X, Y))
+    PrX = PMF(X)
+    PrY = PMF(Y)
+
+    return (PrXY, PrX, PrY)
 
 
 
