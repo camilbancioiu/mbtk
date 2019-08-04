@@ -37,11 +37,10 @@ if __name__ == '__main__':
     from mbff_tests.TestBayesianNetwork import TestBayesianNetwork
     from mbff_tests.TestSampledBayesianNetworkDatasetSource import TestSampledBayesianNetworkDatasetSource
     from mbff_tests.TestVariableAndPMF import TestVariableAndPMF
-    from mbff_tests.TestGStat import TestGStat
+    from mbff_tests.TestGTestUnoptimized import TestGTestUnoptimized
     from mbff_tests.TestADTree import TestADTree
     from mbff_tests.TestAlgorithmIPCMB import TestAlgorithmIPCMB
     from mbff_tests.TestAlgorithmIPCMBOptimizations import TestAlgorithmIPCMBOptimizations
 
     import unittest
     unittest.main(verbosity=2)
-
