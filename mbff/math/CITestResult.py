@@ -16,6 +16,7 @@ class CITestResult:
         self.index = -1
         self.independent = None
         self.dependent = None
+        self.skipped = None
         self.X = None
         self.Y = None
         self.Z = []
@@ -38,6 +39,7 @@ class CITestResult:
 
 
     def __eq__(self, other):
+        # TODO handle skipped
         return (
             self.independent == other.independent and
             self.dependent == other.dependent and
@@ -56,6 +58,7 @@ class CITestResult:
 
 
     def diff(self, other):
+        # TODO handle skipped
         if self.independent != other.independent:
             return 'Differring \'independent\': {} vs {}'.format(self.independent, other.independent)
         if self.dependent != other.dependent:
@@ -88,12 +91,21 @@ class CITestResult:
         self.independent = independent
         self.dependent = not independent
         self.significance = significance
+        self.skipped = None
 
 
     def set_dependent(self, dependent, significance):
         self.dependent = dependent
         self.independent = not dependent
         self.significance = significance
+        self.skipped = None
+
+
+    def set_skipped(self):
+        self.skipped = True
+        self.independent = None
+        self.dependent = None
+        self.significance = None
 
 
     def set_variables(self, X, Y, Z):
@@ -154,6 +166,7 @@ class CITestResult:
 
 
     def __str__(self):
+        # TODO handle skipped
         view = dict()
         view.update(self.__dict__)
         view['startcode'] = ''
