@@ -104,6 +104,10 @@ class CPMF(PMF):
         return output
 
 
+    def __len__(self):
+        return len(self.conditional_probabilities)
+
+
     def items(self):
         return self.conditional_probabilities.items()
 
