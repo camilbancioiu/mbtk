@@ -14,10 +14,15 @@ class G_test:
     def __init__(self, datasetmatrix, parameters):
         self.parameters = parameters
         self.debug = self.parameters.get('ci_test_debug', 0)
-        self.datasetmatrix = datasetmatrix
-        self.matrix = self.datasetmatrix.X
-        self.N = self.matrix.get_shape()[0]
-        self.column_values = self.datasetmatrix.get_values_per_column('X')
+        self.datasetmatrix = None
+        self.matrix = None
+        self.column_values = None
+        self.N = None
+        if datasetmatrix is not None:
+            self.datasetmatrix = datasetmatrix
+            self.matrix = self.datasetmatrix.X
+            self.column_values = self.datasetmatrix.get_values_per_column('X')
+            self.N = self.matrix.get_shape()[0]
         self.significance = parameters.get('ci_test_significance', 0)
         self.omega = parameters.get('omega', None)
         self.source_bn = parameters.get('source_bayesian_network', None)
