@@ -1,10 +1,12 @@
+import scipy
+import numpy
 import unittest
 
 from pathlib import Path
 
-from mbff.math.Variable import Variable, JointVariables
+from mbff.math.Variable import JointVariables
 import mbff.math.Variable
-from mbff.math.PMF import PMF
+from mbff.dataset.DatasetMatrix import DatasetMatrix
 import mbff.math.G_test__unoptimized
 
 from mbff_tests.TestBase import TestBase
@@ -16,7 +18,6 @@ class TestGTestUnoptimized(TestBase):
     @classmethod
     def initTestResources(testClass):
         super(TestGTestUnoptimized, testClass).initTestResources()
-        # TODO revert DatasetsInUse
         testClass.DatasetsInUse = ['lungcancer', 'alarm']
         testClass.DatasetsInUse = []
         testClass.DatasetMatrixFolder = Path('testfiles', 'tmp', 'test_gstat_dm')
@@ -43,23 +44,25 @@ class TestGTestUnoptimized(TestBase):
 
 
     def test_calculating_effective_dof(self):
-        self.G_test = mbff.math.G_test__unoptimized.G_test(None, dict())
+        # TODO develop this test further
+        X = [0, 0, 0, 0, 0, 0, 0, 0]
+        Y = [0, 0, 0, 0, 0, 0, 0, 0]
+        self.assertComputedDoF(0, [X, Y], 0, 1, [])
 
-        VarX = Variable([0, 0, 0, 0, 0, 0, 0, 0])
-        VarY = Variable([0, 0, 0, 0, 0, 0, 0, 0])
-        self.assertJointPMFDoF(VarX, VarY, 0)
+        X = [1, 0, 0, 0, 0, 0, 0, 0]
+        Y = [0, 0, 0, 0, 0, 0, 0, 0]
+        self.assertComputedDoF(0, [X, Y], 0, 1, [])
 
-        VarX = Variable([1, 0, 0, 0, 0, 0, 0, 0])
-        VarY = Variable([0, 0, 0, 0, 0, 0, 0, 0])
-        self.assertJointPMFDoF(VarX, VarY, 0)
+        X = [1, 0, 0, 0, 0, 0, 0, 0]
+        Y = [0, 0, 1, 1, 0, 0, 0, 0]
+        self.assertComputedDoF(1, [X, Y], 0, 1, [])
 
-        VarX = Variable([1, 0, 0, 0, 0, 0, 0, 0])
-        VarY = Variable([0, 0, 1, 1, 0, 0, 0, 0])
-        self.assertJointPMFDoF(VarX, VarY, 0)
+        X = [1, 0, 0, 0, 0, 0, 0, 1]
+        Y = [0, 0, 1, 1, 0, 0, 0, 1]
+        self.assertComputedDoF(1, [X, Y], 0, 1, [])
 
-        VarX = Variable([1, 0, 0, 0, 0, 0, 0, 1])
-        VarY = Variable([0, 0, 1, 1, 0, 0, 0, 1])
-        self.assertJointPMFDoF(VarX, VarY, 1)
+
+
 
 
     def test_G_value__alarm(self):
@@ -125,20 +128,18 @@ class TestGTestUnoptimized(TestBase):
         self.assertCITestAccurate(XRAY, TUB, Omega)
 
 
-    def assertJointPMFDoF(self, VarX, VarY, expected_dof):
-        VarXY = JointVariables(VarX, VarY)
-
-        PrX = PMF(VarX)
-        PrY = PMF(VarY)
-        PrXY = PMF(VarXY)
-
-        print()
-        print('PrX:', len(PrX))
-        print('PrY:', len(PrY))
-        print('PrXY:', len(PrXY))
-
-        dof = self.G_test.calculate_degrees_of_freedom__joint_pmf(PrXY, PrX, PrY)
+    def assertComputedDoF(self, expected_dof, columns, X, Y, Z):
+        dm = self.make_dataset_matrix(columns)
+        G_test = mbff.math.G_test__unoptimized.G_test(dm, dict())
+        dof = G_test.calculate_degrees_of_freedom(X, Y, Z)
         self.assertEqual(expected_dof, dof)
+
+
+    def make_dataset_matrix(self, columns):
+        matrix = scipy.sparse.csr_matrix(numpy.array(columns)).transpose()
+        dm = DatasetMatrix('test_dm')
+        dm.X = matrix
+        return dm
 
 
     def assertCITestAccurate(self, X, Y, Z):
