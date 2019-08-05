@@ -1,6 +1,5 @@
 import pickle
 
-from mbff.math.Variable import validate_variable_lengths
 from mbff.math.CITestResult import CITestResult
 
 import mbff.math.infotheory as infotheory
@@ -77,13 +76,9 @@ class G_test:
 
 
     def G_value(self, VarX, VarY, VarZ):
-        validate_variable_lengths([VarX, VarY, VarZ])
-
-        N = len(VarX)
-
         (PrXYcZ, PrXcZ, PrYcZ, PrZ) = infotheory.calculate_pmf_for_cmi(VarX, VarY, VarZ)
         cMI = infotheory.conditional_mutual_information(PrXYcZ, PrXcZ, PrYcZ, PrZ, base='e')
-        return 2 * N * cMI
+        return 2 * self.N * cMI
 
 
     def load_variables(self, X, Y, Z):
