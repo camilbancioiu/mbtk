@@ -75,6 +75,16 @@ class DatasetMatrix:
             raise ValueError('Unknown matrix label. Only X and Y are allowed.')
 
 
+    def get_row_count(self, matrix_label):
+        matrix = self.get_matrix(matrix_label)
+        return matrix.get_shape()[0]
+
+
+    def get_column_count(self, matrix_label):
+        matrix = self.get_matrix(matrix_label)
+        return matrix.get_shape()[1]
+
+
     def get_column(self, matrix_label, column):
         """
         Retrieve the entire column specified by the argument ``column`` from
