@@ -1,4 +1,4 @@
-import sys
+import pudb
 import numpy
 import scipy.io
 
@@ -61,3 +61,8 @@ def flatten(l, ltypes=(list, tuple)):
                 l[i:i + 1] = l[i]
         i += 1
     return ltype(l)
+
+
+
+def breakpoint():
+    pudb.set_trace()
