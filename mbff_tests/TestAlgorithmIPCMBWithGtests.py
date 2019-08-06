@@ -94,7 +94,6 @@ class TestAlgorithmIPCMBWithGtests(TestBase):
 
 
     def test_dof_computation_methods(self):
-        # TODO run this test on ALARM
         dm_label = 'alarm'
         datasetmatrix = self.DatasetMatrices[dm_label]
         targets = range(datasetmatrix.get_column_count('X'))
@@ -109,21 +108,21 @@ class TestAlgorithmIPCMBWithGtests(TestBase):
 
             print('=== IPC-MB with G-test (AD-tree - dof_computation_method = structural) ===')
             extra_parameters = {'ci_test_dof_computation_method': 'structural'}
-            ipcmb_g_adtree = self.make_IPCMB_with_Gtest_ADtree(dm_label, target, significance, LLT=200, extra_parameters=extra_parameters)
+            ipcmb_g_adtree = self.make_IPCMB_with_Gtest_ADtree(dm_label, target, significance, LLT=400, extra_parameters=extra_parameters)
             markov_blanket__adtree = ipcmb_g_adtree.select_features()
             print(self.format_ipcmb_result('AD-tree', target, datasetmatrix, markov_blanket__adtree))
             self.assertEqual(markov_blanket__dsep, markov_blanket__adtree)
 
             print('=== IPC-MB with G-test (AD-tree - dof_computation_method = rowcol) ===')
             extra_parameters = {'ci_test_dof_computation_method': 'rowcol'}
-            ipcmb_g_adtree = self.make_IPCMB_with_Gtest_ADtree(dm_label, target, significance, LLT=200, extra_parameters=extra_parameters)
+            ipcmb_g_adtree = self.make_IPCMB_with_Gtest_ADtree(dm_label, target, significance, LLT=400, extra_parameters=extra_parameters)
             markov_blanket__adtree = ipcmb_g_adtree.select_features()
             print(self.format_ipcmb_result('AD-tree', target, datasetmatrix, markov_blanket__adtree))
             self.assertEqual(markov_blanket__dsep, markov_blanket__adtree)
 
             print('=== IPC-MB with G-test (AD-tree - dof_computation_method = rowcol_minus_zerocells) ===')
             extra_parameters = {'ci_test_dof_computation_method': 'rowcol_minus_zerocells'}
-            ipcmb_g_adtree = self.make_IPCMB_with_Gtest_ADtree(dm_label, target, significance, LLT=200, extra_parameters=extra_parameters)
+            ipcmb_g_adtree = self.make_IPCMB_with_Gtest_ADtree(dm_label, target, significance, LLT=400, extra_parameters=extra_parameters)
             markov_blanket__adtree = ipcmb_g_adtree.select_features()
             print(self.format_ipcmb_result('AD-tree', target, datasetmatrix, markov_blanket__adtree))
             self.assertEqual(markov_blanket__dsep, markov_blanket__adtree)
