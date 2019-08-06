@@ -63,8 +63,6 @@ class TestGTestUnoptimized(TestBase):
 
 
 
-
-
     def test_G_value__alarm(self):
         Omega = self.OmegaVariables['alarm']
         dataset = self.DatasetMatrices['alarm']
