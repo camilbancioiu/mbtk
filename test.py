@@ -40,7 +40,7 @@ if __name__ == '__main__':
     from mbff_tests.TestGTestUnoptimized import TestGTestUnoptimized
     from mbff_tests.TestADTree import TestADTree
     from mbff_tests.TestAlgorithmIPCMB import TestAlgorithmIPCMB
-    from mbff_tests.TestAlgorithmIPCMBOptimizations import TestAlgorithmIPCMBOptimizations
+    from mbff_tests.TestAlgorithmIPCMBOptimizations import TestAlgorithmIPCMBWithGtests
 
     import unittest
     unittest.main(verbosity=2)
