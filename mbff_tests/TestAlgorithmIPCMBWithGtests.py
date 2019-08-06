@@ -16,7 +16,7 @@ class TestAlgorithmIPCMBWithGtests(TestBase):
     @classmethod
     def initTestResources(testClass):
         super().initTestResources()
-        testClass.DatasetsInUse = ['lc_repaired']
+        testClass.DatasetsInUse = ['lc_repaired', 'alarm']
         testClass.RootFolder = Path('testfiles', 'tmp', 'test_ipcmb_with_gtests')
         testClass.DatasetMatrixFolder = testClass.RootFolder / 'dm'
         testClass.JHTFolder = testClass.RootFolder / 'jht'
@@ -44,6 +44,13 @@ class TestAlgorithmIPCMBWithGtests(TestBase):
             configuration['values_as_indices'] = True
             configuration['objectives'] = []
 
+        if dm_label == 'alarm':
+            configuration['sourcepath'] = Path('testfiles', 'bif_files', 'alarm.bif')
+            configuration['sample_count'] = int(8e3)
+            configuration['random_seed'] = 1984
+            configuration['values_as_indices'] = True
+            configuration['objectives'] = []
+
         return configuration
 
 
@@ -53,17 +60,6 @@ class TestAlgorithmIPCMBWithGtests(TestBase):
         targets = range(datasetmatrix.get_column_count('X'))
         significance = 0.98
 
-        # debug output
-        from mbff.math.PMF import PMF
-        from mbff.math.Variable import JointVariables
-
-        print()
-        almost_or = datasetmatrix.get_variable('X', 0)
-        asia = datasetmatrix.get_variable('X', 1)
-        pmf = PMF(JointVariables(almost_or, asia))
-        print(pmf)
-        # debug output
-
         print()
         for target in targets:
             print('=== IPC-MB with d-sep ===')
@@ -72,30 +68,71 @@ class TestAlgorithmIPCMBWithGtests(TestBase):
             print(self.format_ipcmb_result('dsep', target, datasetmatrix, markov_blanket__dsep))
 
             print('=== IPC-MB with G-test (dcMI) ===')
-            ipcmb_g_dcmi = self.make_IPCMB_with_Gtest_dcMI(dm_label, target, significance)
+            extra_parameters = {'ci_test_dof_computation_method': 'structural'}
+            ipcmb_g_dcmi = self.make_IPCMB_with_Gtest_dcMI(dm_label, target, significance, extra_parameters)
             markov_blanket__dcmi = ipcmb_g_dcmi.select_features()
             print(self.format_ipcmb_result('dcMI', target, datasetmatrix, markov_blanket__dcmi))
             self.assertEqual(markov_blanket__dsep, markov_blanket__dcmi)
 
-            if True:
-                print('=== IPC-MB with G-test (AD-tree) ===')
-                ipcmb_g_adtree = self.make_IPCMB_with_Gtest_ADtree(dm_label, target, significance, LLT=200)
-                markov_blanket__adtree = ipcmb_g_adtree.select_features()
-                print(self.format_ipcmb_result('AD-tree', target, datasetmatrix, markov_blanket__adtree))
-                self.assertEqualCITestResults(ipcmb_g_dcmi.CITest.ci_test_results, ipcmb_g_adtree.CITest.ci_test_results)
-                self.assertEqual(markov_blanket__dsep, markov_blanket__adtree)
+            print('=== IPC-MB with G-test (AD-tree) ===')
+            extra_parameters = {'ci_test_dof_computation_method': 'rowcol'}
+            ipcmb_g_adtree = self.make_IPCMB_with_Gtest_ADtree(dm_label, target, significance, LLT=200, extra_parameters=extra_parameters)
+            markov_blanket__adtree = ipcmb_g_adtree.select_features()
+            print(self.format_ipcmb_result('AD-tree', target, datasetmatrix, markov_blanket__adtree))
+            self.assertEqual(markov_blanket__dsep, markov_blanket__adtree)
 
-            if True:
-                print('=== IPC-MB with G-test (unoptimized) ===')
-                ipcmb_g_unoptimized = self.make_IPCMB_with_Gtest_unoptimized(dm_label, target, significance)
-                markov_blanket__unoptimized = ipcmb_g_unoptimized.select_features()
-                print(self.format_ipcmb_result('unoptimized', target, datasetmatrix, markov_blanket__unoptimized))
-                self.assertEqualCITestResults(ipcmb_g_dcmi.CITest.ci_test_results, ipcmb_g_unoptimized.CITest.ci_test_results)
-                self.assertEqual(markov_blanket__dsep, markov_blanket__unoptimized)
+            print('=== IPC-MB with G-test (unoptimized) ===')
+            extra_parameters = {'ci_test_dof_computation_method': 'rowcol_minus_zerocells'}
+            ipcmb_g_unoptimized = self.make_IPCMB_with_Gtest_unoptimized(dm_label, target, significance, extra_parameters)
+            markov_blanket__unoptimized = ipcmb_g_unoptimized.select_features()
+            print(self.format_ipcmb_result('unoptimized', target, datasetmatrix, markov_blanket__unoptimized))
+            self.assertEqual(markov_blanket__dsep, markov_blanket__unoptimized)
 
             print()
 
             gc.collect()
+
+
+    def test_dof_computation_methods(self):
+        # TODO run this test on ALARM
+        dm_label = 'alarm'
+        datasetmatrix = self.DatasetMatrices[dm_label]
+        targets = range(datasetmatrix.get_column_count('X'))
+        significance = 0.95
+
+        print()
+        for target in targets:
+            print('=== IPC-MB with d-sep ===')
+            ipcmb_dsep = self.make_IPCMB_with_dsep(dm_label, target)
+            markov_blanket__dsep = ipcmb_dsep.select_features()
+            print(self.format_ipcmb_result('dsep', target, datasetmatrix, markov_blanket__dsep))
+
+            print('=== IPC-MB with G-test (AD-tree - dof_computation_method = structural) ===')
+            extra_parameters = {'ci_test_dof_computation_method': 'structural'}
+            ipcmb_g_adtree = self.make_IPCMB_with_Gtest_ADtree(dm_label, target, significance, LLT=200, extra_parameters=extra_parameters)
+            markov_blanket__adtree = ipcmb_g_adtree.select_features()
+            print(self.format_ipcmb_result('AD-tree', target, datasetmatrix, markov_blanket__adtree))
+            self.assertEqual(markov_blanket__dsep, markov_blanket__adtree)
+
+            print('=== IPC-MB with G-test (AD-tree - dof_computation_method = rowcol) ===')
+            extra_parameters = {'ci_test_dof_computation_method': 'rowcol'}
+            ipcmb_g_adtree = self.make_IPCMB_with_Gtest_ADtree(dm_label, target, significance, LLT=200, extra_parameters=extra_parameters)
+            markov_blanket__adtree = ipcmb_g_adtree.select_features()
+            print(self.format_ipcmb_result('AD-tree', target, datasetmatrix, markov_blanket__adtree))
+            self.assertEqual(markov_blanket__dsep, markov_blanket__adtree)
+
+            print('=== IPC-MB with G-test (AD-tree - dof_computation_method = rowcol_minus_zerocells) ===')
+            extra_parameters = {'ci_test_dof_computation_method': 'rowcol_minus_zerocells'}
+            ipcmb_g_adtree = self.make_IPCMB_with_Gtest_ADtree(dm_label, target, significance, LLT=200, extra_parameters=extra_parameters)
+            markov_blanket__adtree = ipcmb_g_adtree.select_features()
+            print(self.format_ipcmb_result('AD-tree', target, datasetmatrix, markov_blanket__adtree))
+            self.assertEqual(markov_blanket__dsep, markov_blanket__adtree)
+
+            print()
+
+            gc.collect()
+
+
 
 
     def format_ipcmb_result(self, label, target, datasetmatrix, markov_blanket):
