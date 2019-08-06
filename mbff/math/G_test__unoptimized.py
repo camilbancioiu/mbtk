@@ -3,6 +3,8 @@ import pickle
 from mbff.math.CITestResult import CITestResult
 
 import mbff.math.infotheory as infotheory
+from mbff.math.PMF import PMF, CPMF
+from mbff.math.Variable import JointVariables
 
 from scipy.stats import chi2
 import gc
@@ -53,8 +55,9 @@ class G_test:
         result = CITestResult()
         result.start_timing()
 
-        G = self.G_value(VarX, VarY, VarZ)
-        DF = self.calculate_degrees_of_freedom(X, Y, Z)
+        (PrXYcZ, PrXcZ, PrYcZ, PrZ) = self.calculate_cpmfs(VarX, VarY, VarZ)
+        G = self.G_value(PrXYcZ, PrXcZ, PrYcZ, PrZ)
+        DF = self.calculate_degrees_of_freedom(PrXYcZ, PrXcZ, PrYcZ, PrZ, X, Y, Z)
 
         p = chi2.cdf(G, DF)
         independent = None
@@ -73,8 +76,7 @@ class G_test:
         return result
 
 
-    def G_value(self, VarX, VarY, VarZ):
-        (PrXYcZ, PrXcZ, PrYcZ, PrZ) = infotheory.calculate_pmf_for_cmi(VarX, VarY, VarZ)
+    def G_value(self, PrXYcZ, PrXcZ, PrYcZ, PrZ):
         cMI = infotheory.conditional_mutual_information(PrXYcZ, PrXcZ, PrYcZ, PrZ, base='e')
         return 2 * self.N * cMI
 
@@ -90,14 +92,62 @@ class G_test:
         return (VarX, VarY, VarZ)
 
 
-    def calculate_degrees_of_freedom(self, X, Y, Z):
+    def calculate_degrees_of_freedom(self, PrXYcZ, PrXcZ, PrYcZ, PrZ, X, Y, Z):
+        method = self.parameters.get('ci_test_dof_computation_method', 'structural')
+        if method == 'structural':
+            return self.calculate_degrees_of_freedom__structural(PrXYcZ, PrXcZ, PrYcZ, PrZ, X, Y, Z)
+        elif method == 'rowcol':
+            return self.calculate_degrees_of_freedom__rowcol(PrXYcZ, PrXcZ, PrYcZ, PrZ, X, Y, Z)
+        elif method == 'rowcol_minus_zerocells':
+            return self.calculate_degrees_of_freedom__rowcol_minus_zerocells(PrXYcZ, PrXcZ, PrYcZ, PrZ, X, Y, Z)
+
+
+    def calculate_degrees_of_freedom__structural(self, PrXYcZ, PrXcZ, PrYcZ, PrZ, X, Y, Z):
         X_val = len(self.column_values[X])
         Y_val = len(self.column_values[Y])
 
         Z_val = 1
         for z in Z:
             Z_val *= len(self.column_values[z])
-        return (X_val - 1) * (Y_val - 1) * Z_val
+        DoF = (X_val - 1) * (Y_val - 1) * Z_val
+        return DoF
+
+
+    def calculate_degrees_of_freedom__rowcol(self, PrXYcZ, PrXcZ, PrYcZ, PrZ, X, Y, Z):
+        DoF = 0
+        for (z, pz) in PrZ.items():
+            PrX = PrXcZ.given(z)
+            PrY = PrYcZ.given(z)
+
+            expected_dof_xycz = (len(PrX) - 1) * (len(PrY) - 1)
+            DoF += expected_dof_xycz
+
+        return DoF
+
+
+    def calculate_degrees_of_freedom__rowcol_minus_zerocells(self, PrXYcZ, PrXcZ, PrYcZ, PrZ, X, Y, Z):
+        DoF = 0
+        for (z, pz) in PrZ.items():
+            PrXY = PrXYcZ.given(z)
+            PrX = PrXcZ.given(z)
+            PrY = PrYcZ.given(z)
+
+            expected_dof_xycz = (len(PrX) - 1) * (len(PrY) - 1)
+            for pxy in PrXY.values():
+                if pxy == 0:
+                    expected_dof_xycz -= 1
+            DoF += expected_dof_xycz
+
+        return DoF
+
+
+    def calculate_cpmfs(self, VarX, VarY, VarZ):
+        PrXYcZ = CPMF(JointVariables(VarX, VarY), VarZ)
+        PrXcZ = CPMF(VarX, VarZ)
+        PrYcZ = CPMF(VarY, VarZ)
+        PrZ = PMF(VarZ)
+
+        return (PrXYcZ, PrXcZ, PrYcZ, PrZ)
 
 
     def end(self):

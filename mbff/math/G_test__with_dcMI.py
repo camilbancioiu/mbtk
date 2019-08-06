@@ -18,6 +18,10 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
         self.JHT_reads = 0
         self.JHT_hits = 0
 
+        dof_computation_method = self.parameters.get('ci_test_dof_computation_method', 'structural')
+        if dof_computation_method != 'structural':
+            raise NotImplementedError
+
         self.prepare_JHT()
 
 
@@ -49,7 +53,7 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
         result.start_timing()
 
         G = self.G_value(X, Y, Z)
-        DF = self.calculate_degrees_of_freedom(X, Y, Z)
+        DF = self.calculate_degrees_of_freedom(None, None, None, None, X, Y, Z)
 
         p = chi2.cdf(G, DF)
         independent = None

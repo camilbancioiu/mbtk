@@ -80,8 +80,9 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
         result = CITestResult()
         result.start_timing()
 
-        G = self.G_value(X, Y, Z)
-        DF = self.calculate_degrees_of_freedom(X, Y, Z)
+        (PrXYcZ, PrXcZ, PrYcZ, PrZ) = self.calculate_pmf_from_AD_tree(X, Y, Z)
+        G = self.G_value(PrXYcZ, PrXcZ, PrYcZ, PrZ)
+        DF = self.calculate_degrees_of_freedom(PrXYcZ, PrXcZ, PrYcZ, PrZ, X, Y, Z)
 
         p = chi2.cdf(G, DF)
         independent = None
@@ -108,8 +109,7 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
         return result
 
 
-    def G_value(self, X, Y, Z):
-        (PrXYcZ, PrXcZ, PrYcZ, PrZ) = self.calculate_pmf_from_AD_tree(X, Y, Z)
+    def G_value(self, PrXYcZ, PrXcZ, PrYcZ, PrZ):
         cMI = infotheory.conditional_mutual_information(PrXYcZ, PrXcZ, PrYcZ, PrZ, base='e')
         return 2 * self.N * cMI
 
