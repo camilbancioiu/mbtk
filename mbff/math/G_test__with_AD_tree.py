@@ -98,6 +98,8 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
         result.set_statistic('G', G, dict())
         result.set_distribution('chi2', p, {'DoF': DF})
 
+        result.extra_info = ' DoF {}'.format(DF)
+
         if self.AD_tree.debug >= 1:
             result.extra_info = (
                 '\nAD-Tree:'

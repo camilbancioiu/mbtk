@@ -73,6 +73,8 @@ class G_test:
         result.set_statistic('G', G, dict())
         result.set_distribution('chi2', p, {'DoF': DF})
 
+        result.extra_info = ' DoF {}'.format(DF)
+
         return result
 
 
