@@ -39,9 +39,7 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
             result.computed_d_separation = self.source_bn.d_separated(X, Z, Y)
 
         self.ci_test_results.append(result)
-
-        if self.debug >= 1: print(result)
-        if self.debug >= 1: print()
+        self.print_ci_test_result(result)
 
         return result.independent
 

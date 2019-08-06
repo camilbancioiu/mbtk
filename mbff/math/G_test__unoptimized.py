@@ -41,9 +41,7 @@ class G_test:
             result.computed_d_separation = self.source_bn.d_separated(X, Z, Y)
 
         self.ci_test_results.append(result)
-
-        if self.debug >= 1: print(result)
-        if self.debug >= 1: print()
+        self.print_ci_test_result(result)
 
         # Garbage collection required to deallocate variable instances.
         gc.collect()
@@ -108,3 +106,13 @@ class G_test:
             with save_path.open('wb') as f:
                 pickle.dump(self.ci_test_results, f)
         if self.debug >= 1: print('CI test results saved to {}'.format(save_path))
+
+
+    def print_ci_test_result(self, result):
+        if self.debug >= 1:
+            if result.accurate():
+                if self.parameters.get('ci_test_results__print_accurate', True):
+                    print(result)
+            if not result.accurate():
+                if self.parameters.get('ci_test_results__print_inaccurate', True):
+                    print(result)
