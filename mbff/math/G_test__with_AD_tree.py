@@ -28,11 +28,19 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
 
 
     def prepare_AD_tree(self):
-        adtree_load_path = self.parameters.get('ci_test_ad_tree_path__load', None)
-        if adtree_load_path is not None and adtree_load_path.exists():
-            self.load_AD_tree(adtree_load_path)
+        preloaded_AD_tree = self.parameters.get('ci_test_ad_tree_preloaded', None)
+        if preloaded_AD_tree is not None:
+            self.AD_tree = preloaded_AD_tree
+            self.AD_tree.debug = self.debug - 1
+            if self.AD_tree.debug >= 1:
+                self.AD_tree.debug_prepare__querying()
+            if self.debug >= 1: print('Using preloaded AD-tree.')
         else:
-            self.build_AD_tree()
+            adtree_load_path = self.parameters.get('ci_test_ad_tree_path__load', None)
+            if adtree_load_path is not None and adtree_load_path.exists():
+                self.load_AD_tree(adtree_load_path)
+            else:
+                self.build_AD_tree()
 
         self.N = self.AD_tree.query_count(dict())
 
