@@ -1,5 +1,6 @@
 import unittest
 import gc
+import pickle
 from pathlib import Path
 
 from mbff_tests.TestBase import TestBase
@@ -39,17 +40,18 @@ class TestAlgorithmIPCMBWithGtests(TestBase):
 
         if dm_label == 'lc_repaired':
             configuration['sourcepath'] = Path('testfiles', 'bif_files', 'lc_repaired.bif')
-            configuration['sample_count'] = int(1e4)
-            configuration['random_seed'] = 19**8
+            configuration['sample_count'] = int(4e4)
             configuration['values_as_indices'] = True
             configuration['objectives'] = []
+            configuration['method'] = 'exact'
 
         if dm_label == 'alarm':
             configuration['sourcepath'] = Path('testfiles', 'bif_files', 'alarm.bif')
-            configuration['sample_count'] = int(8e3)
-            configuration['random_seed'] = 1984
+            configuration['sample_count'] = int(3e3)
             configuration['values_as_indices'] = True
             configuration['objectives'] = []
+            configuration['random_seed'] = 1984
+            configuration['method'] = 'random'
 
         return configuration
 
@@ -82,7 +84,7 @@ class TestAlgorithmIPCMBWithGtests(TestBase):
             self.assertEqual(markov_blanket__dsep, markov_blanket__adtree)
 
             print('=== IPC-MB with G-test (unoptimized) ===')
-            extra_parameters = {'ci_test_dof_computation_method': 'rowcol_minus_zerocells'}
+            extra_parameters = {'ci_test_dof_computation_method': 'structural_minus_zerocells'}
             ipcmb_g_unoptimized = self.make_IPCMB_with_Gtest_unoptimized(dm_label, target, significance, extra_parameters)
             markov_blanket__unoptimized = ipcmb_g_unoptimized.select_features()
             print(self.format_ipcmb_result('unoptimized', target, datasetmatrix, markov_blanket__unoptimized))
@@ -97,41 +99,72 @@ class TestAlgorithmIPCMBWithGtests(TestBase):
         dm_label = 'alarm'
         datasetmatrix = self.DatasetMatrices[dm_label]
         targets = range(datasetmatrix.get_column_count('X'))
-        significance = 0.95
+        significance = 0.9
+        LLT = 0
+
+        ADTree_path = self.ADTreesFolder / ('{}_LLT={}.pickle'.format(dm_label, LLT))
+        preloaded_AD_tree = None
+        try:
+            with ADTree_path.open('rb') as f:
+                preloaded_AD_tree = pickle.load(f)
+        except FileNotFoundError:
+            pass
 
         print()
         for target in targets:
+            extra_parameters = dict()
             print('=== IPC-MB with d-sep ===')
             ipcmb_dsep = self.make_IPCMB_with_dsep(dm_label, target)
             markov_blanket__dsep = ipcmb_dsep.select_features()
             print(self.format_ipcmb_result('dsep', target, datasetmatrix, markov_blanket__dsep))
 
-            print('=== IPC-MB with G-test (AD-tree - dof_computation_method = structural) ===')
-            extra_parameters = {'ci_test_dof_computation_method': 'structural'}
-            ipcmb_g_adtree = self.make_IPCMB_with_Gtest_ADtree(dm_label, target, significance, LLT=400, extra_parameters=extra_parameters)
-            markov_blanket__adtree = ipcmb_g_adtree.select_features()
-            print(self.format_ipcmb_result('AD-tree', target, datasetmatrix, markov_blanket__adtree))
-            self.assertEqual(markov_blanket__dsep, markov_blanket__adtree)
+            if False:
+                print('=== IPC-MB with G-test (AD-tree - dof_computation_method = structural) ===')
+                extra_parameters['ci_test_dof_computation_method'] = 'structural'
+                extra_parameters['ci_test_results_path__save'] = self.CITestResultsFolder / '{}_{}_adtree_dof_structural.pickle'.format(dm_label, target)
+                extra_parameters['ci_test_ad_tree_preloaded'] = preloaded_AD_tree
+                extra_parameters['ci_test_ad_tree_path__save'] = None
+                ipcmb_g_adtree = self.make_IPCMB_with_Gtest_ADtree(dm_label, target, significance, LLT=LLT, extra_parameters=extra_parameters)
+                markov_blanket__adtree__structural = ipcmb_g_adtree.select_features()
+                print(self.format_ipcmb_result('AD-tree', target, datasetmatrix, markov_blanket__adtree__structural))
 
-            print('=== IPC-MB with G-test (AD-tree - dof_computation_method = rowcol) ===')
-            extra_parameters = {'ci_test_dof_computation_method': 'rowcol'}
-            ipcmb_g_adtree = self.make_IPCMB_with_Gtest_ADtree(dm_label, target, significance, LLT=400, extra_parameters=extra_parameters)
-            markov_blanket__adtree = ipcmb_g_adtree.select_features()
-            print(self.format_ipcmb_result('AD-tree', target, datasetmatrix, markov_blanket__adtree))
-            self.assertEqual(markov_blanket__dsep, markov_blanket__adtree)
+                extra_parameters['ci_test_dof_computation_method'] = 'rowcol'
+                extra_parameters['ci_test_results_path__save'] = self.CITestResultsFolder / '{}_{}_adtree_dof_rowcol.pickle'.format(dm_label, target)
+                extra_parameters['ci_test_ad_tree_preloaded'] = preloaded_AD_tree
+                extra_parameters['ci_test_ad_tree_path__save'] = None
+                ipcmb_g_adtree = self.make_IPCMB_with_Gtest_ADtree(dm_label, target, significance, LLT=LLT, extra_parameters=extra_parameters)
+                markov_blanket__adtree__rowcol = ipcmb_g_adtree.select_features()
+                print(self.format_ipcmb_result('AD-tree', target, datasetmatrix, markov_blanket__adtree__rowcol))
 
-            print('=== IPC-MB with G-test (AD-tree - dof_computation_method = rowcol_minus_zerocells) ===')
-            extra_parameters = {'ci_test_dof_computation_method': 'rowcol_minus_zerocells'}
-            ipcmb_g_adtree = self.make_IPCMB_with_Gtest_ADtree(dm_label, target, significance, LLT=400, extra_parameters=extra_parameters)
-            markov_blanket__adtree = ipcmb_g_adtree.select_features()
-            print(self.format_ipcmb_result('AD-tree', target, datasetmatrix, markov_blanket__adtree))
-            self.assertEqual(markov_blanket__dsep, markov_blanket__adtree)
-
-            print()
+            print('=== IPC-MB with G-test (AD-tree - dof_computation_method = structural_minus_zerocells) ===')
+            extra_parameters['ci_test_results_path__save'] = self.CITestResultsFolder / '{}_{}_adtree_dof_structural_minus_zerocells.pickle'.format(dm_label, target)
+            extra_parameters['ci_test_dof_computation_method'] = 'structural_minus_zerocells'
+            extra_parameters['ci_test_ad_tree_preloaded'] = preloaded_AD_tree
+            extra_parameters['ci_test_ad_tree_path__save'] = None
+            ipcmb_g_adtree = self.make_IPCMB_with_Gtest_ADtree(dm_label, target, significance, LLT=LLT, extra_parameters=extra_parameters)
+            markov_blanket__adtree__structural_minus_zerocells = ipcmb_g_adtree.select_features()
+            print(self.format_ipcmb_result('AD-tree', target, datasetmatrix, markov_blanket__adtree__structural_minus_zerocells))
 
             gc.collect()
 
+            print()
 
+            if False:
+                mb_correctness = 'CORRECT'
+                if markov_blanket__dsep != markov_blanket__adtree__structural:
+                    mb_correctness = 'WRONG'
+                print('MB, structural ({}): {} vs {}'.format(mb_correctness, markov_blanket__dsep, markov_blanket__adtree__structural))
+                mb_correctness = 'CORRECT'
+                if markov_blanket__dsep != markov_blanket__adtree__rowcol:
+                    mb_correctness = 'WRONG'
+                print('MB, rowcol ({}): {} vs {}'.format(mb_correctness, markov_blanket__dsep, markov_blanket__adtree__rowcol))
+
+            mb_correctness = 'CORRECT'
+            if markov_blanket__dsep != markov_blanket__adtree__structural_minus_zerocells:
+                mb_correctness = 'WRONG'
+            print('MB, structural_minus_zerocells ({}): {} vs {}'.format(mb_correctness, markov_blanket__dsep, markov_blanket__adtree__structural_minus_zerocells))
+
+            print()
 
 
     def format_ipcmb_result(self, label, target, datasetmatrix, markov_blanket):

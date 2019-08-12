@@ -97,14 +97,16 @@ class G_test:
     def calculate_degrees_of_freedom(self, PrXYcZ, PrXcZ, PrYcZ, PrZ, X, Y, Z):
         method = self.parameters.get('ci_test_dof_computation_method', 'structural')
         if method == 'structural':
-            return self.calculate_degrees_of_freedom__structural(PrXYcZ, PrXcZ, PrYcZ, PrZ, X, Y, Z)
+            return self.calculate_degrees_of_freedom__structural(X, Y, Z)
         elif method == 'rowcol':
-            return self.calculate_degrees_of_freedom__rowcol(PrXYcZ, PrXcZ, PrYcZ, PrZ, X, Y, Z)
-        elif method == 'rowcol_minus_zerocells':
-            return self.calculate_degrees_of_freedom__rowcol_minus_zerocells(PrXYcZ, PrXcZ, PrYcZ, PrZ, X, Y, Z)
+            return self.calculate_degrees_of_freedom__rowcol(PrXYcZ, PrXcZ, PrYcZ, PrZ)
+        elif method == 'structural_minus_zerocells':
+            return self.calculate_degrees_of_freedom__structural_minus_zerocells(PrXYcZ, PrXcZ, PrYcZ, PrZ, X, Y)
+        else:
+            raise ValueError('Unknown DoF computation method')
 
 
-    def calculate_degrees_of_freedom__structural(self, PrXYcZ, PrXcZ, PrYcZ, PrZ, X, Y, Z):
+    def calculate_degrees_of_freedom__structural(self, X, Y, Z):
         X_val = len(self.column_values[X])
         Y_val = len(self.column_values[Y])
 
@@ -115,7 +117,7 @@ class G_test:
         return DoF
 
 
-    def calculate_degrees_of_freedom__rowcol(self, PrXYcZ, PrXcZ, PrYcZ, PrZ, X, Y, Z):
+    def calculate_degrees_of_freedom__rowcol(self, PrXYcZ, PrXcZ, PrYcZ, PrZ):
         DoF = 0
         for (z, pz) in PrZ.items():
             PrX = PrXcZ.given(z)
@@ -127,14 +129,14 @@ class G_test:
         return DoF
 
 
-    def calculate_degrees_of_freedom__rowcol_minus_zerocells(self, PrXYcZ, PrXcZ, PrYcZ, PrZ, X, Y, Z):
+    def calculate_degrees_of_freedom__structural_minus_zerocells(self, PrXYcZ, PrXcZ, PrYcZ, PrZ, X, Y):
         DoF = 0
+        X_val = len(self.column_values[X])
+        Y_val = len(self.column_values[Y])
         for (z, pz) in PrZ.items():
             PrXY = PrXYcZ.given(z)
-            PrX = PrXcZ.given(z)
-            PrY = PrYcZ.given(z)
 
-            expected_dof_xycz = (len(PrX) - 1) * (len(PrY) - 1)
+            expected_dof_xycz = (X_val - 1) * (Y_val - 1)
             for pxy in PrXY.values():
                 if pxy == 0:
                     expected_dof_xycz -= 1
