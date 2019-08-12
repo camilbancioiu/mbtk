@@ -18,7 +18,12 @@ class PMF:
 
 
     def __str__(self):
-        return str(self.probabilities)
+        output = ''
+        keys = sorted(self.probabilities.keys())
+        for key in keys:
+            prob = self.probabilities[key]
+            output += '{}: {}\n'.format(key, prob)
+        return output
 
 
     def __len__(self):
