@@ -105,6 +105,21 @@ class TestVariableAndPMF(TestBase):
         self.assertEqual(3.25, PrAnimals.expected_value(lambda v, p: len(v)))
 
 
+    def test_instantiating_joint_pmf(self):
+        survey_bif = Path('testfiles', 'bif_files', 'survey.bif')
+        bn = util.read_bif_file(survey_bif)
+        bn.finalize()
+
+        self.assertListEqual(['AGE', 'SEX', 'EDU', 'OCC', 'R', 'TRN'], bn.variable_node_names__sampling_order)
+        self.assertListEqual(['AGE', 'EDU', 'OCC', 'R', 'SEX', 'TRN'], bn.variable_node_names())
+
+        joint_pmf = bn.create_joint_pmf(values_as_indices=False)
+
+        self.assertEqual(76593, joint_pmf.min_instance_count_for_accuracy())
+        instances = list(joint_pmf.create_instances_list(77000))
+        self.assertEqual(77000, len(instances))
+
+
     def test_conditional_pmf__binary(self):
         V0 = Variable([0, 1, 0, 1, 0, 1, 0, 1])
         V1 = Variable([0, 0, 1, 1, 0, 0, 1, 1])

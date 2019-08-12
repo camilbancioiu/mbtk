@@ -1,3 +1,4 @@
+import itertools
 from collections import Counter
 from mbff.utilities import functions as util
 
@@ -34,6 +35,10 @@ class PMF:
         except KeyError:
             self.value_counts[value] = count
         self.total_count += count
+
+
+    def keys(self):
+        return self.probabilities.keys()
 
 
     def values(self):
@@ -76,6 +81,34 @@ class PMF:
 
     def expected_value(self, f):
         return sum([p * f(v, p) for (v, p) in self.probabilities.items()])
+
+
+    def min_instance_count_for_accuracy(self):
+        nonzero_probabilities = filter(None, self.values())
+        return round(1 / min(nonzero_probabilities))
+
+
+    def create_instances_list(self, n=1):
+        sorted_keys = sorted(self.keys(), key=lambda k: self.probabilities[k], reverse=True)
+        instances = itertools.repeat(None, 0)
+
+        running_instance_count = n
+
+        for key in sorted_keys:
+            probability = self.probabilities[key]
+            value_instance_count = max(1, round(n * probability))
+            if value_instance_count > running_instance_count:
+                value_instance_count = running_instance_count
+            running_instance_count -= value_instance_count
+            instances = itertools.chain(instances, itertools.repeat(key, value_instance_count))
+            if running_instance_count == 0:
+                break
+
+        if running_instance_count > 0:
+            extra_instances = self.create_instances_list(running_instance_count)
+            instances = itertools.chain(instances, extra_instances)
+
+        return instances
 
 
     def __eq__(self, other):

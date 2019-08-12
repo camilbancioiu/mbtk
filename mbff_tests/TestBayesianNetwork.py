@@ -32,6 +32,35 @@ class TestBayesianNetwork(TestBase):
             self.assertAlmostEqual(pair[0], pair[1])
 
 
+    def test_creating_complete_joint_pmf(self):
+        survey_bif = Path('testfiles', 'bif_files', 'survey.bif')
+        bn = util.read_bif_file(survey_bif)
+
+        bn.finalize()
+        self.assertListEqual(['AGE', 'SEX', 'EDU', 'OCC', 'R', 'TRN'], bn.variable_node_names__sampling_order)
+        self.assertListEqual(['AGE', 'EDU', 'OCC', 'R', 'SEX', 'TRN'], bn.variable_node_names())
+
+        total_possible_values_in_bn = 1
+        for varnode in bn.variable_nodes.values():
+            total_possible_values_in_bn *= len(varnode.values)
+
+        joint_pmf = bn.joint_pmf(values_as_indices=False)
+        self.assertEqual(1.0, sum(joint_pmf.values()))
+        self.assertEqual(total_possible_values_in_bn, len(joint_pmf))
+
+        test_sample = ('young', 'uni', 'self', 'small', 'F', 'train')
+        expected_probability = 0.3 * 0.51 * 0.36 * 0.08 * 0.2 * 0.36
+        self.assertEqual(expected_probability, joint_pmf.p(test_sample))
+
+        test_sample = ('young', 'uni', 'emp', 'small', 'F', 'other')
+        expected_probability = 0.3 * 0.51 * 0.36 * 0.92 * 0.2 * 0.1
+        self.assertEqual(expected_probability, joint_pmf.p(test_sample))
+
+        test_sample = ('young', 'highschool', 'emp', 'small', 'M', 'other')
+        expected_probability = 0.3 * 0.49 * 0.75 * 0.96 * 0.25 * 0.1
+        self.assertEqual(expected_probability, joint_pmf.p(test_sample))
+
+
     def test_sampling_single(self):
         survey_bif = Path('testfiles', 'bif_files', 'survey.bif')
         bn = util.read_bif_file(survey_bif)

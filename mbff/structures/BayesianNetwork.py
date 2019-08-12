@@ -7,6 +7,7 @@ import numpy
 
 from collections import OrderedDict
 
+from mbff.math.PMF import PMF
 from mbff.structures.Exceptions import BayesianNetworkNotFinalizedError
 
 
@@ -93,6 +94,43 @@ class BayesianNetwork:
             sample_with_indices[varname] = self.variable_nodes[varname].values.index(value)
 
         return sample_with_indices
+
+
+    @finalization_required
+    def create_joint_pmf(self, values_as_indices=True):
+        pmf = PMF(None)
+        pmf.probabilities = self.joint_values_and_probabilities(values_as_indices=values_as_indices)
+        return pmf
+
+
+    @finalization_required
+    def joint_values_and_probabilities(self, values_as_indices=True, joint_vp=dict(), current_value=dict(), current_probability=1.0):
+        if len(current_value) == len(self.variable_nodes__sampling_order):
+            if values_as_indices:
+                current_value = self.sample_values_to_indices(current_value)
+            current_value_as_list = self.sample_as_list(current_value)
+            current_value_tuple = tuple(current_value_as_list)
+            joint_vp[current_value_tuple] = current_probability
+            return joint_vp
+
+        current_variable = self.variable_nodes__sampling_order[len(current_value)]
+        for value in current_variable.values:
+            conditioning_values = current_variable.get_conditioning_values_from_partial_sample(current_value)
+            if len(conditioning_values) == 0:
+                conditioning_values = '<unconditioned>'
+            current_value_probability = current_probability * current_variable.probability_of_value(value, conditioning_values)
+            current_value[current_variable.name] = value
+            self.joint_values_and_probabilities(values_as_indices, joint_vp, current_value, current_value_probability)
+
+        del current_value[current_variable.name]
+        return joint_vp
+
+
+    def total_possible_values_count(self):
+        count = 1
+        for varnode in self.variable_nodes.values():
+            count *= len(varnode.values)
+        return count
 
 
     def finalize(self):
@@ -355,6 +393,12 @@ class VariableNode:
         value = self.values[value_index]
         partial_sample[self.name] = value
         return partial_sample
+
+
+    def probability_of_value(self, value, conditioning_values):
+        value_index = self.values.index(value)
+        value_probability = self.probdist.probabilities[conditioning_values][value_index]
+        return value_probability
 
 
     def get_unsampled_conditioning_variables(self, partial_sample):
