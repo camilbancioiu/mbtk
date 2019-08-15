@@ -75,7 +75,7 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
         try:
             H = self.JHT[jht_key]
             self.JHT_hits += 1
-            if self.debug >= 2: print('\tJMI cache hit: found H={:8.6f} for {}'.format(H, jht_key))
+            if self.debug >= 2: print('\tJHT hit: found H={:8.6f} for {}'.format(H, jht_key))
         except KeyError:
             joint_variables = self.datasetmatrix.get_variables('X', jht_key)
             pmf = PMF(joint_variables)
