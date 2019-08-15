@@ -44,7 +44,7 @@ class TestBayesianNetwork(TestBase):
         for varnode in bn.variable_nodes.values():
             total_possible_values_in_bn *= len(varnode.values)
 
-        joint_pmf = bn.joint_pmf(values_as_indices=False)
+        joint_pmf = bn.create_joint_pmf(values_as_indices=False)
         self.assertEqual(1.0, sum(joint_pmf.values()))
         self.assertEqual(total_possible_values_in_bn, len(joint_pmf))
 
