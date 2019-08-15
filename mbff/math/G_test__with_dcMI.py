@@ -36,26 +36,14 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
             if self.debug >= 1: print('JHT loaded.')
 
 
-    def conditionally_independent(self, X, Y, Z):
-        result = self.G_test_conditionally_independent(X, Y, Z)
-
-        if self.source_bn is not None:
-            result.computed_d_separation = self.source_bn.d_separated(X, Z, Y)
-
-        self.ci_test_results.append(result)
-        self.print_ci_test_result(result)
-
-        return result.independent
-
-
     def G_test_conditionally_independent(self, X, Y, Z):
         result = CITestResult()
         result.start_timing()
 
         G = self.G_value(X, Y, Z)
-        DF = self.calculate_degrees_of_freedom(None, None, None, None, X, Y, Z)
+        DoF = self.calculate_degrees_of_freedom(None, None, None, None, X, Y, Z)
 
-        p = chi2.cdf(G, DF)
+        p = chi2.cdf(G, DoF)
         independent = None
         if p < self.significance:
             independent = True
@@ -63,13 +51,13 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
             independent = False
 
         result.end_timing()
-        result.index = len(self.ci_test_results)
+        result.index = self.ci_test_counter + 1
         result.set_independent(independent, self.significance)
         result.set_variables(X, Y, Z)
         result.set_statistic('G', G, dict())
-        result.set_distribution('chi2', p, {'DoF': DF})
+        result.set_distribution('chi2', p, {'DoF': DoF})
 
-        result.extra_info = ' DoF {}'.format(DF)
+        result.extra_info = ' DoF {}'.format(DoF)
 
         return result
 
@@ -84,11 +72,9 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
 
 
     def get_joint_entropy_term(self, *variables):
-        variable_set = self.create_flat_variable_set(*variables)
-        if len(variable_set) == 0:
+        jht_key = self.create_flat_variable_set(*variables)
+        if len(jht_key) == 0:
             return 0
-
-        jht_key = frozenset(variable_set)
 
         self.JHT_reads += 1
 
@@ -97,30 +83,19 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
             self.JHT_hits += 1
             if self.debug >= 2: print('\tJMI cache hit: found H={:8.6f} for {}'.format(H, jht_key))
         except KeyError:
-            joint_variables = self.datasetmatrix.get_variables('X', variable_set)
+            joint_variables = self.datasetmatrix.get_variables('X', jht_key)
             pmf = PMF(joint_variables)
             H = - pmf.expected_value(lambda v, p: math.log(p))
             self.JHT[jht_key] = H
-            if self.debug >= 2: print('\tJMI cache miss and update: store H={:8.6f} for {}'.format(H, jht_key))
+            if self.debug >= 2: print('\tJHT miss and update: store H={:8.6f} for {}'.format(H, jht_key))
+            self.cache_pmf_info(jht_key, pmf)
 
         return H
 
 
-    def create_flat_variable_set(self, *variables):
-        variable_set = set()
-        for variable in variables:
-            if isinstance(variable, int):
-                # `variable` is a single variable ID, not a set or list of IDs
-                variable_set.add(variable)
-            else:
-                # `variable` is a set or list of IDs
-                variable_set.update(variable)
-
-        return variable_set
-
-
     def end(self):
         super().end()
+
         jht_save_path = self.parameters.get('ci_test_jht_path__save', None)
         if jht_save_path is not None:
             self.JHT['reads'] = self.JHT_reads

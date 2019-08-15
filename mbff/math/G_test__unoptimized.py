@@ -30,14 +30,15 @@ class G_test:
         self.ci_test_name = '.'.join([self.__module__, self.__class__.__name__])
         self.parameters['ci_test_name'] = self.ci_test_name
         self.ci_test_results = []
+        self.ci_test_counter = 0
+        self.gc_collect_rate = self.parameters.get('ci_test_gc_collect_rate', 0)
+
+
+
 
 
     def conditionally_independent(self, X, Y, Z):
-        # Load the actual variable instances (samples) from the
-        # datasetmatrix.
-        (VarX, VarY, VarZ) = self.load_variables(X, Y, Z)
-
-        result = self.G_test_conditionally_independent(VarX, VarY, VarZ, X, Y, Z)
+        result = self.G_test_conditionally_independent(X, Y, Z)
 
         if self.source_bn is not None:
             result.computed_d_separation = self.source_bn.d_separated(X, Z, Y)
@@ -45,21 +46,25 @@ class G_test:
         self.ci_test_results.append(result)
         self.print_ci_test_result(result)
 
-        # Garbage collection required to deallocate variable instances.
-        gc.collect()
+        self.ci_test_counter += 1
+        if self.gc_collect_rate != 0:
+            if self.ci_test_counter % self.gc_collect_rate == 0:
+                gc.collect()
 
         return result.independent
 
 
-    def G_test_conditionally_independent(self, VarX, VarY, VarZ, X, Y, Z):
+    def G_test_conditionally_independent(self, X, Y, Z):
+        (VarX, VarY, VarZ) = self.load_variables(X, Y, Z)
+
         result = CITestResult()
         result.start_timing()
 
         (PrXYcZ, PrXcZ, PrYcZ, PrZ) = self.calculate_cpmfs(VarX, VarY, VarZ)
         G = self.G_value(PrXYcZ, PrXcZ, PrYcZ, PrZ)
-        DF = self.calculate_degrees_of_freedom(PrXYcZ, PrXcZ, PrYcZ, PrZ, X, Y, Z)
+        DoF = self.calculate_degrees_of_freedom(PrXYcZ, PrXcZ, PrYcZ, PrZ, X, Y, Z)
 
-        p = chi2.cdf(G, DF)
+        p = chi2.cdf(G, DoF)
         independent = None
         if p < self.significance:
             independent = True
@@ -67,13 +72,13 @@ class G_test:
             independent = False
 
         result.end_timing()
-        result.index = len(self.ci_test_results)
+        result.index = self.ci_test_counter + 1
         result.set_independent(independent, self.significance)
         result.set_variables(VarX, VarY, VarZ)
         result.set_statistic('G', G, dict())
-        result.set_distribution('chi2', p, {'DoF': DF})
+        result.set_distribution('chi2', p, {'DoF': DoF})
 
-        result.extra_info = ' DoF {}'.format(DF)
+        result.extra_info = ' DoF {}'.format(DoF)
 
         return result
 
@@ -96,14 +101,17 @@ class G_test:
 
     def calculate_degrees_of_freedom(self, PrXYcZ, PrXcZ, PrYcZ, PrZ, X, Y, Z):
         method = self.parameters.get('ci_test_dof_computation_method', 'structural')
+        DoF = 0
         if method == 'structural':
-            return self.calculate_degrees_of_freedom__structural(X, Y, Z)
+            DoF = self.calculate_degrees_of_freedom__structural(X, Y, Z)
         elif method == 'rowcol':
-            return self.calculate_degrees_of_freedom__rowcol(PrXYcZ, PrXcZ, PrYcZ, PrZ)
+            DoF = self.calculate_degrees_of_freedom__rowcol(PrXYcZ, PrXcZ, PrYcZ, PrZ)
         elif method == 'structural_minus_zerocells':
-            return self.calculate_degrees_of_freedom__structural_minus_zerocells(PrXYcZ, PrXcZ, PrYcZ, PrZ, X, Y)
+            DoF = self.calculate_degrees_of_freedom__structural_minus_zerocells(PrXYcZ, PrXcZ, PrYcZ, PrZ, X, Y)
         else:
-            raise ValueError('Unknown DoF computation method')
+            raise NotImplementedError
+
+        return DoF
 
 
     def calculate_degrees_of_freedom__structural(self, X, Y, Z):
@@ -152,6 +160,19 @@ class G_test:
         PrZ = PMF(VarZ)
 
         return (PrXYcZ, PrXcZ, PrYcZ, PrZ)
+
+
+    def create_flat_variable_set(self, *variables):
+        variable_set = set()
+        for variable in variables:
+            if isinstance(variable, int):
+                # `variable` is a single variable ID, not a set or list of IDs
+                variable_set.add(variable)
+            else:
+                # `variable` is a set or list of IDs
+                variable_set.update(variable)
+
+        return frozenset(variable_set)
 
 
     def end(self):

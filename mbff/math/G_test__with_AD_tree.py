@@ -72,27 +72,15 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
         if self.debug >= 1: print('AD-tree loaded.')
 
 
-    def conditionally_independent(self, X, Y, Z):
-        result = self.G_test_conditionally_independent(X, Y, Z)
-
-        if self.source_bn is not None:
-            result.computed_d_separation = self.source_bn.d_separated(X, Z, Y)
-
-        self.ci_test_results.append(result)
-        self.print_ci_test_result(result)
-
-        return result.independent
-
-
     def G_test_conditionally_independent(self, X, Y, Z):
         result = CITestResult()
         result.start_timing()
 
         (PrXYcZ, PrXcZ, PrYcZ, PrZ) = self.calculate_pmf_from_AD_tree(X, Y, Z)
         G = self.G_value(PrXYcZ, PrXcZ, PrYcZ, PrZ)
-        DF = self.calculate_degrees_of_freedom(PrXYcZ, PrXcZ, PrYcZ, PrZ, X, Y, Z)
+        DoF = self.calculate_degrees_of_freedom(PrXYcZ, PrXcZ, PrYcZ, PrZ, X, Y, Z)
 
-        p = chi2.cdf(G, DF)
+        p = chi2.cdf(G, DoF)
         independent = None
         if p < self.significance:
             independent = True
@@ -100,13 +88,13 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
             independent = False
 
         result.end_timing()
-        result.index = len(self.ci_test_results)
+        result.index = self.ci_test_counter + 1
         result.set_independent(independent, self.significance)
         result.set_variables(X, Y, Z)
         result.set_statistic('G', G, dict())
-        result.set_distribution('chi2', p, {'DoF': DF})
+        result.set_distribution('chi2', p, {'DoF': DoF})
 
-        result.extra_info = ' DoF {}'.format(DF)
+        result.extra_info = ' DoF {}'.format(DoF)
 
         if self.AD_tree.debug >= 1:
             result.extra_info = (
