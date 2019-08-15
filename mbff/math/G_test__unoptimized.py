@@ -7,6 +7,7 @@ from mbff.math.PMF import PMF, CPMF
 from mbff.math.Variable import JointVariables
 
 from scipy.stats import chi2
+from pprint import pprint
 import gc
 
 
@@ -33,8 +34,17 @@ class G_test:
         self.ci_test_counter = 0
         self.gc_collect_rate = self.parameters.get('ci_test_gc_collect_rate', 0)
 
+        self.PMF_info = dict()
+        self.prepare_PMF_info()
 
 
+    def prepare_PMF_info(self):
+        pmf_info_load_path = self.parameters.get('ci_test_pmf_info_path__load', None)
+        if pmf_info_load_path is not None and pmf_info_load_path.exists():
+            if self.debug >= 1: print('Loading the PMF info from {} ...'.format(pmf_info_load_path))
+            with pmf_info_load_path.open('rb') as f:
+                self.PMF_info = pickle.load(f)
+            if self.debug >= 1: print('PMF info loaded.')
 
 
     def conditionally_independent(self, X, Y, Z):
@@ -93,8 +103,12 @@ class G_test:
         VarY = self.datasetmatrix.get_variable('X', Y)
         if len(Z) == 0:
             VarZ = self.omega
+            if self.parameters.get('ci_test_dof_computation_method', 'structural') == 'cached_joint_pmf_info':
+                self.cache_variable_pmf_infos__XY(VarX, VarY, X, Y)
         else:
             VarZ = self.datasetmatrix.get_variables('X', Z)
+            if self.parameters.get('ci_test_dof_computation_method', 'structural') == 'cached_joint_pmf_info':
+                self.cache_variable_pmf_infos__XYZ(VarX, VarY, VarZ, X, Y, Z)
 
         return (VarX, VarY, VarZ)
 
@@ -108,6 +122,8 @@ class G_test:
             DoF = self.calculate_degrees_of_freedom__rowcol(PrXYcZ, PrXcZ, PrYcZ, PrZ)
         elif method == 'structural_minus_zerocells':
             DoF = self.calculate_degrees_of_freedom__structural_minus_zerocells(PrXYcZ, PrXcZ, PrYcZ, PrZ, X, Y)
+        elif method == 'cached_joint_pmf_info':
+            DoF = self.calculate_degrees_of_freedom__cached_joint_pmf_info(X, Y, Z)
         else:
             raise NotImplementedError
 
@@ -153,6 +169,95 @@ class G_test:
         return DoF
 
 
+    def calculate_degrees_of_freedom__cached_joint_pmf_info(self, X, Y, Z):
+        xyz = self.create_flat_variable_set(X, Y, Z)
+        xyz = frozenset(xyz)
+        (xyz_total_cells, xyz_pmf_cells, xyz_zero_cells) = self.PMF_info[xyz]
+        X_val = len(self.column_values[X])
+        Y_val = len(self.column_values[Y])
+
+        if len(Z) > 0:
+            z = self.create_flat_variable_set(Z)
+            z = frozenset(z)
+            (z_total_cells, z_pmf_cells, z_zero_cells) = self.PMF_info[z]
+            unadjusted_dof_xycz = z_total_cells * X_val * Y_val
+            marginal_adjustment = z_total_cells * (X_val + Y_val - 1)
+            total_adjustment = max(marginal_adjustment, xyz_zero_cells)
+            DoF = unadjusted_dof_xycz - total_adjustment
+        else:
+            xy = self.create_flat_variable_set(X, Y)
+            xy = frozenset(xy)
+            (xy_total_cells, xy_pmf_cells, xy_zero_cells) = self.PMF_info[xy]
+            marginal_adjustment = (X_val + Y_val - 1)
+            total_adjustment = max(marginal_adjustment, xy_zero_cells)
+            DoF = X_val * Y_val - total_adjustment
+
+        if DoF < 1:
+            print()
+            pprint(locals())
+
+        return DoF
+
+
+    def cache_variable_pmf_infos__XYZ(self, VarX, VarY, VarZ, X, Y, Z):
+        PrXYZ = PMF(JointVariables(VarX, VarY, VarZ))
+        PrXZ = PMF(JointVariables(VarX, VarZ))
+        PrYZ = PMF(JointVariables(VarY, VarZ))
+        PrZ = PMF(VarZ)
+        self.cache_pmf_infos__XYZ(PrXYZ, PrXZ, PrYZ, PrZ, X, Y, Z)
+
+
+    def cache_variable_pmf_infos__XY(self, VarX, VarY, X, Y):
+        PrXY = PMF(JointVariables(VarX, VarY))
+        PrX = PMF(VarX)
+        PrY = PMF(VarY)
+        self.cache_pmf_infos__XY(PrXY, PrX, PrY, X, Y)
+
+
+    def cache_pmf_infos__XYZ(self, PrXYZ, PrXZ, PrYZ, PrZ, X, Y, Z):
+        if PrXYZ is not None:
+            xyz = self.create_flat_variable_set(X, Y, Z)
+            self.cache_pmf_info(xyz, PrXYZ)
+
+        if PrXZ is not None:
+            xz = self.create_flat_variable_set(X, Z)
+            self.cache_pmf_info(xz, PrXZ)
+
+        if PrYZ is not None:
+            yz = self.create_flat_variable_set(Y, Z)
+            self.cache_pmf_info(yz, PrYZ)
+
+        if PrZ is not None:
+            z = self.create_flat_variable_set(Z)
+            self.cache_pmf_info(z, PrZ)
+
+
+    def cache_pmf_infos__XY(self, PrXY, PrX, PrY, X, Y):
+        if PrXY is not None:
+            xy = self.create_flat_variable_set(X, Y)
+            self.cache_pmf_info(xy, PrXY)
+
+        if PrX is not None:
+            x = self.create_flat_variable_set(X)
+            self.cache_pmf_info(x, PrX)
+
+        if PrY is not None:
+            y = self.create_flat_variable_set(Y)
+            self.cache_pmf_info(y, PrY)
+
+
+    def cache_pmf_info(self, key, pmf):
+        if key not in self.PMF_info:
+            total_cells = 1
+            for variable_index in key:
+                total_cells *= len(self.column_values[variable_index])
+            pmf_cells = len(pmf)
+            pmf_nonzero_cells = len(list(filter(None, pmf.values())))
+            pmf_zero_cells = pmf_cells - pmf_nonzero_cells
+            total_zero_cells = total_cells - pmf_cells - pmf_zero_cells
+            self.PMF_info[key] = (total_cells, pmf_cells, total_zero_cells)
+
+
     def calculate_cpmfs(self, VarX, VarY, VarZ):
         PrXYcZ = CPMF(JointVariables(VarX, VarY), VarZ)
         PrXcZ = CPMF(VarX, VarZ)
@@ -181,6 +286,12 @@ class G_test:
             with save_path.open('wb') as f:
                 pickle.dump(self.ci_test_results, f)
         if self.debug >= 1: print('CI test results saved to {}'.format(save_path))
+
+        pmf_info_save_path = self.parameters.get('ci_test_pmf_info_path__save', None)
+        if pmf_info_save_path is not None:
+            with pmf_info_save_path.open('wb') as f:
+                pickle.dump(self.PMF_info, f)
+        if self.debug >= 1: print('PMF info has been saved to {}'.format(pmf_info_save_path))
 
 
     def print_ci_test_result(self, result):

@@ -13,15 +13,9 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
     def __init__(self, datasetmatrix, parameters):
         super().__init__(datasetmatrix, parameters)
 
-
         self.JHT = dict()
         self.JHT_reads = 0
         self.JHT_hits = 0
-
-        dof_computation_method = self.parameters.get('ci_test_dof_computation_method', 'structural')
-        if dof_computation_method != 'structural':
-            raise NotImplementedError
-
         self.prepare_JHT()
 
 

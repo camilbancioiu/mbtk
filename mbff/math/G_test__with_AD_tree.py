@@ -127,12 +127,19 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
             PrXcZ = self.make_omega_cpmf_from_pmf(PrX)
             PrYcZ = self.make_omega_cpmf_from_pmf(PrY)
             PrZ = self.make_omega_pmf()
+
+            if self.parameters.get('ci_test_dof_computation_method', 'structural') == 'cached_joint_pmf_info':
+                self.cache_pmf_infos__XY(PrXY, PrX, PrY, X, Y)
         else:
             Z = sorted(list(Z))
             PrZ = self.AD_tree.make_pmf(Z)
-            PrXYcZ = self.make_cpmf_PrXYcZ(X, Y, Z, PrZ)
-            PrXcZ = self.make_cpmf_PrXcZ(X, Z, PrZ)
-            PrYcZ = self.make_cpmf_PrYcZ(Y, Z, PrZ)
+            (PrXYcZ, PrXYZ) = self.make_cpmf_PrXYcZ(X, Y, Z, PrZ)
+            (PrXcZ, PrXZ) = self.make_cpmf_PrXcZ(X, Z, PrZ)
+            (PrYcZ, PrYZ) = self.make_cpmf_PrYcZ(Y, Z, PrZ)
+
+            if self.parameters.get('ci_test_dof_computation_method', 'structural') == 'cached_joint_pmf_info':
+                self.cache_pmf_infos__XYZ(PrXYZ, PrXZ, PrYZ, PrZ, X, Y, Z)
+
         return (PrXYcZ, PrXcZ, PrYcZ, PrZ)
 
 
@@ -175,7 +182,7 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
             except ZeroDivisionError:
                 pass
 
-        return PrXYcZ
+        return (PrXYcZ, PrXYZ)
 
 
     def make_cpmf_PrXcZ(self, X, Z, PrZ=None):
@@ -205,7 +212,7 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
             except ZeroDivisionError:
                 pass
 
-        return PrXcZ
+        return (PrXcZ, PrXZ)
 
 
     def make_cpmf_PrYcZ(self, Y, Z, PrZ=None):
