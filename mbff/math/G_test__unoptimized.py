@@ -5,9 +5,9 @@ from mbff.math.CITestResult import CITestResult
 import mbff.math.infotheory as infotheory
 from mbff.math.PMF import PMF, CPMF
 from mbff.math.Variable import JointVariables
+from mbff.math.Exceptions import InsufficientSamplesForCITest
 
 from scipy.stats import chi2
-from pprint import pprint
 import gc
 
 
@@ -127,6 +127,9 @@ class G_test:
         else:
             raise NotImplementedError
 
+        if DoF < 1:
+            raise InsufficientSamplesForCITest("Calculated degrees of freedom is less than 1 for {} ⊥ {} | {}: {} due to too many empty cells in the contingency table.".format(X, Y, Z, DoF))
+
         return DoF
 
 
@@ -175,6 +178,7 @@ class G_test:
         (xyz_total_cells, xyz_pmf_cells, xyz_zero_cells) = self.PMF_info[xyz]
         X_val = len(self.column_values[X])
         Y_val = len(self.column_values[Y])
+        adjustment_type = self.parameters.get('ci_test_cjpi_adjustment_type', 'max')
 
         if len(Z) > 0:
             z = self.create_flat_variable_set(Z)
@@ -182,19 +186,21 @@ class G_test:
             (z_total_cells, z_pmf_cells, z_zero_cells) = self.PMF_info[z]
             unadjusted_dof_xycz = z_total_cells * X_val * Y_val
             marginal_adjustment = z_total_cells * (X_val + Y_val - 1)
-            total_adjustment = max(marginal_adjustment, xyz_zero_cells)
+            if adjustment_type == 'max':
+                total_adjustment = max(marginal_adjustment, xyz_zero_cells)
+            if adjustment_type == 'sum':
+                total_adjustment = marginal_adjustment + xyz_zero_cells
             DoF = unadjusted_dof_xycz - total_adjustment
         else:
             xy = self.create_flat_variable_set(X, Y)
             xy = frozenset(xy)
             (xy_total_cells, xy_pmf_cells, xy_zero_cells) = self.PMF_info[xy]
             marginal_adjustment = (X_val + Y_val - 1)
-            total_adjustment = max(marginal_adjustment, xy_zero_cells)
+            if adjustment_type == 'max':
+                total_adjustment = max(marginal_adjustment, xy_zero_cells)
+            if adjustment_type == 'sum':
+                total_adjustment = marginal_adjustment + xy_zero_cells
             DoF = X_val * Y_val - total_adjustment
-
-        if DoF < 1:
-            print()
-            pprint(locals())
 
         return DoF
 
