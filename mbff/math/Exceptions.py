@@ -1,8 +1,7 @@
 class InsufficientSamplesForCITest(Exception):
 
-    def __init__(self, ci_test_result):
-        self.message = "Insufficient samples to compute the test of conditional independence"
-        self.ci_test_result = ci_test_result
+    def __init__(self, message):
+        self.message = message
 
 
     def __str__(self):

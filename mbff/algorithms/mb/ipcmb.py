@@ -1,4 +1,5 @@
 import itertools
+from mbff.math.Exceptions import InsufficientSamplesForCITest
 
 from pprint import pprint
 
@@ -85,11 +86,14 @@ class AlgorithmIPCMB:
                 if Y not in MB:
                     if self.debug >= 2: print('\t\t\tTesting if {} ⊥ {} |  ( {} ∪ {{ {} }} ):'.format(T, Y, self.SepSetCache.get(T, Y), X))
                     separation_set = self.SepSetCache.get(T, Y)
-                    if not self.CITest.conditionally_independent(T, Y, separation_set | {X}):
-                        MB.add(Y)
-                        if self.debug >= 2: print('\t\t\t\tFalse, adding {} to the MB, which becomes {}'.format(Y, MB))
-                    else:
-                        if self.debug >= 2: print('\t\t\t\tTrue, thus {} is not a spouse of {}'.format(Y, T))
+                    try:
+                        if not self.CITest.conditionally_independent(T, Y, separation_set | {X}):
+                            MB.add(Y)
+                            if self.debug >= 2: print('\t\t\t\tFalse, adding {} to the MB, which becomes {}'.format(Y, MB))
+                        else:
+                            if self.debug >= 2: print('\t\t\t\tTrue, thus {} is not a spouse of {}'.format(Y, T))
+                    except InsufficientSamplesForCITest:
+                        continue
 
         if self.debug >= 1: print('Returning the entire MB: {}'.format(MB))
         return MB
@@ -115,15 +119,18 @@ class AlgorithmIPCMB:
                     Z = set(Z)
                     if self.debug >= 2: print('\t\tIterating over possible conditioning sets Z: {}'.format(Z))
                     if self.debug >= 2: print('\t\tTesting {} ̩⊥ {} | {}: '.format(T, X, Z))
-                    if self.CITest.conditionally_independent(X, T, Z):
-                        if self.debug >= 2: print('\t\t\tTrue')
-                        NonPC.add(X)
-                        if self.debug >= 2: print('\t\t\tNonPC is currently {}'.format(NonPC))
-                        self.SepSetCache.add(Z, T, X)
-                        break
-                    else:
-                        if self.debug >= 2: print('\t\t\tFalse')
-                        if self.debug >= 2: print('\t\t\tNonPC remains {}'.format(NonPC))
+                    try:
+                        if self.CITest.conditionally_independent(X, T, Z):
+                            if self.debug >= 2: print('\t\t\tTrue')
+                            NonPC.add(X)
+                            if self.debug >= 2: print('\t\t\tNonPC is currently {}'.format(NonPC))
+                            self.SepSetCache.add(Z, T, X)
+                            break
+                        else:
+                            if self.debug >= 2: print('\t\t\tFalse')
+                            if self.debug >= 2: print('\t\t\tNonPC remains {}'.format(NonPC))
+                    except InsufficientSamplesForCITest:
+                        continue
                 if not self.SepSetCache.contains(T, X):
                     self.SepSetCache.add(set(), T, X)
             AdjacentNodes = AdjacentNodes - NonPC
