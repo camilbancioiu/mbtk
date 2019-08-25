@@ -10,6 +10,8 @@ import mbff.math.G_test__with_AD_tree
 import mbff.math.G_test__with_dcMI
 import mbff.math.DSeparationCITest
 
+from mbff.math.PMF import PMF, CPMF
+
 
 @unittest.skipIf(TestBase.tag_excluded('ipcmb_run'), 'Tests running IPC-MB are excluded')
 class TestAlgorithmIPCMBWithGtests(TestBase):
@@ -95,7 +97,201 @@ class TestAlgorithmIPCMBWithGtests(TestBase):
             gc.collect()
 
 
-    def test_dof_computation_methods(self):
+    def test_dof_computation_methods__cjpi(self):
+        dm_label = 'alarm'
+        # targets = range(datasetmatrix.get_column_count('X'))
+        significance = 0.9
+
+        cjpi_folder = self.RootFolder / 'cjpi'
+        cjpi_folder.mkdir(parents=True, exist_ok=True)
+
+        print()
+        for target in [19]:
+            print('=== IPC-MB with G-test (unoptimized - dof_computation_method = cjpi) ===')
+            extra_parameters = dict()
+            extra_parameters['ci_test_dof_computation_method'] = 'cached_joint_pmf_info'
+            extra_parameters['ci_test_results_path__save'] = self.CITestResultsFolder / '{}_{}_dcmi_dof_cjpi.pickle'.format(dm_label, target)
+            ipcmb = self.make_IPCMB_with_Gtest_unoptimized(dm_label, target, significance, extra_parameters=extra_parameters)
+            markov_blanket = ipcmb.select_features()
+            print(markov_blanket)
+
+
+    def test_dof_computation_methods__cjpi__detailed(self):
+        parameters = dict()
+        parameters['ci_test_dof_computation_method'] = 'cached_joint_pmf_info'
+        parameters['ci_test_debug'] = self.CITestDebugLevel
+        parameters['ci_test_significance'] = 0.9
+        parameters['ci_test_results__print_accurate'] = True
+        parameters['ci_test_results__print_inaccurate'] = True
+
+        G_test = mbff.math.G_test__unoptimized.G_test(None, parameters)
+        G_test.column_values = [[0, 1, 2, 3, 4, 5, 6, 7], [0, 1, 2, 3, 4], [0, 1, 2, 3, 4, 5]]
+        (PrXYZ, PrXYcZ) = self.mock_pmf_for_cjpi_testing__xyz()
+        (PrXZ, PrXcZ) = self.mock_pmf_for_cjpi_testing__xz()
+        (PrYZ, PrYcZ) = self.mock_pmf_for_cjpi_testing__yz()
+        PrZ = self.mock_pmf_for_cjpi_testing__z()
+        X = 0
+        Y = 1
+        Z = 2
+
+        expected_dof = G_test.calculate_degrees_of_freedom__rowcol(PrXYcZ, PrXcZ, PrYcZ, PrZ)
+
+        G_test.cache_pmf_infos__XYZ(PrXYZ, PrXZ, PrYZ, PrZ, X, Y, [Z])
+        computed_dof = G_test.calculate_degrees_of_freedom__cached_joint_pmf_info(X, Y, [Z])
+        self.assertEqual(expected_dof, computed_dof)
+
+
+    def mock_pmf_for_cjpi_testing__xyz(self):
+        p = dict()
+        cp = dict()
+
+        z = 0
+        cp[z] = dict()
+        for x in [6, 7]:
+            for y in range(5):
+                p[(x, y, z)] = 1
+                cp[z][(x, y)] = 1
+
+        z = 1
+        cp[z] = dict()
+        for x in [0, 1, 2, 5, 6, 7]:
+            for y in [0, 2, 3, 4]:
+                p[(x, y, z)] = 1
+                cp[z][(x, y)] = 1
+
+        p[(5, 3, z)] = 0
+        cp[z][(5, 3)] = 0
+        p[(5, 4, z)] = 0
+        cp[z][(5, 4)] = 0
+
+        z = 2
+        cp[z] = dict()
+        for x in [0, 1, 5, 6, 7]:
+            for y in [0, 1, 4]:
+                p[(x, y, z)] = 1
+                cp[z][(x, y)] = 1
+
+        z = 3
+        cp[z] = dict()
+        for x in [1, 2, 3, 4, 5, 6, 7]:
+            for y in range(5):
+                p[(x, y, z)] = 1
+                cp[z][(x, y)] = 1
+        p[(3, 3, z)] = 0
+        cp[z][(3, 3)] = 0
+
+        z = 4
+        cp[z] = dict()
+        for x in range(8):
+            for y in range(5):
+                if x == 2 or y == 4:
+                    continue
+                p[(x, y, z)] = 1
+                cp[z][(x, y)] = 1
+        p[(3, 3, z)] = 0
+        cp[z][(3, 3)] = 0
+
+        PrXYZ = PMF(None)
+        PrXYZ.probabilities = p
+        PrXYcZ = CPMF(None, None)
+        PrXYcZ.conditional_probabilities = cp
+        return (PrXYZ, PrXYcZ)
+
+
+    def mock_pmf_for_cjpi_testing__xz(self):
+        p = dict()
+        cp = dict()
+
+        z = 0
+        cp[z] = dict()
+        for x in [6, 7]:
+            p[(x, z)] = 1
+            cp[z][x] = 1
+
+        z = 1
+        cp[z] = dict()
+        for x in [0, 1, 2, 5, 6, 7]:
+            p[(x, z)] = 1
+            cp[z][x] = 1
+
+        z = 2
+        cp[z] = dict()
+        for x in [0, 1, 5, 6, 7]:
+            p[(x, z)] = 1
+            cp[z][x] = 1
+
+        z = 3
+        cp[z] = dict()
+        for x in [1, 2, 3, 4, 5, 6, 7]:
+            p[(x, z)] = 1
+            cp[z][x] = 1
+
+        z = 4
+        cp[z] = dict()
+        for x in [0, 1, 3, 4, 5, 6, 7]:
+            p[(x, z)] = 1
+            cp[z][x] = 1
+
+        PrXZ = PMF(None)
+        PrXZ.probabilities = p
+        PrXcZ = CPMF(None, None)
+        PrXcZ.conditional_probabilities = cp
+        return (PrXZ, PrXcZ)
+
+
+    def mock_pmf_for_cjpi_testing__yz(self):
+        p = dict()
+        cp = dict()
+
+        z = 0
+        cp[z] = dict()
+        for y in [0, 1, 2, 3, 4]:
+            p[(y, z)] = 1
+            cp[z][y] = 1
+
+        z = 1
+        cp[z] = dict()
+        for y in [0, 2, 3, 4]:
+            p[(y, z)] = 1
+            cp[z][y] = 1
+
+        z = 2
+        cp[z] = dict()
+        for y in [0, 1, 4]:
+            p[(y, z)] = 1
+            cp[z][y] = 1
+
+        z = 3
+        cp[z] = dict()
+        for y in [0, 1, 2, 3, 4]:
+            p[(y, z)] = 1
+            cp[z][y] = 1
+
+        z = 4
+        cp[z] = dict()
+        for y in [0, 1, 2, 3]:
+            p[(y, z)] = 1
+            cp[z][y] = 1
+
+        PrYZ = PMF(None)
+        PrYZ.probabilities = p
+        PrYcZ = CPMF(None, None)
+        PrYcZ.conditional_probabilities = cp
+        return (PrYZ, PrYcZ)
+
+
+    def mock_pmf_for_cjpi_testing__z(self):
+        p = dict()
+
+        for z in [0, 1, 2, 3, 4]:
+            p[z] = 1
+
+        PrZ = PMF(None)
+        PrZ.probabilities = p
+        return PrZ
+
+
+    def test_dof_cjpi_across_Gtest_optimizations(self):
         dm_label = 'alarm'
         datasetmatrix = self.DatasetMatrices[dm_label]
         # targets = range(datasetmatrix.get_column_count('X'))

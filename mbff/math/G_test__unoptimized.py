@@ -3,9 +3,8 @@ import pickle
 from mbff.math.CITestResult import CITestResult
 
 import mbff.math.infotheory as infotheory
-from mbff.math.PMF import PMF, CPMF
+from mbff.math.PMF import PMF, CPMF, PMFInfo
 from mbff.math.Variable import JointVariables
-from mbff.math.Exceptions import InsufficientSamplesForCITest
 
 from scipy.stats import chi2
 import gc
@@ -173,34 +172,40 @@ class G_test:
 
 
     def calculate_degrees_of_freedom__cached_joint_pmf_info(self, X, Y, Z):
-        xyz = self.create_flat_variable_set(X, Y, Z)
-        xyz = frozenset(xyz)
-        (xyz_total_cells, xyz_pmf_cells, xyz_zero_cells) = self.PMF_info[xyz]
-        X_val = len(self.column_values[X])
-        Y_val = len(self.column_values[Y])
-        adjustment_type = self.parameters.get('ci_test_cjpi_adjustment_type', 'max')
+        # Expected count of values for X, when none are missing.
+        X_xp = len(self.column_values[X])
+        # Expected count of values for Y, when none are missing.
+        Y_xp = len(self.column_values[Y])
 
+        Z_observed = None
         if len(Z) > 0:
             z = self.create_flat_variable_set(Z)
-            z = frozenset(z)
-            (z_total_cells, z_pmf_cells, z_zero_cells) = self.PMF_info[z]
-            unadjusted_dof_xycz = z_total_cells * X_val * Y_val
-            marginal_adjustment = z_total_cells * (X_val + Y_val - 1)
-            if adjustment_type == 'max':
-                total_adjustment = max(marginal_adjustment, xyz_zero_cells)
-            if adjustment_type == 'sum':
-                total_adjustment = marginal_adjustment + xyz_zero_cells
-            DoF = unadjusted_dof_xycz - total_adjustment
+            infoZ = self.PMF_info[z]
+            Z_observed = infoZ.observed_nonzero_cells
         else:
-            xy = self.create_flat_variable_set(X, Y)
-            xy = frozenset(xy)
-            (xy_total_cells, xy_pmf_cells, xy_zero_cells) = self.PMF_info[xy]
-            marginal_adjustment = (X_val + Y_val - 1)
-            if adjustment_type == 'max':
-                total_adjustment = max(marginal_adjustment, xy_zero_cells)
-            if adjustment_type == 'sum':
-                total_adjustment = marginal_adjustment + xy_zero_cells
-            DoF = X_val * Y_val - total_adjustment
+            Z_observed = 1
+
+        xyz = self.create_flat_variable_set(X, Y, Z)
+        xz = self.create_flat_variable_set(X, Z)
+        yz = self.create_flat_variable_set(Y, Z)
+
+        infoXYZ = self.PMF_info[xyz]
+        infoXZ = self.PMF_info[xz]
+        infoYZ = self.PMF_info[yz]
+
+        X_0 = Z_observed * X_xp - infoXZ.observed_nonzero_cells
+        Y_0 = Z_observed * Y_xp - infoYZ.observed_nonzero_cells
+        XY_0 = Z_observed * X_xp * Y_xp - infoXYZ.observed_nonzero_cells - infoXYZ.observed_zero_cells
+
+        sum_of_products_of_observed_XcZ_and_YcZ = (-1) * (XY_0 - (X_0 * Y_xp) - (Y_0 * X_xp))
+
+        term1 = Z_observed * (X_xp * Y_xp - X_xp - Y_xp + 1)
+        term2 = (-1) * X_xp * Y_0
+        term3 = (-1) * Y_xp * X_0
+        term4 = X_0
+        term5 = Y_0
+        term6 = sum_of_products_of_observed_XcZ_and_YcZ
+        DoF = term1 + term2 + term3 + term4 + term5 + term6
 
         return DoF
 
@@ -254,14 +259,15 @@ class G_test:
 
     def cache_pmf_info(self, key, pmf):
         if key not in self.PMF_info:
-            total_cells = 1
+            info = PMFInfo()
+            info.expected_total_cells = 1
             for variable_index in key:
-                total_cells *= len(self.column_values[variable_index])
-            pmf_cells = len(pmf)
-            pmf_nonzero_cells = len(list(filter(None, pmf.values())))
-            pmf_zero_cells = pmf_cells - pmf_nonzero_cells
-            total_zero_cells = total_cells - pmf_cells - pmf_zero_cells
-            self.PMF_info[key] = (total_cells, pmf_cells, total_zero_cells)
+                info.expected_total_cells *= len(self.column_values[variable_index])
+            info.observed_total_cells = len(pmf)
+            info.observed_nonzero_cells = len(list(filter(None, pmf.values())))
+            info.observed_zero_cells = info.observed_total_cells - info.observed_nonzero_cells
+            info.observed_missing_cells = info.expected_total_cells - info.observed_total_cells
+            self.PMF_info[key] = info
 
 
     def calculate_cpmfs(self, VarX, VarY, VarZ):

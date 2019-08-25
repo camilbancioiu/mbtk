@@ -190,6 +190,16 @@ class CPMF(PMF):
 
 
 
+class PMFInfo:
+    def __init__(self):
+        self.expected_total_cells = None
+        self.observed_total_cells = None
+        self.observed_nonzero_cells = None
+        self.observed_zero_cells = None
+        self.observed_missing_cells = None
+
+
+
 def process_pmf_key(key):
     # If the key is a tuple or list, flatten it.
     key = util.flatten(key)
