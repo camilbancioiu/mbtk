@@ -32,53 +32,53 @@
   &\mathring{X} \text{ is known} \\
   &\mathring{Y} \text{ is known} \\
 %
+  &{} \\
   &\mathring{X} = \Xn{1} + \Xn{2} + \Xn{3} + \Xn{4} \\ 
   &\mathring{Y} = \Yn{1} + \Yn{2} + \Yn{3} + \Yn{4} \\ 
   &\Xp{1} = \Xp{2} = \Xp{3} = \Xp{4} = X \\
   &\Yp{1} = \Yp{2} = \Yp{3} = \Yp{4} = Y \\
 %
-  &\left( \Xp{1} - \Xn{1} - 1 \right)   \cdot  \left( \Yp{1} - \Yn{1} - 1 \right) +   \\
-  &\left( \Xp{2} - \Xn{2} - 1 \right)   \cdot  \left( \Yp{2} - \Yn{2} - 1 \right) +   \\
-  &\left( \Xp{3} - \Xn{3} - 1 \right)   \cdot  \left( \Yp{3} - \Yn{3} - 1 \right) +   \\
-  &\left( \Xp{4} - \Xn{4} - 1 \right)   \cdot  \left( \Yp{4} - \Yn{4} - 1 \right) =   \\
+  &{} \\
+  &\left( X - \Xn{1} - 1 \right)   \cdot  \left( Y - \Yn{1} - 1 \right) +   \\
+  &\left( X - \Xn{2} - 1 \right)   \cdot  \left( Y - \Yn{2} - 1 \right) +   \\
+  &\left( X - \Xn{3} - 1 \right)   \cdot  \left( Y - \Yn{3} - 1 \right) +   \\
+  &\left( X - \Xn{4} - 1 \right)   \cdot  \left( Y - \Yn{4} - 1 \right) =   \\
 %
-  &\sum_{i} \left( \Xp{i} - \Xn{i} - 1 \right)   \cdot  \left( \Yp{i} - \Yn{i} - 1 \right) = \\
+  &{} \\
+  &\sum_{i} \left( X - \Xn{i} - 1 \right)   \cdot  \left( Y - \Yn{i} - 1 \right) = \\
 %
-  &\sum_{i} \left( \Xp{i} \cdot \Yp{i} - \Xp{i} \cdot \Yn{i} - \Xp{i} \right) + \\
-  &\sum_{i} \left( \Xn{i} \cdot \Yp{i} - \Xn{i} \cdot \Yn{i} - \Xn{i} \right) + \\
-  &\sum_{i} \left( - \Yp{i} + \Yn{i} + 1 \right) = \\
+  &{} \\
+  &\sum_{i} \left( X \cdot Y - X \cdot \Yn{i} - X \right) + \\
+  &\sum_{i} \left( - \Xn{i} \cdot Y + \Xn{i} \cdot \Yn{i} + \Xn{i} \right) + \\
+  &\sum_{i} \left( - Y + \Yn{i} + 1 \right) = \\
 %
-  &\sum_{i} \left( \Xp{i} \cdot \Yp{i} - \Xp{i} - \Yp{i} + 1 \right) + \\
-  &\sum_{i} \left( - \Xp{i} \cdot \Yn{i} + \Xn{i} \cdot \Yp{i} - \Xn{i} \cdot \Yn{i} - \Xn{i}  + \Yn{i} \right) = \\
+  &{} \\
+  &\sum_{i} \left( X \cdot Y - X - Y + 1 \right) + \\
+  &\sum_{i} \left( - X \cdot \Yn{i} - \Xn{i} \cdot Y + \Xn{i} \cdot \Yn{i} + \Xn{i}  + \Yn{i} \right) = \\
 %
-  &\sum_{i} \left( \Xp{i} \cdot \Yp{i} - \Xp{i} - \Yp{i} + 1 \right) + \\
-  &\left( - \Xp{1} \cdot \Yn{1} + \Xn{1} \cdot \Yp{1} - \Xn{1} \cdot \Yn{1} - \Xn{1}  + \Yn{1} \right) + \\
-  &\left( - \Xp{2} \cdot \Yn{2} + \Xn{2} \cdot \Yp{2} - \Xn{2} \cdot \Yn{2} - \Xn{2}  + \Yn{2} \right) + \\
-  &\left( - \Xp{3} \cdot \Yn{3} + \Xn{3} \cdot \Yp{3} - \Xn{3} \cdot \Yn{3} - \Xn{3}  + \Yn{3} \right) + \\
-  &\left( - \Xp{4} \cdot \Yn{4} + \Xn{4} \cdot \Yp{4} - \Xn{4} \cdot \Yn{4} - \Xn{4}  + \Yn{4} \right) = \\
-%
-  &\sum_{i} \left( \Xp{i} \cdot \Yp{i} - \Xp{i} - \Yp{i} + 1 \right) + \\
-  &\left( - X \cdot \Yn{1} + \Xn{1} \cdot Y - \Xn{1} \cdot \Yn{1} - \Xn{1}  + \Yn{1} \right) + \\
-  &\left( - X \cdot \Yn{2} + \Xn{2} \cdot Y - \Xn{2} \cdot \Yn{2} - \Xn{2}  + \Yn{2} \right) + \\
-  &\left( - X \cdot \Yn{3} + \Xn{3} \cdot Y - \Xn{3} \cdot \Yn{3} - \Xn{3}  + \Yn{3} \right) + \\
-  &\left( - X \cdot \Yn{4} + \Xn{4} \cdot Y - \Xn{4} \cdot \Yn{4} - \Xn{4}  + \Yn{4} \right) = \\
-%
+  &{} \\
+  &\sum_{i} \left( X \cdot Y - X - Y + 1 \right) + \\
+  &\left( - X \cdot \Yn{1} - \Xn{1} \cdot Y + \Xn{1} \cdot \Yn{1} + \Xn{1}  + \Yn{1} \right) + \\
+  &\left( - X \cdot \Yn{2} - \Xn{2} \cdot Y + \Xn{2} \cdot \Yn{2} + \Xn{2}  + \Yn{2} \right) + \\
+  &\left( - X \cdot \Yn{3} - \Xn{3} \cdot Y + \Xn{3} \cdot \Yn{3} + \Xn{3}  + \Yn{3} \right) + \\
+  &\left( - X \cdot \Yn{4} - \Xn{4} \cdot Y + \Xn{4} \cdot \Yn{4} + \Xn{4}  + \Yn{4} \right) =
 \end{align*}
 
 \begin{align*}
-  &\sum_{i} \left( \Xp{i} \cdot \Yp{i} - \Xp{i} - \Yp{i} + 1 \right) + \\
-  & - X \cdot \mathring{Y} + Y \cdot \mathring{X} + \\
-  &\left( - \Xn{1} \cdot \Yn{1} - \Xn{1}  + \Yn{1} \right) + \\
-  &\left( - \Xn{2} \cdot \Yn{2} - \Xn{2}  + \Yn{2} \right) + \\
-  &\left( - \Xn{3} \cdot \Yn{3} - \Xn{3}  + \Yn{3} \right) + \\
-  &\left( - \Xn{4} \cdot \Yn{4} - \Xn{4}  + \Yn{4} \right) = \\
+  &\sum_{i} \left( X \cdot Y - X - Y + 1 \right) + \\
+  & - X \cdot \mathring{Y} - Y \cdot \mathring{X} + \\
+  &\left( \Xn{1} \cdot \Yn{1} + \Xn{1}  + \Yn{1} \right) + \\
+  &\left( \Xn{2} \cdot \Yn{2} + \Xn{2}  + \Yn{2} \right) + \\
+  &\left( \Xn{3} \cdot \Yn{3} + \Xn{3}  + \Yn{3} \right) + \\
+  &\left( \Xn{4} \cdot \Yn{4} + \Xn{4}  + \Yn{4} \right) = \\
 %
-  &\sum_{i} \left( \Xp{i} \cdot \Yp{i} - \Xp{i} - \Yp{i} + 1 \right) + \\
-  & - X \cdot \mathring{Y} + Y \cdot \mathring{X} + \\
-  & - \mathring{X} + \mathring{Y} + \\
-  & - \Xn{1} \cdot \Yn{1} \\
-  & - \Xn{2} \cdot \Yn{2} \\
-  & - \Xn{3} \cdot \Yn{3} \\
-  & - \Xn{4} \cdot \Yn{4}
+  &{} \\
+  &\sum_{i} \left( X \cdot Y - X - Y + 1 \right) + \\
+  & - X \cdot \mathring{Y} - Y \cdot \mathring{X} + \\
+  & \mathring{X} + \mathring{Y} \\
+  & + \Xn{1} \cdot \Yn{1} \\
+  & + \Xn{2} \cdot \Yn{2} \\
+  & + \Xn{3} \cdot \Yn{3} \\
+  & + \Xn{4} \cdot \Yn{4}
 \end{align*}
 \end{document}
