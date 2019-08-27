@@ -5,9 +5,10 @@ import unittest
 from pathlib import Path
 
 from mbff.math.Variable import JointVariables
-import mbff.math.Variable
 from mbff.dataset.DatasetMatrix import DatasetMatrix
+import mbff.math.Variable
 import mbff.math.G_test__unoptimized
+import mbff.math.DoFCalculators
 
 from mbff_tests.TestBase import TestBase
 
@@ -19,7 +20,6 @@ class TestGTestUnoptimized(TestBase):
     def initTestResources(testClass):
         super(TestGTestUnoptimized, testClass).initTestResources()
         testClass.DatasetsInUse = ['lungcancer', 'alarm']
-        testClass.DatasetsInUse = []
         testClass.DatasetMatrixFolder = Path('testfiles', 'tmp', 'test_gstat_dm')
         testClass.G_test = None
 
@@ -72,6 +72,7 @@ class TestGTestUnoptimized(TestBase):
         parameters['ci_test_debug'] = 0
         parameters['omega'] = Omega
         parameters['source_bayesian_network'] = self.BayesianNetworks['alarm']
+        parameters['ci_test_dof_calculator_class'] = mbff.math.DoFCalculators.UnadjustedDoF
 
         X = 35
         Y = 3
@@ -99,9 +100,11 @@ class TestGTestUnoptimized(TestBase):
         parameters['ci_test_debug'] = 1
         parameters['omega'] = Omega
         parameters['source_bayesian_network'] = self.BayesianNetworks['lungcancer']
+        parameters['ci_test_dof_calculator_class'] = mbff.math.DoFCalculators.StructuralMinusSamplingZerosDoF
 
         self.G_test = mbff.math.G_test__unoptimized.G_test(lungcancer, parameters)
 
+        print()
         self.assertCITestAccurate(ASIA, SMOKE, Omega)
         self.assertCITestAccurate(ASIA, LUNG, Omega)
         self.assertCITestAccurate(ASIA, BRONC, Omega)
@@ -148,11 +151,10 @@ class TestGTestUnoptimized(TestBase):
         elif isinstance(Z, mbff.math.Variable.Variable):
             Z_ID = [Z.ID]
 
-        result = self.G_test.G_test_conditionally_independent(X, Y, Z, X.ID, Y.ID, Z_ID)
+        result = self.G_test.G_test_conditionally_independent(X.ID, Y.ID, Z_ID)
         if self.G_test.source_bn is not None:
             result.computed_d_separation = self.G_test.source_bn.d_separated(X.ID, Z_ID, Y.ID)
         result.index = len(self.G_test.ci_test_results)
         self.G_test.ci_test_results.append(result)
         print(result, result.test_distribution_parameters)
-        print()
         self.assertTrue(result.accurate())
