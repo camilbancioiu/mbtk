@@ -5,6 +5,7 @@ from mbff.math.CITestResult import CITestResult
 import mbff.math.infotheory as infotheory
 from mbff.math.PMF import PMF, CPMF
 from mbff.math.Variable import JointVariables
+from mbff.math.Exceptions import InsufficientSamplesForCITest
 
 from scipy.stats import chi2
 import gc
@@ -54,6 +55,9 @@ class G_test:
             if self.ci_test_counter % self.gc_collect_rate == 0:
                 gc.collect()
 
+        if result.insufficient_samples:
+            raise InsufficientSamplesForCITest(result)
+
         return result.independent
 
 
@@ -64,7 +68,6 @@ class G_test:
         result.start_timing()
 
         (PrXYcZ, PrXcZ, PrYcZ, PrZ) = self.calculate_cpmfs(VarX, VarY, VarZ)
-        G = self.G_value(PrXYcZ, PrXcZ, PrYcZ, PrZ)
 
         self.DoF_calculator.set_context_variables(X, Y, Z)
         if self.DoF_calculator.requires_pmfs:
@@ -74,7 +77,17 @@ class G_test:
             self.DoF_calculator.set_context_cpmfs(PrXYcZ, PrXcZ, PrYcZ, PrZ)
         DoF = self.DoF_calculator.calculate_DoF(X, Y, Z)
 
+        if not self.sufficient_samples(DoF):
+            result.end_timing()
+            result.index = self.ci_test_counter + 1
+            result.set_insufficient_samples()
+            result.set_variables(VarX, VarY, VarZ)
+            result.extra_info = ' DoF {}'.format(DoF)
+            return result
+
+        G = self.G_value(PrXYcZ, PrXcZ, PrYcZ, PrZ)
         p = chi2.cdf(G, DoF)
+
         independent = None
         if p < self.significance:
             independent = True
@@ -96,6 +109,14 @@ class G_test:
     def G_value(self, PrXYcZ, PrXcZ, PrYcZ, PrZ):
         cMI = infotheory.conditional_mutual_information(PrXYcZ, PrXcZ, PrYcZ, PrZ, base='e')
         return 2 * self.N * cMI
+
+
+    def sufficient_samples(self, DoF):
+        custom_criterion = self.parameters.get('ci_test_sufficient_samples_criterion', None)
+        if custom_criterion is None:
+            return 5 * DoF < self.N
+        else:
+            return custom_criterion(self, DoF)
 
 
     def load_variables(self, X, Y, Z):

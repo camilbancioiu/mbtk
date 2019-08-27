@@ -39,9 +39,27 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
 
         self.DoF_calculator.set_context_variables(X, Y, Z)
 
+        # In the other two implementations of the G-test (unoptimized and with
+        # AD-tree), the DoF could be calculated before calculating G. But this
+        # implementation of the G-test (using dcMI) requires the
+        # CachingStructuralDoF calculator, which must have received the joint
+        # probability distribution of X, Y and Z sometime in the past. The only
+        # time it would have been possible to pass this joint distribution to
+        # the CachingStructuralDoF calculator would be inside the method
+        # self.G_value(), and even then, only when there is a miss in the JHT.
+        # Therefore self.G_value() must run before the DoF calculator, to be
+        # sure that it has received the required joint distributions beforehand.
         G = self.G_value(X, Y, Z)
 
         DoF = self.DoF_calculator.calculate_DoF(X, Y, Z)
+
+        if not self.sufficient_samples(DoF):
+            result.end_timing()
+            result.index = self.ci_test_counter + 1
+            result.set_insufficient_samples()
+            result.set_variables(X, Y, Z)
+            result.extra_info = ' DoF {}'.format(DoF)
+            return result
 
         p = chi2.cdf(G, DoF)
         independent = None
@@ -89,7 +107,7 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
             self.JHT[jht_key] = H
             if self.debug >= 2: print('\tJHT miss and update: store H={:8.6f} for {}'.format(H, jht_key))
             if self.DoF_calculator.requires_pmfs:
-                self.DoF_calculator.cache_DoFs_for_pmf(pmf, pmf.variable.variableIDs)
+                self.DoF_calculator.set_context_pmfs(pmf, None, None, None)
 
         return H
 

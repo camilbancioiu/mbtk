@@ -1,11 +1,12 @@
 class InsufficientSamplesForCITest(Exception):
 
-    def __init__(self, message):
-        self.message = message
+    def __init__(self, result):
+        self.message = "Insufficient samples for CI test"
+        self.result = result
 
 
     def __str__(self):
-        return self.message
+        return self.message + '\n' + self.result
 
 
 

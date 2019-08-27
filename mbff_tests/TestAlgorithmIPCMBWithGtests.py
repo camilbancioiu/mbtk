@@ -22,7 +22,7 @@ class TestAlgorithmIPCMBWithGtests(TestBase):
     @classmethod
     def initTestResources(testClass):
         super().initTestResources()
-        testClass.DatasetsInUse = ['lc_repaired', 'alarm']
+        testClass.DatasetsInUse = ['lc_repaired', 'alarm', 'alarm_small']
         testClass.RootFolder = Path('testfiles', 'tmp', 'test_ipcmb_with_gtests')
 
         testClass.DatasetMatrixFolder = testClass.RootFolder / 'dm'
@@ -60,6 +60,14 @@ class TestAlgorithmIPCMBWithGtests(TestBase):
             configuration['values_as_indices'] = True
             configuration['objectives'] = []
             configuration['random_seed'] = 1984
+            configuration['method'] = 'random'
+
+        if dm_label == 'alarm_small':
+            configuration['sourcepath'] = Path('testfiles', 'bif_files', 'alarm.bif')
+            configuration['sample_count'] = int(3e2)
+            configuration['values_as_indices'] = True
+            configuration['objectives'] = []
+            configuration['random_seed'] = 1983
             configuration['method'] = 'random'
 
         return configuration
@@ -158,22 +166,27 @@ class TestAlgorithmIPCMBWithGtests(TestBase):
         parameters['G_test__unoptimized'] = dict()
         parameters['G_test__unoptimized']['ci_test_dof_calculator_class'] = DoF_calculator_class
         parameters['G_test__unoptimized']['ci_test_gc_collect_rate'] = 0
+        parameters['G_test__unoptimized']['ci_test_sufficient_samples_criterion'] = None
 
         # ADTree_path = self.ADTreesFolder / ('{}_LLT={}.pickle'.format(dm_label, LLT))
         parameters['G_test__with_AD_tree'] = dict()
         parameters['G_test__with_AD_tree']['ci_test_dof_calculator_class'] = DoF_calculator_class
         parameters['G_test__with_AD_tree']['ci_test_ad_tree_preloaded'] = ADTreeClient('tcp://127.0.0.1:8888')
+        # parameters['G_test__with_AD_tree']['ci_test_ad_tree_path__load'] = ADTree_path
+        parameters['G_test__with_AD_tree']['ci_test_ad_tree_path__load'] = None
         parameters['G_test__with_AD_tree']['ci_test_ad_tree_path__save'] = None
         parameters['G_test__with_AD_tree']['ci_test_ad_tree_leaf_list_threshold'] = LLT
         parameters['G_test__with_AD_tree']['ci_test_gc_collect_rate'] = 0
+        parameters['G_test__with_AD_tree']['ci_test_sufficient_samples_criterion'] = None
 
         parameters['G_test__with_dcMI'] = dict()
         parameters['G_test__with_dcMI']['ci_test_dof_calculator_class'] = DoF_calculator_class
         parameters['G_test__with_dcMI']['ci_test_gc_collect_rate'] = 0
         parameters['G_test__with_dcMI']['ci_test_jht_path__load'] = None
         parameters['G_test__with_dcMI']['ci_test_jht_path__save'] = None
+        parameters['G_test__with_dcMI']['ci_test_sufficient_samples_criterion'] = None
 
-        for target in [19]:
+        for target in [3]:
             self.run_test_dof_across_Gtest_optimizations(dm_label, target, significance, parameters)
 
 
@@ -196,11 +209,13 @@ class TestAlgorithmIPCMBWithGtests(TestBase):
         parameters['G_test__with_AD_tree'] = dict()
         parameters['G_test__with_AD_tree']['ci_test_dof_calculator_class'] = DoF_calculator_class
         parameters['G_test__with_AD_tree']['ci_test_ad_tree_preloaded'] = ADTreeClient('tcp://127.0.0.1:8888')
+        # parameters['G_test__with_AD_tree']['ci_test_ad_tree_path__load'] = ADTree_path
+        parameters['G_test__with_AD_tree']['ci_test_ad_tree_path__load'] = None
         parameters['G_test__with_AD_tree']['ci_test_ad_tree_path__save'] = None
         parameters['G_test__with_AD_tree']['ci_test_ad_tree_leaf_list_threshold'] = LLT
         parameters['G_test__with_AD_tree']['ci_test_gc_collect_rate'] = 0
 
-        for target in [19]:
+        for target in [3]:
             self.run_test_dof_across_Gtest_optimizations(dm_label, target, significance, parameters)
 
 
@@ -219,12 +234,12 @@ class TestAlgorithmIPCMBWithGtests(TestBase):
         parameters['G_test__unoptimized']['ci_test_dof_calculator_class'] = DoF_calculator_class
         parameters['G_test__unoptimized']['ci_test_gc_collect_rate'] = 0
 
-        # ADTree_path = self.ADTreesFolder / ('{}_LLT={}.pickle'.format(dm_label, LLT))
+        ADTree_path = self.ADTreesFolder / ('{}_LLT={}.pickle'.format(dm_label, LLT))
         parameters['G_test__with_AD_tree'] = dict()
         parameters['G_test__with_AD_tree']['ci_test_dof_calculator_class'] = DoF_calculator_class
-        parameters['G_test__with_AD_tree']['ci_test_ad_tree_preloaded'] = ADTreeClient('tcp://127.0.0.1:8888')
-        # parameters['G_test__with_AD_tree']['ci_test_ad_tree_path__load'] = ADTree_path
-        parameters['G_test__with_AD_tree']['ci_test_ad_tree_path__load'] = None
+        # parameters['G_test__with_AD_tree']['ci_test_ad_tree_preloaded'] = ADTreeClient('tcp://127.0.0.1:8888')
+        parameters['G_test__with_AD_tree']['ci_test_ad_tree_path__load'] = ADTree_path
+        # parameters['G_test__with_AD_tree']['ci_test_ad_tree_path__load'] = None
         parameters['G_test__with_AD_tree']['ci_test_ad_tree_path__save'] = None
         parameters['G_test__with_AD_tree']['ci_test_ad_tree_leaf_list_threshold'] = LLT
         parameters['G_test__with_AD_tree']['ci_test_gc_collect_rate'] = 0
@@ -234,8 +249,6 @@ class TestAlgorithmIPCMBWithGtests(TestBase):
         parameters['G_test__with_dcMI']['ci_test_gc_collect_rate'] = 0
         parameters['G_test__with_dcMI']['ci_test_jht_path__load'] = None
         parameters['G_test__with_dcMI']['ci_test_jht_path__save'] = None
-
-        del parameters['G_test__unoptimized']
 
         for target in [19]:
             self.run_test_dof_across_Gtest_optimizations(dm_label, target, significance, parameters)

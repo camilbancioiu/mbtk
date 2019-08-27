@@ -9,7 +9,7 @@ class CITestResult:
         self.index = -1
         self.independent = None
         self.dependent = None
-        self.skipped = None
+        self.insufficient_samples = None
         self.X = None
         self.Y = None
         self.Z = []
@@ -32,10 +32,10 @@ class CITestResult:
 
 
     def __eq__(self, other):
-        # TODO handle skipped
         return (
             self.independent == other.independent and
             self.dependent == other.dependent and
+            self.insufficient_samples == other.insufficient_samples and
             self.X == other.X and
             self.Y == other.Y and
             self.Z == other.Z and
@@ -51,7 +51,8 @@ class CITestResult:
 
 
     def diff(self, other):
-        # TODO handle skipped
+        if self.insufficient_samples != other.insufficient_samples:
+            return 'Differring \'insufficient_samples\': {} vs {}'.format(self.insufficient_samples, other.insufficient_samples)
         if self.independent != other.independent:
             return 'Differring \'independent\': {} vs {}'.format(self.independent, other.independent)
         if self.dependent != other.dependent:
@@ -84,18 +85,18 @@ class CITestResult:
         self.independent = independent
         self.dependent = not independent
         self.significance = significance
-        self.skipped = None
+        self.insufficient_samples = None
 
 
     def set_dependent(self, dependent, significance):
         self.dependent = dependent
         self.independent = not dependent
         self.significance = significance
-        self.skipped = None
+        self.insufficient_samples = None
 
 
-    def set_skipped(self):
-        self.skipped = True
+    def set_insufficient_samples(self):
+        self.insufficient_samples = True
         self.independent = None
         self.dependent = None
         self.significance = None
@@ -159,7 +160,20 @@ class CITestResult:
 
 
     def __str__(self):
-        # TODO handle skipped
+        if not self.insufficient_samples:
+            (view, format_string) = self.render__sufficient_samples()
+        else:
+            (view, format_string) = self.render__insufficient_samples()
+
+        output = format_string.format(**view)
+        if hasattr(self, 'extra_info'):
+            if self.extra_info is not None:
+                output += self.extra_info
+
+        return output
+
+
+    def render__sufficient_samples(self):
         view = dict()
         view.update(self.__dict__)
         view['startcode'] = ''
@@ -178,7 +192,7 @@ class CITestResult:
                 d_sep_verification = '✔'
             else:
                 d_sep_verification = '✘'
-                view['startcode'] = col.YELLOW
+                view['startcode'] = col.RED
                 view['endcode'] = col.ENDC
         view['i_or_d'] += d_sep_verification
         view['duration_in_seconds'] = self.duration
@@ -194,9 +208,25 @@ class CITestResult:
             "{endcode}"
         )
 
-        output = format_string.format(**view)
-        if hasattr(self, 'extra_info'):
-            if self.extra_info is not None:
-                output += self.extra_info
+        return (view, format_string)
 
-        return output
+
+    def render__insufficient_samples(self):
+        view = dict()
+        view.update(self.__dict__)
+        view['startcode'] = ''
+        view['endcode'] = ''
+        view['i_or_d'] = 'INSUFFICIENT SAMPLES'
+        view['startcode'] = col.YELLOW
+        view['endcode'] = col.ENDC
+        view['duration_in_seconds'] = self.duration
+        view['index'] = self.index
+
+        format_string = (
+            "{startcode}"
+            "CI test {index}: {X:>4} ⊥ {Y:<4} | {Z:<20}: {i_or_d}"
+            ", Δt={duration_in_seconds:>10.4f}s"
+            "{endcode}"
+        )
+
+        return (view, format_string)

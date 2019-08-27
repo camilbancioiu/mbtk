@@ -4,7 +4,7 @@ import collections
 class UnadjustedDoF:
 
     def __init__(self, G_test):
-        self.requires_pmfs = False
+        self.requires_pmfs = True
         self.requires_cpmfs = False
 
         self.G_test = G_test
@@ -15,8 +15,6 @@ class UnadjustedDoF:
             self.matrix = self.G_test.matrix
             self.column_values = self.G_test.column_values
             self.N = self.G_test.N
-
-        self.debug_values = dict()
 
         self.reset()
 
@@ -75,13 +73,11 @@ class StructuralDoF(UnadjustedDoF):
 
     def __init__(self, G_test):
         super().__init__(G_test)
-        self.requires_pmfs = False
+        self.requires_pmfs = True
         self.requires_cpmfs = True
 
-    def calculate_DoF(self, X, Y, Z):
-        dkey = frozenset({X} | {Y} | set(Z))
-        self.debug_values[dkey] = dict()
 
+    def calculate_DoF(self, X, Y, Z):
         DoF = 0
         for (z, pz) in self.PrZ.items():
             if pz == 0:
@@ -90,10 +86,11 @@ class StructuralDoF(UnadjustedDoF):
             PrX = self.PrXcZ.given(z)
             PrY = self.PrYcZ.given(z)
 
+            PrX.remove_zeros()
+            PrY.remove_zeros()
+
             X_val = len(list(filter(None, PrX.values())))
             Y_val = len(list(filter(None, PrY.values())))
-
-            self.debug_values[dkey][z] = (X_val, Y_val)
 
             structural_dof_xycz = (X_val - 1) * (Y_val - 1)
             DoF += structural_dof_xycz
@@ -148,6 +145,7 @@ class CachedStructuralDoF(UnadjustedDoF):
         iy = variables.index(Y)
 
         DoF = pairwise_dofs[(ix, iy)]
+
         return DoF
 
 
@@ -158,15 +156,15 @@ class CachedStructuralDoF(UnadjustedDoF):
         key = frozenset(variables)
 
         if key not in self.DoF_cache:
+            # Remove any 0 entry from the PMF, as it they will increase DoF
+            # artificially.
+            pmf.remove_zeros()
+
             pairwise_dofs = self.calculate_pairwise_DoFs(pmf, len(variables))
             self.DoF_cache[key] = (variables, pairwise_dofs)
 
 
     def calculate_pairwise_DoFs(self, pmf, keysize):
-        # Remove any 0 entry from the PMF, as it they will increase DoF
-        # artificially.
-        pmf.remove_zeros()
-
         pairwise_dofs = dict()
 
         for ix in range(keysize):

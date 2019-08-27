@@ -77,14 +77,23 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
         result.start_timing()
 
         (PrXYcZ, PrXcZ, PrYcZ, PrZ) = self.calculate_pmf_from_AD_tree(X, Y, Z)
-        G = self.G_value(PrXYcZ, PrXcZ, PrYcZ, PrZ)
 
         self.DoF_calculator.set_context_variables(X, Y, Z)
         if self.DoF_calculator.requires_cpmfs:
             self.DoF_calculator.set_context_cpmfs(PrXYcZ, PrXcZ, PrYcZ, PrZ)
         DoF = self.DoF_calculator.calculate_DoF(X, Y, Z)
 
+        if not self.sufficient_samples(DoF):
+            result.end_timing()
+            result.index = self.ci_test_counter + 1
+            result.set_insufficient_samples()
+            result.set_variables(X, Y, Z)
+            result.extra_info = ' DoF {}'.format(DoF)
+            return result
+
+        G = self.G_value(PrXYcZ, PrXcZ, PrYcZ, PrZ)
         p = chi2.cdf(G, DoF)
+
         independent = None
         if p < self.significance:
             independent = True
