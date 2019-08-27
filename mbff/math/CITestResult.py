@@ -1,16 +1,9 @@
 import time
 
+import mbff.utilities.colors as col
+
 
 class CITestResult:
-
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
 
     def __init__(self):
         self.index = -1
@@ -185,8 +178,8 @@ class CITestResult:
                 d_sep_verification = '✔'
             else:
                 d_sep_verification = '✘'
-                view['startcode'] = self.WARNING
-                view['endcode'] = self.ENDC
+                view['startcode'] = col.YELLOW
+                view['endcode'] = col.ENDC
         view['i_or_d'] += d_sep_verification
         view['duration_in_seconds'] = self.duration
         view['index'] = self.index
@@ -195,7 +188,7 @@ class CITestResult:
             "{startcode}"
             "CI test {index}: {X:>4} ⊥ {Y:<4} | {Z:<20}: {i_or_d}"
             " @ {significance:6.4f}"
-            " with {statistic}={statistic_value:>8.2f}"
+            " with {statistic}={statistic_value:>8.6f}"
             " at p={p_value:<8.6f} on {test_distribution}"
             ", Δt={duration_in_seconds:>10.4f}s"
             "{endcode}"
