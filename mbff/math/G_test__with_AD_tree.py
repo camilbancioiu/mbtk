@@ -78,7 +78,11 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
 
         (PrXYcZ, PrXcZ, PrYcZ, PrZ) = self.calculate_pmf_from_AD_tree(X, Y, Z)
         G = self.G_value(PrXYcZ, PrXcZ, PrYcZ, PrZ)
-        DoF = self.calculate_degrees_of_freedom(PrXYcZ, PrXcZ, PrYcZ, PrZ, X, Y, Z)
+
+        self.DoF_calculator.set_context_variables(X, Y, Z)
+        if self.DoF_calculator.requires_cpmfs:
+            self.DoF_calculator.set_context_cpmfs(PrXYcZ, PrXcZ, PrYcZ, PrZ)
+        DoF = self.DoF_calculator.calculate_DoF(X, Y, Z)
 
         p = chi2.cdf(G, DoF)
         independent = None
@@ -121,6 +125,7 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
                     new_key = tuple(reversed(key))
                     new_probabilities[new_key] = p
                 PrXY.probabilities = new_probabilities
+
             PrX = self.AD_tree.make_pmf([X])
             PrY = self.AD_tree.make_pmf([Y])
             PrXYcZ = self.make_omega_cpmf_from_pmf(PrXY)
@@ -128,8 +133,9 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
             PrYcZ = self.make_omega_cpmf_from_pmf(PrY)
             PrZ = self.make_omega_pmf()
 
-            if self.parameters.get('ci_test_dof_computation_method', 'structural') == 'cached_joint_pmf_info':
-                self.cache_pmf_infos__XY(PrXY, PrX, PrY, X, Y)
+            if self.DoF_calculator.requires_pmfs:
+                self.DoF_calculator.set_context_pmfs(PrXY, PrX, PrY, None)
+
         else:
             Z = sorted(list(Z))
             PrZ = self.AD_tree.make_pmf(Z)
@@ -137,8 +143,8 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
             (PrXcZ, PrXZ) = self.make_cpmf_PrXcZ(X, Z, PrZ)
             (PrYcZ, PrYZ) = self.make_cpmf_PrYcZ(Y, Z, PrZ)
 
-            if self.parameters.get('ci_test_dof_computation_method', 'structural') == 'cached_joint_pmf_info':
-                self.cache_pmf_infos__XYZ(PrXYZ, PrXZ, PrYZ, PrZ, X, Y, Z)
+            if self.DoF_calculator.requires_pmfs:
+                self.DoF_calculator.set_context_pmfs(PrXYZ, PrXZ, PrYZ, PrZ)
 
         return (PrXYcZ, PrXcZ, PrYcZ, PrZ)
 

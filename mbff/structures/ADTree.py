@@ -178,6 +178,8 @@ class ADTree:
         for key, count in joint_ct.items():
             pmf.probabilities[key] = count / total_count
 
+        pmf.variable = JointVariablesIDs(variables)
+
         result = pmf
 
         if self.debug >= 2: duration = time.time() - start_time
@@ -503,3 +505,16 @@ class VaryNode:
             else:
                 rendered_children.append("{}AD col{}={} (MCV) NULL".format(INDENT * (self.level + 1), self.column_index, value))
         return "\n".join(rendered_children)
+
+
+
+class JointVariablesIDs:
+    """
+    JointVariablesIDs mimics the mbff.math.Variable.JointVariables class. There
+    is only one property, variableIDs, which the method ADtree.make_pmf() will
+    set to the list of variables for which it constructed the PMF out of the
+    data in the AD-tree. This is required by the classes in DoFCalculators,
+    which require the variable IDs to be present in PMF.variable.variableIDs.
+    """
+    def __init__(self, variableIDs):
+        self.variableIDs = variableIDs

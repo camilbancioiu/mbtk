@@ -6,6 +6,7 @@ from mbff.utilities import functions as util
 class PMF:
 
     def __init__(self, variable):
+        self.tolerance_pdiff = 1e-10
         self.variable = variable
         if variable is not None:
             self.total_count = len(self.variable)
@@ -28,6 +29,10 @@ class PMF:
 
     def __len__(self):
         return len(self.probabilities)
+
+
+    def __getitem__(self, key):
+        return self.p(key)
 
 
     def items(self):
@@ -117,7 +122,17 @@ class PMF:
 
 
     def __eq__(self, other):
-        return self.probabilities == other.probabilities
+        selfkeyset = set(self.probabilities.keys())
+        otherkeyset = set(other.probabilities.keys())
+        keys_equal = selfkeyset == otherkeyset
+        if keys_equal is False:
+            return False
+        for key in (selfkeyset | otherkeyset):
+            selfp = self.p(key)
+            otherp = other.p(key)
+            if abs(selfp - otherp) > self.tolerance_pdiff:
+                return False
+        return True
 
 
 
@@ -126,6 +141,7 @@ class CPMF(PMF):
     def __init__(self, variable, given):
         super().__init__(variable)
         self.conditional_probabilities = dict()
+        self.tolerance_pdiff = 1e-10
 
         if not (variable is None) and not (given is None):
             self.conditioning_variable = given
@@ -144,6 +160,14 @@ class CPMF(PMF):
 
     def __len__(self):
         return len(self.conditional_probabilities)
+
+
+    def __getitem__(self, key):
+        return self.given(key)
+
+
+    def keys(self):
+        return self.conditional_probabilities.keys()
 
 
     def items(self):
@@ -190,16 +214,6 @@ class CPMF(PMF):
 
 
 
-class PMFInfo:
-    def __init__(self):
-        self.expected_total_cells = None
-        self.observed_total_cells = None
-        self.observed_nonzero_cells = None
-        self.observed_zero_cells = None
-        self.observed_missing_cells = None
-
-
-
 def process_pmf_key(key):
     # If the key is a tuple or list, flatten it.
     key = util.flatten(key)
@@ -209,3 +223,86 @@ def process_pmf_key(key):
     if len(key) == 1:
         key = key[0]
     return key
+
+
+
+def cpmf_diff(A, B):
+    import mbff.utilities.colors as col
+
+    output = ""
+    pdiff_threshold = 1e-10
+
+    condkeysUnion = sorted(set(list(A.keys()) + list(B.keys())))
+
+    jointkeysUnion = []
+    for cpmf in [A, B]:
+        for condkey in condkeysUnion:
+            jointkeys = list(cpmf.given(condkey).keys())
+            jointkeysUnion.extend(jointkeys)
+    jointkeysUnion = sorted(set(jointkeysUnion))
+
+    width_condkey = max([len(str(condkey)) for condkey in condkeysUnion])
+    width_jointkey = max([len(str(jointkey)) for jointkey in jointkeysUnion])
+
+    formatString = (
+        '| {:>' + str(width_condkey) + '} |'
+        ' {:>' + str(width_jointkey) + '} |'
+        ' {:>8.6f} |'
+        ' {:>8.6f} |'
+        '\n'
+    )
+    row_width = 4 + width_condkey + 3 + width_jointkey + 3 + 8 + 3 + 8
+
+    for condkey in condkeysUnion:
+        XYA = A.given(condkey)
+        XYB = B.given(condkey)
+
+        output += row_width * '-' + '\n'
+        for jointkey in jointkeysUnion:
+            xyap = XYA.p(jointkey)
+            xybp = XYB.p(jointkey)
+
+            row = formatString.format(str(condkey), str(jointkey), xyap, xybp)
+            if abs(xyap - xybp) > pdiff_threshold:
+                row = col.red(row)
+
+            output += row
+            output += row_width * '-' + '\n'
+
+        output += '\n'
+
+    return output
+
+
+
+def pmf_diff(A, B):
+    import mbff.utilities.colors as col
+
+    output = ""
+    pdiff_threshold = 1e-10
+
+    jointkeysUnion = sorted(set(list(A.keys()) + list(B.keys())))
+
+    width_jointkey = max([len(str(jointkey)) for jointkey in jointkeysUnion])
+
+    formatString = (
+        '| {:>' + str(width_jointkey) + '} |'
+        ' {:>8.6f} |'
+        ' {:>8.6f} |'
+        '\n'
+    )
+    row_width = 4 + width_jointkey + 3 + 8 + 3 + 8
+
+    output += row_width * '-' + '\n'
+    for jointkey in jointkeysUnion:
+        ap = A.p(jointkey)
+        bp = B.p(jointkey)
+
+        row = formatString.format(str(jointkey), ap, bp)
+        if abs(ap - bp) > pdiff_threshold:
+            row = col.red(row)
+
+        output += row
+        output += row_width * '-' + '\n'
+
+    return output
