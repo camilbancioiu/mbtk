@@ -1,10 +1,5 @@
-import os
-import shutil
-from pathlib import Path
-
-import mbff.utilities.functions as util
 from mbff.dataset.DatasetMatrix import DatasetMatrix
-from mbff.dataset.Exceptions import *
+from mbff.dataset.Exceptions import ExperimentalDatasetError
 
 
 class ExperimentalDataset():
@@ -71,13 +66,13 @@ class ExperimentalDataset():
 
         self.total_row_count = self.matrix.X.get_shape()[0]
 
-        if finalize_and_save == None:
+        if finalize_and_save is None:
             finalize_and_save = self.definition.after_build__finalize_and_save
 
         if finalize_and_save:
             self.finalize_and_save()
 
-    
+
     def finalize_and_save(self):
         self.finalize()
         self.save()
@@ -126,3 +121,7 @@ class ExperimentalDataset():
         if self.matrix is None:
             self.matrix = DatasetMatrix("dataset")
         self.matrix.load(self.definition.path)
+
+
+    def info(self):
+        return self.matrix.info()

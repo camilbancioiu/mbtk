@@ -61,7 +61,7 @@ from mbff.algorithms.mb.ipcmb import AlgorithmIPCMB
 
 EXPRUN_REPO = EXPERIMENTS_ROOT / 'exprun_repository'
 
-ExperimentDef = ExperimentDefinition(EXPRUN_REPO, 'IPCMB_ADTree_LLT_Eval')
+ExperimentDef = ExperimentDefinition(EXPRUN_REPO, 'dcMI_vs_ADtree_in_IPCMB')
 ExperimentDef.experiment_run_class = ExperimentRun
 ExperimentDef.algorithm_run_class = AlgorithmRun
 ExperimentDef.algorithm_run_datapoint_class = AlgorithmRunDatapoint
@@ -187,21 +187,18 @@ if __name__ == '__main__':
     command = sys.argv[1]
     arguments = sys.argv[2:]
 
-    import mbff.utilities.experiment as utilcli
+    import experiment_dcmi_main_commands as custom_commands
     from mbff.utilities.Exceptions import CLICommandNotHandled
 
     try:
-        utilcli.handle_common_commands(command, arguments, ExperimentDef, ExdsDef, AlgorithmRunParameters)
+        if command == 'build-adtree':
+            custom_commands.command_build_adtree(arguments, ExdsDef, AlgorithmRunParameters)
+        elif command == 'build-adtree-analysis':
+            custom_commands.command_build_adtree_analysis(arguments, ExperimentDef, AlgorithmRunParameters)
+        elif command == 'plot':
+            custom_commands.command_plot(arguments, ExperimentDef, AlgorithmRunParameters)
+        else:
+            raise CLICommandNotHandled(command)
     except CLICommandNotHandled:
-        pass
-
-    import experiment_dcmi_main_commands as custom_commands
-
-    if command == 'build-adtree':
-        custom_commands.command_build_adtree(arguments, ExdsDef, AlgorithmRunParameters)
-    elif command == 'build-adtree-analysis':
-        custom_commands.command_build_adtree_analysis(arguments, ExperimentDef, AlgorithmRunParameters)
-    elif command == 'plot':
-        custom_commands.command_plot(arguments, ExperimentDef, AlgorithmRunParameters)
-    else:
-        raise CLICommandNotHandled(command)
+        import mbff.utilities.experiment as utilcli
+        utilcli.handle_common_commands(command, arguments, ExperimentDef, ExdsDef, AlgorithmRunParameters)

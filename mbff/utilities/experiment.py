@@ -6,9 +6,11 @@ from mbff.utilities.Exceptions import CLICommandNotHandled
 
 def handle_common_commands(command, arguments, ExperimentDef, ExdsDef, AlgorithmRunParameters):
     if command == 'show-exp-def':
-        pprint(ExperimentDef.__dict__)
+        command_show_experiment_def(ExperimentDef)
     elif command == 'show-exds-def':
-        pprint(ExdsDef.__dict__)
+        command_show_exds_def(ExdsDef)
+    elif command == 'build-exds':
+        command_build_exds(arguments, ExdsDef)
     elif command == 'list-algrun':
         command_list_algrun(arguments, AlgorithmRunParameters)
     elif command == 'list-algrun-datapoints':
@@ -19,8 +21,82 @@ def handle_common_commands(command, arguments, ExperimentDef, ExdsDef, Algorithm
         command_unlock_experiment(arguments, ExperimentDef)
     elif command == 'lock-exp':
         command_lock_experiment(arguments, ExperimentDef)
+    elif command == 'delete-exp':
+        command_delete_exp(ExperimentDef)
+    elif command == 'delete-exds':
+        command_delete_exds(ExdsDef)
+    elif command == 'lock-exds':
+        command_lock_exds(arguments, ExdsDef)
+    elif command == 'unlock-exds':
+        command_unlock_exds(arguments, ExdsDef)
+    elif command == 'show-exds':
+        command_show_exds(arguments, ExdsDef)
     else:
         raise CLICommandNotHandled(command)
+
+
+
+def command_show_experiment_def(ExperimentDef):
+    view = ExperimentDef.__dict__.copy()
+    view['locks'] = ExperimentDef.get_locks()
+    pprint(view)
+
+
+
+def command_show_exds_def(ExdsDef):
+    view = ExdsDef.__dict__.copy()
+    view['locks'] = ExdsDef.get_locks()
+    view['ready'] = ExdsDef.exds_ready()
+    pprint(view)
+
+
+
+def command_delete_exds(ExdsDef):
+    ExdsDef.delete_folder()
+
+
+
+def command_delete_exp(ExperimentDef):
+    ExperimentDef.delete_folder()
+
+
+
+def command_build_exds(arguments, ExdsDef):
+    if ExdsDef.exds_ready():
+        print('Experimental Dataset already built.')
+    else:
+        ExDs = ExdsDef.create_exds()
+        ExDs.build()
+        print('Experimental Dataset has been built.')
+
+
+
+def command_show_exds(arguments, ExdsDef):
+    if ExdsDef.exds_ready():
+        ExDs = ExdsDef.create_exds()
+        ExDs.load()
+        print(ExDs.info())
+    else:
+        print('Experimental Dataset must be built before information about it can be displayed.')
+
+
+
+def command_unlock_exds(arguments, ExdsDef):
+    try:
+        lock_type = arguments[0]
+    except IndexError:
+        lock_type = ''
+    ExdsDef.unlock_folder(lock_type)
+
+
+
+def command_lock_exds(arguments, ExdsDef):
+    try:
+        lock_type = arguments[0]
+    except IndexError:
+        lock_type = ''
+    ExdsDef.lock_folder(lock_type)
+
 
 
 def command_list_algrun(arguments, AlgorithmRunParameters):

@@ -12,13 +12,14 @@ class LockablePath:
 
 
     def get_lock(self, lock_type=''):
-        if lock_type == '': lock_type = self.default_lock_type
+        if lock_type == '':
+            lock_type = self.default_lock_type
         return self.path / ('locked_{}'.format(lock_type))
 
 
     def folder_is_locked(self, lock_type=''):
-        if lock_type == '': lock_type = self.default_lock_type
-        return self.get_lock(lock_type).exists()
+        any_locks_exist = len(self.get_locks()) != 0
+        return any_locks_exist
 
 
     def folder_exists(self):
@@ -30,7 +31,8 @@ class LockablePath:
 
 
     def lock_folder(self, lock_type=''):
-        if lock_type == '': lock_type = self.default_lock_type
+        if lock_type == '':
+            lock_type = self.default_lock_type
         if self.folder_is_locked(lock_type):
             pass
         else:
@@ -74,3 +76,7 @@ class LockablePath:
 
     def subfolder(self, subfolder_name):
         return self.ensure_subfolder(subfolder_name)
+
+
+    def get_locks(self):
+        return [lockfile.name for lockfile in self.path.glob('locked_*')]

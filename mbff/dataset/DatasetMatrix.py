@@ -56,6 +56,22 @@ class DatasetMatrix:
         self.metadata = {}
 
 
+    def info(self):
+        infoX = self.get_info_per_matrix(self.X)
+        infoY = self.get_info_per_matrix(self.Y)
+        return "X: {}\nColumns: {}\n\nY: {}\nColumns: {}".format(
+            infoX, self.column_labels_X, infoY, self.column_labels_Y)
+
+
+    def get_info_per_matrix(self, matrix):
+        if matrix is None:
+            return 'n/a'
+        shape = matrix.get_shape()
+        return 'rows x columns: {rows} x {columns}'.format(
+            rows=shape[0],
+            columns=shape[1])
+
+
     def get_matrix(self, matrix_label):
         """
         Return the ``X`` or ``Y`` matrix, based on the value of
@@ -585,6 +601,7 @@ class DatasetMatrix:
     # Utility static methods.
     ########################
 
+
     def sparse_equal(m1, m2):
         """
         Test for the equality of two sparse matrices, by comparing their shape and their content.
@@ -602,7 +619,6 @@ class DatasetMatrix:
         return True
 
 
-    # Taken from https://stackoverflow.com/a/45486349/583574
     def delete_rows_cols(self, matrix_label, row_indices=[], col_indices=[]):
         """
         Remove multiple rows and columns simultaneously from the requested CSR
@@ -622,6 +638,7 @@ class DatasetMatrix:
             specified rows and columns.
         :rtype: scipy.sparse.csr_matrix
         """
+        # Taken from https://stackoverflow.com/a/45486349/583574
         matrix = self.get_matrix(matrix_label)
         if not isinstance(matrix, scipy.sparse.csr_matrix):
             raise ValueError("works only for CSR format -- use .tocsr() first")

@@ -20,7 +20,7 @@ class ExperimentRun:
         self.end_time = None
         self.duration = None
 
-        self.checkpoint_path = None
+        self.checkpoint_path = self.definition.path / 'checkpoint'
 
 
     def run(self):
@@ -28,21 +28,12 @@ class ExperimentRun:
         if self.definition.folder_is_locked():
             raise ExperimentFolderLockedException(self.definition, str(self.definition.path), 'Experiment folder is locked, cannot start.')
 
-        self.checkpoint_path = self.definition.path / 'checkpoint'
-        self.start_time = time.time()
-        self.print_experiment_run_header()
-
-        if self.definition.exds_definition is not None:
-            self.exds = self.definition.exds_definition.create_exds()
-            if self.definition.exds_definition.exds_ready():
-                self.exds.load()
-            else:
-                self.exds.build()
-        else:
-            self.exds = None
-
         self.definition.ensure_subfolder('algorithm_run_logs')
         self.definition.ensure_subfolder('algorithm_run_datapoints')
+
+        self.prepare_exds()
+
+        self.begin_run()
 
         # Verify if this ExperimentalRun is a continuation of a previous ExperimentalRun.
         # If yes, then resume the previous one by continuing at the
@@ -58,6 +49,26 @@ class ExperimentRun:
             self.run_algorithm(algrun_index, algorithm_run_parameters)
             gc.collect()
 
+        self.end_run()
+
+
+    def prepare_exds(self):
+        if self.definition.exds_definition is not None:
+            self.exds = self.definition.exds_definition.create_exds()
+            if self.definition.exds_definition.exds_ready():
+                self.exds.load()
+            else:
+                self.exds.build()
+        else:
+            self.exds = None
+
+
+    def begin_run(self):
+        self.start_time = time.time()
+        self.print_experiment_run_header()
+
+
+    def end_run(self):
         self.end_time = time.time()
         self.duration = self.end_time - self.start_time
         self.remove_checkpoint()
