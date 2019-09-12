@@ -117,7 +117,6 @@ CITest_Significance = 0.95
 LLT = 0
 
 DefaultParameters = {
-    'debug': False,
     'omega': Omega,
     'source_bayesian_network': BayesianNetwork,
     'algorithm_debug': 1,
