@@ -41,6 +41,10 @@ class BayesianNetwork:
         return self.variable_node_names().index(varname)
 
 
+    def __len__(self):
+        return len(self.variable_nodes)
+
+
     @finalization_required
     def sample(self, as_list=False, values_as_indices=False):
         sample = {}

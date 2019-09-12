@@ -8,4 +8,9 @@ class LockablePathException(Exception):
 
 
 
+class CLICommandNotHandled(Exception):
 
+    def __init__(self, command):
+        self.command = command
+        self.message = "CLI command {} not handled.".format(self.command)
+        super().__init__(self.message)

@@ -13,6 +13,8 @@ sys.path.insert(0, str(MBFF_PATH))
 import mbff.utilities.functions as util
 
 
+
+################################################################################
 # Elements of the experiment
 
 EXDS_REPO = None
@@ -24,6 +26,8 @@ AlgorithmRunConfiguration = None
 AlgorithmRunParameters = None
 
 
+
+################################################################################
 # Create the Experimental Dataset Definition
 
 from mbff.dataset.ExperimentalDatasetDefinition import ExperimentalDatasetDefinition
@@ -33,20 +37,20 @@ import mbff.math.Variable
 
 EXDS_REPO = EXPERIMENTS_ROOT / 'exds_repository'
 
-ExDsDefinition_ALARM_med2 = ExperimentalDatasetDefinition(EXDS_REPO, 'synthetic_alarm_8e4')
-ExDsDefinition_ALARM_med2.exds_class = ExperimentalDataset
-ExDsDefinition_ALARM_med2.source = SampledBayesianNetworkDatasetSource
-ExDsDefinition_ALARM_med2.source_configuration = {
+ExdsDef = ExperimentalDatasetDefinition(EXDS_REPO, 'synthetic_alarm_4e4')
+ExdsDef.exds_class = ExperimentalDataset
+ExdsDef.source = SampledBayesianNetworkDatasetSource
+ExdsDef.source_configuration = {
     'sourcepath': EXPERIMENTS_ROOT / 'bif_repository' / 'alarm.bif',
-    'sample_count': int(8e4),
-    'random_seed': 128,
+    'sample_count': int(4e4),
+    'random_seed': 81628965211,
 }
 
-
-ExdsDef = ExDsDefinition_ALARM_med2
 Omega = mbff.math.Variable.Omega(ExdsDef.source_configuration['sample_count'])
 
 
+
+################################################################################
 # Create the Experiment Definition
 
 from mbff.experiment.ExperimentDefinition import ExperimentDefinition
@@ -55,21 +59,20 @@ from mbff.experiment.AlgorithmRun import AlgorithmRun
 from mbff.experiment.AlgorithmRunDatapoint import AlgorithmRunDatapoint
 from mbff.algorithms.mb.ipcmb import AlgorithmIPCMB
 
-
 EXPRUN_REPO = EXPERIMENTS_ROOT / 'exprun_repository'
 
-IPCMB_ADTree_LLT_Eval_Definition = ExperimentDefinition(EXPRUN_REPO, 'IPCMB_ADTree_LLT_Eval')
-IPCMB_ADTree_LLT_Eval_Definition.experiment_run_class = ExperimentRun
-IPCMB_ADTree_LLT_Eval_Definition.algorithm_run_class = AlgorithmRun
-IPCMB_ADTree_LLT_Eval_Definition.algorithm_run_datapoint_class = AlgorithmRunDatapoint
-IPCMB_ADTree_LLT_Eval_Definition.exds_definition = ExdsDef
-IPCMB_ADTree_LLT_Eval_Definition.save_algorithm_run_datapoints = True
-IPCMB_ADTree_LLT_Eval_Definition.algorithm_run_log__stdout = True
-IPCMB_ADTree_LLT_Eval_Definition.algorithm_run_log__file = True
-
-ExperimentDef = IPCMB_ADTree_LLT_Eval_Definition
+ExperimentDef = ExperimentDefinition(EXPRUN_REPO, 'IPCMB_ADTree_LLT_Eval')
+ExperimentDef.experiment_run_class = ExperimentRun
+ExperimentDef.algorithm_run_class = AlgorithmRun
+ExperimentDef.algorithm_run_datapoint_class = AlgorithmRunDatapoint
+ExperimentDef.exds_definition = ExdsDef
+ExperimentDef.save_algorithm_run_datapoints = True
+ExperimentDef.algorithm_run_log__stdout = True
+ExperimentDef.algorithm_run_log__file = True
 
 
+
+################################################################################
 # Create AlgorithmRun parameters
 
 import mbff.math.DSeparationCITest
@@ -93,19 +96,24 @@ AlgorithmRunConfiguration = {
     'label': make_algorithm_run_label,
     'algorithm': AlgorithmIPCMB
 }
+
 ExperimentDef.algorithm_run_configuration = AlgorithmRunConfiguration
 
 ADTree_repo = ExperimentDef.path / 'adtrees'
-ADTree_repo.mkdir(parents=True, exist_ok=True)
+JHT_repo = ExperimentDef.path / 'jht'
 CITestResult_repo = ExperimentDef.path / 'ci_test_results'
+
+ADTree_repo.mkdir(parents=True, exist_ok=True)
+JHT_repo.mkdir(parents=True, exist_ok=True)
 CITestResult_repo.mkdir(parents=True, exist_ok=True)
+
 BayesianNetwork = util.read_bif_file(ExdsDef.source_configuration['sourcepath'])
 BayesianNetwork.finalize()
-CITest_Significance = 0.95
 
+CITest_Significance = 0.95
+LLT = 0
 
 DefaultParameters = {
-    'target': 3,
     'debug': False,
     'omega': Omega,
     'source_bayesian_network': BayesianNetwork,
@@ -114,81 +122,64 @@ DefaultParameters = {
     'ci_test_significance': CITest_Significance,
 }
 
-Parameters_direct_d_separation_ci_test = [
-    {
+# Create AlgorithmRun parameters using the D-separation CI test
+Parameters_DSep = list()
+for target in range(len(BayesianNetwork)):
+    parameters = {
         'ci_test_class': mbff.math.DSeparationCITest.DSeparationCITest,
-        'ci_test_results_path__save': CITestResult_repo / 'ci_test_results_{}_T3_dsep.pickle'.format(ExdsDef.name)
+        'ci_test_results_path__save': CITestResult_repo / 'ci_test_results_{}_T{}_dsep.pickle'.format(ExdsDef.name, target)
     }
-]
+    Parameters_DSep.append(parameters)
 
-Parameters_unoptimized = [
-    {
+# Create AlgorithmRun parameters using the unoptimized G-test
+Parameters_Gtest_unoptimized = list()
+for target in range(len(BayesianNetwork)):
+    parameters = {
         'ci_test_class': mbff.math.G_test__unoptimized.G_test,
-        'ci_test_results_path__save': CITestResult_repo / 'ci_test_results_{}_T3_unoptimized.pickle'.format(ExdsDef.name)
+        'ci_test_results_path__save': CITestResult_repo / 'ci_test_results_{}_T{}_unoptimized.pickle'.format(ExdsDef.name, target)
     }
-]
+    Parameters_Gtest_unoptimized.append(parameters)
 
-Parameters_with_dcMI = [
-    {
-        'ci_test_class': mbff.math.G_test__with_dcMI.G_test,
-        'ci_test_results_path__save': CITestResult_repo / 'ci_test_results_{}_T3_dcMI.pickle'.format(ExdsDef.name)
-    }
-]
-
-Parameters_with_AD_tree = [
-    {
-        'ci_test_class': mbff.math.G_test__with_AD_tree.G_test,
-        'ci_test_ad_tree_leaf_list_threshold': LLT,
-        'ci_test_ad_tree_path__load': ADTree_repo / 'adtree_{}_llt{}.pickle'.format(ExdsDef.name, LLT),
-        'ci_test_ad_tree_path__save': ADTree_repo / 'adtree_{}_llt{}.pickle'.format(ExdsDef.name, LLT),
-        'ci_test_results_path__save': CITestResult_repo / 'ci_test_results_{}_T3_ADtree_LLT{}.pickle'.format(ExdsDef.name, LLT)
-    }
-    for LLT in [4096, 8192, 2048, 1024]
-]
-
-AlgorithmRunParameters = [] \
-    + Parameters_direct_d_separation_ci_test \
-    + Parameters_with_AD_tree \
-    + Parameters_unoptimized \
-    + Parameters_with_dcMI \
-    + []
-
-# Quick and dirty experiment on multiple targets
-Targets = [0, 1, 2, 3, 4]
-del DefaultParameters['target']
-Parameters_with_dcMI = [
-    {
-        'target': target,
-        'ci_test_jht_path__save': ExperimentDef.path / 'JHT.pickle',
-        'ci_test_jht_path__load': ExperimentDef.path / 'JHT.pickle',
-        'ci_test_class': mbff.math.G_test__with_dcMI.G_test,
-        'ci_test_results_path__save': CITestResult_repo / 'ci_test_results_{}_T{}_dcMI.pickle'.format(ExdsDef.name, target)
-    }
-    for target in Targets
-]
-LLT = 1024
-Parameters_with_AD_tree = [
-    {
-        'target': target,
+# Create AlgorithmRun parameters using the G-test optimized with an AD-tree @LLT=0
+Parameters_Gtest_ADtree = list()
+for target in range(len(BayesianNetwork)):
+    parameters = {
         'ci_test_class': mbff.math.G_test__with_AD_tree.G_test,
         'ci_test_ad_tree_leaf_list_threshold': LLT,
         'ci_test_ad_tree_path__load': ADTree_repo / 'adtree_{}_llt{}.pickle'.format(ExdsDef.name, LLT),
         'ci_test_ad_tree_path__save': ADTree_repo / 'adtree_{}_llt{}.pickle'.format(ExdsDef.name, LLT),
         'ci_test_results_path__save': CITestResult_repo / 'ci_test_results_{}_T{}_ADtree_LLT{}.pickle'.format(ExdsDef.name, target, LLT)
     }
-    for target in Targets
-]
+    Parameters_Gtest_ADtree.append(parameters)
+
+# Create AlgorithmRun parameters using the G-test optimized with dcMI
+Parameters_Gtest_dcMI = list()
+for target in range(len(BayesianNetwork)):
+    parameters = {
+        'ci_test_class': mbff.math.G_test__with_dcMI.G_test,
+        'ci_test_jht_path__load': JHT_repo / 'jht_{}.pickle'.format(ExdsDef.name),
+        'ci_test_jht_path__save': JHT_repo / 'jht_{}.pickle'.format(ExdsDef.name),
+        'ci_test_results_path__save': CITestResult_repo / 'ci_test_results_{}_T{}_dcMI.pickle'.format(ExdsDef.name, target)
+    }
+    Parameters_Gtest_dcMI.append(parameters)
+
+
+# Concatenate the lists of all AlgorithmRun parameters defined above
 AlgorithmRunParameters = [] \
-    + Parameters_with_AD_tree \
-    + Parameters_with_dcMI \
-    + []
+    + Parameters_DSep \
+    + Parameters_Gtest_unoptimized \
+    + Parameters_Gtest_ADtree \
+    + Parameters_Gtest_dcMI
 
 
+# Apply defaults to all AlgorithmRun parameters
 for parameters in AlgorithmRunParameters:
     parameters.update(DefaultParameters)
 
 
 
+################################################################################
+# Command-line interface
 if __name__ == '__main__':
     command = sys.argv[1]
     arguments = sys.argv[2:]
