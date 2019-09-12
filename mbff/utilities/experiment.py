@@ -11,7 +11,9 @@ def handle_common_commands(command, arguments, ExperimentDef, ExdsDef, Algorithm
         command_show_exds_def(ExdsDef)
     elif command == 'build-exds':
         command_build_exds(arguments, ExdsDef)
-    elif command == 'list-algrun':
+    elif command == 'show-algruns':
+        command_show_algruns(arguments, AlgorithmRunParameters)
+    elif command == 'list-algruns':
         command_list_algrun(arguments, AlgorithmRunParameters)
     elif command == 'list-algrun-datapoints':
         command_list_algrun_datapoints(arguments, ExperimentDef)
@@ -39,6 +41,7 @@ def handle_common_commands(command, arguments, ExperimentDef, ExdsDef, Algorithm
 def command_show_experiment_def(ExperimentDef):
     view = ExperimentDef.__dict__.copy()
     view['locks'] = ExperimentDef.get_locks()
+    view['folder_exists'] = ExperimentDef.folder_exists()
     pprint(view)
 
 
@@ -47,6 +50,7 @@ def command_show_exds_def(ExdsDef):
     view = ExdsDef.__dict__.copy()
     view['locks'] = ExdsDef.get_locks()
     view['ready'] = ExdsDef.exds_ready()
+    view['folder_exists'] = ExdsDef.folder_exists()
     pprint(view)
 
 
@@ -99,6 +103,19 @@ def command_lock_exds(arguments, ExdsDef):
 
 
 
+def command_show_algruns(arguments, AlgorithmRunParameters):
+    algrun_parameters_index = get_algrun_index(arguments)
+    if algrun_parameters_index is None:
+        algruns = AlgorithmRunParameters
+    else:
+        algruns = AlgorithmRunParameters[algrun_parameters_index]
+    for i, algrun in enumerate(algruns):
+        print('AlgorithmRun {} parameters:'.format(algrun_parameters_index.start + i))
+        pprint(algrun)
+        print()
+
+
+
 def command_list_algrun(arguments, AlgorithmRunParameters):
     specific_key = None
     try:
@@ -106,9 +123,8 @@ def command_list_algrun(arguments, AlgorithmRunParameters):
     except IndexError:
         pass
 
-    from pprint import pprint
     for index, parameters in enumerate(AlgorithmRunParameters):
-        print('AlgorithmRun parameters:', index)
+        print('AlgorithmRun {} parameters:'.format(index))
         if specific_key is not None:
             try:
                 print('{}: {}'.format(specific_key, parameters[specific_key]))
@@ -125,11 +141,11 @@ def command_list_algrun_datapoints(arguments, ExperimentDef):
     datapoints_folder = ExperimentDef.subfolder('algorithm_run_datapoints')
     datapoint_files = sorted(list(datapoints_folder.iterdir()))
 
-    try:
-        specific_algrun_parameters_index = int(arguments[0])
-        datapoint_files_to_list = [datapoint_files[specific_algrun_parameters_index]]
-    except IndexError:
+    algrun_parameters_index = get_algrun_index(arguments)
+    if algrun_parameters_index is None:
         datapoint_files_to_list = datapoint_files
+    else:
+        datapoint_files_to_list = datapoint_files[algrun_parameters_index]
 
     for datapoint_file in datapoint_files_to_list:
         with datapoint_file.open('rb') as f:
@@ -142,11 +158,7 @@ def command_list_algrun_datapoints(arguments, ExperimentDef):
 
 
 def command_run_experiment(arguments, ExperimentDef, AlgorithmRunParameters):
-    try:
-        specific_algrun_parameters_index = int(arguments[0])
-        ExperimentDef.algorithm_run_parameters = [AlgorithmRunParameters[specific_algrun_parameters_index]]
-    except IndexError:
-        ExperimentDef.algorithm_run_parameters = AlgorithmRunParameters
+    ExperimentDef.algorithm_run_parameters = get_algruns_by_index(arguments, AlgorithmRunParameters)
     Experiment = ExperimentDef.create_experiment_run()
     Experiment.run()
 
@@ -167,3 +179,32 @@ def command_lock_experiment(arguments, ExperimentDef):
     except IndexError:
         lock_type = ''
     ExperimentDef.lock_folder(lock_type)
+
+
+def get_algruns_by_index(arguments, AlgorithmRunParameters):
+    algrun_parameters_index = get_algrun_index(arguments)
+    if algrun_parameters_index is None:
+        return AlgorithmRunParameters
+    else:
+        return AlgorithmRunParameters[algrun_parameters_index]
+
+
+
+def get_algrun_index(arguments):
+    if len(arguments) == 0:
+        return None
+    else:
+        algrun_parameters_index = arguments[0]
+        try:
+            algrun_parameters_index = int(algrun_parameters_index)
+            return slice(algrun_parameters_index, algrun_parameters_index + 1)
+        except ValueError:
+            if '-' in algrun_parameters_index:
+                return create_slice_from_string(algrun_parameters_index)
+            else:
+                raise
+
+
+def create_slice_from_string(s):
+    parts = s.split('-')
+    return slice(int(parts[0]), int(parts[1]) + 1)
