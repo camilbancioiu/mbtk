@@ -9,6 +9,7 @@ class UnadjustedDoF:
         self.requires_cpmfs = False
 
         self.G_test = G_test
+        self.debug = 3
 
         if self.G_test is not None:
             self.parameters = self.G_test.parameters
@@ -16,6 +17,7 @@ class UnadjustedDoF:
             self.matrix = self.G_test.matrix
             self.column_values = self.G_test.column_values
             self.N = self.G_test.N
+            self.debug = self.G_test.debug
 
         self.reset()
 
@@ -115,13 +117,13 @@ class CachedStructuralDoF(UnadjustedDoF):
         self.requires_pmfs = True
         self.requires_cpmfs = False
 
-        self.load_path = G_test.parameters.get('ci_test_dof_calculator_cache_path__load', None)
-        self.save_path = G_test.parameters.get('ci_test_dof_calculator_cache_path__save', None)
+        self.load_path = self.G_test.parameters.get('ci_test_dof_calculator_cache_path__load', None)
+        self.save_path = self.G_test.parameters.get('ci_test_dof_calculator_cache_path__save', None)
 
         if self.load_path is not None and self.load_path.exists():
             with self.load_path.open('rb') as f:
                 self.DoF_cache = pickle.load(f)
-            print('DoF cache loaded from {} and contains {} entries'.format(self.load_path, len(self.DoF_cache)))
+            if self.debug > 1: print('DoF cache loaded from {} and contains {} entries'.format(self.load_path, len(self.DoF_cache)))
 
 
     def set_context_pmfs(self, PrXYZ, PrXZ, PrYZ, PrZ):
@@ -209,9 +211,7 @@ class CachedStructuralDoF(UnadjustedDoF):
 
     def end(self):
         super().end()
-        print('CachedStructuralDoF.end()')
-        print(self.save_path)
         if self.save_path is not None:
             with self.save_path.open('wb') as f:
                 pickle.dump(self.DoF_cache, f)
-            print('DoF cache saved to {} while containing {} entries'.format(self.save_path, len(self.DoF_cache)))
+            if self.debug > 1: print('DoF cache saved to {} while containing {} entries'.format(self.save_path, len(self.DoF_cache)))
