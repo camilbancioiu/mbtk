@@ -128,6 +128,7 @@ DefaultParameters = {
 Parameters_DSep = list()
 for target in range(len(BayesianNetwork)):
     parameters = {
+        'target': target,
         'ci_test_class': mbff.math.DSeparationCITest.DSeparationCITest,
         'ci_test_results_path__save': CITestResult_repo / 'ci_test_results_{}_T{}_dsep.pickle'.format(ExdsDef.name, target)
     }
@@ -137,6 +138,7 @@ for target in range(len(BayesianNetwork)):
 Parameters_Gtest_unoptimized = list()
 for target in range(len(BayesianNetwork)):
     parameters = {
+        'target': target,
         'ci_test_class': mbff.math.G_test__unoptimized.G_test,
         'ci_test_results_path__save': CITestResult_repo / 'ci_test_results_{}_T{}_unoptimized.pickle'.format(ExdsDef.name, target)
     }
@@ -146,6 +148,7 @@ for target in range(len(BayesianNetwork)):
 Parameters_Gtest_ADtree = list()
 for target in range(len(BayesianNetwork)):
     parameters = {
+        'target': target,
         'ci_test_class': mbff.math.G_test__with_AD_tree.G_test,
         'ci_test_ad_tree_leaf_list_threshold': LLT,
         'ci_test_ad_tree_path__load': ADTree_repo / 'adtree_{}_llt{}.pickle'.format(ExdsDef.name, LLT),
@@ -158,6 +161,7 @@ for target in range(len(BayesianNetwork)):
 Parameters_Gtest_dcMI = list()
 for target in range(len(BayesianNetwork)):
     parameters = {
+        'target': target,
         'ci_test_class': mbff.math.G_test__with_dcMI.G_test,
         'ci_test_jht_path__load': JHT_repo / 'jht_{}.pickle'.format(ExdsDef.name),
         'ci_test_jht_path__save': JHT_repo / 'jht_{}.pickle'.format(ExdsDef.name),
