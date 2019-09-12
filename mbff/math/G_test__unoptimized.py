@@ -167,6 +167,7 @@ class G_test:
             with save_path.open('wb') as f:
                 pickle.dump(self.ci_test_results, f)
         if self.debug >= 1: print('CI test results saved to {}'.format(save_path))
+        self.DoF_calculator.end()
 
 
     def print_ci_test_result(self, result):

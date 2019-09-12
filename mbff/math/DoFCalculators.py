@@ -1,4 +1,5 @@
 import collections
+import pickle
 
 
 class UnadjustedDoF:
@@ -68,6 +69,10 @@ class UnadjustedDoF:
         return DoF
 
 
+    def end(self):
+        pass
+
+
 
 class StructuralDoF(UnadjustedDoF):
 
@@ -109,6 +114,14 @@ class CachedStructuralDoF(UnadjustedDoF):
         self.DoF_cache = dict()
         self.requires_pmfs = True
         self.requires_cpmfs = False
+
+        self.load_path = G_test.parameters.get('ci_test_dof_calculator_cache_path__load', None)
+        self.save_path = G_test.parameters.get('ci_test_dof_calculator_cache_path__save', None)
+
+        if self.load_path is not None and self.load_path.exists():
+            with self.load_path.open('rb') as f:
+                self.DoF_cache = pickle.load(f)
+            print('DoF cache loaded from {} and contains {} entries'.format(self.load_path, len(self.DoF_cache)))
 
 
     def set_context_pmfs(self, PrXYZ, PrXZ, PrYZ, PrZ):
@@ -192,3 +205,13 @@ class CachedStructuralDoF(UnadjustedDoF):
                 pairwise_dofs[(ix, iy)] = pairwise_dofs[(iy, ix)] = DoF
 
         return pairwise_dofs
+
+
+    def end(self):
+        super().end()
+        print('CachedStructuralDoF.end()')
+        print(self.save_path)
+        if self.save_path is not None:
+            with self.save_path.open('wb') as f:
+                pickle.dump(self.DoF_cache, f)
+            print('DoF cache saved to {} while containing {} entries'.format(self.save_path, len(self.DoF_cache)))
