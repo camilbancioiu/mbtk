@@ -1,7 +1,8 @@
 from pathlib import Path
 import shutil
 
-from mbff.utilities.Exceptions import *
+from mbff.utilities.Exceptions import LockablePathException
+
 
 class LockablePath:
 
@@ -73,4 +74,3 @@ class LockablePath:
 
     def subfolder(self, subfolder_name):
         return self.ensure_subfolder(subfolder_name)
-

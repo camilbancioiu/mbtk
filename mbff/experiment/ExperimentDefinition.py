@@ -1,7 +1,5 @@
-import os
-import shutil
-from pathlib import Path
 from mbff.utilities.LockablePath import LockablePath
+
 
 class ExperimentDefinition(LockablePath):
 
@@ -30,5 +28,3 @@ class ExperimentDefinition(LockablePath):
 
     def validate(self):
         pass
-
-

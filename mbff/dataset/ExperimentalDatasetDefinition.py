@@ -1,10 +1,5 @@
-import random
-import os
-import shutil
-from pathlib import Path
-from mbff.dataset.DatasetMatrix import DatasetMatrix
-from mbff.dataset.Exceptions import ExperimentalDatasetFolderException
 from mbff.utilities.LockablePath import LockablePath
+
 
 class ExperimentalDatasetDefinition(LockablePath):
     """
@@ -46,7 +41,7 @@ class ExperimentalDatasetDefinition(LockablePath):
         self.exds_class = None
         self.source = None
         self.source_configuration = {}
-        self.options = { }
+        self.options = {}
         self.after_build__finalize_and_save = True
         self.after_save__auto_lock = True
         self.tags = []
@@ -62,5 +57,3 @@ class ExperimentalDatasetDefinition(LockablePath):
 
     def validate(self):
         pass
-
-
