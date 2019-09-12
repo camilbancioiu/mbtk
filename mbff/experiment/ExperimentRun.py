@@ -20,12 +20,10 @@ class ExperimentRun:
         self.end_time = None
         self.duration = None
 
-        self.checkpoint_path = self.definition.path / 'checkpoint'
-
 
     def run(self):
         self.definition.ensure_folder()
-        if self.definition.folder_is_locked():
+        if self.definition.folder_is_locked('experiment'):
             raise ExperimentFolderLockedException(self.definition, str(self.definition.path), 'Experiment folder is locked, cannot start.')
 
         self.definition.ensure_subfolder('algorithm_run_logs')
@@ -35,17 +33,8 @@ class ExperimentRun:
 
         self.begin_run()
 
-        # Verify if this ExperimentalRun is a continuation of a previous ExperimentalRun.
-        # If yes, then resume the previous one by continuing at the
-        # algrun_index where it stopped.
-        if self.has_previous_checkpoint():
-            start_index = self.load_checkpoint()
-        else:
-            start_index = 0
-
-        for algrun_index in range(start_index, len(self.definition.algorithm_run_parameters)):
+        for algrun_index in range(0, len(self.definition.algorithm_run_parameters)):
             algorithm_run_parameters = self.definition.algorithm_run_parameters[algrun_index]
-            self.save_checkpoint(algrun_index)
             self.run_algorithm(algrun_index, algorithm_run_parameters)
             gc.collect()
 
@@ -71,11 +60,10 @@ class ExperimentRun:
     def end_run(self):
         self.end_time = time.time()
         self.duration = self.end_time - self.start_time
-        self.remove_checkpoint()
         self.print_experiment_run_footer()
 
         if self.definition.after_finishing__auto_lock:
-            self.definition.lock_folder()
+            self.definition.lock_folder('experiment')
 
 
     def run_algorithm(self, algorithm_run_index, algorithm_run_parameters):
@@ -104,23 +92,6 @@ class ExperimentRun:
         algorithm_run_datapoint = self.definition.algorithm_run_datapoint_class(algorithm_run)
         with datapoint_file.open(mode='wb') as f:
             pickle.dump(algorithm_run_datapoint, f)
-
-
-    def has_previous_checkpoint(self):
-        return self.checkpoint_path.exists()
-
-
-    def save_checkpoint(self, algorithm_run_index):
-        self.checkpoint_path.write_text(str(algorithm_run_index))
-
-
-    def load_checkpoint(self):
-        content = self.checkpoint_path.read_text()
-        return int(content)
-
-
-    def remove_checkpoint(self):
-        self.checkpoint_path.unlink()
 
 
     def get_algorithm_run_stdout_destination(self, algorithm_run):
