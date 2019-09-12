@@ -18,8 +18,11 @@ class LockablePath:
 
 
     def folder_is_locked(self, lock_type=''):
-        any_locks_exist = len(self.get_locks()) != 0
-        return any_locks_exist
+        if lock_type == '':
+            any_locks_exist = len(self.get_locks()) != 0
+            return any_locks_exist
+        else:
+            return self.get_lock(lock_type).exists()
 
 
     def folder_exists(self):
@@ -57,7 +60,8 @@ class LockablePath:
 
 
     def unlock_folder(self, lock_type=''):
-        if lock_type == '': lock_type = self.default_lock_type
+        if lock_type == '':
+            lock_type = self.default_lock_type
         if not self.folder_is_locked(lock_type):
             pass
         else:
