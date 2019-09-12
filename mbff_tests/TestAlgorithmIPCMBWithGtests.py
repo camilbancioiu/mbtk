@@ -31,7 +31,7 @@ class TestAlgorithmIPCMBWithGtests(TestBase):
         testClass.CITestResultsFolder = testClass.RootFolder / 'ci_test_results'
         testClass.DebugLevel = 0
         testClass.CITestDebugLevel = 1
-        testClass.CJPIFolder = testClass.RootFolder / 'cjpi'
+        testClass.DoFCacheFolder = testClass.RootFolder / 'dofcache'
 
 
     @classmethod
@@ -40,7 +40,7 @@ class TestAlgorithmIPCMBWithGtests(TestBase):
         testClass.ADTreesFolder.mkdir(parents=True, exist_ok=True)
         testClass.JHTFolder.mkdir(parents=True, exist_ok=True)
         testClass.CITestResultsFolder.mkdir(parents=True, exist_ok=True)
-        testClass.CJPIFolder.mkdir(parents=True, exist_ok=True)
+        testClass.DoFCacheFolder.mkdir(parents=True, exist_ok=True)
 
 
     @classmethod
@@ -77,50 +77,35 @@ class TestAlgorithmIPCMBWithGtests(TestBase):
         dm_label = 'alarm'
         significance = 0.9
         LLT = 0
-        target = 19
-        DoF_calculator_class = StructuralDoF
 
-        parameters = dict()
-        parameters['ci_test_dof_calculator_class'] = DoF_calculator_class
-        parameters['ci_test_gc_collect_rate'] = 0
-        IGU = self.make_IPCMB_with_Gtest_unoptimized(dm_label, target, significance, parameters)
-        GU = IGU.CITest
+        parameters_dcmi = dict()
+        parameters_dcmi['ci_test_dof_calculator_class'] = CachedStructuralDoF
+        parameters_dcmi['ci_test_dof_calculator_cache_path__load'] = self.DoFCacheFolder / 'dof_cache_{}.pickle'.format(dm_label)
+        parameters_dcmi['ci_test_dof_calculator_cache_path__save'] = self.DoFCacheFolder / 'dof_cache_{}.pickle'.format(dm_label)
+        parameters_dcmi['ci_test_gc_collect_rate'] = 0
 
-        parameters = dict()
-        parameters['ci_test_dof_calculator_class'] = DoF_calculator_class
-        parameters['ci_test_ad_tree_preloaded'] = ADTreeClient('tcp://127.0.0.1:8888')
-        parameters['ci_test_ad_tree_path__save'] = None
-        parameters['ci_test_ad_tree_leaf_list_threshold'] = LLT
-        parameters['ci_test_gc_collect_rate'] = 0
-        IGA = self.make_IPCMB_with_Gtest_ADtree(dm_label, target, significance, parameters)
-        GA = IGA.CITest
+        parameters_adtree = dict()
+        parameters_adtree['ci_test_dof_calculator_class'] = StructuralDoF
+        parameters_adtree['ci_test_ad_tree_preloaded'] = ADTreeClient('tcp://127.0.0.1:8888')
+        parameters_adtree['ci_test_ad_tree_path__load'] = None
+        parameters_adtree['ci_test_ad_tree_path__save'] = None
+        parameters_adtree['ci_test_ad_tree_leaf_list_threshold'] = LLT
+        parameters_adtree['ci_test_gc_collect_rate'] = 0
+        parameters_adtree['ci_test_sufficient_samples_criterion'] = None
 
-        test_vars = {'X': 1,
-                     'Y': 19,
-                     'Z': {28}}
+        for target in range(10):
+            ipcmb = self.make_IPCMB_with_Gtest_dcMI(dm_label, target, significance, parameters_dcmi)
+            mb = ipcmb.select_features()
+            results_dcmi = ipcmb.CITest.ci_test_results
+            print(mb)
 
-        print()
-        print('G_test__unoptimized:')
-        GU.conditionally_independent(**test_vars)
-        print()
+            ipcmb = self.make_IPCMB_with_Gtest_ADtree(dm_label, target, significance, parameters_adtree)
+            mb = ipcmb.select_features()
+            results_adtree = ipcmb.CITest.ci_test_results
+            print(mb)
 
-        print()
-        print()
+            self.assertEqualCITestResults(results_adtree, results_dcmi)
 
-        print('G_test__with_AD_tree:')
-        GA.conditionally_independent(**test_vars)
-        print()
-
-        print(GU.ci_test_results[0])
-        print(GA.ci_test_results[0])
-
-
-        print(GU.DoF_calculator.debug_values)
-        print(GA.DoF_calculator.debug_values)
-        self.maxDiff = None
-        self.assertEqual(GU.DoF_calculator.debug_values, GA.DoF_calculator.debug_values)
-
-        self.assertEqualCITestResults(GU.ci_test_results, GA.ci_test_results)
 
 
     def test_CachedStructuralDoF_vs_StructuralDof_on_G_test__unoptimized(self):
