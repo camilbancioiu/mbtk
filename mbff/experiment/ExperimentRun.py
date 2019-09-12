@@ -1,17 +1,14 @@
-import os
 import sys
 import time
 import contextlib
 import pickle
 import gc
 
-from pathlib import Path
 from string import Template
 
-import mbff.utilities.functions as util
 from mbff.utilities.MultiFileWriter import MultiFileWriter
-from mbff.experiment.AlgorithmRunDatapoint import AlgorithmRunDatapoint
 from mbff.experiment.Exceptions import ExperimentFolderLockedException
+
 
 class ExperimentRun:
 
@@ -35,7 +32,7 @@ class ExperimentRun:
         self.start_time = time.time()
         self.print_experiment_run_header()
 
-        if not self.definition.exds_definition is None:
+        if self.definition.exds_definition is not None:
             self.exds = self.definition.exds_definition.create_exds()
             if self.definition.exds_definition.exds_ready():
                 self.exds.load()
@@ -81,7 +78,7 @@ class ExperimentRun:
                 algorithm_run.run()
                 self.print_algorithm_run_footer(algorithm_run)
         finally:
-            if not algorithm_run_stdout_destination is sys.__stdout__:
+            if algorithm_run_stdout_destination is not sys.__stdout__:
                 algorithm_run_stdout_destination.close()
 
         if self.definition.save_algorithm_run_datapoints:
@@ -142,6 +139,3 @@ class ExperimentRun:
 
     def print_algorithm_run_footer(self, algorithm_run):
         pass
-
-
-
