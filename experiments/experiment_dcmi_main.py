@@ -81,6 +81,9 @@ import mbff.math.G_test__unoptimized
 import mbff.math.G_test__with_dcMI
 
 
+# This function will be called by the ExperimentRun object to give each
+# AlgorithmRun a unique label, based on what CI test class was configured for
+# IPC-MB during the run
 def make_algorithm_run_label(parameters):
     if parameters['ci_test_class'] is mbff.math.DSeparationCITest.DSeparationCITest:
         return Template('run_${algorithm_run_index}_T${target}__dsep')
