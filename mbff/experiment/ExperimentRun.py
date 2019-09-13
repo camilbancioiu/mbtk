@@ -33,9 +33,8 @@ class ExperimentRun:
 
         self.begin_run()
 
-        for algrun_index in range(0, len(self.definition.algorithm_run_parameters)):
-            algorithm_run_parameters = self.definition.algorithm_run_parameters[algrun_index]
-            self.run_algorithm(algrun_index, algorithm_run_parameters)
+        for algorithm_run_parameters in self.definition.algorithm_run_parameters:
+            self.run_algorithm(algorithm_run_parameters)
             gc.collect()
 
         self.end_run()
@@ -66,8 +65,9 @@ class ExperimentRun:
             self.definition.lock_folder('experiment')
 
 
-    def run_algorithm(self, algorithm_run_index, algorithm_run_parameters):
+    def run_algorithm(self, algorithm_run_parameters):
         algorithm_run = self.definition.algorithm_run_class(self.exds, self.definition.algorithm_run_configuration, algorithm_run_parameters)
+        algorithm_run_index = algorithm_run_parameters['index']
         algorithm_run.ID = Template(algorithm_run.label).safe_substitute(algorithm_run_index=algorithm_run_index)
 
         algorithm_run_stdout_destination = self.get_algorithm_run_stdout_destination(algorithm_run)

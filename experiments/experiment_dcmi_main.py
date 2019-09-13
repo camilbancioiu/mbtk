@@ -182,9 +182,10 @@ AlgorithmRunParameters = [] \
     + Parameters_Gtest_dcMI
 
 
-# Apply defaults to all AlgorithmRun parameters
-for parameters in AlgorithmRunParameters:
+# Apply indices and defaults to all AlgorithmRun parameters
+for index, parameters in enumerate(AlgorithmRunParameters):
     parameters.update(DefaultParameters)
+    parameters['index'] = index
 
 
 
