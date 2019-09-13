@@ -79,6 +79,7 @@ import mbff.math.DSeparationCITest
 import mbff.math.G_test__with_AD_tree
 import mbff.math.G_test__unoptimized
 import mbff.math.G_test__with_dcMI
+import mbff.math.DoFCalculators
 
 
 # This function will be called by the ExperimentRun object to give each
@@ -140,6 +141,7 @@ for target in range(len(BayesianNetwork)):
     parameters = {
         'target': target,
         'ci_test_class': mbff.math.G_test__unoptimized.G_test,
+        'ci_test_dof_calculator_class': mbff.math.DoFCalculators.StructuralDoF,
         'ci_test_results_path__save': CITestResult_repo / 'ci_test_results_{}_T{}_unoptimized.pickle'.format(ExdsDef.name, target)
     }
     Parameters_Gtest_unoptimized.append(parameters)
@@ -150,6 +152,7 @@ for target in range(len(BayesianNetwork)):
     parameters = {
         'target': target,
         'ci_test_class': mbff.math.G_test__with_AD_tree.G_test,
+        'ci_test_dof_calculator_class': mbff.math.DoFCalculators.StructuralDoF,
         'ci_test_ad_tree_leaf_list_threshold': LLT,
         'ci_test_ad_tree_path__load': ADTree_repo / 'adtree_{}_llt{}.pickle'.format(ExdsDef.name, LLT),
         'ci_test_ad_tree_path__save': ADTree_repo / 'adtree_{}_llt{}.pickle'.format(ExdsDef.name, LLT),
@@ -163,6 +166,7 @@ for target in range(len(BayesianNetwork)):
     parameters = {
         'target': target,
         'ci_test_class': mbff.math.G_test__with_dcMI.G_test,
+        'ci_test_dof_calculator_class': mbff.math.DoFCalculators.CachedStructuralDoF,
         'ci_test_jht_path__load': JHT_repo / 'jht_{}.pickle'.format(ExdsDef.name),
         'ci_test_jht_path__save': JHT_repo / 'jht_{}.pickle'.format(ExdsDef.name),
         'ci_test_results_path__save': CITestResult_repo / 'ci_test_results_{}_T{}_dcMI.pickle'.format(ExdsDef.name, target)
