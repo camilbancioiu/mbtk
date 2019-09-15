@@ -1,5 +1,6 @@
 import sys
 import os
+import pickle
 from pathlib import Path
 from string import Template
 
@@ -117,6 +118,8 @@ BayesianNetwork.finalize()
 CITest_Significance = 0.95
 LLT = 0
 
+ADTree_path = ADTree_repo / 'adtree_{}_llt{}.pickle'.format(ExdsDef.name, LLT)
+
 DefaultParameters = {
     'omega': Omega,
     'source_bayesian_network': BayesianNetwork,
@@ -154,11 +157,17 @@ for target in range(len(BayesianNetwork)):
         'ci_test_class': mbff.math.G_test__with_AD_tree.G_test,
         'ci_test_dof_calculator_class': mbff.math.DoFCalculators.StructuralDoF,
         'ci_test_ad_tree_leaf_list_threshold': LLT,
-        'ci_test_ad_tree_path__load': ADTree_repo / 'adtree_{}_llt{}.pickle'.format(ExdsDef.name, LLT),
-        'ci_test_ad_tree_path__save': ADTree_repo / 'adtree_{}_llt{}.pickle'.format(ExdsDef.name, LLT),
+        'ci_test_ad_tree_path__load': ADTree_path,
         'ci_test_results_path__save': CITestResult_repo / 'ci_test_results_{}_T{}_ADtree_LLT{}.pickle'.format(ExdsDef.name, target, LLT)
     }
     Parameters_Gtest_ADtree.append(parameters)
+
+
+def set_preloaded_AD_tree(adtree):
+    for parameters in Parameters_Gtest_ADtree:
+        parameters['ci_test_ad_tree_preloaded'] = adtree
+        del parameters['ci_test_ad_tree_path__load']
+
 
 # Create AlgorithmRun parameters using the G-test optimized with dcMI
 Parameters_Gtest_dcMI = list()
@@ -198,11 +207,18 @@ if __name__ == '__main__':
     import experiment_dcmi_main_commands as custom_commands
     from mbff.utilities.Exceptions import CLICommandNotHandled
 
+    if arguments[0] == '--preload-adtree':
+        adtree = None
+        with ADTree_path.open('rb') as f:
+            adtree = pickle.load(f)
+        set_preloaded_AD_tree(adtree)
+        arguments = arguments[1:]
+
     try:
         if command == 'build-adtree':
-            custom_commands.command_build_adtree(arguments, ExdsDef, AlgorithmRunParameters)
+            custom_commands.command_build_adtree(arguments, ADTree_path, LLT, ExdsDef)
         elif command == 'build-adtree-analysis':
-            custom_commands.command_build_adtree_analysis(arguments, ExperimentDef, AlgorithmRunParameters)
+            custom_commands.command_build_adtree_analysis(arguments, ADTree_path, ExdsDef, ExperimentDef)
         elif command == 'plot':
             custom_commands.command_plot(arguments, ExperimentDef, AlgorithmRunParameters)
         else:

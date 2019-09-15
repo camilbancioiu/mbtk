@@ -5,72 +5,55 @@ import gc
 import mbff.math.G_test__with_AD_tree
 
 
-def command_build_adtree(arguments, ExdsDef, AlgorithmRunParameters):
+def command_build_adtree(arguments, ADTree_path, LLT, ExdsDef):
     exds = ExdsDef.create_exds()
     if ExdsDef.exds_ready():
         exds.load()
     else:
         exds.build()
-    try:
-        specific_algrun_parameters_index = int(arguments[0])
-        algrun_parameters_to_build_trees_for = [AlgorithmRunParameters[specific_algrun_parameters_index]]
-    except IndexError:
-        algrun_parameters_to_build_trees_for = filter_algrun_parameters_Gtest_ADtree(AlgorithmRunParameters)
 
-    for parameters in algrun_parameters_to_build_trees_for:
-        LLT = parameters['ci_test_ad_tree_leaf_list_threshold']
-        matrix = exds.matrix.X
-        column_values = exds.matrix.get_values_per_column('X')
-        start_time = time.time()
-        adtree = mbff.structures.ADTree.ADTree(matrix, column_values, LLT, debug=3)
-        duration = time.time() - start_time
-        print("AD-tree with LLT={} built in {:>10.4f}s".format(LLT, duration))
+    matrix = exds.matrix.X
+    column_values = exds.matrix.get_values_per_column('X')
+    start_time = time.time()
+    adtree = mbff.structures.ADTree.ADTree(matrix, column_values, LLT, debug=3)
+    duration = time.time() - start_time
+    print("AD-tree with LLT={} built in {:>10.4f}s".format(LLT, duration))
 
-        adtree_save_path = parameters.get('ci_test_ad_tree_path__save', None)
-        if adtree_save_path is not None:
-            with adtree_save_path.open('wb') as f:
-                pickle.dump(adtree, f)
-        print("AD-tree saved to", adtree_save_path)
+    adtree_save_path = ADTree_path
+    if adtree_save_path is not None:
+        with adtree_save_path.open('wb') as f:
+            pickle.dump(adtree, f)
+    print("AD-tree saved to", adtree_save_path)
 
 
 
-def command_build_adtree_analysis(arguments, ExperimentDef, AlgorithmRunParameters):
-    try:
-        specific_algrun_parameters_index = int(arguments[0])
-        specific_algrun_parameters = AlgorithmRunParameters[specific_algrun_parameters_index]
-        algrun_parameters_to_analyze_trees_for = [specific_algrun_parameters]
-    except IndexError:
-        algrun_parameters_to_analyze_trees_for = filter_algrun_parameters_Gtest_ADtree(AlgorithmRunParameters)
-
+def command_build_adtree_analysis(arguments, ADTree_path, ExdsDef, ExperimentDef):
     from pympler.asizeof import asizeof
     from pprint import pprint
 
     analysis_path = ExperimentDef.path / 'adtree_analysis'
     analysis_path.mkdir(parents=True, exist_ok=True)
 
-    for parameters in algrun_parameters_to_analyze_trees_for:
-        tree_analysis_path = analysis_path / (parameters['ci_test_ad_tree_path__save'].name)
-        with parameters['ci_test_ad_tree_path__save'].open('rb') as f:
-            print('Loading tree')
-            pprint(parameters)
-            adtree = pickle.load(f)
+    tree_analysis_path = analysis_path / (ADTree_path.name)
+    with ADTree_path.open('rb') as f:
+        adtree = pickle.load(f)
 
-        adtree.matrix = None
-        adtree.column_values = None
-        gc.collect()
-        tree_size = asizeof(adtree)
-        analysis = {
-            'LLT': adtree.leaf_list_threshold,
-            'nodes': adtree.ad_node_count + adtree.vary_node_count,
-            'duration': adtree.duration,
-            'size': tree_size
-        }
-        print()
-        print('Analysis')
-        pprint(analysis)
-        with tree_analysis_path.open('wb') as f:
-            pickle.dump(analysis, f)
-        print()
+    adtree.matrix = None
+    adtree.column_values = None
+    gc.collect()
+    tree_size = asizeof(adtree)
+    analysis = {
+        'LLT': adtree.leaf_list_threshold,
+        'nodes': adtree.ad_node_count + adtree.vary_node_count,
+        'duration': adtree.duration,
+        'size': tree_size
+    }
+    print()
+    print('Analysis')
+    pprint(analysis)
+    with tree_analysis_path.open('wb') as f:
+        pickle.dump(analysis, f)
+    print()
 
 
 
