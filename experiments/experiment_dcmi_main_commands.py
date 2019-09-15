@@ -75,7 +75,6 @@ def command_build_adtree_analysis(arguments, ExperimentDef, AlgorithmRunParamete
 
 
 def command_plot(arguments, ExperimentDef, AlgorithmRunParameters):
-    import experiment_dcmi_main_plotting as plotting
 
     try:
         plot_what = arguments[0]
@@ -91,11 +90,12 @@ def command_plot(arguments, ExperimentDef, AlgorithmRunParameters):
         plot_save_filename = None
 
     citr = load_citr(AlgorithmRunParameters)
-    data = plotting.make_plot_data(plot_what, citr)
 
     algruns_Gtest_ADtree = filter_algrun_parameters_Gtest_ADtree(AlgorithmRunParameters)
     adtree_analysis = load_adtrees_analysis(algruns_Gtest_ADtree, ExperimentDef)
 
+    import experiment_dcmi_main_plotting as plotting
+    data = plotting.make_plot_data(plot_what, citr)
     plotting.plot(data, adtree_analysis, plot_save_filename)
 
 

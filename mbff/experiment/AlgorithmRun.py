@@ -22,12 +22,13 @@ class AlgorithmRun:
         self.selected_features = []
         self.objective_index = -1
 
-        # self.label could be a Template string.
         self.label = self.configuration['label']
 
+        # self.label could be a callback.
         if callable(self.label):
             self.label = self.label(self.parameters)
 
+        # self.label could be a Template string.
         if isinstance(self.label, Template):
             self.label = self.label.safe_substitute(self.parameters)
 

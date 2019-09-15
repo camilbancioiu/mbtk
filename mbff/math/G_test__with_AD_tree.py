@@ -30,19 +30,44 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
     def prepare_AD_tree(self):
         preloaded_AD_tree = self.parameters.get('ci_test_ad_tree_preloaded', None)
         if preloaded_AD_tree is not None:
-            self.AD_tree = preloaded_AD_tree
-            self.AD_tree.debug = self.debug - 1
-            if self.AD_tree.debug >= 1:
-                self.AD_tree.debug_prepare__querying()
-            if self.debug >= 1: print('Using preloaded AD-tree.')
+            # The AD-tree might have already been loaded in memory (by the
+            # experiment script, by a previous G-test instance or any other
+            # way), and we've been passed a reference to it. We simply use that
+            # reference from now on.
+            self.use_preloaded_AD_tree(preloaded_AD_tree)
         else:
+            # There is no preloaded AD tree available, so we try to load
+            # it ourselves from the path provided as a parameter; if that
+            # fails, start building the entire AD-tree for the given
+            # datasetmatrix.
             adtree_load_path = self.parameters.get('ci_test_ad_tree_path__load', None)
             if adtree_load_path is not None and adtree_load_path.exists():
                 self.load_AD_tree(adtree_load_path)
             else:
                 self.build_AD_tree()
 
+        # By definition, an empty query passed to the AD-tree returns the total
+        # number of rows in the dataset.
         self.N = self.AD_tree.query_count(dict())
+
+
+    def use_preloaded_AD_tree(self, preloaded_AD_tree):
+        self.AD_tree = preloaded_AD_tree
+        self.AD_tree.debug = self.debug - 1
+        if self.AD_tree.debug >= 1:
+            self.AD_tree.debug_prepare__querying()
+        if self.debug >= 1: print('Using preloaded AD-tree.')
+
+
+    def load_AD_tree(self, adtree_load_path):
+        if self.debug >= 1: print("Loading the AD-tree from {} ...".format(adtree_load_path))
+        with adtree_load_path.open('rb') as f:
+            self.AD_tree = pickle.load(f)
+
+        self.AD_tree.debug = self.debug - 1
+        if self.AD_tree.debug >= 1:
+            self.AD_tree.debug_prepare__querying()
+        if self.debug >= 1: print('AD-tree loaded.')
 
 
     def build_AD_tree(self):
@@ -59,17 +84,6 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
             with adtree_save_path.open('wb') as f:
                 pickle.dump(self.AD_tree, f)
         if self.debug >= 1: print("AD-tree saved to", adtree_save_path)
-
-
-    def load_AD_tree(self, adtree_load_path):
-        if self.debug >= 1: print("Loading the AD-tree from {} ...".format(adtree_load_path))
-        with adtree_load_path.open('rb') as f:
-            self.AD_tree = pickle.load(f)
-
-        self.AD_tree.debug = self.debug - 1
-        if self.AD_tree.debug >= 1:
-            self.AD_tree.debug_prepare__querying()
-        if self.debug >= 1: print('AD-tree loaded.')
 
 
     def G_test_conditionally_independent(self, X, Y, Z):
