@@ -212,7 +212,7 @@ if __name__ == '__main__':
     import experiment_dcmi_main_commands as custom_commands
     from mbff.utilities.Exceptions import CLICommandNotHandled
 
-    if arguments[0] == '--preload-adtree':
+    if len(arguments) > 0 and arguments[0] == '--preload-adtree':
         adtree = None
         with ADTree_path.open('rb') as f:
             adtree = pickle.load(f)
