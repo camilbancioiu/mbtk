@@ -1,5 +1,4 @@
 import numpy
-import unittest
 import scipy
 import pickle
 
@@ -7,6 +6,7 @@ from pathlib import Path
 
 from mbff.structures.ADTree import ADTree
 from mbff.math.PMF import PMF, CPMF
+import mbff.math.DoFCalculators
 import mbff.math.G_test__unoptimized
 import mbff.math.G_test__with_AD_tree
 
@@ -173,7 +173,6 @@ class TestADTree(TestBase):
         self.assert_pmf_adtree_vs_dm(dm, adtree, [0, 1, 2, 3, 4, 5])
 
 
-    @unittest.skipIf(TestBase.tag_excluded('conditional_independence'), 'Conditional independence tests excluded')
     def test_compare_g_tests__alarm(self):
         dm_label = 'alarm'
         omega = self.OmegaVariables[dm_label]
@@ -187,6 +186,7 @@ class TestADTree(TestBase):
         parameters['ci_test_ad_tree_path__load'] = self.ADTreesFolder / 'alarm.pickle'
         parameters['omega'] = omega
         parameters['source_bayesian_network'] = bn
+        parameters['ci_test_dof_calculator_class'] = mbff.math.DoFCalculators.StructuralDoF
 
         self.G_unoptimized = mbff.math.G_test__unoptimized.G_test(datasetmatrix, parameters)
         self.G_with_AD_tree = mbff.math.G_test__with_AD_tree.G_test(datasetmatrix, parameters)
@@ -201,7 +201,6 @@ class TestADTree(TestBase):
         self.assertGTestEqual(33, 3, {2, 28, 36})
 
 
-    @unittest.skipIf(TestBase.tag_excluded('conditional_independence'), 'Conditional independence tests excluded')
     def test_compare_g_tests__survey(self):
         dm_label = 'survey'
         omega = self.OmegaVariables[dm_label]
@@ -214,6 +213,7 @@ class TestADTree(TestBase):
         parameters['ci_test_ad_tree_leaf_list_threshold'] = 20
         parameters['omega'] = omega
         parameters['source_bayesian_network'] = bn
+        parameters['ci_test_dof_calculator_class'] = mbff.math.DoFCalculators.StructuralDoF
 
         self.G_unoptimized = mbff.math.G_test__unoptimized.G_test(datasetmatrix, parameters)
         self.G_with_AD_tree = mbff.math.G_test__with_AD_tree.G_test(datasetmatrix, parameters)

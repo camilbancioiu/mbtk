@@ -190,13 +190,13 @@ class TestAlgorithmIPCMBWithGtests(TestBase):
         parameters['G_test__unoptimized']['ci_test_dof_calculator_class'] = DoF_calculator_class
         parameters['G_test__unoptimized']['ci_test_gc_collect_rate'] = 0
 
-        # ADTree_path = self.ADTreesFolder / ('{}_LLT={}.pickle'.format(dm_label, LLT))
+        ADTree_path = self.ADTreesFolder / ('{}_LLT={}.pickle'.format(dm_label, LLT))
         parameters['G_test__with_AD_tree'] = dict()
         parameters['G_test__with_AD_tree']['ci_test_dof_calculator_class'] = DoF_calculator_class
-        parameters['G_test__with_AD_tree']['ci_test_ad_tree_preloaded'] = ADTreeClient('tcp://127.0.0.1:8888')
-        # parameters['G_test__with_AD_tree']['ci_test_ad_tree_path__load'] = ADTree_path
-        parameters['G_test__with_AD_tree']['ci_test_ad_tree_path__load'] = None
-        parameters['G_test__with_AD_tree']['ci_test_ad_tree_path__save'] = None
+        # parameters['G_test__with_AD_tree']['ci_test_ad_tree_preloaded'] = ADTreeClient('tcp://127.0.0.1:8888')
+        parameters['G_test__with_AD_tree']['ci_test_ad_tree_path__load'] = ADTree_path
+        # parameters['G_test__with_AD_tree']['ci_test_ad_tree_path__load'] = None
+        parameters['G_test__with_AD_tree']['ci_test_ad_tree_path__save'] = ADTree_path
         parameters['G_test__with_AD_tree']['ci_test_ad_tree_leaf_list_threshold'] = LLT
         parameters['G_test__with_AD_tree']['ci_test_gc_collect_rate'] = 0
 
@@ -246,6 +246,17 @@ class TestAlgorithmIPCMBWithGtests(TestBase):
 
         datasetmatrix = self.DatasetMatrices[dm_label]
 
+        if 'G_test__unoptimized' in parameters:
+            print('=== IPC-MB with G-test (unoptimized) ===')
+            extra_parameters = parameters['G_test__unoptimized']
+            ipcmb_g_unoptimized = self.make_IPCMB_with_Gtest_unoptimized(dm_label, target, significance, extra_parameters=extra_parameters)
+            start_time = time.time()
+            markov_blanket__unoptimized = ipcmb_g_unoptimized.select_features()
+            duration__unoptimized = time.time() - start_time
+            ci_test_results__unoptimized = ipcmb_g_unoptimized.CITest.ci_test_results
+            print(self.format_ipcmb_result('unoptimized', target, datasetmatrix, markov_blanket__unoptimized))
+            print()
+
         if 'G_test__with_dcMI' in parameters:
             print('=== IPC-MB with G-test (dcMI) ===')
             extra_parameters = parameters['G_test__with_dcMI']
@@ -270,17 +281,6 @@ class TestAlgorithmIPCMBWithGtests(TestBase):
             print(self.format_ipcmb_result('AD-tree', target, datasetmatrix, markov_blanket__adtree))
             if ci_test_results__unoptimized is not None:
                 self.assertEqualCITestResults(ci_test_results__unoptimized, ci_test_results__adtree)
-            print()
-
-        if 'G_test__unoptimized' in parameters:
-            print('=== IPC-MB with G-test (unoptimized) ===')
-            extra_parameters = parameters['G_test__unoptimized']
-            ipcmb_g_unoptimized = self.make_IPCMB_with_Gtest_unoptimized(dm_label, target, significance, extra_parameters=extra_parameters)
-            start_time = time.time()
-            markov_blanket__unoptimized = ipcmb_g_unoptimized.select_features()
-            duration__unoptimized = time.time() - start_time
-            ci_test_results__unoptimized = ipcmb_g_unoptimized.CITest.ci_test_results
-            print(self.format_ipcmb_result('unoptimized', target, datasetmatrix, markov_blanket__unoptimized))
             print()
 
         print('=== IPC-MB with d-sep ===')
@@ -312,62 +312,6 @@ class TestAlgorithmIPCMBWithGtests(TestBase):
 
         print('MB, d-sep : {}'.format(markov_blanket__dsep))
         print()
-
-
-    def test_individual_gtest(self):
-        dm_label = 'alarm'
-
-        target = 16
-        significance = 0.9
-
-        self.CITestDebugLevel = 0
-
-        extra_parameters = dict()
-        extra_parameters['ci_test_dof_computation_method'] = 'cached_joint_pmf_info'
-        extra_parameters['ci_test_cjpi_adjustment_type'] = 'max'
-        extra_parameters['ci_test_gc_collect_rate'] = 0
-        extra_parameters['ci_test_results__print_accurate'] = False
-        extra_parameters['ci_test_results__print_inaccurate'] = False
-        ipcmb_g_unoptimized = self.make_IPCMB_with_Gtest_unoptimized(dm_label, target, significance, extra_parameters=extra_parameters)
-        markov_blanket__unoptimized = ipcmb_g_unoptimized.select_features()
-        citr = ipcmb_g_unoptimized.CITest.ci_test_results
-        accuracy = len([r for r in citr if r.accurate()]) / len(citr)
-        citr_cjpi_A = citr
-        accuracy_cjpi_A = accuracy
-
-        extra_parameters = dict()
-        extra_parameters['ci_test_dof_computation_method'] = 'rowcol'
-        extra_parameters['ci_test_gc_collect_rate'] = 0
-        extra_parameters['ci_test_results__print_accurate'] = False
-        extra_parameters['ci_test_results__print_inaccurate'] = False
-        ipcmb_g_unoptimized = self.make_IPCMB_with_Gtest_unoptimized(dm_label, target, significance, extra_parameters=extra_parameters)
-        markov_blanket__unoptimized = ipcmb_g_unoptimized.select_features()
-        citr = ipcmb_g_unoptimized.CITest.ci_test_results
-        accuracy = len([r for r in citr if r.accurate()]) / len(citr)
-        citr_rowcol = citr
-        accuracy_rowcol = accuracy
-
-        extra_parameters = dict()
-        extra_parameters['ci_test_dof_computation_method'] = 'structural_minus_zerocells'
-        extra_parameters['ci_test_gc_collect_rate'] = 0
-        extra_parameters['ci_test_results__print_accurate'] = False
-        extra_parameters['ci_test_results__print_inaccurate'] = False
-        ipcmb_g_unoptimized = self.make_IPCMB_with_Gtest_unoptimized(dm_label, target, significance, extra_parameters=extra_parameters)
-        markov_blanket__unoptimized = ipcmb_g_unoptimized.select_features()
-        citr = ipcmb_g_unoptimized.CITest.ci_test_results
-        accuracy = len([r for r in citr if r.accurate()]) / len(citr)
-        citr_structural_minus_zerocells = citr
-        accuracy_structural_minus_zerocells = accuracy
-
-        ipcmb_dsep = self.make_IPCMB_with_dsep(dm_label, target)
-        markov_blanket__dsep = ipcmb_dsep.select_features()
-
-        print()
-        print('markov_blanket__unoptimized:', markov_blanket__unoptimized)
-        print('markov_blanket__dsep:', markov_blanket__dsep, 'test count:', len(ipcmb_dsep.CITest.ci_test_results))
-        print('accuracy_cjpi_A:', accuracy_cjpi_A, 'test count:', len(citr_cjpi_A))
-        print('accuracy_rowcol:', accuracy_rowcol, 'test count:', len(citr_rowcol))
-        print('accuracy_structural_minus_zerocells:', accuracy_structural_minus_zerocells, 'test count:', len(citr_structural_minus_zerocells))
 
 
     def format_ipcmb_result(self, label, target, datasetmatrix, markov_blanket):
