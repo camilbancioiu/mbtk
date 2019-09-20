@@ -171,7 +171,7 @@ class ADTree:
 
         variables = sorted(variables)
 
-        joint_ct = self.root.make_contingency_table(variables)
+        joint_ct = self.root.make_contingency_table(self, variables)
 
         pmf = PMF(None)
         total_count = 1.0 * self.root.count
@@ -302,12 +302,14 @@ class ADTree:
 
 class ADNode:
 
+    __slots__ = ('level', 'row_selection', 'count', 'column_index', 'value',
+                 'leaf_list_node', 'Vary_children')
+
     def __init__(self, tree, column_index, value, row_selection=None, level=0):
-        self.tree = tree
         self.level = level
         self.row_selection = row_selection
         if self.row_selection is None:
-            self.count = self.tree.matrix.get_shape()[0]
+            self.count = tree.matrix.get_shape()[0]
         else:
             self.count = len(self.row_selection)
         self.column_index = column_index
@@ -315,22 +317,22 @@ class ADNode:
         self.leaf_list_node = False
         self.Vary_children = []
 
-        self.tree.ad_node_count += 1
+        tree.ad_node_count += 1
 
-        if self.count < self.tree.leaf_list_threshold:
+        if self.count < tree.leaf_list_threshold:
             self.leaf_list_node = True
 
-        if self.tree.debug >= 1:
-            self.tree.debug_node(self)
+        if tree.debug >= 1:
+            tree.debug_node(self)
 
         if not self.leaf_list_node:
-            self.create_Vary_children()
+            self.create_Vary_children(tree)
 
 
-    def create_Vary_children(self):
-        column_count = self.tree.matrix.get_shape()[1]
+    def create_Vary_children(self, tree):
+        column_count = tree.matrix.get_shape()[1]
         for column_index in range(self.column_index + 1, column_count):
-            varyNode = VaryNode(self.tree, column_index, self.row_selection, level=self.level + 1)
+            varyNode = VaryNode(tree, column_index, self.row_selection, level=self.level + 1)
             self.Vary_children.append(varyNode)
 
 
@@ -355,18 +357,18 @@ class ADNode:
         return "\n".join(rendered_children)
 
 
-    def make_contingency_table(self, columns=list()):
-        contingency_tree = self.make_contingency_tree(columns)
+    def make_contingency_table(self, tree, columns=list()):
+        contingency_tree = self.make_contingency_tree(tree, columns)
         contingency_table = contingency_tree.convert_to_dictionary()
         return contingency_table
 
 
-    def make_contingency_tree(self, columns=list()):
+    def make_contingency_tree(self, tree, columns=list()):
         if len(columns) == 0:
             return ContingencyTreeNode(self.column_index, self.value, self.count)
 
         if self.leaf_list_node:
-            return self.make_contingency_tree_from_leaf_list(columns)
+            return self.make_contingency_tree_from_leaf_list(tree, columns)
 
         non_mcv_ct = ContingencyTreeNode(self.column_index, self.value, None)
         next_column = columns[0]
@@ -376,10 +378,10 @@ class ADNode:
             if value != vary.most_common_value:
                 child = vary.get_AD_child_for_value(value)
                 if child is not None:
-                    child_ct = child.make_contingency_tree(columns[1:])
+                    child_ct = child.make_contingency_tree(tree, columns[1:])
                     non_mcv_ct.append_child(child_ct)
 
-        mcv_child_ct = self.make_contingency_tree(columns[1:])
+        mcv_child_ct = self.make_contingency_tree(tree, columns[1:])
         mcv_child_ct.column = next_column
         mcv_child_ct.value = vary.most_common_value
 
@@ -393,8 +395,8 @@ class ADNode:
         return contingency_tree
 
 
-    def make_contingency_tree_from_leaf_list(self, columns):
-        matrix = self.tree.matrix
+    def make_contingency_tree_from_leaf_list(self, tree, columns):
+        matrix = tree.matrix
         ct = ContingencyTreeNode(self.column_index, self.value, None)
 
         if len(columns) == 1:
@@ -407,62 +409,65 @@ class ADNode:
             for row_index in self.row_selection:
                 key = [matrix[row_index, column_index] for column_index in columns]
                 ct.add_count_to_leaf(columns, key, 1)
-        if self.tree.debug >= 1: self.tree.n_pmf_ll += 1
+        if tree.debug >= 1: tree.n_pmf_ll += 1
         return ct
 
 
 
 class VaryNode:
 
+    __slots__ = ('level', 'row_selection', 'column_index',
+                 'AD_children', 'values', 'most_common_value')
+
     def __init__(self, tree, column_index, row_selection=None, level=0):
-        self.tree = tree
         self.level = level
-        self.row_subselections = None
         self.row_selection = row_selection
         self.column_index = column_index
         self.AD_children = []
 
-        self.create_row_subselections_by_value()
-        self.values = self.tree.column_values[column_index]
-        self.most_common_value = self.discoverMCV()
+        row_subselections = self.create_row_subselections_by_value(tree.matrix)
+        self.values = tree.column_values[column_index]
+        self.most_common_value = self.discoverMCV(row_subselections)
 
-        self.tree.vary_node_count += 1
+        tree.vary_node_count += 1
 
-        if self.tree.debug >= 1:
-            self.tree.debug_node(self)
+        if tree.debug >= 1:
+            tree.debug_node(self)
 
-        self.create_AD_children()
+        self.create_AD_children(tree, row_subselections)
 
 
-    def create_AD_children(self):
+    def create_AD_children(self, tree, row_subselections):
         for value in self.values:
-            row_selection = self.row_subselections[value]
+            row_selection = row_subselections[value]
             adNode = None
             if len(row_selection) > 0 and value != self.most_common_value:
-                adNode = ADNode(self.tree, self.column_index, value, row_selection, level=self.level + 1)
+                adNode = ADNode(tree, self.column_index, value, row_selection, level=self.level + 1)
             self.AD_children.append(adNode)
 
 
-    def create_row_subselections_by_value(self):
+    def create_row_subselections_by_value(self, matrix):
         """
-        Group the rows of the self.tree.matrix by their value in the first column,
+        Group the rows of the matrix by their value in the first column,
         but regardless of the rest of the columns. Only iterates over the rows
         found in row_selection.
         """
-        self.row_subselections = collections.defaultdict(list)
+        row_subselections = collections.defaultdict(list)
 
         if self.row_selection is None:
             # If row_selection isn't set yet, initialize it to cover all the
             # rows.
-            row_count = self.tree.matrix.get_shape()[0]
+            row_count = matrix.get_shape()[0]
             self.row_selection = range(0, row_count)
 
         # Iterate over the rows in self.row_selection, putting each row_index
-        # into a list corresponding to its value, in the self.row_subselections
+        # into a list corresponding to its value, in the row_subselections
         # dictionary.
         for row_index in self.row_selection:
-            value = self.tree.matrix[row_index, self.column_index]
-            self.row_subselections[value].append(row_index)
+            value = matrix[row_index, self.column_index]
+            row_subselections[value].append(row_index)
+
+        return row_subselections
 
 
     def get_AD_child_for_value(self, value):
@@ -482,8 +487,8 @@ class VaryNode:
         return sum([child.count for child in self.AD_children if child is not None])
 
 
-    def discoverMCV(self):
-        return max(self.values, key=lambda v: len(self.row_subselections[v]))
+    def discoverMCV(self, row_subselections):
+        return max(self.values, key=lambda v: len(row_subselections[v]))
 
 
     def __str__(self):
