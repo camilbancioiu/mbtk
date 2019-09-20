@@ -107,10 +107,12 @@ ExperimentDef.algorithm_run_configuration = AlgorithmRunConfiguration
 ADTree_repo = ExperimentDef.path / 'adtrees'
 JHT_repo = ExperimentDef.path / 'jht'
 CITestResult_repo = ExperimentDef.path / 'ci_test_results'
+DoFCacheRepo = ExperimentDef.path / 'dof_cache'
 
 ADTree_repo.mkdir(parents=True, exist_ok=True)
 JHT_repo.mkdir(parents=True, exist_ok=True)
 CITestResult_repo.mkdir(parents=True, exist_ok=True)
+DoFCacheRepo.mkdir(parents=True, exist_ok=True)
 
 BayesianNetwork = util.read_bif_file(ExdsDef.source_configuration['sourcepath'])
 BayesianNetwork.finalize()
@@ -119,6 +121,7 @@ CITest_Significance = 0.95
 LLT = 0
 
 ADTree_path = ADTree_repo / 'adtree_{}_llt{}.pickle'.format(ExdsDef.name, LLT)
+DoFCache_path = DoFCacheRepo / 'dofcache_{}.pickle'.format(ExdsDef.name)
 
 DefaultParameters = {
     'omega': Omega,
@@ -178,6 +181,8 @@ for target in range(len(BayesianNetwork)):
         'ci_test_dof_calculator_class': mbff.math.DoFCalculators.CachedStructuralDoF,
         'ci_test_jht_path__load': JHT_repo / 'jht_{}.pickle'.format(ExdsDef.name),
         'ci_test_jht_path__save': JHT_repo / 'jht_{}.pickle'.format(ExdsDef.name),
+        'ci_test_dof_calculator_cache_path__load': DoFCache_path,
+        'ci_test_dof_calculator_cache_path__save': DoFCache_path,
         'ci_test_results_path__save': CITestResult_repo / 'ci_test_results_{}_T{}_dcMI.pickle'.format(ExdsDef.name, target)
     }
     Parameters_Gtest_dcMI.append(parameters)
