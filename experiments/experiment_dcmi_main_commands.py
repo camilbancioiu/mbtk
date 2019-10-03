@@ -15,7 +15,7 @@ def command_build_adtree(arguments, ADTree_path, LLT, ExdsDef):
     matrix = exds.matrix.X
     column_values = exds.matrix.get_values_per_column('X')
     start_time = time.time()
-    adtree = mbff.structures.ADTree.ADTree(matrix, column_values, LLT, debug=3)
+    adtree = mbff.structures.ADTree.ADTree(matrix, column_values, LLT, debug=2)
     duration = time.time() - start_time
     print("AD-tree with LLT={} built in {:>10.4f}s".format(LLT, duration))
 

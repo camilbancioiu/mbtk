@@ -75,6 +75,8 @@ class ADTree:
         self.sample_count = self.matrix.get_shape()[0]
         self.bin_size = int(self.sample_count / self.count_bins)
         self.leaf_list_nodes = 0
+        self.topmost_list_length = 5
+        self.topmost_nodes = [None] * (self.topmost_list_length + 1)
 
 
     def debug_prepare__querying(self):
@@ -101,6 +103,13 @@ class ADTree:
             if node.leaf_list_node:
                 self.leaf_list_nodes += 1
 
+        if self.debug == 2:
+            if node.level <= self.topmost_list_length:
+                self.topmost_nodes[node.level] = node
+                for i in range(node.level + 1, len(self.topmost_nodes)):
+                    self.topmost_nodes[i] = None
+                print(self.debug_print_topmost_nodes())
+
         if self.debug >= 3:
             os.system('clear')
             print('Building AD-tree with LLT={}'.format(self.leaf_list_threshold))
@@ -112,6 +121,19 @@ class ADTree:
             print('Leaf list node count', self.leaf_list_nodes)
             if isinstance(node, ADNode):
                 print("ADNode added to bin", count_bin)
+
+
+    def debug_print_topmost_nodes(self):
+        output = []
+        for node in self.topmost_nodes:
+            if node is not None:
+                try:
+                    node_string = 'AD[{}:{}]'.format(node.column_index, node.value)
+                except AttributeError:
+                    node_string = 'Vary[{}]'.format(node.column_index)
+                output.append(node_string)
+
+        return ' > '.join(output)
 
 
     def find_node_for_values(self, values, current_node=None):
