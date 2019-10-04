@@ -206,28 +206,37 @@ for index, parameters in enumerate(AlgorithmRunParameters):
 ################################################################################
 # Command-line interface
 if __name__ == '__main__':
-    command = sys.argv[1]
-    arguments = sys.argv[2:]
-
+    import mbff.utilities.experiment as utilcli
     import experiment_dcmi_main_commands as custom_commands
-    from mbff.utilities.Exceptions import CLICommandNotHandled
 
-    if len(arguments) > 0 and arguments[0] == '--preload-adtree':
+    import argparse
+    argparser = argparse.ArgumentParser()
+    argparser.add_argument('--preload-adtree', action='store_true')
+
+    object_subparsers = argparser.add_subparsers(dest='object')
+    object_subparsers.required = True
+
+    utilcli.configure_objects_subparser__exp_def(object_subparsers)
+    utilcli.configure_objects_subparser__exds_def(object_subparsers)
+    utilcli.configure_objects_subparser__exds(object_subparsers)
+    utilcli.configure_objects_subparser__exp(object_subparsers)
+    utilcli.configure_objects_subparser__algruns(object_subparsers)
+    utilcli.configure_objects_subparser__algrun_datapoints(object_subparsers)
+
+    custom_commands.configure_objects_subparser__adtree(object_subparsers)
+
+    arguments = argparser.parse_args()
+
+    command_context = utilcli.CommandContext(arguments, ExperimentDef, ExdsDef, AlgorithmRunParameters)
+    command_context.ADTree_path = ADTree_path
+    command_context.LLT = LLT
+
+    if arguments.preload_adtree is True:
         adtree = None
         with ADTree_path.open('rb') as f:
             adtree = pickle.load(f)
         set_preloaded_AD_tree(adtree)
-        arguments = arguments[1:]
 
-    try:
-        if command == 'build-adtree':
-            custom_commands.command_build_adtree(arguments, ADTree_path, LLT, ExdsDef)
-        elif command == 'build-adtree-analysis':
-            custom_commands.command_build_adtree_analysis(arguments, ADTree_path, ExdsDef, ExperimentDef)
-        elif command == 'plot':
-            custom_commands.command_plot(arguments, ExperimentDef, AlgorithmRunParameters)
-        else:
-            raise CLICommandNotHandled(command)
-    except CLICommandNotHandled:
-        import mbff.utilities.experiment as utilcli
-        utilcli.handle_common_commands(command, arguments, ExperimentDef, ExdsDef, AlgorithmRunParameters)
+    command_handled = utilcli.handle_command(command_context)
+    if command_handled is False:
+        custom_commands.handle_command(command_context)

@@ -1,13 +1,39 @@
 import time
 import pickle
 import gc
+from pprint import pprint
 
 import mbff.math.G_test__with_AD_tree
 
 
-def command_build_adtree(arguments, ADTree_path, LLT, ExdsDef):
-    exds = ExdsDef.create_exds()
-    if ExdsDef.exds_ready():
+def configure_objects_subparser__adtree(subparsers):
+    subparser = subparsers.add_parser('adtree')
+    subparser.add_argument('verb', choices=['build', 'analyze', 'print-analysis'],
+                           default='print-analysis', nargs='?')
+
+
+def handle_command(command_context):
+    command_handled = False
+    command_object = command_context.arguments.object
+    command_verb = command_context.arguments.verb
+
+    if command_object == 'adtree':
+        if command_verb == 'build':
+            command_adtree_build(command_context)
+            command_handled = True
+        elif command_verb == 'analyze':
+            command_adtree_build_analysis(command_context)
+            command_handled = True
+        elif command_verb == 'print-analysis':
+            command_adtree_print_analysis(command_context)
+            command_handled = True
+
+    return command_handled
+
+
+def command_adtree_build(command_context):
+    exds = command_context.ExdsDef.create_exds()
+    if command_context.ExdsDef.exds_ready():
         exds.load()
     else:
         exds.build()
@@ -15,11 +41,11 @@ def command_build_adtree(arguments, ADTree_path, LLT, ExdsDef):
     matrix = exds.matrix.X
     column_values = exds.matrix.get_values_per_column('X')
     start_time = time.time()
-    adtree = mbff.structures.ADTree.ADTree(matrix, column_values, LLT, debug=2)
+    adtree = mbff.structures.ADTree.ADTree(matrix, column_values, command_context.LLT, debug=2)
     duration = time.time() - start_time
-    print("AD-tree with LLT={} built in {:>10.4f}s".format(LLT, duration))
+    print("AD-tree with LLT={} built in {:>10.4f}s".format(command_context.LLT, duration))
 
-    adtree_save_path = ADTree_path
+    adtree_save_path = command_context.ADTree_path
     if adtree_save_path is not None:
         with adtree_save_path.open('wb') as f:
             pickle.dump(adtree, f)
@@ -27,15 +53,14 @@ def command_build_adtree(arguments, ADTree_path, LLT, ExdsDef):
 
 
 
-def command_build_adtree_analysis(arguments, ADTree_path, ExdsDef, ExperimentDef):
+def command_adtree_build_analysis(command_context):
     from pympler.asizeof import asizeof
-    from pprint import pprint
 
-    analysis_path = ExperimentDef.path / 'adtree_analysis'
+    analysis_path = command_context.ExperimentDef.path / 'adtree_analysis'
     analysis_path.mkdir(parents=True, exist_ok=True)
 
-    tree_analysis_path = analysis_path / (ADTree_path.name)
-    with ADTree_path.open('rb') as f:
+    tree_analysis_path = analysis_path / (command_context.ADTree_path.name)
+    with command_context.ADTree_path.open('rb') as f:
         adtree = pickle.load(f)
 
     adtree.matrix = None
@@ -57,25 +82,32 @@ def command_build_adtree_analysis(arguments, ADTree_path, ExdsDef, ExperimentDef
 
 
 
-def command_plot(arguments, ExperimentDef, AlgorithmRunParameters):
+def command_adtree_print_analysis(command_context):
+    analysis_path = command_context.ExperimentDef.path / 'adtree_analysis'
 
-    try:
-        plot_what = arguments[0]
-    except IndexError:
-        plot_what = 'duration'
+    tree_analysis_path = analysis_path / (command_context.ADTree_path.name)
+    with tree_analysis_path.open('rb') as f:
+        analysis = pickle.load(f)
+    print('Analysis')
+    pprint(analysis)
 
-    try:
-        plot_save_filename = arguments[1]
-        PlotPath = ExperimentDef.path / 'plots'
-        PlotPath.mkdir(parents=True, exist_ok=True)
-        plot_save_filename = PlotPath / (plot_save_filename + '.png')
-    except IndexError:
-        plot_save_filename = None
 
-    citr = load_citr(AlgorithmRunParameters)
 
-    algruns_Gtest_ADtree = filter_algrun_parameters_Gtest_ADtree(AlgorithmRunParameters)
-    adtree_analysis = load_adtrees_analysis(algruns_Gtest_ADtree, ExperimentDef)
+
+def command_plot_create(command_context):
+
+    plot_what = command_context.arguments.metric
+    plot_save_filename = command_context.arguments.file
+
+    if plot_save_filename is not None:
+        plot_path = command_context.ExperimentDef.path / 'plots'
+        plot_path.mkdir(parents=True, exist_ok=True)
+        plot_save_filename = plot_path / (plot_save_filename + '.png')
+
+    citr = load_citr(command_context.AlgorithmRunParameters)
+
+    algruns_Gtest_ADtree = filter_algrun_parameters_Gtest_ADtree(command_context.AlgorithmRunParameters)
+    adtree_analysis = load_adtrees_analysis(algruns_Gtest_ADtree, command_context.ExperimentDef)
 
     import experiment_dcmi_main_plotting as plotting
     data = plotting.make_plot_data(plot_what, citr)
