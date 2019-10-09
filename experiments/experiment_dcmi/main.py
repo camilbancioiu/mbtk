@@ -13,29 +13,25 @@ sys.path.insert(0, str(MBFF_PATH))
 CITest_Significance = 0.95
 LLT = 0
 
+import mbff.utilities.experiment as util
 
-class ExperimentalPathSet:
+
+class CustomExperimentalPathSet(util.ExperimentalPathSet):
 
     def __init__(self, root):
-        self.Root = root
-        self.ExDsRepository = self.Root / 'exds_repository'
-        self.ExpRunRepository = self.Root / 'exprun_repository'
+        super().__init__(root)
         self.BIFRepository = self.Root / 'bif_repository'
 
 
 
-class ExperimentalSetup:
+class CustomExperimentalSetup(util.ExperimentalSetup):
 
     def __init__(self):
-        self.ExperimentDef = None
-        self.ExDsDef = None
-        self.Paths = None
+        super().__init__()
         self.Omega = None
         self.CITest_Significance = None
         self.LLT = None
         self.ADTree = None
-        self.AlgorithmRunParameters = None
-        self.Arguments = None
 
 
     def update_paths(self):
@@ -60,17 +56,6 @@ class ExperimentalSetup:
         self.set_preloaded_ADTree_to_relevant_algrun_parameters()
 
 
-    def filter_algruns_by_tag(self, tag):
-        self.AlgorithmRunParameters = [p for p in self.AlgorithmRunParameters if tag in p['tags']]
-
-
-    def is_tag_present_in_any_algrun(self, tag):
-        for parameters in self.AlgorithmRunParameters:
-            if tag in parameters['tags']:
-                return True
-        return False
-
-
     def set_preloaded_ADTree_to_relevant_algrun_parameters(self):
         for parameters in self.AlgorithmRunParameters:
             if 'adtree' in parameters['tags']:
@@ -81,7 +66,6 @@ class ExperimentalSetup:
 ################################################################################
 # Command-line interface
 if __name__ == '__main__':
-    import mbff.utilities.experiment as utilcli
     import definitions
     import algrun_parameters
     import commands
@@ -94,19 +78,19 @@ if __name__ == '__main__':
     object_subparsers = argparser.add_subparsers(dest='object')
     object_subparsers.required = True
 
-    utilcli.configure_objects_subparser__exp_def(object_subparsers)
-    utilcli.configure_objects_subparser__exds_def(object_subparsers)
-    utilcli.configure_objects_subparser__exds(object_subparsers)
-    utilcli.configure_objects_subparser__exp(object_subparsers)
-    utilcli.configure_objects_subparser__algruns(object_subparsers)
-    utilcli.configure_objects_subparser__algrun_datapoints(object_subparsers)
+    util.configure_objects_subparser__exp_def(object_subparsers)
+    util.configure_objects_subparser__exds_def(object_subparsers)
+    util.configure_objects_subparser__exds(object_subparsers)
+    util.configure_objects_subparser__exp(object_subparsers)
+    util.configure_objects_subparser__algruns(object_subparsers)
+    util.configure_objects_subparser__algrun_datapoints(object_subparsers)
 
     commands.configure_objects_subparser__adtree(object_subparsers)
 
     arguments = argparser.parse_args()
 
-    experimental_setup = ExperimentalSetup()
-    experimental_setup.Paths = ExperimentalPathSet(EXPERIMENTS_ROOT)
+    experimental_setup = CustomExperimentalSetup()
+    experimental_setup.Paths = CustomExperimentalPathSet(EXPERIMENTS_ROOT)
     experimental_setup.ExDsDef = definitions.exds_definition(experimental_setup)
     experimental_setup.ExperimentDef = definitions.exds_definition(experimental_setup)
     experimental_setup.Arguments = arguments
@@ -121,6 +105,6 @@ if __name__ == '__main__':
             experimental_setup.preload_ADTree()
 
 
-    command_handled = utilcli.handle_command(experimental_setup)
+    command_handled = util.handle_command(experimental_setup)
     if command_handled is False:
         commands.handle_command(experimental_setup)

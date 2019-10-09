@@ -2,6 +2,41 @@ import pickle
 from pprint import pprint
 
 
+class ExperimentalPathSet:
+
+    def __init__(self, root):
+        self.Root = root
+        self.ExDsRepository = self.Root / 'exds_repository'
+        self.ExpRunRepository = self.Root / 'exprun_repository'
+
+
+
+class ExperimentalSetup:
+
+    def __init__(self):
+        self.ExperimentDef = None
+        self.ExDsDef = None
+        self.Paths = None
+        self.AlgorithmRunParameters = None
+        self.Arguments = None
+
+
+    def update_paths(self):
+        self.Paths.Experiment = self.ExperimentDef.path
+
+
+    def filter_algruns_by_tag(self, tag):
+        self.AlgorithmRunParameters = [p for p in self.AlgorithmRunParameters if tag in p['tags']]
+
+
+    def is_tag_present_in_any_algrun(self, tag):
+        for parameters in self.AlgorithmRunParameters:
+            if tag in parameters['tags']:
+                return True
+        return False
+
+
+
 def configure_objects_subparser__exp_def(subparsers):
     subparser = subparsers.add_parser('exp-def')
     subparser.add_argument('verb', choices=['show'], default='show', nargs='?')
