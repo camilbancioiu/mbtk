@@ -45,116 +45,106 @@ def configure_objects_subparser__algrun_datapoints(subparsers):
 
 
 
-class CommandContext:
-
-    def __init__(self, args=None, expdef=None, exdsdef=None, algrunparams=None):
-        self.arguments = args
-        self.ExperimentDef = expdef
-        self.ExdsDef = exdsdef
-        self.AlgorithmRunParameters = algrunparams
-
-
-
-def handle_command(command_context):
+def handle_command(experimental_setup):
     command_handled = False
-    command_object = command_context.arguments.object
-    command_verb = command_context.arguments.verb
+    command_object = experimental_setup.Arguments.object
+    command_verb = experimental_setup.Arguments.verb
 
     if command_object == 'exp-def':
         if command_verb == 'show':
-            command_exp_def_show(command_context)
+            command_exp_def_show(experimental_setup)
             command_handled = True
 
     elif command_object == 'exds-def':
         if command_verb == 'show':
-            command_exds_def_show(command_context)
+            command_exds_def_show(experimental_setup)
             command_handled = True
 
     elif command_object == 'exds':
         if command_verb == 'show':
-            command_exds_show(command_context)
+            command_exds_show(experimental_setup)
             command_handled = True
         elif command_verb == 'build':
-            command_exds_build(command_context)
+            command_exds_build(experimental_setup)
             command_handled = True
         elif command_verb == 'lock':
-            command_exds_lock(command_context)
+            command_exds_lock(experimental_setup)
             command_handled = True
         elif command_verb == 'unlock':
-            command_exds_unlock(command_context)
+            command_exds_unlock(experimental_setup)
             command_handled = True
         elif command_verb == 'delete':
-            command_exds_unlock(command_context)
+            command_exds_unlock(experimental_setup)
             command_handled = True
 
     elif command_object == 'exp':
         if command_verb == 'show':
             pass
         elif command_verb == 'run':
-            command_exp_run(command_context)
+            command_exp_run(experimental_setup)
             command_handled = True
         elif command_verb == 'lock':
-            command_exp_lock(command_context)
+            command_exp_lock(experimental_setup)
             command_handled = True
         elif command_verb == 'unlock':
-            command_exp_unlock(command_context)
+            command_exp_unlock(experimental_setup)
             command_handled = True
         elif command_verb == 'delete':
-            command_exp_delete(command_context)
+            command_exp_delete(experimental_setup)
             command_handled = True
 
     elif command_object == 'algruns':
         if command_verb == 'show':
-            command_algruns_show(command_context)
+            command_algruns_show(experimental_setup)
             command_handled = True
         elif command_verb == 'list':
-            command_algruns_list(command_context)
+            command_algruns_list(experimental_setup)
             command_handled = True
 
     elif command_object == 'algrun-datapoints':
         if command_verb == 'list':
-            command_algrun_datapoints_list(command_context)
+            command_algrun_datapoints_list(experimental_setup)
             command_handled = True
 
     return command_handled
 
 
 
-def command_exp_def_show(command_context):
-    view = command_context.ExperimentDef.__dict__.copy()
-    view['locks'] = command_context.ExperimentDef.get_locks()
-    view['folder_exists'] = command_context.ExperimentDef.folder_exists()
+def command_exp_def_show(experimental_setup):
+    view = experimental_setup.ExperimentDef.__dict__.copy()
+    view['locks'] = experimental_setup.ExperimentDef.get_locks()
+    view['folder_exists'] = experimental_setup.ExperimentDef.folder_exists()
     pprint(view)
 
 
 
-def command_exds_def_show(command_context):
-    view = command_context.ExdsDef.__dict__.copy()
-    view['locks'] = command_context.ExdsDef.get_locks()
-    view['ready'] = command_context.ExdsDef.exds_ready()
-    view['folder_exists'] = command_context.ExdsDef.folder_exists()
+def command_exds_def_show(experimental_setup):
+    view = experimental_setup.ExdsDef.__dict__.copy()
+    view['locks'] = experimental_setup.ExdsDef.get_locks()
+    view['ready'] = experimental_setup.ExdsDef.exds_ready()
+    view['folder_exists'] = experimental_setup.ExdsDef.folder_exists()
     pprint(view)
 
 
 
-def command_exds_delete(command_context):
-    command_context.ExdsDef.delete_folder()
+def command_exds_delete(experimental_setup):
+    experimental_setup.ExdsDef.delete_folder()
 
 
 
-def command_exds_build(command_context):
-    if command_context.ExdsDef.exds_ready():
+def command_exds_build(experimental_setup):
+    if experimental_setup.ExdsDef.exds_ready():
         print('Experimental Dataset already built.')
     else:
-        ExDs = command_context.ExdsDef.create_exds()
+        ExDs = experimental_setup.ExdsDef.create_exds()
         ExDs.build()
         print('Experimental Dataset has been built.')
 
 
 
-def command_exds_show(command_context):
-    if command_context.ExdsDef.exds_ready():
-        ExDs = command_context.ExdsDef.create_exds()
+def command_exds_show(experimental_setup):
+    if experimental_setup.ExdsDef.exds_ready():
+        ExDs = experimental_setup.ExdsDef.create_exds()
         ExDs.load()
         print(ExDs.info())
     else:
@@ -162,45 +152,45 @@ def command_exds_show(command_context):
 
 
 
-def command_exds_unlock(command_context):
-    command_context.ExdsDef.unlock_folder(command_context.arguments.type)
+def command_exds_unlock(experimental_setup):
+    experimental_setup.ExdsDef.unlock_folder(experimental_setup.Arguments.type)
 
 
 
-def command_exp_run(command_context):
-    selected_algruns = get_algruns_by_index(command_context.arguments, command_context.AlgorithmRunParameters)
-    command_context.ExperimentDef.algorithm_run_parameters = selected_algruns
-    Experiment = command_context.ExperimentDef.create_experiment_run()
+def command_exp_run(experimental_setup):
+    selected_algruns = get_algruns_by_index(experimental_setup.Arguments, experimental_setup.AlgorithmRunParameters)
+    experimental_setup.ExperimentDef.algorithm_run_parameters = selected_algruns
+    Experiment = experimental_setup.ExperimentDef.create_experiment_run()
     Experiment.run()
 
 
 
-def command_exp_unlock(command_context):
-    command_context.ExperimentDef.unlock_folder(command_context.arguments.type)
+def command_exp_unlock(experimental_setup):
+    experimental_setup.ExperimentDef.unlock_folder(experimental_setup.Arguments.type)
 
 
 
-def command_exp_lock(command_context):
-    command_context.ExperimentDef.lock_folder(command_context.arguments.type)
+def command_exp_lock(experimental_setup):
+    experimental_setup.ExperimentDef.lock_folder(experimental_setup.Arguments.type)
 
 
 
-def command_exds_lock(command_context):
-    command_context.ExdsDef.lock_folder(command_context.arguments.type)
+def command_exds_lock(experimental_setup):
+    experimental_setup.ExdsDef.lock_folder(experimental_setup.Arguments.type)
 
 
 
-def command_exp_delete(command_context):
-    command_context.ExperimentDef.delete_folder()
+def command_exp_delete(experimental_setup):
+    experimental_setup.ExperimentDef.delete_folder()
 
 
 
-def command_algruns_show(command_context):
-    algrun_parameters_index = get_algrun_index(command_context.arguments.index)
+def command_algruns_show(experimental_setup):
+    algrun_parameters_index = get_algrun_index(experimental_setup.Arguments.index)
     if algrun_parameters_index is None:
-        algruns = command_context.AlgorithmRunParameters
+        algruns = experimental_setup.AlgorithmRunParameters
     else:
-        algruns = command_context.AlgorithmRunParameters[algrun_parameters_index]
+        algruns = experimental_setup.AlgorithmRunParameters[algrun_parameters_index]
     for i, algrun in enumerate(algruns):
         print('AlgorithmRun {} parameters:'.format(algrun_parameters_index.start + i))
         pprint(algrun)
@@ -208,9 +198,9 @@ def command_algruns_show(command_context):
 
 
 
-def command_algruns_list(command_context):
-    specific_key = command_context.arguments.key
-    for index, parameters in enumerate(command_context.AlgorithmRunParameters):
+def command_algruns_list(experimental_setup):
+    specific_key = experimental_setup.Arguments.key
+    for index, parameters in enumerate(experimental_setup.AlgorithmRunParameters):
         print('AlgorithmRun {} parameters:'.format(index))
         if specific_key is not None:
             try:
@@ -220,15 +210,15 @@ def command_algruns_list(command_context):
         else:
             pprint(parameters)
         print()
-    print('Total of', len(command_context.AlgorithmRunParameters), 'AlgorithmRun parameters')
+    print('Total of', len(experimental_setup.AlgorithmRunParameters), 'AlgorithmRun parameters')
 
 
 
-def command_algrun_datapoints_list(command_context):
-    datapoints_folder = command_context.ExperimentDef.subfolder('algorithm_run_datapoints')
+def command_algrun_datapoints_list(experimental_setup):
+    datapoints_folder = experimental_setup.ExperimentDef.subfolder('algorithm_run_datapoints')
     datapoint_files = sorted(list(datapoints_folder.iterdir()))
 
-    algrun_parameters_index = get_algrun_index(command_context.arguments.index)
+    algrun_parameters_index = get_algrun_index(experimental_setup.Arguments.index)
     if algrun_parameters_index is None:
         datapoint_files_to_list = datapoint_files
     else:
@@ -244,17 +234,17 @@ def command_algrun_datapoints_list(command_context):
 
 
 
-def get_algruns_by_index(command_context):
-    algrun_parameters_index = get_algrun_index(command_context.arguments)
+def get_algruns_by_index(experimental_setup):
+    algrun_parameters_index = get_algrun_index(experimental_setup.Arguments)
     if algrun_parameters_index is None:
-        return command_context.AlgorithmRunParameters
+        return experimental_setup.AlgorithmRunParameters
     else:
-        return command_context.AlgorithmRunParameters[algrun_parameters_index]
+        return experimental_setup.AlgorithmRunParameters[algrun_parameters_index]
 
 
 
-def get_algrun_index(command_context):
-    algrun_parameters_index = command_context.arguments.index
+def get_algrun_index(experimental_setup):
+    algrun_parameters_index = experimental_setup.Arguments.index
     if algrun_parameters_index is None:
         return None
     else:
