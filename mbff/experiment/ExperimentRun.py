@@ -63,10 +63,6 @@ class ExperimentRun:
             self.definition.lock_folder('experiment')
 
 
-    def make_algorithm_run_ID(self, algorithm_run_parameters):
-        pass
-
-
     def run_algorithm(self, algorithm_run_parameters):
         algorithm_run = self.definition.algorithm_run_class(self.exds, self.definition.algorithm_run_configuration, algorithm_run_parameters)
         algorithm_run_stdout_destination = self.get_algorithm_run_stdout_destination(algorithm_run)
