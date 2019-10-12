@@ -19,9 +19,10 @@ from mbff.dataset.sources.SampledBayesianNetworkDatasetSource import SampledBaye
 import mbff.math.Variable
 
 
-def exds_definition(experimental_setup, sample_count_string):
+def exds_definition(experimental_setup):
     """Argument sample_count_string should be a positive integer in exponential
     notation, e.g. 4e4 or 2e5"""
+    sample_count_string = experimental_setup.Arguments.sample_count
     exds_name = 'synthetic_alarm_{}'.format(sample_count_string)
     sample_count = int(float(sample_count_string))
 
@@ -54,11 +55,11 @@ from mbff.algorithms.mb.ipcmb import AlgorithmIPCMB
 
 
 def experiment_definition(experimental_setup):
-    experimentDef = ExperimentDefinition(experimental_setup.Paths.ExpRunRepository, 'dcMIEvExp')
+    experiment_name = 'dcMIEvExp_{}'.format(experimental_setup.Arguments.sample_count)
+    experimentDef = ExperimentDefinition(experimental_setup.Paths.ExpRunRepository, experiment_name)
     experimentDef.experiment_run_class = ExperimentRun
     experimentDef.algorithm_run_class = AlgorithmRun
     experimentDef.algorithm_run_configuration = {
-        'label': make_algorithm_run_label,
         'algorithm': AlgorithmIPCMB
     }
     experimentDef.algorithm_run_datapoint_class = AlgorithmRunDatapoint
@@ -68,17 +69,3 @@ def experiment_definition(experimental_setup):
     experimentDef.algorithm_run_log__file = True
 
     return experimentDef
-
-
-# This function will be called by the ExperimentRun object to give each
-# AlgorithmRun a unique label, based on what CI test class was configured for
-# IPC-MB during the run
-def make_algorithm_run_label(parameters):
-    if parameters['ci_test_class'] is mbff.math.DSeparationCITest.DSeparationCITest:
-        return Template('run_${algorithm_run_index}_T${target}__dsep')
-    if parameters['ci_test_class'] is mbff.math.G_test__unoptimized.G_test:
-        return Template('run_${algorithm_run_index}_T${target}__unoptimized')
-    if parameters['ci_test_class'] is mbff.math.G_test__with_AD_tree.G_test:
-        return Template('run_${algorithm_run_index}_T${target}__@LLT=${ci_test_ad_tree_leaf_list_threshold}')
-    if parameters['ci_test_class'] is mbff.math.G_test__with_dcMI.G_test:
-        return Template('run_${algorithm_run_index}_T${target}__dcMI')
