@@ -39,6 +39,8 @@ def create_algrun_parameters(experimental_setup):
 
     for index, parameters in enumerate(parameters_list):
         parameters['index'] = index
+        ID_format = parameters['ID']
+        parameters['ID'] = ID_format.format(**parameters)
 
     return parameters_list
 
@@ -74,6 +76,7 @@ def create_algrun_parameters__dsep(experimental_setup, default_parameters):
             'ci_test_class': dsep,
             'ci_test_results_path__save': citrrepo / citr_filename,
             'tags': ['dsep', 'fast', 'no_dependencies'],
+            'ID': 'run_{index}_T{target}__dsep',
         }
         parameters.update(default_parameters)
         parameters_list.append(parameters)
@@ -99,6 +102,7 @@ def create_algrun_parameters__unoptimized(experimental_setup, default_parameters
             'ci_test_dof_calculator_class': dof__structural,
             'ci_test_results_path__save': citrrepo / citr_filename,
             'tags': ['unoptimized', 'slow', 'no_dependencies'],
+            'ID': 'run_{index}_T{target}__unoptimized',
         }
         parameters.update(default_parameters)
         parameters_list.append(parameters)
@@ -127,6 +131,7 @@ def create_algrun_parameters__adtree(experimental_setup, default_parameters):
             'ci_test_ad_tree_path__load': experimental_setup.Paths.ADTree,
             'ci_test_results_path__save': citrrepo / citr_filename,
             'tags': ['adtree', 'fast', 'has_dependencies'],
+            'ID': 'run_{index}_T{target}__@LLT={ci_test_ad_tree_leaf_list_threshold}',
         }
         parameters.update(default_parameters)
         parameters_list.append(parameters)
@@ -162,6 +167,7 @@ def create_algrun_parameters__dcmi(experimental_setup, default_parameters):
             'ci_test_dof_calculator_cache_path__save': dof_cache_path,
             'ci_test_results_path__save': citrrepo / citr_filename,
             'tags': ['dcmi', 'fast', 'no_dependencies'],
+            'ID': 'run_{index}_T{target}__dcMI',
         }
 
         parameters.update(default_parameters)

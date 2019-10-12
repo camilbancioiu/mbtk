@@ -1,7 +1,6 @@
 import time
 import numpy
 import gc
-from string import Template
 
 
 class AlgorithmRun:
@@ -9,7 +8,7 @@ class AlgorithmRun:
     def __init__(self, exds, configuration, parameters):
         self.configuration = configuration
         self.parameters = parameters
-        self.ID = ''
+        self.ID = self.parameters['ID']
         self.algorithm = self.configuration['algorithm']
         self.algorithm_name = '.'.join([self.algorithm.__module__, self.algorithm.__name__])
         self.algorithm_instance = None
@@ -21,16 +20,6 @@ class AlgorithmRun:
 
         self.selected_features = []
         self.objective_index = -1
-
-        self.label = self.configuration['label']
-
-        # self.label could be a callback.
-        if callable(self.label):
-            self.label = self.label(self.parameters)
-
-        # self.label could be a Template string.
-        if isinstance(self.label, Template):
-            self.label = self.label.safe_substitute(self.parameters)
 
 
     def run(self):

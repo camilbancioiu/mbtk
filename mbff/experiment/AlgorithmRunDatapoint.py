@@ -6,7 +6,6 @@ import pprint
 class AlgorithmRunDatapoint:
     def __init__(self, algorithm_run):
         self.parameters = self.pickleable_parameters(algorithm_run.parameters)
-        self.label = algorithm_run.label
         self.ID = algorithm_run.ID
         self.algorithm_name = algorithm_run.algorithm_name
         self.selected_features = algorithm_run.selected_features
@@ -26,7 +25,6 @@ class AlgorithmRunDatapoint:
 
     def __str__(self):
         view = dict()
-        view['label'] = self.label
         view['ID'] = self.ID
         view['algorithm_name'] = self.algorithm_name
         view['parameters'] = pprint.pformat(self.parameters)
@@ -35,9 +33,9 @@ class AlgorithmRunDatapoint:
         view['exact_duration'] = self.duration
         format_string = (
             '{ID}\n'
+            'Duration: {exact_duration:.2f}s ({duration})\n'
             '{algorithm_name}, with parameters:\n'
-            '{parameters}\n'
-            'Duration: {exact_duration:.2f}s ({duration})')
+            '{parameters}\n')
         return format_string.format(**view)
 
 

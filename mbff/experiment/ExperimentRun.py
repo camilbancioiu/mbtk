@@ -4,8 +4,6 @@ import contextlib
 import pickle
 import gc
 
-from string import Template
-
 from mbff.utilities.MultiFileWriter import MultiFileWriter
 from mbff.experiment.Exceptions import ExperimentFolderLockedException
 
@@ -67,9 +65,6 @@ class ExperimentRun:
 
     def run_algorithm(self, algorithm_run_parameters):
         algorithm_run = self.definition.algorithm_run_class(self.exds, self.definition.algorithm_run_configuration, algorithm_run_parameters)
-        algorithm_run_index = algorithm_run_parameters['index']
-        algorithm_run.ID = Template(algorithm_run.label).safe_substitute(algorithm_run_index=algorithm_run_index)
-
         algorithm_run_stdout_destination = self.get_algorithm_run_stdout_destination(algorithm_run)
         try:
             with contextlib.redirect_stdout(algorithm_run_stdout_destination):

@@ -1,7 +1,6 @@
 import sys
 import os
 from pathlib import Path
-from string import Template
 
 
 # Assume that the 'experiments' folder, which contains this file, is directly
