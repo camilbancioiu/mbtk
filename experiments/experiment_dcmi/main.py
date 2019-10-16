@@ -49,8 +49,12 @@ class CustomExperimentalSetup(util.ExperimentalSetup):
 
 
     def preload_ADTree(self):
+        import gc
+        print('Starting AD-tree preloading...')
         with self.Paths.ADTree.open('rb') as f:
             self.ADTree = pickle.load(f)
+        gc.collect()
+        print('AD-tree preloading complete.')
         self.set_preloaded_ADTree_to_relevant_algrun_parameters()
 
 
