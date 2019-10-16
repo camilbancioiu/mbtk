@@ -215,7 +215,7 @@ def command_exds_unlock(experimental_setup):
 
 
 def command_exp_run(experimental_setup):
-    selected_parameters = get_parameters_by_index(experimental_setup.Arguments, experimental_setup.AlgorithmRunParameters)
+    selected_parameters = get_parameters_by_index(experimental_setup)
     experimental_setup.ExperimentDef.algorithm_run_parameters = selected_parameters
     Experiment = experimental_setup.ExperimentDef.create_experiment_run()
     Experiment.run()

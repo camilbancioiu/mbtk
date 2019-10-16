@@ -32,8 +32,8 @@ def handle_command(experimental_setup):
 
 
 def command_adtree_build(experimental_setup):
-    exds = experimental_setup.ExdsDef.create_exds()
-    if experimental_setup.ExdsDef.exds_ready():
+    exds = experimental_setup.ExDsDef.create_exds()
+    if experimental_setup.ExDsDef.exds_ready():
         exds.load()
     else:
         exds.build()
@@ -45,7 +45,7 @@ def command_adtree_build(experimental_setup):
     duration = time.time() - start_time
     print("AD-tree with LLT={} built in {:>10.4f}s".format(experimental_setup.LLT, duration))
 
-    adtree_save_path = experimental_setup.ADTree_path
+    adtree_save_path = experimental_setup.Paths.ADTree
     if adtree_save_path is not None:
         with adtree_save_path.open('wb') as f:
             pickle.dump(adtree, f)
@@ -59,8 +59,8 @@ def command_adtree_build_analysis(experimental_setup):
     analysis_path = experimental_setup.ExperimentDef.path / 'adtree_analysis'
     analysis_path.mkdir(parents=True, exist_ok=True)
 
-    tree_analysis_path = analysis_path / (experimental_setup.ADTree_path.name)
-    with experimental_setup.ADTree_path.open('rb') as f:
+    tree_analysis_path = analysis_path / (experimental_setup.Paths.ADTree.name)
+    with experimental_setup.Paths.ADTree.open('rb') as f:
         adtree = pickle.load(f)
 
     adtree.matrix = None
@@ -85,7 +85,7 @@ def command_adtree_build_analysis(experimental_setup):
 def command_adtree_print_analysis(experimental_setup):
     analysis_path = experimental_setup.ExperimentDef.path / 'adtree_analysis'
 
-    tree_analysis_path = analysis_path / (experimental_setup.ADTree_path.name)
+    tree_analysis_path = analysis_path / (experimental_setup.Paths.ADTree.name)
     with tree_analysis_path.open('rb') as f:
         analysis = pickle.load(f)
     print('Analysis')
