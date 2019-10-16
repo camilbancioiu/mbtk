@@ -372,6 +372,14 @@ class ADNode:
         return "{}AD col{}={} ({}){}".format(INDENT * (self.level), self.column_index, self.value, self.count, children)
 
 
+    def __getstate__(self):
+        return (self.level, self.count, self.column_index, self.value, self.leaf_list_node, self.Vary_children)
+
+
+    def __setstate__(self, state):
+        (self.level, self.count, self.column_index, self.value, self.leaf_list_node, self.Vary_children) = state
+
+
     def children_to_string(self):
         rendered_children = []
         for child in self.Vary_children:
@@ -457,6 +465,14 @@ class VaryNode:
             tree.debug_node(self)
 
         self.create_AD_children(tree, row_subselections)
+
+
+    def __getstate__(self):
+        return (self.level, self.column_index, self.values, self.AD_children, self.most_common_value)
+
+
+    def __setstate__(self, state):
+        (self.level, self.column_index, self.values, self.AD_children, self.most_common_value) = state
 
 
     def create_AD_children(self, tree, row_subselections):
