@@ -1,6 +1,6 @@
 import time
-import pickle
 import gc
+import pickle
 from pprint import pprint
 
 import mbff.math.G_test__with_AD_tree
@@ -8,7 +8,7 @@ import mbff.math.G_test__with_AD_tree
 
 def configure_objects_subparser__adtree(subparsers):
     subparser = subparsers.add_parser('adtree')
-    subparser.add_argument('verb', choices=['build', 'analyze', 'print-analysis'],
+    subparser.add_argument('verb', choices=['build', 'analyze', 'print-analysis', 'test-load'],
                            default='print-analysis', nargs='?')
 
 
@@ -26,6 +26,9 @@ def handle_command(experimental_setup):
             command_handled = True
         elif command_verb == 'print-analysis':
             command_adtree_print_analysis(experimental_setup)
+            command_handled = True
+        elif command_verb == 'test-load':
+            command_adtree_test_load(experimental_setup)
             command_handled = True
 
     return command_handled
@@ -91,6 +94,46 @@ def command_adtree_print_analysis(experimental_setup):
     print('Analysis')
     pprint(analysis)
 
+
+
+def command_adtree_test_load(experimental_setup):
+    from pympler.asizeof import asizeof
+    from humanize import naturalsize
+
+    print('Loading AD-tree from {}...'.format(experimental_setup.Paths.ADTree))
+    start_time = time.time()
+
+    adtree = load_adtree(experimental_setup.Paths.ADTree)
+
+    print('AD-tree size:', naturalsize(asizeof(adtree)))
+
+    adtree_node_count = adtree.ad_node_count + adtree.vary_node_count
+    duration = time.time() - start_time
+    print('AD-tree loaded in {:.2f}s. It contains {} nodes, ({} AD; {} Vary).'
+          .format(duration, adtree_node_count, adtree.ad_node_count, adtree.vary_node_count))
+
+    input('Press <ENTER> to run GC after loading the AD-tree...')
+    gc.collect()
+
+    input('Press <ENTER> to run GC after setting adtree = None...')
+    adtree = None
+    del adtree
+    gc.collect()
+
+    input('Press <ENTER> to exit...')
+
+
+
+def load_adtree(path):
+    adtree = None
+
+    with path.open('rb') as f:
+        unpickler = pickle.Unpickler(f)
+        adtree = unpickler.load()
+
+    del unpickler
+
+    return adtree
 
 
 
