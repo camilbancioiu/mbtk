@@ -97,15 +97,10 @@ def command_adtree_print_analysis(experimental_setup):
 
 
 def command_adtree_test_load(experimental_setup):
-    from pympler.asizeof import asizeof
-    from humanize import naturalsize
-
     print('Loading AD-tree from {}...'.format(experimental_setup.Paths.ADTree))
     start_time = time.time()
 
     adtree = load_adtree(experimental_setup.Paths.ADTree)
-
-    print('AD-tree size:', naturalsize(asizeof(adtree)))
 
     adtree_node_count = adtree.ad_node_count + adtree.vary_node_count
     duration = time.time() - start_time
