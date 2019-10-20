@@ -7,7 +7,9 @@ from mbff_tests.TestBase import TestBase
 from mbff.structures.BayesianNetwork import BayesianNetwork
 from mbff.math.DSeparationCITest import DSeparationCITest
 from mbff.algorithms.mb.ipcmb import AlgorithmIPCMB
+
 import mbff.math.G_test__unoptimized
+import mbff.math.DoFCalculators
 import mbff.utilities.functions as util
 
 
@@ -45,6 +47,7 @@ class TestAlgorithmIPCMB(TestBase):
         parameters['ci_test_debug'] = 0
         parameters['omega'] = Omega
         parameters['source_bayesian_network'] = bn
+        parameters['ci_test_dof_calculator_class'] = mbff.math.DoFCalculators.StructuralDoF
 
         ipcmb = AlgorithmIPCMB(datasetmatrix, parameters)
         mb = ipcmb.select_features()

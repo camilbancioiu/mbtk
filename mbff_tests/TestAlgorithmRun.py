@@ -1,7 +1,5 @@
 import numpy
 
-from string import Template
-
 from mbff_tests.TestBase import TestBase
 from mbff_tests.MockDatasetSource import MockDatasetSource
 
@@ -32,7 +30,8 @@ class TestAlgorithmRun(TestBase):
         }
         parameters = {
             'Q': 4,
-            'objective_index': 0
+            'objective_index': 0,
+            'ID': 'test_algrun_Q4_T0',
         }
         algrun = AlgorithmAndClassifierRun(exds, configuration, parameters)
 
@@ -58,17 +57,16 @@ class TestAlgorithmRun(TestBase):
     def test_algorithm_run_configuration(self):
         # Prepare an AlgorithmRun instance.
         configuration = {
-            'label': Template('${nosubstitution}__test_AlgorithmIGt_Q${Q}_Obj${objective_index}'),
             'classifier': MockBernouliClassifier,
             'algorithm': AlgorithmIGt,
         }
         parameters = {
             'Q': 4,
-            'objective_index': 0
+            'objective_index': 0,
+            'ID': 'test_algrun_Q4_T0',
         }
         algrun = AlgorithmAndClassifierRun(None, configuration, parameters)
 
-        self.assertEqual('${nosubstitution}__test_AlgorithmIGt_Q4_Obj0', algrun.label)
         self.assertEqual('mbff.algorithms.basic.IGt.AlgorithmIGt', algrun.algorithm_name)
         self.assertEqual('mbff_tests.TestAlgorithmRun.MockBernouliClassifier', algrun.classifier_classname)
 

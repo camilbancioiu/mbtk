@@ -1,6 +1,5 @@
 import numpy
 import scipy
-import pickle
 
 from pathlib import Path
 
@@ -29,39 +28,7 @@ class TestADTree(TestBase):
     @classmethod
     def prepareTestResources(testClass):
         super(TestADTree, testClass).prepareTestResources()
-        testClass.prepare_AD_trees()
-
-
-    @classmethod
-    def prepare_AD_trees(testClass):
-        testClass.ADTrees = dict()
-        for label in testClass.ADTreesInUse:
-            testClass.ADTrees[label] = testClass.prepare_AD_tree(label)
         testClass.prepare_small_AD_trees()
-
-
-    @classmethod
-    def prepare_AD_tree(testClass, label):
-        configuration = testClass.configure_adtree(label)
-        path = testClass.ADTreesFolder / (label + '.pickle')
-        adtree = None
-        if path.exists():
-            with path.open('rb') as f:
-                adtree = pickle.load(f)
-            adtree.debug = configuration['debug']
-            if adtree.debug >= 1:
-                adtree.debug_prepare__querying()
-        else:
-            datasetmatrix = testClass.DatasetMatrices[label]
-            matrix = datasetmatrix.X
-            column_values = datasetmatrix.get_values_per_column('X')
-            leaf_list_threshold = configuration['leaf_list_threshold']
-            debug = configuration['debug']
-            adtree = ADTree(matrix, column_values, leaf_list_threshold, debug)
-            if path is not None:
-                with path.open('wb') as f:
-                    pickle.dump(adtree, f)
-        return adtree
 
 
     @classmethod
