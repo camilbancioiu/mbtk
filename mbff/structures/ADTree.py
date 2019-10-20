@@ -365,26 +365,12 @@ class ADNode:
         return None
 
 
-    def __str__(self):
-        children = self.children_to_string()
-        if len(children) > 0:
-            children = "\n" + children
-        return "{}AD col{}={} ({}){}".format(INDENT * (self.level), self.column_index, self.value, self.count, children)
-
-
     def __getstate__(self):
-        return (self.level, self.count, self.column_index, self.value, self.leaf_list_node, self.Vary_children)
+        return (self.count, self.column_index, self.value, self.leaf_list_node, self.Vary_children, self.row_selection)
 
 
     def __setstate__(self, state):
-        (self.level, self.count, self.column_index, self.value, self.leaf_list_node, self.Vary_children) = state
-
-
-    def children_to_string(self):
-        rendered_children = []
-        for child in self.Vary_children:
-            rendered_children.append(str(child))
-        return "\n".join(rendered_children)
+        (self.count, self.column_index, self.value, self.leaf_list_node, self.Vary_children, self.row_selection) = state
 
 
     def make_contingency_table(self, tree, columns=list()):
@@ -468,11 +454,11 @@ class VaryNode:
 
 
     def __getstate__(self):
-        return (self.level, self.column_index, self.values, self.AD_children, self.most_common_value)
+        return (self.column_index, self.values, self.AD_children, self.most_common_value)
 
 
     def __setstate__(self, state):
-        (self.level, self.column_index, self.values, self.AD_children, self.most_common_value) = state
+        (self.column_index, self.values, self.AD_children, self.most_common_value) = state
 
 
     def create_AD_children(self, tree, row_subselections):
@@ -527,27 +513,6 @@ class VaryNode:
 
     def discoverMCV(self, row_subselections):
         return max(self.values, key=lambda v: len(row_subselections[v]))
-
-
-    def __str__(self):
-        children = self.children_to_string()
-        if len(children) > 0:
-            children = "\n" + children
-        return "{}Vary col{} (MCV={}){}".format(INDENT * (self.level), self.column_index, self.most_common_value, children)
-
-
-    def children_to_string(self):
-        rendered_children = []
-        for value in self.values:
-            if value != self.most_common_value:
-                child = self.get_AD_child_for_value(value)
-                if child is None:
-                    rendered_children.append("{}AD col{}={} (0) NULL".format(INDENT * (self.level + 1), self.column_index, value))
-                else:
-                    rendered_children.append(str(child))
-            else:
-                rendered_children.append("{}AD col{}={} (MCV) NULL".format(INDENT * (self.level + 1), self.column_index, value))
-        return "\n".join(rendered_children)
 
 
 
