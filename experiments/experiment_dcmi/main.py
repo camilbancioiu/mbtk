@@ -99,6 +99,7 @@ if __name__ == '__main__':
     util.configure_objects_subparser__datapoints(object_subparsers)
 
     commands.configure_objects_subparser__adtree(object_subparsers)
+    commands.configure_objects_subparser__plot(object_subparsers)
 
     arguments = argparser.parse_args()
 

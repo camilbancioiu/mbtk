@@ -12,6 +12,14 @@ def configure_objects_subparser__adtree(subparsers):
                            default='print-analysis', nargs='?')
 
 
+def configure_objects_subparser__plot(subparsers):
+    subparser = subparsers.add_parser('plot')
+    subparser.add_argument('verb', choices=['create'],
+                           default='create', nargs='?')
+    subparser.add_argument('--metric', type=str, nargs='?', default='duration-cummulative')
+    subparser.add_argument('--file', type=str, nargs='?', default=None)
+
+
 def handle_command(experimental_setup):
     command_handled = False
     command_object = experimental_setup.Arguments.object
@@ -29,6 +37,11 @@ def handle_command(experimental_setup):
             command_handled = True
         elif command_verb == 'test-load':
             command_adtree_test_load(experimental_setup)
+            command_handled = True
+
+    if command_object == 'plot':
+        if command_verb == 'create':
+            command_plot_create(experimental_setup)
             command_handled = True
 
     return command_handled
@@ -142,12 +155,12 @@ def command_plot_create(experimental_setup):
         plot_path.mkdir(parents=True, exist_ok=True)
         plot_save_filename = plot_path / (plot_save_filename + '.png')
 
-    citr = load_citr(experimental_setup.AlgorithmRunParameters)
+    citr = load_citr(experimental_setup)
 
-    algruns_Gtest_ADtree = filter_algrun_parameters_Gtest_ADtree(experimental_setup.AlgorithmRunParameters)
+    algruns_Gtest_ADtree = experimental_setup.get_algruns_by_tag('adtree')
     adtree_analysis = load_adtrees_analysis(algruns_Gtest_ADtree, experimental_setup.ExperimentDef)
 
-    import experiment_dcmi_main_plotting as plotting
+    import plotting
     data = plotting.make_plot_data(plot_what, citr)
     plotting.plot(data, adtree_analysis, plot_save_filename)
 

@@ -49,7 +49,7 @@ def plot(data, adtree_analysis, plot_save_filename):
 
     legend = make_plot_legend(data, adtree_analysis)
     Plotter.legend(legend)
-    # Plotter.yscale('log')
+    Plotter.yscale('log')
     Plotter.grid(True)
     Plotter.title('CI test times')
     Plotter.tight_layout()
