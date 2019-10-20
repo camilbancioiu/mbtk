@@ -8,7 +8,7 @@ import mbff.math.G_test__with_AD_tree
 
 def configure_objects_subparser__adtree(subparsers):
     subparser = subparsers.add_parser('adtree')
-    subparser.add_argument('verb', choices=['build', 'analyze', 'print-analysis', 'test-load'],
+    subparser.add_argument('verb', choices=['build', 'analyze', 'print-analysis', 'test-load', 'update'],
                            default='print-analysis', nargs='?')
 
 
@@ -37,6 +37,9 @@ def handle_command(experimental_setup):
             command_handled = True
         elif command_verb == 'test-load':
             command_adtree_test_load(experimental_setup)
+            command_handled = True
+        elif command_verb == 'update':
+            command_adtree_update(experimental_setup)
             command_handled = True
 
     if command_object == 'plot':
@@ -132,6 +135,19 @@ def command_adtree_test_load(experimental_setup):
 
 
 
+def command_adtree_update(experimental_setup):
+    path = experimental_setup.Paths.ADTree
+    print('Loading AD-tree from {}...'.format(path))
+    adtree = load_adtree(path)
+    print('AD-tree loaded, running GC...')
+    gc.collect()
+    print('Saving the AD-tree as updated to {}...'.format(path))
+    with path.open('wb') as f:
+        pickle.dump(adtree, f)
+    print('Done')
+
+
+
 def load_adtree(path):
     adtree = None
 
@@ -146,7 +162,6 @@ def load_adtree(path):
 
 
 def command_plot_create(experimental_setup):
-
     plot_what = experimental_setup.Arguments.metric
     plot_save_filename = experimental_setup.Arguments.file
 
