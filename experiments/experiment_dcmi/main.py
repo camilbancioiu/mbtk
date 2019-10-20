@@ -82,7 +82,7 @@ if __name__ == '__main__':
 
     import argparse
     argparser = argparse.ArgumentParser()
-    argparser.add_argument('--preload-adtree', action='store_true')
+    argparser.add_argument('--dont-preload-adtree', action='store_true')
     argparser.add_argument('--algrun-tag', type=str, default=None, nargs='?')
 
     argparser.add_argument('sample_count', type=str, default=None)
@@ -117,7 +117,8 @@ if __name__ == '__main__':
     if arguments.algrun_tag is not None:
         experimental_setup.filter_algruns_by_tag(arguments.algrun_tag)
 
-    if arguments.preload_adtree is True:
+    preload_adtree = arguments.object == 'exp' and arguments.verb == 'run' and not arguments.dont_preload_adtree
+    if preload_adtree is True:
         if experimental_setup.is_tag_present_in_any_algrun('adtree'):
             experimental_setup.preload_ADTree()
 
