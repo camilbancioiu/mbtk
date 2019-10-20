@@ -34,7 +34,11 @@ class ExperimentalSetup:
 
 
     def filter_algruns_by_tag(self, tag):
-        self.AlgorithmRunParameters = [p for p in self.AlgorithmRunParameters if tag in p['tags']]
+        self.AlgorithmRunParameters = self.get_algruns_by_tag(tag)
+
+
+    def get_algruns_by_tag(self, tag):
+        return [p for p in self.AlgorithmRunParameters if tag in p['tags']]
 
 
     def is_tag_present_in_any_algrun(self, tag):
@@ -76,6 +80,7 @@ def configure_objects_subparser__exp(subparsers):
     subparser.add_argument('verb', choices=['show', 'run', 'lock', 'unlock', 'delete'],
                            default='show', nargs='?')
     subparser.add_argument('--index', type=str, default=None)
+    subparser.add_argument('--type', type=str, default='')
 
 
 
@@ -129,7 +134,7 @@ def handle_command(experimental_setup):
             command_exds_unlock(experimental_setup)
             command_handled = True
         elif command_verb == 'delete':
-            command_exds_unlock(experimental_setup)
+            command_exds_delete(experimental_setup)
             command_handled = True
 
     elif command_object == 'exp':
@@ -314,7 +319,7 @@ def command_datapoints_list(experimental_setup):
 
 
 def get_parameters_by_index(experimental_setup):
-    parameters_index = get_parameters_index(experimental_setup.Arguments)
+    parameters_index = get_parameters_index(experimental_setup)
     if parameters_index is None:
         return experimental_setup.AlgorithmRunParameters
     else:

@@ -153,24 +153,27 @@ def command_plot_create(experimental_setup):
 
 
 
-def load_citr(AlgorithmRunParameters):
+def load_citr(experimental_setup):
     citr = dict()
 
     # Concatenate the CI test results for all AlgorithmRuns with the unoptimized G-test
-    algruns_Gtest_unoptimized = filter_algrun_parameters_Gtest_unoptimized(AlgorithmRunParameters)
-    citr['unoptimized'] = list(map(load_citr_from_algrun_parameters, algruns_Gtest_unoptimized))
+    algruns_Gtest_unoptimized = experimental_setup.get_algruns_by_tag('unoptimized')
+    citr['unoptimized'] = list()
+    for parameters in algruns_Gtest_unoptimized:
+        results = load_citr_from_algrun_parameters(parameters)
+        citr['unoptimized'].extend(results)
+
 
     # Concatenate the CI test results for all AlgorithmRuns with dcMI
-    algruns_Gtest_dcMI = filter_algrun_parameters_Gtest_dcMI(AlgorithmRunParameters)
-    algruns_Gtest_dcMI = list(algruns_Gtest_dcMI)
+    algruns_Gtest_dcMI = experimental_setup.get_algruns_by_tag('dcmi')
     citr['dcmi'] = list()
     for parameters in algruns_Gtest_dcMI:
-        loaded_citr_per_algrun = load_citr_from_algrun_parameters(parameters)
-        citr['dcmi'].extend(loaded_citr_per_algrun)
+        results = load_citr_from_algrun_parameters(parameters)
+        citr['dcmi'].extend(results)
 
     # Concatenate the CI test results for all AlgorithmRuns with AD-trees, but
     # separated by the LLT value of the AD-trees
-    algruns_Gtest_ADtree = filter_algrun_parameters_Gtest_ADtree(AlgorithmRunParameters)
+    algruns_Gtest_ADtree = experimental_setup.get_algruns_by_tag('adtree')
     for parameters in algruns_Gtest_ADtree:
         LLT = parameters['ci_test_ad_tree_leaf_list_threshold']
         key = 'adtree_{}'.format(LLT)
@@ -178,7 +181,7 @@ def load_citr(AlgorithmRunParameters):
         try:
             citr[key].extend(loaded_citr_per_algrun)
         except KeyError:
-            citr[key] = list(loaded_citr_per_algrun)
+            citr[key] = loaded_citr_per_algrun
 
     return citr
 
@@ -191,7 +194,7 @@ def load_adtrees_analysis(algrun_parameters, ExperimentDef):
 
     for parameters in algrun_parameters:
         key = 'adtree_{}'.format(parameters['ci_test_ad_tree_leaf_list_threshold'])
-        tree_analysis_path = analysis_path / (parameters['ci_test_ad_tree_path__save'].name)
+        tree_analysis_path = analysis_path / (parameters['ci_test_ad_tree_path__load'].name)
         with tree_analysis_path.open('rb') as f:
             analysis = pickle.load(f)
 
