@@ -5,3 +5,4 @@ systemctl stop httpd php-fpm mysqld postgresql memcached
 systemctl stop dbus abrtd cups
 systemctl stop radicale
 systemctl stop pulseaudio
+cpupower frequency-set --governor performance
