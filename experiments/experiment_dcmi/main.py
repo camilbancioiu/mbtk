@@ -11,6 +11,7 @@ EXPERIMENTS_ROOT = Path(os.getcwd()).parents[0]
 MBFF_PATH = EXPERIMENTS_ROOT.parents[0]
 sys.path.insert(0, str(MBFF_PATH))
 
+import mbff.math.Variable
 import mbff.utilities.experiment as util
 
 
@@ -30,6 +31,25 @@ class CustomExperimentalSetup(util.ExperimentalSetup):
         self.CITest_Significance = None
         self.LLT = None
         self.ADTree = None
+        self.SampleCountString = None
+        self.SampleCount = None
+        self.AllowedLLTArgument = [0, 5, 10]
+
+
+    def set_arguments(self, arguments):
+        self.Arguments = arguments
+        self.SampleCountString = self.Arguments.sample_count
+        self.SampleCount = int(float(self.SampleCountString))
+        self.LLTArgument = self.Arguments.llt
+        if self.Arguments.llt in self.AllowedLLTArgument:
+            self.LLT = self.calculate_absolute_LLT_from_llt_argument(self.LLTArgument)
+        else:
+            raise ValueError('Allowed values for the --llt argument are {}'.format(self.AllowedLLTArgument))
+        self.Omega = mbff.math.Variable.Omega(self.SampleCount)
+
+
+    def calculate_absolute_LLT_from_llt_argument(self, llt):
+        return int(self.SampleCount * llt / 1000)
 
 
     def update_paths(self):
@@ -44,8 +64,12 @@ class CustomExperimentalSetup(util.ExperimentalSetup):
         self.Paths.CITestResultRepository.mkdir(parents=True, exist_ok=True)
         self.Paths.DoFCacheRepository.mkdir(parents=True, exist_ok=True)
 
-        adtree_filename = 'adtree_{}_llt{}.pickle'.format(self.ExDsDef.name, self.LLT)
-        self.Paths.ADTree = self.Paths.ADTreeRepository / adtree_filename
+        self.Paths.ADTree = self.get_ADTree_path_for_llt_argument(self.LLTArgument)
+
+
+    def get_ADTree_path_for_llt_argument(self, llt):
+        adtree_filename = 'adtree_{}_llt{}.pickle'.format(self.ExDsDef.name, llt)
+        return self.Paths.ADTreeRepository / adtree_filename
 
 
     def preload_ADTree(self):
@@ -84,6 +108,7 @@ if __name__ == '__main__':
     argparser = argparse.ArgumentParser()
     argparser.add_argument('--dont-preload-adtree', action='store_true')
     argparser.add_argument('--algrun-tag', type=str, default=None, nargs='?')
+    argparser.add_argument('--llt', type=int, default=0, nargs='?')
 
     argparser.add_argument('sample_count', type=str, default=None)
 
@@ -106,9 +131,8 @@ if __name__ == '__main__':
     validate_sample_count_string(arguments.sample_count)
 
     experimental_setup = CustomExperimentalSetup()
-    experimental_setup.Arguments = arguments
+    experimental_setup.set_arguments(arguments)
     experimental_setup.CITest_Significance = 0.95
-    experimental_setup.LLT = 0
     experimental_setup.Paths = CustomExperimentalPathSet(EXPERIMENTS_ROOT)
     experimental_setup.ExDsDef = definitions.exds_definition(experimental_setup)
     experimental_setup.ExperimentDef = definitions.experiment_definition(experimental_setup)

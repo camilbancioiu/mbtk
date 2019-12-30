@@ -1,13 +1,13 @@
 import itertools
 
 
-def make_plot_data(plot_what, citr):
+def make_plot_data(metric, citr):
     data = dict()
 
-    if plot_what == 'duration':
+    if metric == 'duration':
         for key, results in citr.items():
             data[key] = [result.duration for result in results]
-    if plot_what == 'duration-cummulative':
+    if metric == 'duration-cummulative':
         for key, results in citr.items():
             durations = [result.duration for result in results]
             durations_cummulative = list(itertools.accumulate(durations))
@@ -63,23 +63,23 @@ def plot(data, adtree_analysis, plot_save_filename):
 
 def make_plot_legend(data, adtree_analysis):
     legend = list()
-    for run in sorted(data.keys()):
-        if run in adtree_analysis:
-            analysis = adtree_analysis[run]
-            entry = make_plot_legend_entry_for_adtree_run(run, analysis)
+    for tag in sorted(data.keys()):
+        if tag in adtree_analysis:
+            analysis = adtree_analysis[tag]
+            entry = make_plot_legend_entry_for_adtree_run(tag, analysis)
         else:
-            entry = run
+            entry = tag
         legend.append(entry)
 
     return legend
 
 
 
-def make_plot_legend_entry_for_adtree_run(run, analysis):
+def make_plot_legend_entry_for_adtree_run(tag, analysis):
     from humanize import naturalsize, naturaldelta
     from datetime import timedelta
     entry = '{} ({size}, {nodes} nodes, {duration} to build)'.format(
-        run,
+        tag,
         size=naturalsize(analysis['size']),
         nodes=analysis['nodes'],
         duration=naturaldelta(timedelta(seconds=analysis['duration'])))

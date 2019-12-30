@@ -18,6 +18,7 @@ def configure_objects_subparser__plot(subparsers):
                            default='create', nargs='?')
     subparser.add_argument('--metric', type=str, nargs='?', default='duration-cummulative')
     subparser.add_argument('--file', type=str, nargs='?', default=None)
+    subparser.add_argument('tags', type=str)
 
 
 def handle_command(experimental_setup):
@@ -62,7 +63,7 @@ def command_adtree_build(experimental_setup):
     start_time = time.time()
     adtree = mbff.structures.ADTree.ADTree(matrix, column_values, experimental_setup.LLT, debug=2)
     duration = time.time() - start_time
-    print("AD-tree with LLT={} built in {:>10.4f}s".format(experimental_setup.LLT, duration))
+    print("AD-tree with LLT={} built in {:>10.4f}s".format(experimental_setup.LLTArgument, duration))
 
     adtree_save_path = experimental_setup.Paths.ADTree
     if adtree_save_path is not None:
@@ -162,7 +163,7 @@ def load_adtree(path):
 
 
 def command_plot_create(experimental_setup):
-    plot_what = experimental_setup.Arguments.metric
+    metric = experimental_setup.Arguments.metric
     plot_save_filename = experimental_setup.Arguments.file
 
     if plot_save_filename is not None:
@@ -171,61 +172,45 @@ def command_plot_create(experimental_setup):
         plot_save_filename = plot_path / (plot_save_filename + '.png')
 
     citr = load_citr(experimental_setup)
-
-    algruns_Gtest_ADtree = experimental_setup.get_algruns_by_tag('adtree')
-    adtree_analysis = load_adtrees_analysis(algruns_Gtest_ADtree, experimental_setup.ExperimentDef)
+    adtree_analysis = load_adtrees_analysis(experimental_setup)
 
     import plotting
-    data = plotting.make_plot_data(plot_what, citr)
+    data = plotting.make_plot_data(metric, citr)
     plotting.plot(data, adtree_analysis, plot_save_filename)
 
 
 
 def load_citr(experimental_setup):
     citr = dict()
-
-    # Concatenate the CI test results for all AlgorithmRuns with the unoptimized G-test
-    algruns_Gtest_unoptimized = experimental_setup.get_algruns_by_tag('unoptimized')
-    citr['unoptimized'] = list()
-    for parameters in algruns_Gtest_unoptimized:
-        results = load_citr_from_algrun_parameters(parameters)
-        citr['unoptimized'].extend(results)
-
-
-    # Concatenate the CI test results for all AlgorithmRuns with dcMI
-    algruns_Gtest_dcMI = experimental_setup.get_algruns_by_tag('dcmi')
-    citr['dcmi'] = list()
-    for parameters in algruns_Gtest_dcMI:
-        results = load_citr_from_algrun_parameters(parameters)
-        citr['dcmi'].extend(results)
-
-    # Concatenate the CI test results for all AlgorithmRuns with AD-trees, but
-    # separated by the LLT value of the AD-trees
-    algruns_Gtest_ADtree = experimental_setup.get_algruns_by_tag('adtree')
-    for parameters in algruns_Gtest_ADtree:
-        LLT = parameters['ci_test_ad_tree_leaf_list_threshold']
-        key = 'adtree_{}'.format(LLT)
-        loaded_citr_per_algrun = load_citr_from_algrun_parameters(parameters)
-        try:
-            citr[key].extend(loaded_citr_per_algrun)
-        except KeyError:
-            citr[key] = loaded_citr_per_algrun
-
+    tags = experimental_setup.Arguments.tags.split(',')
+    for tag in tags:
+        citr[tag] = list()
+        parameters_list = experimental_setup.get_algruns_by_tag(tag)
+        for parameters in parameters_list:
+            results = load_citr_from_algrun_parameters(parameters)
+            citr[tag].extend(results)
     return citr
 
 
 
-def load_adtrees_analysis(algrun_parameters, ExperimentDef):
+def load_adtrees_analysis(experimental_setup):
     adtrees_analysis = dict()
 
-    analysis_path = ExperimentDef.path / 'adtree_analysis'
+    analysis_path = experimental_setup.ExperimentDef.path / 'adtree_analysis'
 
-    for parameters in algrun_parameters:
-        key = 'adtree_{}'.format(parameters['ci_test_ad_tree_leaf_list_threshold'])
-        tree_analysis_path = analysis_path / (parameters['ci_test_ad_tree_path__load'].name)
-        with tree_analysis_path.open('rb') as f:
-            analysis = pickle.load(f)
+    for parameters in experimental_setup.AlgorithmRunParameters:
+        try:
+            tree_analysis_path = analysis_path / (parameters['ci_test_ad_tree_path__load'].name)
+        except KeyError:
+            continue
 
+        try:
+            with tree_analysis_path.open('rb') as f:
+                analysis = pickle.load(f)
+        except FileNotFoundError:
+            continue
+
+        key = 'adtree-llt{}'.format(parameters['ci_test_ad_tree_llt_argument'])
         adtrees_analysis[key] = analysis
 
     return adtrees_analysis

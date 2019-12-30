@@ -53,7 +53,7 @@ def create_default_parameters(experimental_setup):
         'omega': experimental_setup.Omega,
         'source_bayesian_network': bayesian_network,
         'algorithm_debug': 1,
-        'ci_test_debug': 1,
+        'ci_test_debug': 0,
         'ci_test_significance': experimental_setup.CITest_Significance,
     }
 
@@ -117,24 +117,25 @@ def create_algrun_parameters__adtree(experimental_setup, default_parameters):
     citrrepo = experimental_setup.Paths.CITestResultRepository
     g_test__adtree = mbff.math.G_test__with_AD_tree.G_test
     dof__structural = mbff.math.DoFCalculators.StructuralDoF
-    llt = experimental_setup.LLT
     exds_name = experimental_setup.ExDsDef.name
 
     parameters_list = list()
     for target in range(target_count):
-        citr_filename = 'ci_test_results_{}_T{}_ADtree_LLT{}.pickle'.format(exds_name, target, llt)
-        parameters = {
-            'target': target,
-            'ci_test_class': g_test__adtree,
-            'ci_test_dof_calculator_class': dof__structural,
-            'ci_test_ad_tree_leaf_list_threshold': llt,
-            'ci_test_ad_tree_path__load': experimental_setup.Paths.ADTree,
-            'ci_test_results_path__save': citrrepo / citr_filename,
-            'tags': ['adtree', 'fast', 'has_dependencies'],
-            'ID': 'run_{index}_T{target}__@LLT={ci_test_ad_tree_leaf_list_threshold}',
-        }
-        parameters.update(default_parameters)
-        parameters_list.append(parameters)
+        for llt in experimental_setup.AllowedLLTArgument:
+            citr_filename = 'ci_test_results_{}_T{}_ADtree_LLT{}.pickle'.format(exds_name, target, llt)
+            parameters = {
+                'target': target,
+                'ci_test_class': g_test__adtree,
+                'ci_test_dof_calculator_class': dof__structural,
+                'ci_test_ad_tree_leaf_list_threshold': experimental_setup.calculate_absolute_LLT_from_llt_argument(llt),
+                'ci_test_ad_tree_llt_argument': llt,
+                'ci_test_ad_tree_path__load': experimental_setup.get_ADTree_path_for_llt_argument(llt),
+                'ci_test_results_path__save': citrrepo / citr_filename,
+                'tags': ['adtree', 'adtree-llt{}'.format(llt), 'fast', 'has_dependencies'],
+                'ID': 'run_{index}_T{target}__@LLT={ci_test_ad_tree_llt_argument}',
+            }
+            parameters.update(default_parameters)
+            parameters_list.append(parameters)
 
     return parameters_list
 

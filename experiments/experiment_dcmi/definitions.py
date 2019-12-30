@@ -16,32 +16,23 @@ sys.path.insert(0, str(MBFF_PATH))
 from mbff.dataset.ExperimentalDatasetDefinition import ExperimentalDatasetDefinition
 from mbff.dataset.ExperimentalDataset import ExperimentalDataset
 from mbff.dataset.sources.SampledBayesianNetworkDatasetSource import SampledBayesianNetworkDatasetSource
-import mbff.math.Variable
 
 
 def exds_definition(experimental_setup):
-    """Argument sample_count_string should be a positive integer in exponential
+    """Argument SampleCountString should be a positive integer in exponential
     notation, e.g. 4e4 or 2e5"""
-    sample_count_string = experimental_setup.Arguments.sample_count
-    exds_name = 'synthetic_alarm_{}'.format(sample_count_string)
-    sample_count = int(float(sample_count_string))
+    exds_name = 'synthetic_alarm_{}'.format(experimental_setup.SampleCountString)
 
     exdsDef = ExperimentalDatasetDefinition(experimental_setup.Paths.ExDsRepository, exds_name)
     exdsDef.exds_class = ExperimentalDataset
     exdsDef.source = SampledBayesianNetworkDatasetSource
     exdsDef.source_configuration = {
         'sourcepath': experimental_setup.Paths.BIFRepository / 'alarm.bif',
-        'sample_count': sample_count,
-        'random_seed': 81628965211 + sample_count
+        'sample_count': experimental_setup.SampleCount,
+        'random_seed': 81628965211 + experimental_setup.SampleCount
     }
 
     return exdsDef
-
-
-
-def omega(exdsDef):
-    omega = mbff.math.Variable.Omega(exdsDef.source_configuration['sample_count'])
-    return omega
 
 
 ################################################################################
@@ -55,7 +46,7 @@ from mbff.algorithms.mb.ipcmb import AlgorithmIPCMB
 
 
 def experiment_definition(experimental_setup):
-    experiment_name = 'dcMIEvExp_{}'.format(experimental_setup.Arguments.sample_count)
+    experiment_name = 'dcMIEvExp_{}'.format(experimental_setup.SampleCountString)
     experimentDef = ExperimentDefinition(experimental_setup.Paths.ExpRunRepository, experiment_name)
     experimentDef.experiment_run_class = ExperimentRun
     experimentDef.algorithm_run_class = AlgorithmRun
