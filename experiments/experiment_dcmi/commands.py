@@ -213,6 +213,8 @@ def command_summary_create(experimental_setup):
     #       - entry count
     #       - hit rate
     from humanize import naturalsize
+    from pympler.asizeof import asizeof
+    from statistics import median
 
     tags = experimental_setup.Arguments.tags
     if tags is None:
@@ -226,22 +228,39 @@ def command_summary_create(experimental_setup):
         algruns = experimental_setup.get_algruns_by_tag(tag)
         datapoints = load_datapoints(experimental_setup, algruns)
         citr = load_citr_for_algrun_list(algruns)
+        ci_durations = list(map(attrgetter('duration'), citr))
         total_duration = sum(map(attrgetter('duration'), datapoints))
-        total_ci_duration = sum(map(attrgetter('duration'), citr))
+        total_ci_duration = sum(ci_durations)
         print('tag \'{}\':'.format(tag))
         print('\tDatapoints:', len(datapoints))
+        print('\tTotal CI count:', len(citr))
         print('\tTotal duration (s):', total_duration)
         print('\tTotal CI duration (s):', total_ci_duration)
+        print('\tAvg. CI duration (s):', total_ci_duration / len(citr))
+        print('\tMax. CI duration (s):', max(ci_durations))
+        print('\tMedian CI duration (s):', median(ci_durations))
 
         if tag.startswith('adtree'):
             analysis = adtree_analysis[tag]
-            print('\tSize (MB):', naturalsize(analysis['size']))
-            print('\tNodes:', analysis['nodes'])
-            print('\tAbsolute LLT:')
-            print('\tPreparation time:', analysis['duration'])
+            print('\tAD-tree size:', naturalsize(analysis['size']))
+            print('\tAD-tree nodes:', analysis['nodes'])
+            print('\tAD-tree absolute LLT:', analysis['LLT'])
+            print('\tAD-tree build time:', analysis['duration'])
 
         if tag == 'dcmi':
-            pass
+            jht = load_jht(experimental_setup)
+            size = asizeof(jht)
+            entries = len(jht) - 2
+            reads = jht['reads']
+            misses = jht['misses']
+            hits = reads - misses
+            hitrate = hits / reads
+            print('\tJHT size:', naturalsize(size))
+            print('\tJHT entries:', entries)
+            print('\tJHT reads:', reads)
+            print('\tJHT hits:', hits)
+            print('\tJHT misses:', misses)
+            print('\tJHT hit rate:', hitrate)
 
 
 
@@ -295,17 +314,31 @@ def load_adtrees_analysis(experimental_setup):
         try:
             with tree_analysis_path.open('rb') as f:
                 analysis = pickle.load(f)
+            key = 'adtree-llt{}'.format(parameters['ci_test_ad_tree_llt_argument'])
+            adtrees_analysis[key] = analysis
         except FileNotFoundError:
             continue
-
-        key = 'adtree-llt{}'.format(parameters['ci_test_ad_tree_llt_argument'])
-        adtrees_analysis[key] = analysis
 
     return adtrees_analysis
 
 
-# def load_jht(experimental_setup):
-#     jhts = dict()
+
+def load_jht(experimental_setup):
+    # Only one JHT is expected for an experimental setup, so we return the
+    # first we find.
+    jht = None
+    for parameters in experimental_setup.AlgorithmRunParameters:
+        try:
+            jht_path = parameters['ci_test_jht_path__load']
+        except KeyError:
+            continue
+
+        with jht_path.open('rb') as f:
+            jht = pickle.load(f)
+        return jht
+
+    return jht
+
 
 
 def validate_all_citrs_equal(citr):
