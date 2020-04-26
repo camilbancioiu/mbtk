@@ -2,6 +2,7 @@ import time
 import gc
 import pickle
 from pprint import pprint
+from operator import attrgetter
 
 import mbff.math.G_test__with_AD_tree
 
@@ -12,6 +13,7 @@ def configure_objects_subparser__adtree(subparsers):
                            default='print-analysis', nargs='?')
 
 
+
 def configure_objects_subparser__plot(subparsers):
     subparser = subparsers.add_parser('plot')
     subparser.add_argument('verb', choices=['create'],
@@ -19,6 +21,15 @@ def configure_objects_subparser__plot(subparsers):
     subparser.add_argument('--metric', type=str, nargs='?', default='duration-cummulative')
     subparser.add_argument('--file', type=str, nargs='?', default=None)
     subparser.add_argument('tags', type=str)
+
+
+
+def configure_objects_subparser__summary(subparsers):
+    subparser = subparsers.add_parser('summary')
+    subparser.add_argument('verb', choices=['create'], default='create',
+                           nargs='?')
+    subparser.add_argument('tags', type=str, default=None, nargs='?')
+
 
 
 def handle_command(experimental_setup):
@@ -48,7 +59,13 @@ def handle_command(experimental_setup):
             command_plot_create(experimental_setup)
             command_handled = True
 
+    if command_object == 'summary':
+        if command_verb == 'create':
+            command_summary_create(experimental_setup)
+            command_handled = True
+
     return command_handled
+
 
 
 def command_adtree_build(experimental_setup):
@@ -180,15 +197,86 @@ def command_plot_create(experimental_setup):
 
 
 
+def command_summary_create(experimental_setup):
+    # Sample count is already selected
+    # group datapoints by tag, or by default tags
+    # summary per group:
+    # * number of datapoints
+    # * total duration
+    # * total CI duration
+    # * AD-tree analysis, for AD-tree runs
+    #       - size in MB
+    #       - node count
+    #       - LLT absolute count
+    # * JHT analysis, for dcMI runs
+    #       - size in MB
+    #       - entry count
+    #       - hit rate
+    from humanize import naturalsize
+
+    tags = experimental_setup.Arguments.tags
+    if tags is None:
+        tags = experimental_setup.DefaultTags
+    else:
+        tags = tags.split(',')
+
+    adtree_analysis = load_adtrees_analysis(experimental_setup)
+
+    for tag in tags:
+        algruns = experimental_setup.get_algruns_by_tag(tag)
+        datapoints = load_datapoints(experimental_setup, algruns)
+        citr = load_citr_for_algrun_list(algruns)
+        total_duration = sum(map(attrgetter('duration'), datapoints))
+        total_ci_duration = sum(map(attrgetter('duration'), citr))
+        print('tag \'{}\':'.format(tag))
+        print('\tDatapoints:', len(datapoints))
+        print('\tTotal duration (s):', total_duration)
+        print('\tTotal CI duration (s):', total_ci_duration)
+
+        if tag.startswith('adtree'):
+            analysis = adtree_analysis[tag]
+            print('\tSize (MB):', naturalsize(analysis['size']))
+            print('\tNodes:', analysis['nodes'])
+            print('\tAbsolute LLT:')
+            print('\tPreparation time:', analysis['duration'])
+
+        if tag == 'dcmi':
+            pass
+
+
+
+def load_datapoints(experimental_setup, algruns):
+    datapoints = []
+
+    datapoints_folder = experimental_setup.ExperimentDef.subfolder('algorithm_run_datapoints')
+    for algrun in algruns:
+        datapoint_file = datapoints_folder / '{}.pickle'.format(algrun['ID'])
+        try:
+            with datapoint_file.open('rb') as f:
+                datapoint = pickle.load(f)
+            datapoints.append(datapoint)
+        except FileNotFoundError:
+            continue
+
+    return datapoints
+
+
+
 def load_citr(experimental_setup):
     citr = dict()
     tags = experimental_setup.Arguments.tags.split(',')
     for tag in tags:
-        citr[tag] = list()
-        parameters_list = experimental_setup.get_algruns_by_tag(tag)
-        for parameters in parameters_list:
-            results = load_citr_from_algrun_parameters(parameters)
-            citr[tag].extend(results)
+        algruns = experimental_setup.get_algruns_by_tag(tag)
+        citr[tag] = load_citr_for_algrun_list(algruns)
+    return citr
+
+
+
+def load_citr_for_algrun_list(algruns):
+    citr = list()
+    for algrun in algruns:
+        results = load_citr_from_algrun_parameters(algrun)
+        citr.extend(results)
     return citr
 
 
@@ -215,6 +303,9 @@ def load_adtrees_analysis(experimental_setup):
 
     return adtrees_analysis
 
+
+# def load_jht(experimental_setup):
+#     jhts = dict()
 
 
 def validate_all_citrs_equal(citr):

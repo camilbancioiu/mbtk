@@ -4,6 +4,7 @@ import pprint
 
 
 class AlgorithmRunDatapoint:
+
     def __init__(self, algorithm_run):
         self.parameters = self.pickleable_parameters(algorithm_run.parameters)
         self.ID = algorithm_run.ID
@@ -41,6 +42,7 @@ class AlgorithmRunDatapoint:
 
 
 class AlgorithmAndClassifierRunDatapoint(AlgorithmRunDatapoint):
+
     def __init__(self, algorithm_run):
         super().__init__(algorithm_run)
         self.classifier_classname = algorithm_run.classifier_classname

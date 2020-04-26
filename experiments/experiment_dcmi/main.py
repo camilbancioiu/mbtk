@@ -34,6 +34,7 @@ class CustomExperimentalSetup(util.ExperimentalSetup):
         self.SampleCountString = None
         self.SampleCount = None
         self.AllowedLLTArgument = [0, 5, 10]
+        self.DefaultTags = ['unoptimized', 'adtree-llt0', 'adtree-llt5', 'adtree-llt10', 'dcmi']
 
 
     def set_arguments(self, arguments):
@@ -115,6 +116,7 @@ if __name__ == '__main__':
     object_subparsers = argparser.add_subparsers(dest='object')
     object_subparsers.required = True
 
+    # Commands provided by the MBFF framework
     util.configure_objects_subparser__paths(object_subparsers)
     util.configure_objects_subparser__exp_def(object_subparsers)
     util.configure_objects_subparser__exds_def(object_subparsers)
@@ -123,8 +125,10 @@ if __name__ == '__main__':
     util.configure_objects_subparser__parameters(object_subparsers)
     util.configure_objects_subparser__datapoints(object_subparsers)
 
+    # Custom commands, specific to the dcMI experiment
     commands.configure_objects_subparser__adtree(object_subparsers)
     commands.configure_objects_subparser__plot(object_subparsers)
+    commands.configure_objects_subparser__summary(object_subparsers)
 
     arguments = argparser.parse_args()
 

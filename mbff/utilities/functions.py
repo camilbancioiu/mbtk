@@ -30,8 +30,8 @@ def save_matrix(path, matrix_name, matrix):
 
 
 
-def create_index(l):
-    return dict(zip(l, range(0, len(l))))
+def create_index(lst):
+    return dict(zip(lst, range(0, len(lst))))
 
 
 
@@ -47,20 +47,20 @@ def read_bif_file(path):
 
 
 
-def flatten(l, ltypes=(list, tuple)):
-    ltype = type(l)
-    l = list(l)
+def flatten(lst, ltypes=(list, tuple)):
+    ltype = type(lst)
+    lst = list(lst)
     i = 0
-    while i < len(l):
-        while isinstance(l[i], ltypes):
-            if not l[i]:
-                l.pop(i)
+    while i < len(lst):
+        while isinstance(lst[i], ltypes):
+            if not lst[i]:
+                lst.pop(i)
                 i -= 1
                 break
             else:
-                l[i:i + 1] = l[i]
+                lst[i:i + 1] = lst[i]
         i += 1
-    return ltype(l)
+    return ltype(lst)
 
 
 
