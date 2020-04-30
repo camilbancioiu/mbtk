@@ -63,8 +63,6 @@ class SampledBayesianNetworkDatasetSource(DatasetSource):
         numpy_datatype = self.configuration.get('numpy_datatype', numpy.int8)
 
         joint_pmf = self.bayesian_network.create_joint_pmf(values_as_indices=True)
-        print()
-        print('Minimum required sample count:', joint_pmf.min_instance_count_for_accuracy())
         instances = joint_pmf.create_instances_list(sample_count)
         instances_as_lists = [list(instance) for instance in instances]
         instances_matrix = numpy.asarray(instances_as_lists, dtype=numpy_datatype)

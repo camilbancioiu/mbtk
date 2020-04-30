@@ -209,17 +209,22 @@ class ADTree:
         return result
 
 
-    def p(self, values, given={}):
+    def p(self, values, given=None):
         """An alias of :py:meth:query."""
+        if given is None:
+            given = dict()
+
         return self.query(values, given)
 
 
-    def query(self, values, given={}):
+    def query(self, values, given=None):
         """
         Query the tree, requesting the joint or conditional probability of a
         specific combination of attributes-to-values, given a separate
         combination of attributes-to-values.
         """
+        if given is None:
+            given = dict()
 
         joint_query = {}
         joint_query.update(given)
@@ -253,8 +258,8 @@ class ADTree:
         column_index = column_indices[0]
         value = values[column_index]
 
-        # Retrieve the Vary node among our immediate children that represents
-        # the current column index.
+        # Retrieve the Vary node among our immediate Vary children that
+        # represents the current column index.
         vary = query_node.get_Vary_child_for_column(column_index)
 
         # Retrieve the ADNode among the children of the aforementioned Vary
@@ -373,13 +378,19 @@ class ADNode:
         (self.count, self.column_index, self.value, self.leaf_list_node, self.Vary_children, self.row_selection) = state
 
 
-    def make_contingency_table(self, tree, columns=list()):
+    def make_contingency_table(self, tree, columns=None):
+        if columns is None:
+            columns = list()
+
         contingency_tree = self.make_contingency_tree(tree, columns)
         contingency_table = contingency_tree.convert_to_dictionary()
         return contingency_table
 
 
-    def make_contingency_tree(self, tree, columns=list()):
+    def make_contingency_tree(self, tree, columns=None):
+        if columns is None:
+            columns = list()
+
         if len(columns) == 0:
             return ContingencyTreeNode(self.column_index, self.value, self.count)
 

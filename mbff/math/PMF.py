@@ -94,8 +94,10 @@ class PMF:
 
 
     def min_instance_count_for_accuracy(self):
-        nonzero_probabilities = filter(None, self.values())
-        return round(1 / min(nonzero_probabilities))
+        nonzero_probabilities = list(filter(None, self.values()))
+        min_nonzero_probability = min(nonzero_probabilities)
+        min_instance_count = round(1 / min_nonzero_probability)
+        return min_instance_count
 
 
     def create_instances_list(self, n=1):

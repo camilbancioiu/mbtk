@@ -6,6 +6,7 @@ from mbff.dataset.DatasetMatrix import DatasetMatrix
 
 import mbff.utilities.functions as util
 
+
 class RCV1v2DatasetSource(DatasetSource):
     """
     A class which reads the RCV1v2 dataset files, as published by LYRL2004.
@@ -23,10 +24,10 @@ class RCV1v2DatasetSource(DatasetSource):
         # TODO update documentation to refer to sourcepath, not sourcefolder
         self.sourcepath = self.configuration['sourcepath']
 
-        if not 'feature_type' in self.configuration.keys():
+        if 'feature_type' not in self.configuration.keys():
             self.configuration['feature_type'] = 'wordcount'
 
-        if not 'filters' in self.configuration.keys():
+        if 'filters' not in self.configuration.keys():
             self.configuration['filters'] = {}
 
         self.sourcefile_documentIDs          = self.sourcepath / 'oa7.rcv1v2-ids.txt'
@@ -35,7 +36,7 @@ class RCV1v2DatasetSource(DatasetSource):
         self.sourcefile_industry_assignments = self.sourcepath / 'oa9.rcv1-v2.industries.qrels.txt'
 
 
-    def create_dataset_matrix(self, label='rcv1v2', feature_type='', filters={}):
+    def create_dataset_matrix(self, label='rcv1v2', feature_type='', filters=None):
         """
         Create a :class:`DatasetMatrix
         <mbff.dataset.DatasetMatrix.DatasetMatrix>` object containing a
@@ -64,7 +65,10 @@ class RCV1v2DatasetSource(DatasetSource):
         :return: A ``DatasetMatrix`` containing a document-term matrix in ``X`` and a class-assignment matrix in ``Y``.
         :rtype: mbff.dataset.DatasetMatrix.DatasetMatrix
         """
-        documentIDs = []
+        if filters is None:
+            filters = dict()
+
+        documentIDs = list()
         if len(filters) == 0:
             filters = self.configuration['filters']
 
@@ -214,7 +218,7 @@ class RCV1v2DatasetSource(DatasetSource):
             # ``documents`` dictionary and start reading a new document.
             if line[0:3] == '.I ':
                 # If a previous document was being read, save it to ``documents``.
-                if document != None:
+                if document is not None:
                     documents[document.did] = document
 
                 # Read the document ID from '.I 000' (extract the 000) and see
@@ -240,11 +244,11 @@ class RCV1v2DatasetSource(DatasetSource):
             # tokenized words of the current document. Feed this line to the
             # current document.
             else:
-                if document != None:
+                if document is not None:
                     document.read_line_with_tokens(line)
 
         # At the end of the file, add the last document to ``documents``.
-        if document != None:
+        if document is not None:
             documents[document.did] = document
 
         sourcefile_tokens.close()
@@ -328,4 +332,3 @@ class RCV1v2Document():
         """
         self.topics.append(topic)
         self.topic_values[topic] = 1
-

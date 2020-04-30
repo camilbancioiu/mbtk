@@ -29,17 +29,17 @@ class TestAlgorithmIPCMBWithGtests(TestBase):
         testClass.ADTreesFolder = testClass.RootFolder / 'adtrees'
         testClass.CITestResultsFolder = testClass.RootFolder / 'ci_test_results'
         testClass.DebugLevel = 0
-        testClass.CITestDebugLevel = 1
+        testClass.CITestDebugLevel = 0
         testClass.DoFCacheFolder = testClass.RootFolder / 'dofcache'
 
 
     @classmethod
     def prepareTestResources(testClass):
-        super(TestAlgorithmIPCMBWithGtests, testClass).prepareTestResources()
         testClass.ADTreesFolder.mkdir(parents=True, exist_ok=True)
         testClass.JHTFolder.mkdir(parents=True, exist_ok=True)
         testClass.CITestResultsFolder.mkdir(parents=True, exist_ok=True)
         testClass.DoFCacheFolder.mkdir(parents=True, exist_ok=True)
+        super(TestAlgorithmIPCMBWithGtests, testClass).prepareTestResources()
 
 
     @classmethod
@@ -48,7 +48,7 @@ class TestAlgorithmIPCMBWithGtests(TestBase):
 
         if label == 'alarm':
             configuration['leaf_list_threshold'] = 100
-            configuration['debug'] = 2
+            configuration['debug'] = 1
         return configuration
 
 
@@ -103,16 +103,16 @@ class TestAlgorithmIPCMBWithGtests(TestBase):
         parameters_adtree['ci_test_gc_collect_rate'] = 0
         parameters_adtree['ci_test_sufficient_samples_criterion'] = None
 
-        for target in range(10):
+        for target in range(4):
             ipcmb = self.make_IPCMB_with_Gtest_dcMI(dm_label, target, significance, parameters_dcmi)
             mb = ipcmb.select_features()
             results_dcmi = ipcmb.CITest.ci_test_results
-            print(mb)
+            if self.DebugLevel > 0: print(mb)
 
             ipcmb = self.make_IPCMB_with_Gtest_ADtree(dm_label, target, significance, parameters_adtree)
             mb = ipcmb.select_features()
             results_adtree = ipcmb.CITest.ci_test_results
-            print(mb)
+            if self.DebugLevel > 0: print(mb)
 
             self.assertEqualCITestResults(results_adtree, results_dcmi)
 
@@ -124,24 +124,29 @@ class TestAlgorithmIPCMBWithGtests(TestBase):
 
         target = 19
 
-        print()
-        print('=== IPC-MB with G-test (unoptimized - with StructuralDoF) ===')
+        if self.DebugLevel > 0:
+            print()
+            print('=== IPC-MB with G-test (unoptimized - with StructuralDoF) ===')
+
         parameters = dict()
         parameters['ci_test_dof_calculator_class'] = StructuralDoF
         parameters['ci_test_gc_collect_rate'] = 0
         ipcmb_g_unoptimized = self.make_IPCMB_with_Gtest_unoptimized(dm_label, target, significance, extra_parameters=parameters)
         mb_unoptimized_StructuralDoF = ipcmb_g_unoptimized.select_features()
         ci_test_results__unoptimized__StructuralDoF = ipcmb_g_unoptimized.CITest.ci_test_results
-        print()
 
-        print('=== IPC-MB with G-test (unoptimized - with CachedStructuralDoF) ===')
+        if self.DebugLevel > 0:
+            print()
+            print('=== IPC-MB with G-test (unoptimized - with CachedStructuralDoF) ===')
+
         parameters = dict()
         parameters['ci_test_dof_calculator_class'] = CachedStructuralDoF
         parameters['ci_test_gc_collect_rate'] = 0
         ipcmb_g_unoptimized = self.make_IPCMB_with_Gtest_unoptimized(dm_label, target, significance, extra_parameters=parameters)
         mb_unoptimized_CachedStructuralDoF = ipcmb_g_unoptimized.select_features()
         ci_test_results__unoptimized__CachedStructuralDoF = ipcmb_g_unoptimized.CITest.ci_test_results
-        print()
+
+        if self.DebugLevel > 0: print()
 
         self.assertEqualCITestResults(ci_test_results__unoptimized__StructuralDoF, ci_test_results__unoptimized__CachedStructuralDoF)
         self.assertEqual(mb_unoptimized_StructuralDoF, mb_unoptimized_CachedStructuralDoF)
@@ -154,7 +159,7 @@ class TestAlgorithmIPCMBWithGtests(TestBase):
 
         DoF_calculator_class = UnadjustedDoF
 
-        print()
+        if self.DebugLevel > 0: print()
 
         parameters = dict()
 
@@ -192,7 +197,7 @@ class TestAlgorithmIPCMBWithGtests(TestBase):
 
         DoF_calculator_class = StructuralDoF
 
-        print()
+        if self.DebugLevel > 0: print()
 
         parameters = dict()
 
@@ -219,7 +224,7 @@ class TestAlgorithmIPCMBWithGtests(TestBase):
 
         DoF_calculator_class = CachedStructuralDoF
 
-        print()
+        if self.DebugLevel > 0: print()
 
         parameters = dict()
 
@@ -253,71 +258,71 @@ class TestAlgorithmIPCMBWithGtests(TestBase):
         datasetmatrix = self.DatasetMatrices[dm_label]
 
         if 'G_test__unoptimized' in parameters:
-            print('=== IPC-MB with G-test (unoptimized) ===')
+            if self.DebugLevel > 0: print('=== IPC-MB with G-test (unoptimized) ===')
             extra_parameters = parameters['G_test__unoptimized']
             ipcmb_g_unoptimized = self.make_IPCMB_with_Gtest_unoptimized(dm_label, target, significance, extra_parameters=extra_parameters)
             start_time = time.time()
             markov_blanket__unoptimized = ipcmb_g_unoptimized.select_features()
             duration__unoptimized = time.time() - start_time
             ci_test_results__unoptimized = ipcmb_g_unoptimized.CITest.ci_test_results
-            print(self.format_ipcmb_result('unoptimized', target, datasetmatrix, markov_blanket__unoptimized))
-            print()
+            if self.DebugLevel > 0: print(self.format_ipcmb_result('unoptimized', target, datasetmatrix, markov_blanket__unoptimized))
+            if self.DebugLevel > 0: print()
 
         if 'G_test__with_dcMI' in parameters:
-            print('=== IPC-MB with G-test (dcMI) ===')
+            if self.DebugLevel > 0: print('=== IPC-MB with G-test (dcMI) ===')
             extra_parameters = parameters['G_test__with_dcMI']
             ipcmb_g_dcmi = self.make_IPCMB_with_Gtest_dcMI(dm_label, target, significance, extra_parameters=extra_parameters)
             start_time = time.time()
             markov_blanket__dcmi = ipcmb_g_dcmi.select_features()
             duration__dcmi = time.time() - start_time
             ci_test_results__dcmi = ipcmb_g_dcmi.CITest.ci_test_results
-            print(self.format_ipcmb_result('dcMI', target, datasetmatrix, markov_blanket__dcmi))
+            if self.DebugLevel > 0: print(self.format_ipcmb_result('dcMI', target, datasetmatrix, markov_blanket__dcmi))
             if ci_test_results__unoptimized is not None:
                 self.assertEqualCITestResults(ci_test_results__unoptimized, ci_test_results__dcmi)
-            print()
+                if self.DebugLevel > 0: print()
 
         if 'G_test__with_AD_tree' in parameters:
-            print('=== IPC-MB with G-test (AD-tree) ===')
+            if self.DebugLevel > 0: print('=== IPC-MB with G-test (AD-tree) ===')
             extra_parameters = parameters['G_test__with_AD_tree']
             ipcmb_g_adtree = self.make_IPCMB_with_Gtest_ADtree(dm_label, target, significance, extra_parameters=extra_parameters)
             start_time = time.time()
             markov_blanket__adtree = ipcmb_g_adtree.select_features()
             duration__adtree = time.time() - start_time
             ci_test_results__adtree = ipcmb_g_adtree.CITest.ci_test_results
-            print(self.format_ipcmb_result('AD-tree', target, datasetmatrix, markov_blanket__adtree))
+            if self.DebugLevel > 0: print(self.format_ipcmb_result('AD-tree', target, datasetmatrix, markov_blanket__adtree))
             if ci_test_results__unoptimized is not None:
                 self.assertEqualCITestResults(ci_test_results__unoptimized, ci_test_results__adtree)
-            print()
+                if self.DebugLevel > 0: print()
 
-        print('=== IPC-MB with d-sep ===')
+        if self.DebugLevel > 0: print('=== IPC-MB with d-sep ===')
         ipcmb_dsep = self.make_IPCMB_with_dsep(dm_label, target)
         markov_blanket__dsep = ipcmb_dsep.select_features()
-        print(self.format_ipcmb_result('dsep', target, datasetmatrix, markov_blanket__dsep))
+        if self.DebugLevel > 0: print(self.format_ipcmb_result('dsep', target, datasetmatrix, markov_blanket__dsep))
 
         gc.collect()
 
-        print()
+        if self.DebugLevel > 0: print()
 
         if 'G_test__with_dcMI' in parameters:
             mb_correctness = 'CORRECT'
             if markov_blanket__dsep != markov_blanket__dcmi:
                 mb_correctness = 'WRONG'
-            print('MB, dcmi ({}): {}, duration {:<.2f}'.format(mb_correctness, markov_blanket__dcmi, duration__dcmi))
+            if self.DebugLevel > 0: print('MB, dcmi ({}): {}, duration {:<.2f}'.format(mb_correctness, markov_blanket__dcmi, duration__dcmi))
 
         if 'G_test__with_AD_tree' in parameters:
             mb_correctness = 'CORRECT'
             if markov_blanket__dsep != markov_blanket__adtree:
                 mb_correctness = 'WRONG'
-            print('MB, adtree ({}): {}, duration {:<.2f}'.format(mb_correctness, markov_blanket__adtree, duration__adtree))
+            if self.DebugLevel > 0: print('MB, adtree ({}): {}, duration {:<.2f}'.format(mb_correctness, markov_blanket__adtree, duration__adtree))
 
         if 'G_test__unoptimized' in parameters:
             mb_correctness = 'CORRECT'
             if markov_blanket__dsep != markov_blanket__unoptimized:
                 mb_correctness = 'WRONG'
-            print('MB, unoptimized ({}): {}, duration {:<.2f}'.format(mb_correctness, markov_blanket__unoptimized, duration__unoptimized))
+            if self.DebugLevel > 0: print('MB, unoptimized ({}): {}, duration {:<.2f}'.format(mb_correctness, markov_blanket__unoptimized, duration__unoptimized))
 
-        print('MB, d-sep : {}'.format(markov_blanket__dsep))
-        print()
+        if self.DebugLevel > 0: print('MB, d-sep : {}'.format(markov_blanket__dsep))
+        if self.DebugLevel > 0: print()
 
 
     def format_ipcmb_result(self, label, target, datasetmatrix, markov_blanket):
@@ -327,7 +332,10 @@ class TestAlgorithmIPCMBWithGtests(TestBase):
         return output
 
 
-    def make_IPCMB_with_dsep(self, dm_label, target, extra_parameters=dict()):
+    def make_IPCMB_with_dsep(self, dm_label, target, extra_parameters=None):
+        if extra_parameters is None:
+            extra_parameters = dict()
+
         ci_test_class = mbff.math.DSeparationCITest.DSeparationCITest
 
         parameters = dict()
@@ -339,7 +347,10 @@ class TestAlgorithmIPCMBWithGtests(TestBase):
         return ipcmb
 
 
-    def make_IPCMB_with_Gtest_dcMI(self, dm_label, target, significance, extra_parameters=dict()):
+    def make_IPCMB_with_Gtest_dcMI(self, dm_label, target, significance, extra_parameters=None):
+        if extra_parameters is None:
+            extra_parameters = dict()
+
         ci_test_class = mbff.math.G_test__with_dcMI.G_test
 
         JHT_path = self.JHTFolder / (dm_label + '.pickle')
@@ -352,7 +363,10 @@ class TestAlgorithmIPCMBWithGtests(TestBase):
         return ipcmb
 
 
-    def make_IPCMB_with_Gtest_ADtree(self, dm_label, target, significance, extra_parameters=dict()):
+    def make_IPCMB_with_Gtest_ADtree(self, dm_label, target, significance, extra_parameters=None):
+        if extra_parameters is None:
+            extra_parameters = dict()
+
         ci_test_class = mbff.math.G_test__with_AD_tree.G_test
 
         LLT = extra_parameters['ci_test_ad_tree_leaf_list_threshold']
@@ -366,14 +380,20 @@ class TestAlgorithmIPCMBWithGtests(TestBase):
         return ipcmb
 
 
-    def make_IPCMB_with_Gtest_unoptimized(self, dm_label, target, significance, extra_parameters=dict()):
+    def make_IPCMB_with_Gtest_unoptimized(self, dm_label, target, significance, extra_parameters=None):
+        if extra_parameters is None:
+            extra_parameters = dict()
+
         ci_test_class = mbff.math.G_test__unoptimized.G_test
         ipcmb = self.make_IPCMB(dm_label, target, ci_test_class, significance, extra_parameters)
 
         return ipcmb
 
 
-    def make_IPCMB(self, dm_label, target, ci_test_class, significance, extra_parameters=dict()):
+    def make_IPCMB(self, dm_label, target, ci_test_class, significance, extra_parameters=None):
+        if extra_parameters is None:
+            extra_parameters = dict()
+
         omega = self.OmegaVariables[dm_label]
         datasetmatrix = self.DatasetMatrices[dm_label]
         bn = self.BayesianNetworks[dm_label]

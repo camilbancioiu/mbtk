@@ -127,7 +127,13 @@ class BayesianNetwork:
 
 
     @finalization_required
-    def joint_values_and_probabilities(self, values_as_indices=True, joint_vp=dict(), current_value=dict(), current_probability=1.0):
+    def joint_values_and_probabilities(self, values_as_indices=True, joint_vp=None, current_value=None, current_probability=1.0):
+        if joint_vp is None:
+            joint_vp = dict()
+
+        if current_value is None:
+            current_value = dict()
+
         if len(current_value) == len(self.variable_nodes__sampling_order):
             if values_as_indices:
                 current_value = self.sample_values_to_indices(current_value)
@@ -321,11 +327,17 @@ class BayesianNetwork:
         return self.find_all_paths(self.graph_d, start, end)
 
 
-    def find_all_undirected_paths(self, start, end, path=[]):
+    def find_all_undirected_paths(self, start, end, path=None):
+        if path is None:
+            path = list()
+
         return self.find_all_paths(self.graph_u, start, end)
 
 
-    def find_all_paths(self, graph, start, end, path=[]):
+    def find_all_paths(self, graph, start, end, path=None):
+        if path is None:
+            path = list()
+
         path = path + [start]
         if start == end:
             return [path]
@@ -374,7 +386,7 @@ class VariableNode:
         self.probdist = None
 
 
-    def sample(self, partial_sample={}, recursive=True):
+    def sample(self, partial_sample=None, recursive=True):
         """
         Produce a random sample that respects the probability distribution of
         the VariableNode.
@@ -382,6 +394,8 @@ class VariableNode:
         Returns the sample as a dictionary which also contains the values of
         the conditioning VariableNodes (they had to be sampled too, after all).
         """
+        if partial_sample is None:
+            partial_sample = dict()
 
         # Don't do anything if this VariableNode has already been sampled.
         if self.name in partial_sample:

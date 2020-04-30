@@ -619,7 +619,7 @@ class DatasetMatrix:
         return True
 
 
-    def delete_rows_cols(self, matrix_label, row_indices=[], col_indices=[]):
+    def delete_rows_cols(self, matrix_label, row_indices=None, col_indices=None):
         """
         Remove multiple rows and columns simultaneously from the requested CSR
         sparse matrix.
@@ -638,6 +638,13 @@ class DatasetMatrix:
             specified rows and columns.
         :rtype: scipy.sparse.csr_matrix
         """
+
+        if row_indices is None:
+            row_indices = list()
+
+        if col_indices is None:
+            col_indices = list()
+
         # Taken from https://stackoverflow.com/a/45486349/583574
         matrix = self.get_matrix(matrix_label)
         if not isinstance(matrix, scipy.sparse.csr_matrix):

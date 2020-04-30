@@ -14,6 +14,7 @@ def get_transformer_chain():
 
 
 class BIFTransformerBasic(Transformer):
+
     def identifier(self, items):
         return str(items[0])
 

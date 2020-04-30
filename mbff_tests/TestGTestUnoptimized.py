@@ -43,25 +43,6 @@ class TestGTestUnoptimized(TestBase):
         return configuration
 
 
-    def test_calculating_effective_dof(self):
-        # TODO develop this test further
-        X = [0, 0, 0, 0, 0, 0, 0, 0]
-        Y = [0, 0, 0, 0, 0, 0, 0, 0]
-        self.assertComputedDoF(0, [X, Y], 0, 1, [])
-
-        X = [1, 0, 0, 0, 0, 0, 0, 0]
-        Y = [0, 0, 0, 0, 0, 0, 0, 0]
-        self.assertComputedDoF(0, [X, Y], 0, 1, [])
-
-        X = [1, 0, 0, 0, 0, 0, 0, 0]
-        Y = [0, 0, 1, 1, 0, 0, 0, 0]
-        self.assertComputedDoF(1, [X, Y], 0, 1, [])
-
-        X = [1, 0, 0, 0, 0, 0, 0, 1]
-        Y = [0, 0, 1, 1, 0, 0, 0, 1]
-        self.assertComputedDoF(1, [X, Y], 0, 1, [])
-
-
 
     def test_G_value__alarm(self):
         Omega = self.OmegaVariables['alarm']
@@ -97,14 +78,13 @@ class TestGTestUnoptimized(TestBase):
 
         parameters = dict()
         parameters['ci_test_significance'] = 0.95
-        parameters['ci_test_debug'] = 1
+        parameters['ci_test_debug'] = 0
         parameters['omega'] = Omega
         parameters['source_bayesian_network'] = self.BayesianNetworks['lungcancer']
-        parameters['ci_test_dof_calculator_class'] = mbff.math.DoFCalculators.StructuralMinusSamplingZerosDoF
+        parameters['ci_test_dof_calculator_class'] = mbff.math.DoFCalculators.StructuralDoF
 
         self.G_test = mbff.math.G_test__unoptimized.G_test(lungcancer, parameters)
 
-        print()
         self.assertCITestAccurate(ASIA, SMOKE, Omega)
         self.assertCITestAccurate(ASIA, LUNG, Omega)
         self.assertCITestAccurate(ASIA, BRONC, Omega)
@@ -129,13 +109,6 @@ class TestGTestUnoptimized(TestBase):
         self.assertCITestAccurate(XRAY, TUB, Omega)
 
 
-    def assertComputedDoF(self, expected_dof, columns, X, Y, Z):
-        dm = self.make_dataset_matrix(columns)
-        G_test = mbff.math.G_test__unoptimized.G_test(dm, dict())
-        dof = G_test.calculate_degrees_of_freedom(X, Y, Z)
-        self.assertEqual(expected_dof, dof)
-
-
     def make_dataset_matrix(self, columns):
         matrix = scipy.sparse.csr_matrix(numpy.array(columns)).transpose()
         dm = DatasetMatrix('test_dm')
@@ -156,5 +129,5 @@ class TestGTestUnoptimized(TestBase):
             result.computed_d_separation = self.G_test.source_bn.d_separated(X.ID, Z_ID, Y.ID)
         result.index = len(self.G_test.ci_test_results)
         self.G_test.ci_test_results.append(result)
-        print(result, result.test_distribution_parameters)
+        # print(result, result.test_distribution_parameters)
         self.assertTrue(result.accurate())
