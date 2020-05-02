@@ -1,0 +1,60 @@
+network lungcancer {
+}
+variable ASIA {
+  type discrete [ 2 ] { yes, no };
+}
+variable TUB {
+  type discrete [ 2 ] { yes, no };
+}
+variable SMOKE {
+  type discrete [ 2 ] { yes, no };
+}
+variable LUNG {
+  type discrete [ 2 ] { yes, no };
+}
+variable BRONC {
+  type discrete [ 2 ] { yes, no };
+}
+variable EITHER {
+  type discrete [ 2 ] { yes, no };
+}
+variable XRAY {
+  type discrete [ 2 ] { yes, no };
+}
+variable DYSP {
+  type discrete [ 2 ] { yes, no };
+}
+probability ( ASIA ) {
+  table 0.01, 0.99;
+}
+probability ( TUB | ASIA ) {
+  (yes) 0.05, 0.95;
+  (no) 0.01, 0.99;
+}
+probability ( SMOKE ) {
+  table 0.5, 0.5;
+}
+probability ( LUNG | SMOKE ) {
+  (yes) 0.1, 0.9;
+  (no) 0.01, 0.99;
+}
+probability ( BRONC | SMOKE ) {
+  (yes) 0.6, 0.4;
+  (no) 0.3, 0.7;
+}
+probability ( EITHER | LUNG, TUB ) {
+  (yes, yes) 1.0, 0.0;
+  (no, yes) 1.0, 0.0;
+  (yes, no) 1.0, 0.0;
+  (no, no) 0.0, 1.0;
+}
+probability ( XRAY | EITHER ) {
+  (yes) 0.98, 0.02;
+  (no) 0.05, 0.95;
+}
+probability ( DYSP | BRONC, EITHER ) {
+  (yes, yes) 0.9, 0.1;
+  (no, yes) 0.7, 0.3;
+  (yes, no) 0.8, 0.2;
+  (no, no) 0.1, 0.9;
+}

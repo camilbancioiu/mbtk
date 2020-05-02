@@ -1,0 +1,115 @@
+RCV1v2 dummy dataset, representative of the LYRL2004 format
+===========================================================
+
+Documents [16]:   101, 102, 103, 104,   -- arboreal, unkown
+                  105, 106, 107, 108,   -- arboreal, sidereal
+                  201, 202,             -- sidereal, encoded
+                  301, 302,             -- unknown, sidereal
+                  401, 402, 403, 404    -- encoded, unknown, arboreal
+
+Vocabulary [16]:  galaxy almond python rocket             -- arboreal
+                  carbohydrate oxygen polyrhythm firefly  -- sidereal
+                  dopamine sonata night ascend            -- unknown
+                  difference session rhapsody cloud       -- encoded
+
+Topics [4]:       arboreal(AR) sidereal(SD) unknown(UNKN) encoded(ENC)
+
+
+Industries [5]:   FUNGI(FNG) ASTROPHYSICS(ASTRO) ARTS(ART) ENGINEERING(ENGN) MYTHOLOGY(MYTH)
+
+Document 101: FUNGI ARTS
+  python: 5
+  rocket: 12
+  almond: 8
+  galaxy: 6
+  session: 2
+Document 102: FUNGI ASTROPHYSICS
+  almond: 10
+  galaxy: 4
+  rocket: 3
+  python: 4
+  night: 2
+Document 103: ARTS
+  galaxy: 2
+  almond: 2
+  rocket: 8
+  python: 8
+  night: 2
+Document 104: FUNGI ARTS ASTROPHYSICS
+  almond: 10
+  galaxy: 4
+  rocket: 7
+  python: 9
+  dopamine: 2
+Document 105: ENGINEERING
+  polyrhythm: 2
+  python: 6
+  almond: 10
+  galaxy: 8
+  rocket: 3
+Document 106: FUNGI
+  galaxy: 4
+  python: 4
+  almond: 10
+  oxygen: 2
+  rocket: 6
+Document 107: ARTS ASTROPHYSICS
+  almond: 7
+  rhapsody: 2
+  galaxy: 4
+  rocket: 5
+  python: 4
+Document 108: ARTS
+  galaxy: 4
+  rocket: 6
+  almond: 10
+  python: 4
+  night: 2
+Document 201: ARTS ENGINEERING
+  carbohydrate: 10
+  oxygen: 9
+  polyrhythm: 5
+  firefly: 8
+  difference: 2
+Document 202: ARTS ASTROPHYSICS
+  firefly: 7
+  oxygen: 9
+  carbohydrate: 4
+  polyrhythm: 5
+  dopamine: 2
+Document 301: FUNGI ENGINEERING
+  dopamine: 6
+  sonata: 11
+  night: 5
+  ascend: 7
+  rocket: 2
+Document 302: FUNGI
+  sonata: 5
+  galaxy: 2
+  dopamine: 9
+  ascend: 6
+  night: 8
+Document 401: ENGINEERING ARTS ASTROPHYSICS
+  difference: 6
+  session: 5
+  rhapsody: 9
+  cloud: 10
+  oxygen: 2
+Document 402: ENGINEERING
+  session: 8
+  difference: 4
+  rhapsody: 6
+  dopamine: 2
+  cloud: 6
+Document 403: FUNGI ENGINEERING
+  dopamine: 2
+  rhapsody: 12
+  difference: 3
+  session: 6
+  cloud: 8
+Document 404: ENGINEERING ARTS
+  difference: 8
+  rhapsody: 6
+  almond: 2
+  session: 6
+  cloud: 8
