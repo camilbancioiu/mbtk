@@ -7,36 +7,6 @@ from mbff.dataset.DatasetMatrix import DatasetMatrix
 
 class TestAlgorithmIGt():
 
-    def default_dataset(self):
-        sample_count = 8
-        feature_count = 8
-        datasetmatrix = DatasetMatrix("test")
-        datasetmatrix.row_labels = ['row{}'.format(i) for i in range(0, sample_count)]
-        datasetmatrix.column_labels_X = ['feature{}'.format(i) for i in range(0, feature_count)]
-        datasetmatrix.column_labels_Y = ['objective']
-        datasetmatrix.Y = scipy.sparse.csr_matrix(numpy.array([
-            [1],
-            [0],
-            [1],
-            [0],
-            [1],
-            [0],
-            [1],
-            [0]
-        ]))
-        datasetmatrix.X = scipy.sparse.csr_matrix(numpy.array([
-            [1, 1, 1, 1, 0, 1, 0, 1],
-            [0, 1, 1, 1, 1, 0, 0, 1],
-            [1, 1, 1, 0, 0, 0, 1, 0],
-            [0, 0, 1, 0, 1, 1, 1, 0],
-            [1, 1, 0, 1, 0, 0, 1, 1],
-            [0, 0, 0, 1, 1, 1, 0, 1],
-            [1, 1, 1, 1, 0, 0, 1, 0],
-            [0, 0, 0, 1, 1, 1, 1, 0]
-        ]))
-        return datasetmatrix
-
-
     def test_selecting_features(self):
         datasetmatrix = self.default_dataset()
 
@@ -66,3 +36,33 @@ class TestAlgorithmIGt():
         expected_features = [0, 4, 1, 5, 2, 6, 3, 7]
         computed_features = AlgorithmIGt(datasetmatrix, parameters).select_features()
         assert computed_features == expected_features
+
+
+    def default_dataset(self):
+        sample_count = 8
+        feature_count = 8
+        datasetmatrix = DatasetMatrix("test")
+        datasetmatrix.row_labels = ['row{}'.format(i) for i in range(0, sample_count)]
+        datasetmatrix.column_labels_X = ['feature{}'.format(i) for i in range(0, feature_count)]
+        datasetmatrix.column_labels_Y = ['objective']
+        datasetmatrix.Y = scipy.sparse.csr_matrix(numpy.array([
+            [1],
+            [0],
+            [1],
+            [0],
+            [1],
+            [0],
+            [1],
+            [0]
+        ]))
+        datasetmatrix.X = scipy.sparse.csr_matrix(numpy.array([
+            [1, 1, 1, 1, 0, 1, 0, 1],
+            [0, 1, 1, 1, 1, 0, 0, 1],
+            [1, 1, 1, 0, 0, 0, 1, 0],
+            [0, 0, 1, 0, 1, 1, 1, 0],
+            [1, 1, 0, 1, 0, 0, 1, 1],
+            [0, 0, 0, 1, 1, 1, 0, 1],
+            [1, 1, 1, 1, 0, 0, 1, 0],
+            [0, 0, 0, 1, 1, 1, 1, 0]
+        ]))
+        return datasetmatrix
