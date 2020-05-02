@@ -41,7 +41,7 @@ class TestAlgorithmRun(TestBase):
 
         # Verify if the AlgorithmRun now contains the expected results.
         self.assertEqual('mbff.algorithms.basic.IGt.AlgorithmIGt', algrun.algorithm_name)
-        self.assertEqual('mbff_tests.TestAlgorithmRun.MockBernouliClassifier', algrun.classifier_classname)
+        self.assertEqual('mbff_tests.test_AlgorithmRun.MockBernouliClassifier', algrun.classifier_classname)
         self.assertListEqual([0, 4, 1, 5], algrun.selected_features)
         self.assertLess(0, algrun.duration)
 
@@ -68,7 +68,7 @@ class TestAlgorithmRun(TestBase):
         algrun = AlgorithmAndClassifierRun(None, configuration, parameters)
 
         self.assertEqual('mbff.algorithms.basic.IGt.AlgorithmIGt', algrun.algorithm_name)
-        self.assertEqual('mbff_tests.TestAlgorithmRun.MockBernouliClassifier', algrun.classifier_classname)
+        self.assertEqual('mbff_tests.test_AlgorithmRun.MockBernouliClassifier', algrun.classifier_classname)
 
 
 

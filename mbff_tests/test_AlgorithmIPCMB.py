@@ -1,8 +1,4 @@
-import unittest
 from pathlib import Path
-
-
-from mbff_tests.TestBase import TestBase
 
 from mbff.structures.BayesianNetwork import BayesianNetwork
 from mbff.math.DSeparationCITest import DSeparationCITest
@@ -13,45 +9,26 @@ import mbff.math.DoFCalculators
 import mbff.utilities.functions as util
 
 
-@unittest.skipIf(TestBase.tag_excluded('ipcmb_run'), 'Tests running IPC-MB are excluded')
-class TestAlgorithmIPCMB(TestBase):
+# @unittest.skipIf(TestBase.tag_excluded('ipcmb_run'), 'Tests running IPC-MB are excluded')
+class TestAlgorithmIPCMB:
 
-    @classmethod
-    def initTestResources(testClass):
-        super(TestAlgorithmIPCMB, testClass).initTestResources()
-        testClass.DatasetsInUse = ['survey']
-        testClass.DatasetMatrixFolder = Path('testfiles', 'tmp', 'test_ipcmb_dm')
-
-
-    @classmethod
-    def configure_dataset(testClass, dm_label):
-        configuration = {}
-        if dm_label == 'survey':
-            configuration['sourcepath'] = Path('testfiles', 'bif_files', 'survey.bif')
-            configuration['sample_count'] = int(2e4)
-            configuration['random_seed'] = 42 * 42
-            configuration['values_as_indices'] = True
-            configuration['objectives'] = []
-        return configuration
-
-
-    def test_finding_Markov_blankets_in_datasetmatrix(self):
-        Omega = self.OmegaVariables['survey']
-        datasetmatrix = self.DatasetMatrices['survey']
-        bn = self.BayesianNetworks['survey']
+    def test_finding_Markov_blankets_in_datasetmatrix(self, ds_survey_small):
+        omega = ds_survey_small.omega
+        datasetmatrix = ds_survey_small.datasetmatrix
+        bn = ds_survey_small.bayesiannetwork
 
         parameters = dict()
         parameters['target'] = 3
         parameters['ci_test_class'] = mbff.math.G_test__unoptimized.G_test
         parameters['ci_test_significance'] = 0.90
         parameters['ci_test_debug'] = 0
-        parameters['omega'] = Omega
+        parameters['omega'] = omega
         parameters['source_bayesian_network'] = bn
         parameters['ci_test_dof_calculator_class'] = mbff.math.DoFCalculators.StructuralDoF
 
         ipcmb = AlgorithmIPCMB(datasetmatrix, parameters)
         mb = ipcmb.select_features()
-        self.assertEqual([1, 2, 5], mb)
+        assert mb == [1, 2, 5]
 
 
     def test_finding_Markov_blankets_in_graphs(self):
@@ -69,11 +46,11 @@ class TestAlgorithmIPCMB(TestBase):
 
         parameters = self.make_parameters(3, bn)
         mb = AlgorithmIPCMB(None, parameters).select_features()
-        self.assertEqual([1, 2, 5], mb)
+        assert mb == [1, 2, 5]
 
         parameters = self.make_parameters(1, bn)
         mb = AlgorithmIPCMB(None, parameters).select_features()
-        self.assertEqual([0, 2, 3, 4], mb)
+        assert mb == [0, 2, 3, 4]
 
         # Remove the edge 1 → 2 from the Bayesian network.
         graph[1] = [3]
@@ -82,11 +59,11 @@ class TestAlgorithmIPCMB(TestBase):
 
         parameters = self.make_parameters(3, bn)
         mb = AlgorithmIPCMB(None, parameters).select_features()
-        self.assertEqual([1, 2, 5], mb)
+        assert mb == [1, 2, 5]
 
         parameters = self.make_parameters(1, bn)
         mb = AlgorithmIPCMB(None, parameters).select_features()
-        self.assertEqual([0, 3, 4], mb)
+        assert mb == [0, 3, 4]
 
         # Replace the edge from 1 → 3 with 1 → 2.
         graph[1] = [2]
@@ -95,11 +72,11 @@ class TestAlgorithmIPCMB(TestBase):
 
         parameters = self.make_parameters(3, bn)
         mb = AlgorithmIPCMB(None, parameters).select_features()
-        self.assertEqual([2, 5], mb)
+        assert mb == [2, 5]
 
         parameters = self.make_parameters(1, bn)
         mb = AlgorithmIPCMB(None, parameters).select_features()
-        self.assertEqual([0, 2, 4], mb)
+        assert mb == [0, 2, 4]
 
         # Test IPC-MB with the graphs proposed in the PCMB article, used to
         # illustrate the flaws of MMMB and HITON.
@@ -116,23 +93,23 @@ class TestAlgorithmIPCMB(TestBase):
         parameters = self.make_parameters(4, bn)
         parameters['pc_only'] = True
         pc = AlgorithmIPCMB(None, parameters).select_features()
-        self.assertEqual([1], pc)
+        assert pc == [1]
 
         parameters = self.make_parameters(4, bn)
         mb = AlgorithmIPCMB(None, parameters).select_features()
-        self.assertEqual([0, 1], mb)
+        assert mb == [0, 1]
 
         parameters = self.make_parameters(0, bn)
         mb = AlgorithmIPCMB(None, parameters).select_features()
-        self.assertEqual([1, 2, 4], mb)
+        assert mb == [1, 2, 4]
 
         parameters = self.make_parameters(2, bn)
         mb = AlgorithmIPCMB(None, parameters).select_features()
-        self.assertEqual([0, 1, 3], mb)
+        assert mb == [0, 1, 3]
 
         parameters = self.make_parameters(1, bn)
         mb = AlgorithmIPCMB(None, parameters).select_features()
-        self.assertEqual([0, 2, 3, 4], mb)
+        assert mb == [0, 2, 3, 4]
 
         # Test IPC-MB with the ALARM network.
         bn = util.read_bif_file(Path('testfiles', 'bif_files', 'alarm.bif'))
@@ -140,23 +117,23 @@ class TestAlgorithmIPCMB(TestBase):
 
         parameters = self.make_parameters(22, bn)
         mb = AlgorithmIPCMB(None, parameters).select_features()
-        self.assertEqual([18, 34], mb)
+        assert mb == [18, 34]
 
         parameters = self.make_parameters(1, bn)
         mb = AlgorithmIPCMB(None, parameters).select_features()
-        self.assertEqual([3, 9, 17, 29, 32, 33, 34], mb)
+        assert mb == [3, 9, 17, 29, 32, 33, 34]
 
         parameters = self.make_parameters(17, bn)
         mb = AlgorithmIPCMB(None, parameters).select_features()
-        self.assertEqual([1, 3, 29, 32], mb)
+        assert mb == [1, 3, 29, 32]
 
         parameters = self.make_parameters(24, bn)
         mb = AlgorithmIPCMB(None, parameters).select_features()
-        self.assertEqual([27], mb)
+        assert mb == [27]
 
         parameters = self.make_parameters(34, bn)
         mb = AlgorithmIPCMB(None, parameters).select_features()
-        self.assertEqual([1, 9, 18, 19, 22, 33, 36], mb)
+        assert mb == [1, 9, 18, 19, 22, 33, 36]
 
 
     def make_parameters(self, target, bn):

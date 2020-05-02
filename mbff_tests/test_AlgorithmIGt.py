@@ -1,13 +1,11 @@
 import scipy
 import numpy
 
-from mbff_tests.TestBase import TestBase
-
 from mbff.algorithms.basic.IGt import AlgorithmIGt
 from mbff.dataset.DatasetMatrix import DatasetMatrix
 
 
-class TestAlgorithmIGt(TestBase):
+class TestAlgorithmIGt():
 
     def default_dataset(self):
         sample_count = 8
@@ -49,7 +47,7 @@ class TestAlgorithmIGt(TestBase):
         }
         expected_features = [0, 4]
         computed_features = AlgorithmIGt(datasetmatrix, parameters).select_features()
-        self.assertListEqual(expected_features, computed_features)
+        assert computed_features == expected_features
 
         # Select the top four features.
         parameters = {
@@ -58,7 +56,7 @@ class TestAlgorithmIGt(TestBase):
         }
         expected_features = [0, 4, 1, 5]
         computed_features = AlgorithmIGt(datasetmatrix, parameters).select_features()
-        self.assertListEqual(expected_features, computed_features)
+        assert computed_features == expected_features
 
         # Select all features, thus seeing them sorted by MI.
         parameters = {
@@ -67,4 +65,4 @@ class TestAlgorithmIGt(TestBase):
         }
         expected_features = [0, 4, 1, 5, 2, 6, 3, 7]
         computed_features = AlgorithmIGt(datasetmatrix, parameters).select_features()
-        self.assertListEqual(expected_features, computed_features)
+        assert computed_features == expected_features

@@ -24,23 +24,23 @@ if __name__ == '__main__':
     # AFTER setting TestsTagsToExclude is required, because unittest.skipIf
     # decorators are evaluated at import time.
 
-    from mbff_tests.TestDatasetMatrix import TestDatasetMatrix
-    from mbff_tests.TestRCV1v2DatasetSource import TestRCV1v2DatasetSource
-    from mbff_tests.TestBinarySyntheticDatasetSource import TestBinarySyntheticDatasetSource
-    from mbff_tests.TestBinaryExperimentalDataset import TestBinaryExperimentalDataset
-    from mbff_tests.TestModelBuildingExperimentalDataset import TestModelBuildingExperimentalDataset
-    from mbff_tests.TestInfoTheory import TestInfoTheory
-    from mbff_tests.TestAlgorithmIGt import TestAlgorithmIGt
-    from mbff_tests.TestAlgorithmRun import TestAlgorithmRun
-    from mbff_tests.TestExperimentRun import TestExperimentRun
-    from mbff_tests.TestBIFReading import TestBIFReading
-    from mbff_tests.TestBayesianNetwork import TestBayesianNetwork
-    from mbff_tests.TestSampledBayesianNetworkDatasetSource import TestSampledBayesianNetworkDatasetSource
-    from mbff_tests.TestVariableAndPMF import TestVariableAndPMF
-    from mbff_tests.TestGTestUnoptimized import TestGTestUnoptimized
-    from mbff_tests.TestADTree import TestADTree
-    from mbff_tests.TestAlgorithmIPCMB import TestAlgorithmIPCMB
-    from mbff_tests.TestAlgorithmIPCMBWithGtests import TestAlgorithmIPCMBWithGtests
+    from mbff_tests.test_DatasetMatrix import TestDatasetMatrix
+    from mbff_tests.test_RCV1v2DatasetSource import TestRCV1v2DatasetSource
+    from mbff_tests.test_BinarySyntheticDatasetSource import TestBinarySyntheticDatasetSource
+    from mbff_tests.test_BinaryExperimentalDataset import TestBinaryExperimentalDataset
+    from mbff_tests.test_ModelBuildingExperimentalDataset import TestModelBuildingExperimentalDataset
+    from mbff_tests.test_InfoTheory import TestInfoTheory
+    from mbff_tests.test_AlgorithmIGt import TestAlgorithmIGt
+    from mbff_tests.test_AlgorithmRun import TestAlgorithmRun
+    from mbff_tests.test_ExperimentRun import TestExperimentRun
+    from mbff_tests.test_BIFReading import TestBIFReading
+    from mbff_tests.test_BayesianNetwork import TestBayesianNetwork
+    from mbff_tests.test_SampledBayesianNetworkDatasetSource import TestSampledBayesianNetworkDatasetSource
+    from mbff_tests.test_VariableAndPMF import TestVariableAndPMF
+    from mbff_tests.test_GTestUnoptimized import TestGTestUnoptimized
+    from mbff_tests.test_ADTree import TestADTree
+    from mbff_tests.test_AlgorithmIPCMB import TestAlgorithmIPCMB
+    from mbff_tests.test_AlgorithmIPCMBWithGtests import TestAlgorithmIPCMBWithGtests
 
     import unittest
     unittest.main(verbosity=2)
