@@ -1,18 +1,15 @@
-from pathlib import Path
-
 from mbff.structures.BayesianNetwork import BayesianNetwork
 from mbff.math.DSeparationCITest import DSeparationCITest
 from mbff.algorithms.mb.ipcmb import AlgorithmIPCMB
 
 import mbff.math.G_test__unoptimized
 import mbff.math.DoFCalculators
-import mbff.utilities.functions as util
 
 
 # @unittest.skipIf(TestBase.tag_excluded('ipcmb_run'), 'Tests running IPC-MB are excluded')
 class TestAlgorithmIPCMB:
 
-    def test_finding_Markov_blankets_in_datasetmatrix(self, ds_survey_small):
+    def test_ipcmb_finding_Markov_blankets_in_datasetmatrix(self, ds_survey_small):
         omega = ds_survey_small.omega
         datasetmatrix = ds_survey_small.datasetmatrix
         bn = ds_survey_small.bayesiannetwork
@@ -31,7 +28,7 @@ class TestAlgorithmIPCMB:
         assert mb == [1, 2, 5]
 
 
-    def test_finding_Markov_blankets_in_graphs(self):
+    def test_ipcmb_finding_Markov_blankets_in_graphs(self):
         # Simple graph imitating the 'survey' Bayesian network, from
         # http://www.bnlearn.com/bnrepository/discrete-small.html#survey
         graph = {
@@ -111,27 +108,25 @@ class TestAlgorithmIPCMB:
         mb = AlgorithmIPCMB(None, parameters).select_features()
         assert mb == [0, 2, 3, 4]
 
-        # Test IPC-MB with the ALARM network.
-        bn = util.read_bif_file(Path('testfiles', 'bif_files', 'alarm.bif'))
-        bn.finalize()
 
-        parameters = self.make_parameters(22, bn)
+    def test_ipcmb_on_alarm(self, bn_alarm):
+        parameters = self.make_parameters(22, bn_alarm)
         mb = AlgorithmIPCMB(None, parameters).select_features()
         assert mb == [18, 34]
 
-        parameters = self.make_parameters(1, bn)
+        parameters = self.make_parameters(1, bn_alarm)
         mb = AlgorithmIPCMB(None, parameters).select_features()
         assert mb == [3, 9, 17, 29, 32, 33, 34]
 
-        parameters = self.make_parameters(17, bn)
+        parameters = self.make_parameters(17, bn_alarm)
         mb = AlgorithmIPCMB(None, parameters).select_features()
         assert mb == [1, 3, 29, 32]
 
-        parameters = self.make_parameters(24, bn)
+        parameters = self.make_parameters(24, bn_alarm)
         mb = AlgorithmIPCMB(None, parameters).select_features()
         assert mb == [27]
 
-        parameters = self.make_parameters(34, bn)
+        parameters = self.make_parameters(34, bn_alarm)
         mb = AlgorithmIPCMB(None, parameters).select_features()
         assert mb == [1, 9, 18, 19, 22, 33, 36]
 
