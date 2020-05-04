@@ -3,93 +3,86 @@ from pathlib import Path
 from collections import Counter
 
 import numpy
-import unittest
-
-from mbff_tests.TestBase import TestBase
+import pytest
 
 import mbff.utilities.functions as util
 from mbff.structures.BayesianNetwork import BayesianNetwork, VariableNode, ProbabilityDistributionOfVariableNode
 from mbff.structures.Exceptions import BayesianNetworkNotFinalizedError
 
 
-class TestBayesianNetwork(TestBase):
+class TestBayesianNetwork:
 
     def test_probability_distribution(self):
         variable = self.default_variable__unconditioned()
         probdist = variable.probdist
 
-        self.assertEqual(1, len(probdist.probabilities))
-        self.assertEqual(0, len(probdist.conditioning_variable_nodes))
-        self.assertEqual(0, len(probdist.cummulative_probabilities))
+        assert len(probdist.probabilities) == 1
+        assert len(probdist.conditioning_variable_nodes) == 0
+        assert len(probdist.cummulative_probabilities) == 0
 
         probdist.finalize()
 
-        self.assertEqual(1, len(probdist.probabilities))
-        self.assertEqual(0, len(probdist.conditioning_variable_nodes))
+        assert len(probdist.probabilities) == 1
+        assert len(probdist.conditioning_variable_nodes) == 0
 
         cprobs_compare = zip([0.2, 0.3, 0.8, 1.0], probdist.cummulative_probabilities['<unconditioned>'])
         for pair in cprobs_compare:
-            self.assertAlmostEqual(pair[0], pair[1])
+            assert abs(pair[0] - pair[1]) < 1e-6
 
 
-    def test_creating_complete_joint_pmf(self):
-        survey_bif = Path('testfiles', 'bif_files', 'survey.bif')
-        bn = util.read_bif_file(survey_bif)
+    def test_creating_complete_joint_pmf(self, bn_survey):
+        bn = bn_survey
 
-        bn.finalize()
-        self.assertListEqual(['AGE', 'SEX', 'EDU', 'OCC', 'R', 'TRN'], bn.variable_node_names__sampling_order)
-        self.assertListEqual(['AGE', 'EDU', 'OCC', 'R', 'SEX', 'TRN'], bn.variable_node_names())
+        assert bn.variable_node_names__sampling_order == ['AGE', 'SEX', 'EDU', 'OCC', 'R', 'TRN']
+        assert bn.variable_node_names() == ['AGE', 'EDU', 'OCC', 'R', 'SEX', 'TRN']
 
         total_possible_values_in_bn = 1
         for varnode in bn.variable_nodes.values():
             total_possible_values_in_bn *= len(varnode.values)
 
         joint_pmf = bn.create_joint_pmf(values_as_indices=False)
-        self.assertEqual(1.0, sum(joint_pmf.values()))
-        self.assertEqual(total_possible_values_in_bn, len(joint_pmf))
+        assert sum(joint_pmf.values()) == 1.0
+        assert len(joint_pmf) == total_possible_values_in_bn
 
         test_sample = ('young', 'uni', 'self', 'small', 'F', 'train')
         expected_probability = 0.3 * 0.51 * 0.36 * 0.08 * 0.2 * 0.36
-        self.assertEqual(expected_probability, joint_pmf.p(test_sample))
+        assert joint_pmf.p(test_sample) == expected_probability
 
         test_sample = ('young', 'uni', 'emp', 'small', 'F', 'other')
         expected_probability = 0.3 * 0.51 * 0.36 * 0.92 * 0.2 * 0.1
-        self.assertEqual(expected_probability, joint_pmf.p(test_sample))
+        assert joint_pmf.p(test_sample) == expected_probability
 
         test_sample = ('young', 'highschool', 'emp', 'small', 'M', 'other')
         expected_probability = 0.3 * 0.49 * 0.75 * 0.96 * 0.25 * 0.1
-        self.assertEqual(expected_probability, joint_pmf.p(test_sample))
+        assert joint_pmf.p(test_sample) == expected_probability
 
 
-    def test_sampling_single(self):
-        survey_bif = Path('testfiles', 'bif_files', 'survey.bif')
-        bn = util.read_bif_file(survey_bif)
+    def test_sampling_single(self, bn_survey):
+        bn = bn_survey
 
-        bn.finalize()
         bn.finalized = False
-        with self.assertRaises(BayesianNetworkNotFinalizedError):
+        with pytest.raises(BayesianNetworkNotFinalizedError):
             sample = bn.sample()
 
         bn.finalized = True
 
-        self.assertListEqual(['AGE', 'SEX', 'EDU', 'OCC', 'R', 'TRN'], bn.variable_node_names__sampling_order)
+        assert bn.variable_node_names__sampling_order == ['AGE', 'SEX', 'EDU', 'OCC', 'R', 'TRN']
 
         sample = bn.sample()
         self.assertValidExpectedSample(sample)
 
 
-    @unittest.skipIf(TestBase.tag_excluded('sampling'), 'Sampling tests excluded')
-    def test_sampling_multiple(self):
-        survey_bif = Path('testfiles', 'bif_files', 'survey.bif')
-        bn = util.read_bif_file(survey_bif)
+    # @unittest.skipIf(TestBase.tag_excluded('sampling'), 'Sampling tests excluded')
+    def test_sampling_multiple(self, bn_survey):
 
-        bn.finalize()
-        self.assertListEqual(['AGE', 'SEX', 'EDU', 'OCC', 'R', 'TRN'], bn.variable_node_names__sampling_order)
+        bn = bn_survey
+
+        assert bn.variable_node_names__sampling_order == ['AGE', 'SEX', 'EDU', 'OCC', 'R', 'TRN']
 
         random.seed(42)
         samples = bn.sample_matrix(100000)
-        self.assertIsInstance(samples, numpy.ndarray)
-        self.assertEqual((100000, 6), samples.shape)
+        assert isinstance(samples, numpy.ndarray)
+        assert samples.shape == (100000, 6)
 
         AGEpd = self.calculate_probdist(samples[:, 0])
         EDUpd = self.calculate_probdist(samples[:, 1])
@@ -100,12 +93,12 @@ class TestBayesianNetwork(TestBase):
 
         delta = 0.003
 
-        self.assertAlmostEqual(0.3, AGEpd[0], delta=delta)   # Pr(AGE = young) = 0.3
-        self.assertAlmostEqual(0.5, AGEpd[1], delta=delta)   # Pr(AGE = adult) = 0.5
-        self.assertAlmostEqual(0.2, AGEpd[2], delta=delta)   # Pr(AGE = old)   = 0.2
+        assert abs(AGEpd[0] - 0.3) < delta
+        assert abs(AGEpd[1] - 0.5) < delta
+        assert abs(AGEpd[2] - 0.2) < delta
 
-        self.assertAlmostEqual(0.49, SEXpd[0], delta=delta)   # Pr(SEX = M) = 0.49
-        self.assertAlmostEqual(0.51, SEXpd[1], delta=delta)   # Pr(SEX = F) = 0.51
+        assert abs(SEXpd[0] - 0.49) < delta
+        assert abs(SEXpd[1] - 0.51) < delta
 
         EDU_p_highschool = (
             0.3 * 0.49 * 0.75 +
@@ -114,7 +107,7 @@ class TestBayesianNetwork(TestBase):
             0.3 * 0.51 * 0.64 +
             0.5 * 0.51 * 0.7 +
             0.2 * 0.51 * 0.9)
-        self.assertAlmostEqual(EDU_p_highschool, EDUpd[0], delta=delta)
+        assert abs(EDUpd[0] - EDU_p_highschool) < delta
 
         EDU_p_uni = (
             0.3 * 0.49 * 0.25 +
@@ -123,41 +116,41 @@ class TestBayesianNetwork(TestBase):
             0.3 * 0.51 * 0.36 +
             0.5 * 0.51 * 0.3 +
             0.2 * 0.51 * 0.1)
-        self.assertAlmostEqual(EDU_p_uni, EDUpd[1], delta=delta)
+        assert abs(EDUpd[1] - EDU_p_uni) < delta
 
         OCC_p_emp = (
             EDU_p_highschool * 0.96 +
             EDU_p_uni * 0.92)
-        self.assertAlmostEqual(OCC_p_emp, OCCpd[0], delta=delta)
+        assert abs(OCCpd[0] - OCC_p_emp) < delta
 
         OCC_p_self = (
             EDU_p_highschool * 0.04 +
             EDU_p_uni * 0.08)
-        self.assertAlmostEqual(OCC_p_self, OCCpd[1], delta=delta)
+        assert abs(OCCpd[1] - OCC_p_self) < delta
 
         R_p_small = (
             EDU_p_highschool * 0.25 +
             EDU_p_uni * 0.2)
-        self.assertAlmostEqual(R_p_small, Rpd[0], delta=delta)
+        assert abs(Rpd[0] - R_p_small) < delta
 
         R_p_big = (
             EDU_p_highschool * 0.75 +
             EDU_p_uni * 0.8)
-        self.assertAlmostEqual(R_p_big, Rpd[1], delta=delta)
+        assert abs(Rpd[1] - R_p_big) < delta
 
         TRN_p_car = (
             OCC_p_emp * R_p_small * 0.48 +
             OCC_p_self * R_p_small * 0.56 +
             OCC_p_emp * R_p_big * 0.58 +
             OCC_p_self * R_p_big * 0.70)
-        self.assertAlmostEqual(TRN_p_car, TRNpd[0], delta=delta)
+        assert abs(TRNpd[0] - TRN_p_car) < delta
 
         TRN_p_train = (
             OCC_p_emp * R_p_small * 0.42 +
             OCC_p_self * R_p_small * 0.36 +
             OCC_p_emp * R_p_big * 0.24 +
             OCC_p_self * R_p_big * 0.21)
-        self.assertAlmostEqual(TRN_p_train, TRNpd[1], delta=delta)
+        assert abs(TRNpd[1] - TRN_p_train) < delta
 
         TRN_p_other = (
             OCC_p_emp * R_p_small * 0.10 +
@@ -165,78 +158,70 @@ class TestBayesianNetwork(TestBase):
             OCC_p_emp * R_p_big * 0.18 +
             OCC_p_self * R_p_big * 0.09)
 
-        self.assertAlmostEqual(TRN_p_other, TRNpd[2], delta=delta)
+        assert abs(TRNpd[2] - TRN_p_other) < delta
 
 
-    def test_variable_IDs(self):
-        survey_bif = Path('testfiles', 'bif_files', 'survey.bif')
-        bn = util.read_bif_file(survey_bif)
-        bn.finalize()
-        self.assertEqual(0, bn.variable_nodes['AGE'].ID)
-        self.assertEqual(1, bn.variable_nodes['EDU'].ID)
-        self.assertEqual(2, bn.variable_nodes['OCC'].ID)
-        self.assertEqual(3, bn.variable_nodes['R'].ID)
-        self.assertEqual(4, bn.variable_nodes['SEX'].ID)
-        self.assertEqual(5, bn.variable_nodes['TRN'].ID)
+    def test_variable_IDs(self, bn_survey, bn_lungcancer, bn_alarm):
+        bn = bn_survey
+        assert bn.variable_nodes['AGE'].ID == 0
+        assert bn.variable_nodes['EDU'].ID == 1
+        assert bn.variable_nodes['OCC'].ID == 2
+        assert bn.variable_nodes['R'].ID == 3
+        assert bn.variable_nodes['SEX'].ID == 4
+        assert bn.variable_nodes['TRN'].ID == 5
 
-        lungcancer_bif = Path('testfiles', 'bif_files', 'lungcancer.bif')
-        bn = util.read_bif_file(lungcancer_bif)
-        bn.finalize()
-        self.assertEqual(0, bn.variable_nodes['ASIA'].ID)
-        self.assertEqual(1, bn.variable_nodes['BRONC'].ID)
-        self.assertEqual(2, bn.variable_nodes['DYSP'].ID)
-        self.assertEqual(3, bn.variable_nodes['EITHER'].ID)
-        self.assertEqual(4, bn.variable_nodes['LUNG'].ID)
-        self.assertEqual(5, bn.variable_nodes['SMOKE'].ID)
-        self.assertEqual(6, bn.variable_nodes['TUB'].ID)
-        self.assertEqual(7, bn.variable_nodes['XRAY'].ID)
+        bn = bn_lungcancer
+        assert bn.variable_nodes['ASIA'].ID == 0
+        assert bn.variable_nodes['BRONC'].ID == 1
+        assert bn.variable_nodes['DYSP'].ID == 2
+        assert bn.variable_nodes['EITHER'].ID == 3
+        assert bn.variable_nodes['LUNG'].ID == 4
+        assert bn.variable_nodes['SMOKE'].ID == 5
+        assert bn.variable_nodes['TUB'].ID == 6
+        assert bn.variable_nodes['XRAY'].ID == 7
 
-        alarm_bif = Path('testfiles', 'bif_files', 'alarm.bif')
-        bn = util.read_bif_file(alarm_bif)
-        bn.finalize()
-        self.assertEqual(0, bn.variable_nodes['ANAPHYLAXIS'].ID)
-        self.assertEqual(1, bn.variable_nodes['ARTCO2'].ID)
-        self.assertEqual(2, bn.variable_nodes['BP'].ID)
-        self.assertEqual(3, bn.variable_nodes['CATECHOL'].ID)
-        self.assertEqual(4, bn.variable_nodes['CO'].ID)
-        self.assertEqual(5, bn.variable_nodes['CVP'].ID)
-        self.assertEqual(6, bn.variable_nodes['DISCONNECT'].ID)
-        self.assertEqual(7, bn.variable_nodes['ERRCAUTER'].ID)
-        self.assertEqual(8, bn.variable_nodes['ERRLOWOUTPUT'].ID)
-        self.assertEqual(9, bn.variable_nodes['EXPCO2'].ID)
-        self.assertEqual(10, bn.variable_nodes['FIO2'].ID)
-        self.assertEqual(11, bn.variable_nodes['HISTORY'].ID)
-        self.assertEqual(12, bn.variable_nodes['HR'].ID)
-        self.assertEqual(13, bn.variable_nodes['HRBP'].ID)
-        self.assertEqual(14, bn.variable_nodes['HREKG'].ID)
-        self.assertEqual(15, bn.variable_nodes['HRSAT'].ID)
-        self.assertEqual(16, bn.variable_nodes['HYPOVOLEMIA'].ID)
-        self.assertEqual(17, bn.variable_nodes['INSUFFANESTH'].ID)
-        self.assertEqual(18, bn.variable_nodes['INTUBATION'].ID)
-        self.assertEqual(19, bn.variable_nodes['KINKEDTUBE'].ID)
-        self.assertEqual(20, bn.variable_nodes['LVEDVOLUME'].ID)
-        self.assertEqual(21, bn.variable_nodes['LVFAILURE'].ID)
-        self.assertEqual(22, bn.variable_nodes['MINVOL'].ID)
-        self.assertEqual(23, bn.variable_nodes['MINVOLSET'].ID)
-        self.assertEqual(24, bn.variable_nodes['PAP'].ID)
-        self.assertEqual(25, bn.variable_nodes['PCWP'].ID)
-        self.assertEqual(26, bn.variable_nodes['PRESS'].ID)
-        self.assertEqual(27, bn.variable_nodes['PULMEMBOLUS'].ID)
-        self.assertEqual(28, bn.variable_nodes['PVSAT'].ID)
-        self.assertEqual(29, bn.variable_nodes['SAO2'].ID)
-        self.assertEqual(30, bn.variable_nodes['SHUNT'].ID)
-        self.assertEqual(31, bn.variable_nodes['STROKEVOLUME'].ID)
-        self.assertEqual(32, bn.variable_nodes['TPR'].ID)
-        self.assertEqual(33, bn.variable_nodes['VENTALV'].ID)
-        self.assertEqual(34, bn.variable_nodes['VENTLUNG'].ID)
-        self.assertEqual(35, bn.variable_nodes['VENTMACH'].ID)
-        self.assertEqual(36, bn.variable_nodes['VENTTUBE'].ID)
+        bn = bn_alarm
+        assert bn.variable_nodes['ANAPHYLAXIS'].ID == 0
+        assert bn.variable_nodes['ARTCO2'].ID == 1
+        assert bn.variable_nodes['BP'].ID == 2
+        assert bn.variable_nodes['CATECHOL'].ID == 3
+        assert bn.variable_nodes['CO'].ID == 4
+        assert bn.variable_nodes['CVP'].ID == 5
+        assert bn.variable_nodes['DISCONNECT'].ID == 6
+        assert bn.variable_nodes['ERRCAUTER'].ID == 7
+        assert bn.variable_nodes['ERRLOWOUTPUT'].ID == 8
+        assert bn.variable_nodes['EXPCO2'].ID == 9
+        assert bn.variable_nodes['FIO2'].ID == 10
+        assert bn.variable_nodes['HISTORY'].ID == 11
+        assert bn.variable_nodes['HR'].ID == 12
+        assert bn.variable_nodes['HRBP'].ID == 13
+        assert bn.variable_nodes['HREKG'].ID == 14
+        assert bn.variable_nodes['HRSAT'].ID == 15
+        assert bn.variable_nodes['HYPOVOLEMIA'].ID == 16
+        assert bn.variable_nodes['INSUFFANESTH'].ID == 17
+        assert bn.variable_nodes['INTUBATION'].ID == 18
+        assert bn.variable_nodes['KINKEDTUBE'].ID == 19
+        assert bn.variable_nodes['LVEDVOLUME'].ID == 20
+        assert bn.variable_nodes['LVFAILURE'].ID == 21
+        assert bn.variable_nodes['MINVOL'].ID == 22
+        assert bn.variable_nodes['MINVOLSET'].ID == 23
+        assert bn.variable_nodes['PAP'].ID == 24
+        assert bn.variable_nodes['PCWP'].ID == 25
+        assert bn.variable_nodes['PRESS'].ID == 26
+        assert bn.variable_nodes['PULMEMBOLUS'].ID == 27
+        assert bn.variable_nodes['PVSAT'].ID == 28
+        assert bn.variable_nodes['SAO2'].ID == 29
+        assert bn.variable_nodes['SHUNT'].ID == 30
+        assert bn.variable_nodes['STROKEVOLUME'].ID == 31
+        assert bn.variable_nodes['TPR'].ID == 32
+        assert bn.variable_nodes['VENTALV'].ID == 33
+        assert bn.variable_nodes['VENTLUNG'].ID == 34
+        assert bn.variable_nodes['VENTMACH'].ID == 35
+        assert bn.variable_nodes['VENTTUBE'].ID == 36
 
 
-    def test_directed_graph_building(self):
-        survey_bif = Path('testfiles', 'bif_files', 'survey.bif')
-        bn = util.read_bif_file(survey_bif)
-        bn.finalize()
+    def test_directed_graph_building(self, bn_survey, bn_lungcancer, bn_alarm):
+        bn = bn_survey
         expected_directed_graph = {
             0: [1],
             1: [2, 3],
@@ -245,10 +230,9 @@ class TestBayesianNetwork(TestBase):
             4: [1],
             5: []
         }
-        self.assertEqual(expected_directed_graph, bn.graph_d)
+        assert bn.graph_d == expected_directed_graph
 
-        lungcancer_bif = Path('testfiles', 'bif_files', 'lungcancer.bif')
-        bn = util.read_bif_file(lungcancer_bif)
+        bn = bn_lungcancer
         bn.finalize()
         expected_directed_graph = {
             0: [6],
@@ -260,11 +244,9 @@ class TestBayesianNetwork(TestBase):
             6: [3],
             7: []
         }
-        self.assertDictEqual(expected_directed_graph, bn.graph_d)
+        assert bn.graph_d == expected_directed_graph
 
-        alarm_bif = Path('testfiles', 'bif_files', 'alarm.bif')
-        bn = util.read_bif_file(alarm_bif)
-        bn.finalize()
+        bn = bn_alarm
         expected_directed_graph = {
             0: [32],
             1: [3, 9],
@@ -304,13 +286,13 @@ class TestBayesianNetwork(TestBase):
             35: [36],
             36: [26, 34],
         }
-        self.assertDictEqual(expected_directed_graph, bn.graph_d)
+        assert bn.graph_d == expected_directed_graph
 
         expected_paths = [
             [0, 32, 2],
             [0, 32, 3, 12, 4, 2]
         ]
-        self.assertEqual(expected_paths, bn.find_all_directed_paths(0, 2))
+        assert bn.find_all_directed_paths(0, 2) == expected_paths
 
         expected_paths = [
             [18, 30, 29, 3, 12, 4],
@@ -319,19 +301,17 @@ class TestBayesianNetwork(TestBase):
             [18, 34, 33, 1, 3, 12, 4],
             [18, 34, 33, 28, 29, 3, 12, 4]
         ]
-        self.assertEqual(expected_paths, bn.find_all_directed_paths(18, 4))
+        assert bn.find_all_directed_paths(18, 4) == expected_paths
 
         expected_paths = []
-        self.assertEqual(expected_paths, bn.find_all_directed_paths(18, 23))
+        assert bn.find_all_directed_paths(18, 23) == expected_paths
 
         expected_paths = [[6, 36]]
-        self.assertEqual(expected_paths, bn.find_all_directed_paths(6, 36))
+        assert bn.find_all_directed_paths(6, 36) == expected_paths
 
 
-    def test_undirected_graph_building(self):
-        alarm_bif = Path('testfiles', 'bif_files', 'alarm.bif')
-        bn = util.read_bif_file(alarm_bif)
-        bn.finalize()
+    def test_undirected_graph_building(self, bn_alarm):
+        bn = bn_alarm
         expected_undirected_graph = {
             0: [32],
             1: [3, 9, 33],
@@ -371,7 +351,7 @@ class TestBayesianNetwork(TestBase):
             35: [23, 36],
             36: [6, 26, 34, 35],
         }
-        self.assertDictEqual(expected_undirected_graph, bn.graph_u)
+        assert bn.graph_u == expected_undirected_graph
 
 
     def test_building_from_directed_graph(self):
@@ -456,8 +436,8 @@ class TestBayesianNetwork(TestBase):
         }
         bn = BayesianNetwork('testnet_graph')
         bn.from_directed_graph(graph)
-        self.assertEqual(graph, bn.graph_d)
-        self.assertEqual(expected_undirected_graph, bn.graph_u)
+        assert bn.graph_d == graph
+        assert bn.graph_u == expected_undirected_graph
 
         graph = {
             1: [2, 3],
@@ -476,8 +456,8 @@ class TestBayesianNetwork(TestBase):
 
         bn = BayesianNetwork('testnet_graph')
         bn.from_directed_graph(graph)
-        self.assertEqual(graph, bn.graph_d)
-        self.assertEqual(expected_undirected_graph, bn.graph_u)
+        assert bn.graph_d == graph
+        assert bn.graph_u == expected_undirected_graph
 
 
     def test_d_separation(self):
@@ -493,8 +473,8 @@ class TestBayesianNetwork(TestBase):
         bn = BayesianNetwork('testnet')
         bn.from_directed_graph(graph)
 
-        self.assertTrue(bn.d_separated(2, [1], 3))
-        self.assertFalse(bn.d_separated(2, [1, 5], 3))
+        assert bn.d_separated(2, [1], 3) is True
+        assert bn.d_separated(2, [1, 5], 3) is False
         self.assertFalse(bn.d_separated(1, [], 2))
         self.assertFalse(bn.d_separated(1, [], 3))
         self.assertFalse(bn.d_separated(1, [], 4))

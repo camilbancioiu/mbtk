@@ -1,6 +1,5 @@
 import numpy
 
-from mbff_tests.TestBase import TestBase
 from mbff_tests.MockDatasetSource import MockDatasetSource
 
 from mbff.dataset.ExperimentalDatasetDefinition import ExperimentalDatasetDefinition
@@ -8,14 +7,20 @@ from mbff.dataset.ModelBuildingExperimentalDataset import ModelBuildingExperimen
 from mbff.experiment.AlgorithmRun import AlgorithmAndClassifierRun
 from mbff.algorithms.basic.IGt import AlgorithmIGt
 
+import pytest
+import mbff_tests.utilities as testutil
 
-class TestAlgorithmRun(TestBase):
 
-    def test_algorithm_run(self):
-        folder = str(self.ensure_empty_tmp_subfolder('test_exds_repository__test_build'))
+@pytest.fixture
+def testfolder():
+    return testutil.ensure_empty_tmp_subfolder('test_exds_repository__test_build')
 
+
+class TestAlgorithmRun():
+
+    def test_algorithm_run(self, testfolder):
         # Prepare an ExperimentalDataset to perform the test on.
-        definition = self.default_exds_definition(folder)
+        definition = self.default_exds_definition(testfolder)
         exds = definition.create_exds()
         exds.build()
 
@@ -40,10 +45,10 @@ class TestAlgorithmRun(TestBase):
         algrun.run()
 
         # Verify if the AlgorithmRun now contains the expected results.
-        self.assertEqual('mbff.algorithms.basic.IGt.AlgorithmIGt', algrun.algorithm_name)
-        self.assertEqual('mbff_tests.test_AlgorithmRun.MockBernouliClassifier', algrun.classifier_classname)
-        self.assertListEqual([0, 4, 1, 5], algrun.selected_features)
-        self.assertLess(0, algrun.duration)
+        assert algrun.algorithm_name == 'mbff.algorithms.basic.IGt.AlgorithmIGt'
+        assert algrun.classifier_classname == 'mbff_tests.test_AlgorithmRun.MockBernouliClassifier'
+        assert algrun.selected_features == [0, 4, 1, 5]
+        assert algrun.duration > 0
 
         expected_classifier_evaluation = {
             'TP': 1,
@@ -51,7 +56,7 @@ class TestAlgorithmRun(TestBase):
             'FP': 1,
             'FN': 2
         }
-        self.assertDictEqual(expected_classifier_evaluation, algrun.classifier_evaluation)
+        assert algrun.classifier_evaluation == expected_classifier_evaluation
 
 
     def test_algorithm_run_configuration(self):
@@ -67,8 +72,8 @@ class TestAlgorithmRun(TestBase):
         }
         algrun = AlgorithmAndClassifierRun(None, configuration, parameters)
 
-        self.assertEqual('mbff.algorithms.basic.IGt.AlgorithmIGt', algrun.algorithm_name)
-        self.assertEqual('mbff_tests.test_AlgorithmRun.MockBernouliClassifier', algrun.classifier_classname)
+        assert algrun.algorithm_name == 'mbff.algorithms.basic.IGt.AlgorithmIGt'
+        assert algrun.classifier_classname == 'mbff_tests.test_AlgorithmRun.MockBernouliClassifier'
 
 
 

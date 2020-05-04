@@ -1,7 +1,15 @@
+import shutil
+from pathlib import Path
+
 from mbff.math.Variable import Omega
 from mbff.dataset.DatasetMatrix import DatasetMatrix
 from mbff.dataset.sources.SampledBayesianNetworkDatasetSource import SampledBayesianNetworkDatasetSource
 import mbff.utilities.functions as util
+
+
+test_folder = Path('mbff_tests', 'testfiles')
+bif_folder = Path('mbff_tests', 'bif_files')
+tmp_folder = Path(test_folder, 'tmp')
 
 
 class MockDataset:
@@ -39,6 +47,17 @@ def make_test_datasetmatrix(configuration):
 
 
 def make_test_bayesian_network(configuration):
-    bayesian_network = util.read_bif_file(configuration['sourcepath'])
-    bayesian_network.finalize()
-    return bayesian_network
+    bn = util.read_bif_file(configuration['sourcepath'])
+    bn.finalize()
+    return bn
+
+
+
+def ensure_empty_tmp_subfolder(subfolder):
+    try:
+        shutil.rmtree(Path(tmp_folder, subfolder))
+    except FileNotFoundError:
+        pass
+    path = Path(tmp_folder, subfolder)
+    path.mkdir(parents=True, exist_ok=True)
+    return path
