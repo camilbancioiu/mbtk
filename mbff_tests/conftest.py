@@ -45,7 +45,7 @@ def bn_lungcancer():
 
 
 @pytest.fixture
-def bn_lungcancer():
-    bn = util.read_bif_file(Path(testutil.bif_folder, 'lungcancer.bif'))
+def bn_lc_repaired():
+    bn = util.read_bif_file(Path(testutil.bif_folder, 'lc_repaired.bif'))
     bn.finalize()
     return bn
