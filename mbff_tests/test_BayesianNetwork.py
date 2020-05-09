@@ -93,12 +93,15 @@ class TestBayesianNetwork:
 
         delta = 0.003
 
-        assert abs(AGEpd[0] - 0.3) < delta
-        assert abs(AGEpd[1] - 0.5) < delta
-        assert abs(AGEpd[2] - 0.2) < delta
+        def almostEqual(x, y):
+            return abs(x - y) < delta
 
-        assert abs(SEXpd[0] - 0.49) < delta
-        assert abs(SEXpd[1] - 0.51) < delta
+        assert almostEqual(AGEpd[0], 0.3)
+        assert almostEqual(AGEpd[1], 0.5)
+        assert almostEqual(AGEpd[2], 0.2)
+
+        assert almostEqual(SEXpd[0], 0.49)
+        assert almostEqual(SEXpd[1], 0.51)
 
         EDU_p_highschool = (
             0.3 * 0.49 * 0.75 +
@@ -107,7 +110,7 @@ class TestBayesianNetwork:
             0.3 * 0.51 * 0.64 +
             0.5 * 0.51 * 0.7 +
             0.2 * 0.51 * 0.9)
-        assert abs(EDUpd[0] - EDU_p_highschool) < delta
+        assert almostEqual(EDUpd[0], EDU_p_highschool)
 
         EDU_p_uni = (
             0.3 * 0.49 * 0.25 +
@@ -116,41 +119,41 @@ class TestBayesianNetwork:
             0.3 * 0.51 * 0.36 +
             0.5 * 0.51 * 0.3 +
             0.2 * 0.51 * 0.1)
-        assert abs(EDUpd[1] - EDU_p_uni) < delta
+        assert almostEqual(EDUpd[1], EDU_p_uni)
 
         OCC_p_emp = (
             EDU_p_highschool * 0.96 +
             EDU_p_uni * 0.92)
-        assert abs(OCCpd[0] - OCC_p_emp) < delta
+        assert almostEqual(OCCpd[0], OCC_p_emp)
 
         OCC_p_self = (
             EDU_p_highschool * 0.04 +
             EDU_p_uni * 0.08)
-        assert abs(OCCpd[1] - OCC_p_self) < delta
+        assert almostEqual(OCCpd[1], OCC_p_self)
 
         R_p_small = (
             EDU_p_highschool * 0.25 +
             EDU_p_uni * 0.2)
-        assert abs(Rpd[0] - R_p_small) < delta
+        assert almostEqual(Rpd[0], R_p_small)
 
         R_p_big = (
             EDU_p_highschool * 0.75 +
             EDU_p_uni * 0.8)
-        assert abs(Rpd[1] - R_p_big) < delta
+        assert almostEqual(Rpd[1], R_p_big)
 
         TRN_p_car = (
             OCC_p_emp * R_p_small * 0.48 +
             OCC_p_self * R_p_small * 0.56 +
             OCC_p_emp * R_p_big * 0.58 +
             OCC_p_self * R_p_big * 0.70)
-        assert abs(TRNpd[0] - TRN_p_car) < delta
+        assert almostEqual(TRNpd[0], TRN_p_car)
 
         TRN_p_train = (
             OCC_p_emp * R_p_small * 0.42 +
             OCC_p_self * R_p_small * 0.36 +
             OCC_p_emp * R_p_big * 0.24 +
             OCC_p_self * R_p_big * 0.21)
-        assert abs(TRNpd[1] - TRN_p_train) < delta
+        assert almostEqual(TRNpd[1], TRN_p_train)
 
         TRN_p_other = (
             OCC_p_emp * R_p_small * 0.10 +
@@ -158,7 +161,7 @@ class TestBayesianNetwork:
             OCC_p_emp * R_p_big * 0.18 +
             OCC_p_self * R_p_big * 0.09)
 
-        assert abs(TRNpd[2] - TRN_p_other) < delta
+        assert almostEqual(TRNpd[2], TRN_p_other)
 
 
     def test_variable_IDs(self, bn_survey, bn_lungcancer, bn_alarm):
@@ -475,20 +478,20 @@ class TestBayesianNetwork:
 
         assert bn.d_separated(2, [1], 3) is True
         assert bn.d_separated(2, [1, 5], 3) is False
-        self.assertFalse(bn.d_separated(1, [], 2))
-        self.assertFalse(bn.d_separated(1, [], 3))
-        self.assertFalse(bn.d_separated(1, [], 4))
-        self.assertFalse(bn.d_separated(1, [], 5))
+        assert bn.d_separated(1, [], 2) is False
+        assert bn.d_separated(1, [], 3) is False
+        assert bn.d_separated(1, [], 4) is False
+        assert bn.d_separated(1, [], 5) is False
 
-        self.assertTrue(bn.d_separated(1, [4], 5))
-        self.assertFalse(bn.d_separated(2, [], 3))
-        self.assertFalse(bn.d_separated(2, [4], 3))
+        assert bn.d_separated(1, [4], 5) is True
+        assert bn.d_separated(2, [], 3) is False
+        assert bn.d_separated(2, [4], 3) is False
 
-        self.assertFalse(bn.d_separated(5, [2], 1))
-        self.assertFalse(bn.d_separated(5, [3], 1))
-        self.assertTrue(bn.d_separated(5, [2, 3], 1))
+        assert bn.d_separated(5, [2], 1) is False
+        assert bn.d_separated(5, [3], 1) is False
+        assert bn.d_separated(5, [2, 3], 1) is True
 
-        self.assertFalse(bn.d_separated(3, [1, 2], 5))
+        assert bn.d_separated(3, [1, 2], 5) is False
 
         # Simple graph imitating the 'survey' Bayesian network, from
         # http://www.bnlearn.com/bnrepository/discrete-small.html#survey
@@ -502,10 +505,10 @@ class TestBayesianNetwork:
         bn = BayesianNetwork('testnet')
         bn.from_directed_graph(graph)
 
-        self.assertFalse(bn.d_separated(3, [0], 1))
-        self.assertFalse(bn.d_separated(3, [], 2))
-        self.assertFalse(bn.d_separated(3, [5], 2))
-        self.assertTrue(bn.d_separated(3, [1], 2))
+        assert bn.d_separated(3, [0], 1) is False
+        assert bn.d_separated(3, [], 2) is False
+        assert bn.d_separated(3, [5], 2) is False
+        assert bn.d_separated(3, [1], 2) is True
 
         # Simple graph taken from the PCMB article, where authors provide
         # examples to illustrate the flaws found in MMMB and HITON.
@@ -519,15 +522,15 @@ class TestBayesianNetwork:
         bn = BayesianNetwork('testnet_a')
         bn.from_directed_graph(graph_a)
         bn.debug = True
-        self.assertFalse(bn.d_separated(4, [1], 3))
+        assert bn.d_separated(4, [1], 3) is False
         # Assert that [0, 1] is the Markov blanket of 4, by the Intersection
         # Property.
-        self.assertTrue(bn.d_separated(4, [0, 1, 3], 2))
-        self.assertTrue(bn.d_separated(4, [0, 1, 2], 3))
+        assert bn.d_separated(4, [0, 1, 3], 2) is True
+        assert bn.d_separated(4, [0, 1, 2], 3) is True
         # Assert that [0, 1] is the Markov blanket of 4, by the Contraction
         # Property.
-        self.assertTrue(bn.d_separated(4, [0, 1, 3], 2))
-        self.assertTrue(bn.d_separated(4, [0, 1], 3))
+        assert bn.d_separated(4, [0, 1, 3], 2) is True
+        assert bn.d_separated(4, [0, 1], 3) is True
 
         # Simple graph, similar to 'lungcancer' (a.k.a. 'asia'), but with no
         # deterministic nodes.
@@ -535,7 +538,7 @@ class TestBayesianNetwork:
         bn = util.read_bif_file(lc_repaired_bif)
         bn.finalize()
 
-        self.assertFalse(bn.d_separated(3, [0], 6))
+        assert bn.d_separated(3, [0], 6) is False
 
         # Moderately complex graph, as generated by the 'alarm' Bayesian
         # network, from
@@ -544,22 +547,22 @@ class TestBayesianNetwork:
         bn = util.read_bif_file(alarm_bif)
         bn.finalize()
 
-        self.assertTrue(bn.d_separated(0, [], 1))
-        self.assertFalse(bn.d_separated(0, [12], 1))
-        self.assertTrue(bn.d_separated(0, [32, 12], 1))
+        assert bn.d_separated(0, [], 1) is True
+        assert bn.d_separated(0, [12], 1) is False
+        assert bn.d_separated(0, [32, 12], 1) is True
 
-        self.assertTrue(bn.d_separated(24, [], 26))
-        self.assertFalse(bn.d_separated(24, [29], 26))
+        assert bn.d_separated(24, [], 26) is True
+        assert bn.d_separated(24, [29], 26) is False
 
-        self.assertTrue(bn.d_separated(17, [], 18))
-        self.assertFalse(bn.d_separated(17, [3], 18))
-        self.assertFalse(bn.d_separated(17, [12], 18))
+        assert bn.d_separated(17, [], 18) is True
+        assert bn.d_separated(17, [3], 18) is False
+        assert bn.d_separated(17, [12], 18) is False
 
-        self.assertTrue(bn.d_separated(10, [], 26))
-        self.assertFalse(bn.d_separated(10, [29], 26))
-        self.assertFalse(bn.d_separated(10, [29, 19], 26))
-        self.assertFalse(bn.d_separated(10, [29, 19, 36], 26))
-        self.assertTrue(bn.d_separated(10, [18, 29, 19, 36], 26))
+        assert bn.d_separated(10, [], 26) is True
+        assert bn.d_separated(10, [29], 26) is False
+        assert bn.d_separated(10, [29, 19], 26) is False
+        assert bn.d_separated(10, [29, 19, 36], 26) is False
+        assert bn.d_separated(10, [18, 29, 19, 36], 26) is True
 
         # Another simple graph, as generated by the 'asia' (or 'lungcancer')
         # Bayesian network, from
@@ -568,7 +571,7 @@ class TestBayesianNetwork:
         bn = util.read_bif_file(alarm_bif)
         bn.finalize()
 
-        self.assertFalse(bn.d_separated(0, [], 6))
+        assert bn.d_separated(0, [], 6) is False
 
 
     def calculate_probdist(self, column):
@@ -589,11 +592,11 @@ class TestBayesianNetwork:
 
 
     def assertValidExpectedSample(self, sample):
-        self.assertIsInstance(sample, dict)
-        self.assertEqual(6, len(sample))
-        self.assertIn(sample['AGE'], ['young', 'adult', 'old'])
-        self.assertIn(sample['SEX'], ['M', 'F'])
-        self.assertIn(sample['EDU'], ['highschool', 'uni'])
-        self.assertIn(sample['OCC'], ['emp', 'self'])
-        self.assertIn(sample['R'], ['small', 'big'])
-        self.assertIn(sample['TRN'], ['car', 'train', 'other'])
+        assert isinstance(sample, dict)
+        assert len(sample) == 6
+        assert sample['AGE'] in ['young', 'adult', 'old']
+        assert sample['SEX'] in ['M', 'F']
+        assert sample['EDU'] in ['highschool', 'uni']
+        assert sample['OCC'] in ['emp', 'self']
+        assert sample['R'] in ['small', 'big']
+        assert sample['TRN'] in ['car', 'train', 'other']
