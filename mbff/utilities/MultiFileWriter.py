@@ -1,5 +1,6 @@
 import sys
 
+
 class MultiFileWriter:
 
     def __init__(self, files):
@@ -19,6 +20,5 @@ class MultiFileWriter:
     def close(self):
         self.flush()
         for f in self.files:
-            if not f is sys.__stdout__:
+            if f is not sys.__stdout__:
                 f.close()
-

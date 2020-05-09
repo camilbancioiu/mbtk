@@ -1,7 +1,5 @@
 import numpy
 
-import mbff_tests.utilities as testutil
-
 from mbff.dataset.sources.BinarySyntheticDatasetSource import BinarySyntheticDatasetSource
 
 
