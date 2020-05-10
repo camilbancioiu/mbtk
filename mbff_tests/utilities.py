@@ -15,6 +15,7 @@ tmp_folder = Path(test_folder, 'tmp')
 class MockDataset:
 
     def __init__(self):
+        self.label = None
         self.omega = None
         self.datasetmatrix = None
         self.bayesiannetwork = None
@@ -23,6 +24,7 @@ class MockDataset:
 
 def make_test_dataset(configuration):
     ds = MockDataset()
+    ds.label = configuration['label']
     ds.omega = Omega(configuration['sample_count'])
     ds.datasetmatrix = make_test_datasetmatrix(configuration)
     ds.bayesiannetwork = make_test_bayesian_network(configuration)
@@ -61,3 +63,25 @@ def ensure_empty_tmp_subfolder(subfolder):
     path = Path(tmp_folder, subfolder)
     path.mkdir(parents=True, exist_ok=True)
     return path
+
+
+
+def prepare_AD_tree(configuration, datasetmatrix):
+    path = configuration['path']
+    debug = configuration['debug']
+    leaf_list_threshold = configuration['leaf_list_threshold']
+    adtree = None
+    if path.exists():
+        with path.open('rb') as f:
+            adtree = pickle.load(f)
+        adtree.debug = debug
+        if adtree.debug >= 1:
+            adtree.debug_prepare__querying()
+    else:
+        matrix = datasetmatrix.X
+        column_values = datasetmatrix.get_values_per_column('X')
+        adtree = ADTree(matrix, column_values, leaf_list_threshold, debug)
+        if path is not None:
+            with path.open('wb') as f:
+                pickle.dump(adtree, f)
+    return adtree

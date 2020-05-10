@@ -11,7 +11,7 @@ import pytest
 import mbff_tests.utilities as testutil
 
 
-@pytest.fixture
+@pytest.fixture(scope='session')
 def testfolder():
     return testutil.ensure_empty_tmp_subfolder('test_exds_repository__test_build')
 

@@ -22,6 +22,21 @@ class UnadjustedDoF:
         self.reset()
 
 
+    def calculate_DoF(self, X, Y, Z):
+        X_val = len(self.column_values[X])
+        Y_val = len(self.column_values[Y])
+
+        Z_val = 1
+        for z in Z:
+            Z_val *= len(self.column_values[z])
+        DoF = (X_val - 1) * (Y_val - 1) * Z_val
+
+        if DoF == 0:
+            DoF = 1
+
+        return DoF
+
+
     def reset(self):
         self.PrXYcZ = None
         self.PrXcZ = None
@@ -54,21 +69,6 @@ class UnadjustedDoF:
         self.PrXZ = PrXZ
         self.PrYZ = PrYZ
         self.PrZ = PrZ
-
-
-    def calculate_DoF(self, X, Y, Z):
-        X_val = len(self.column_values[X])
-        Y_val = len(self.column_values[Y])
-
-        Z_val = 1
-        for z in Z:
-            Z_val *= len(self.column_values[z])
-        DoF = (X_val - 1) * (Y_val - 1) * Z_val
-
-        if DoF == 0:
-            DoF = 1
-
-        return DoF
 
 
     def end(self):
@@ -126,6 +126,20 @@ class CachedStructuralDoF(UnadjustedDoF):
             if self.debug > 1: print('DoF cache loaded from {} and contains {} entries'.format(self.load_path, len(self.DoF_cache)))
 
 
+    def calculate_DoF(self, X, Y, Z):
+        key = {X, Y}
+        key.update(Z)
+        key = frozenset(key)
+        (variables, pairwise_dofs) = self.DoF_cache[key]
+
+        ix = variables.index(X)
+        iy = variables.index(Y)
+
+        DoF = pairwise_dofs[(ix, iy)]
+
+        return DoF
+
+
     def set_context_pmfs(self, PrXYZ, PrXZ, PrYZ, PrZ):
         # All PMFs received as arguments are expected to be PMFs of
         # JointVariables. If PrZ is the PMF of a single variable, it is skipped
@@ -148,20 +162,6 @@ class CachedStructuralDoF(UnadjustedDoF):
 
             if ZvariableIDs is not None:
                 self.cache_DoFs_for_pmf(PrZ, ZvariableIDs)
-
-
-    def calculate_DoF(self, X, Y, Z):
-        key = {X, Y}
-        key.update(Z)
-        key = frozenset(key)
-        (variables, pairwise_dofs) = self.DoF_cache[key]
-
-        ix = variables.index(X)
-        iy = variables.index(Y)
-
-        DoF = pairwise_dofs[(ix, iy)]
-
-        return DoF
 
 
     def cache_DoFs_for_pmf(self, pmf, variables):
