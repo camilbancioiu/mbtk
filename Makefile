@@ -39,4 +39,4 @@ test-quick: Makefile
 	notify-send "Make" "Testing complete."
 
 test-clean:
-	rm -rf testfiles/tmp/*
+	rm -rf mbff_tests/testfiles/tmp/*

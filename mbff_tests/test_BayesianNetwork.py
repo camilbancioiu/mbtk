@@ -70,7 +70,8 @@ def test_sampling_single(bn_survey):
     assertValidExpectedSample(sample)
 
 
-    # @unittest.skipIf(TestBase.tag_excluded('sampling'), 'Sampling tests excluded')
+
+@pytest.mark.slow
 def test_sampling_multiple(bn_survey):
 
     bn = bn_survey

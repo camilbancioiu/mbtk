@@ -1,9 +1,11 @@
+import pickle
 import shutil
 from pathlib import Path
 
 from mbff.math.Variable import Omega
 from mbff.dataset.DatasetMatrix import DatasetMatrix
 from mbff.dataset.sources.SampledBayesianNetworkDatasetSource import SampledBayesianNetworkDatasetSource
+from mbff.structures.ADTree import ADTree
 import mbff.utilities.functions as util
 
 
@@ -14,26 +16,16 @@ tmp_folder = Path(test_folder, 'tmp')
 
 class MockDataset:
 
-    def __init__(self):
-        self.label = None
-        self.omega = None
-        self.datasetmatrix = None
-        self.bayesiannetwork = None
-
-
-
-def make_test_dataset(configuration):
-    ds = MockDataset()
-    ds.label = configuration['label']
-    ds.omega = Omega(configuration['sample_count'])
-    ds.datasetmatrix = make_test_datasetmatrix(configuration)
-    ds.bayesiannetwork = make_test_bayesian_network(configuration)
-    return ds
+    def __init__(self, configuration):
+        self.label = configuration['label']
+        self.omega = Omega(configuration['sample_count'])
+        self.datasetmatrix = make_test_datasetmatrix(configuration)
+        self.bayesiannetwork = make_test_bayesian_network(configuration)
 
 
 
 def make_test_datasetmatrix(configuration):
-    folder = configuration['folder']
+    folder = tmp_folder / 'mockdataset'
     label = configuration['label']
     try:
         datasetmatrix = DatasetMatrix(label)
@@ -55,19 +47,29 @@ def make_test_bayesian_network(configuration):
 
 
 
+
+def ensure_tmp_subfolder(subfolder):
+    path = tmp_folder / subfolder
+    path.mkdir(parents=True, exist_ok=True)
+    return path
+
+
+
 def ensure_empty_tmp_subfolder(subfolder):
     try:
         shutil.rmtree(Path(tmp_folder, subfolder))
     except FileNotFoundError:
         pass
-    path = Path(tmp_folder, subfolder)
+    path = tmp_folder / subfolder
     path.mkdir(parents=True, exist_ok=True)
     return path
 
 
 
 def prepare_AD_tree(configuration, datasetmatrix):
-    path = configuration['path']
+    adtrees_folder = tmp_folder / 'adtrees'
+    adtrees_folder.mkdir(parents=True, exist_ok=True)
+    path = adtrees_folder / (configuration['label'] + '.pickle')
     debug = configuration['debug']
     leaf_list_threshold = configuration['leaf_list_threshold']
     adtree = None

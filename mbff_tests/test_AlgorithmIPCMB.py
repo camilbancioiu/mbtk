@@ -1,3 +1,5 @@
+import pytest
+
 from mbff.structures.BayesianNetwork import BayesianNetwork
 from mbff.math.DSeparationCITest import DSeparationCITest
 from mbff.algorithms.mb.ipcmb import AlgorithmIPCMB
@@ -6,7 +8,7 @@ import mbff.math.G_test__unoptimized
 import mbff.math.DoFCalculators
 
 
-# @unittest.skipIf(TestBase.tag_excluded('ipcmb_run'), 'Tests running IPC-MB are excluded')
+@pytest.mark.slow
 def test_ipcmb_finding_Markov_blankets_in_datasetmatrix(ds_survey_2e4):
     omega = ds_survey_2e4.omega
     datasetmatrix = ds_survey_2e4.datasetmatrix

@@ -100,6 +100,8 @@ class CITestResult:
         self.independent = None
         self.dependent = None
         self.significance = None
+        self.statistic_value = -1
+        self.p_value = -1
 
 
     def set_variables(self, X, Y, Z):

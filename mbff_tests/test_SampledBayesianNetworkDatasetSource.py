@@ -1,5 +1,6 @@
 import numpy
 import random
+import pytest
 
 import mbff_tests.utilities as testutil
 
@@ -7,7 +8,7 @@ from mbff.dataset.sources.SampledBayesianNetworkDatasetSource import SampledBaye
 import mbff.utilities.functions as util
 
 
-# @unittest.skipIf(TestBase.tag_excluded('sampling'), 'Sampling tests excluded')
+@pytest.mark.slow
 def test_sampling_bayesian_network_as_dataset_source__random():
     configuration = default_configuration()
     configuration['method'] = 'random'
@@ -38,7 +39,7 @@ def test_sampling_bayesian_network_as_dataset_source__random():
     assert numpy.array_equal(sample_matrix[:, 5], datasetmatrix.get_column_Y(1)) is True
 
 
-# @unittest.skipIf(TestBase.tag_excluded('sampling'), 'Sampling tests excluded')
+@pytest.mark.slow
 def test_sampling_bayesian_network_as_dataset_source__exact():
     configuration = default_configuration()
     configuration['method'] = 'exact'
