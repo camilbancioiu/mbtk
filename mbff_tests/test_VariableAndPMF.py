@@ -53,6 +53,7 @@ def test_single_variable_pmf():
     assert 3.0625 == ev
 
 
+
 def test_joint_variables_pmf():
     animals = Variable(['cat', 'dog', 'cat', 'mouse', 'dog', 'cat'])
     animals.ID = 3
@@ -104,6 +105,7 @@ def test_pmf_expected_values():
     assert PrAnimals.expected_value(lambda v, p: len(v)) == 3.25
 
 
+
 def test_instantiating_joint_pmf(bn_survey):
     bn = bn_survey
 
@@ -115,6 +117,7 @@ def test_instantiating_joint_pmf(bn_survey):
 
     instances = list(joint_pmf.create_instances_list(77000))
     assert len(instances) == 77000
+
 
 
 def test_conditional_pmf__binary():
@@ -150,6 +153,7 @@ def test_conditional_pmf__binary():
     assert Pr.given(1, 0).p(1) == 0 / 2
     assert Pr.given(1, 1).p(0) == 0 / 2
     assert Pr.given(1, 1).p(1) == 2 / 2
+
 
 
 def test_conditional_pmf__multiple_values():
@@ -212,7 +216,7 @@ def test_conditional_pmf__multiple_values():
     assert almostEqual(1, test_p_ip)
 
 
-# @unittest.skipIf(TestBase.tag_excluded('sampling'), 'Sampling tests excluded')
+
 def test_conditional_pmf__from_bayesian_network():
     configuration = dict()
     configuration['sourcepath'] = testutil.bif_folder / 'survey.bif'
@@ -277,6 +281,7 @@ def test_conditional_pmf__from_bayesian_network():
         PrTRN)
 
 
+
 def test_pmf_key_processing():
     key = (0, 1)
     expected = (0, 1)
@@ -315,6 +320,7 @@ def test_pmf_key_processing():
     assert expected == process_pmf_key(key)
 
 
+
 def test_joint_variables__unequal_numbers_of_instances():
     # Variable animals has 6 instances.
     animals = Variable(['cat', 'dog', 'cat', 'mouse', 'dog', 'cat'])
@@ -348,12 +354,14 @@ def test_joint_variables__unequal_numbers_of_instances():
         JointVariables(fauna, can_fly)
 
 
+
 def assert_PMF_AlmostEquals_BNProbDist(probdist, pmf):
     probdist_dict = dict(enumerate(probdist.probabilities['<unconditioned>']))
     pmf_dict = pmf.probabilities
     assert set(probdist_dict.keys()) == set(pmf_dict.keys())
     for key in probdist_dict.keys():
         assert almostEqual(probdist_dict[key], pmf_dict[key])
+
 
 
 def assert_CPMF_AlmostEquals_BNProbDist(probdist, cpmf):
@@ -369,6 +377,7 @@ def assert_CPMF_AlmostEquals_BNProbDist(probdist, cpmf):
                 print("Key", key)
                 print("Conditioning key", conditioning_key)
                 raise
+
 
 
 def almostEqual(x, y):

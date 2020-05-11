@@ -3,10 +3,10 @@ import mbff.math.Variable
 import mbff.math.G_test__unoptimized
 import mbff.math.DoFCalculators
 
+import pytest
 
-# @unittest.skipIf(TestBase.tag_excluded('conditional_independence'), 'Conditional independence tests excluded')
 
-
+@pytest.mark.slow
 def test_G_value__alarm(ds_alarm_8e3):
     Omega = ds_alarm_8e3.omega
     dataset = ds_alarm_8e3.datasetmatrix
@@ -28,6 +28,7 @@ def test_G_value__alarm(ds_alarm_8e3):
 
 
 
+@pytest.mark.slow
 def test_G_value__lungcancer(ds_lungcancer_4e4):
     Omega = ds_lungcancer_4e4.omega
     lungcancer = ds_lungcancer_4e4.datasetmatrix
