@@ -1,6 +1,6 @@
 import pytest
 from pathlib import Path
-import mbff_tests.utilities as testutil
+import tests.utilities as testutil
 import mbff.utilities.functions as util
 
 

@@ -9,8 +9,8 @@ from mbff.structures.ADTree import ADTree
 import mbff.utilities.functions as util
 
 
-test_folder = Path('mbff_tests', 'testfiles')
-bif_folder = Path('mbff_tests', 'bif_files')
+test_folder = Path('tests', 'testfiles')
+bif_folder = Path('tests', 'bif_files')
 tmp_folder = Path(test_folder, 'tmp')
 
 

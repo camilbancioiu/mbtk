@@ -2,7 +2,7 @@ from collections import OrderedDict
 from pathlib import Path
 
 import mbff.utilities.functions as util
-import mbff_tests.utilities as testutil
+import tests.utilities as testutil
 from mbff.structures.BayesianNetwork import BayesianNetwork, VariableNode, ProbabilityDistributionOfVariableNode
 
 

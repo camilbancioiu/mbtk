@@ -3,9 +3,9 @@ from pathlib import Path
 from string import Template
 from sklearn.naive_bayes import BernoulliNB
 
-import mbff_tests.utilities as testutil
+import tests.utilities as testutil
 import pytest
-from mbff_tests.MockDatasetSource import MockDatasetSource
+from tests.MockDatasetSource import MockDatasetSource
 
 from mbff.dataset.ExperimentalDatasetDefinition import ExperimentalDatasetDefinition
 from mbff.dataset.ModelBuildingExperimentalDataset import ModelBuildingExperimentalDataset

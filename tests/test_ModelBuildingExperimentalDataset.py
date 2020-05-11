@@ -1,4 +1,4 @@
-import mbff_tests.utilities as testutil
+import tests.utilities as testutil
 
 from mbff.dataset.DatasetMatrix import DatasetMatrix
 from mbff.dataset.ExperimentalDatasetDefinition import ExperimentalDatasetDefinition

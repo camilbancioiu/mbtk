@@ -1,6 +1,6 @@
-pytest_plugins = ['mbff_tests.fixtures_survey',
-                  'mbff_tests.fixtures_alarm',
-                  'mbff_tests.fixtures_lc']
+pytest_plugins = ['tests.fixtures_survey',
+                  'tests.fixtures_alarm',
+                  'tests.fixtures_lc']
 
 
 def pytest_configure(config):

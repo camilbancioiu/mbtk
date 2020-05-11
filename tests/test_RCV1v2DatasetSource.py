@@ -1,7 +1,7 @@
 import numpy
 import scipy
 
-import mbff_tests.utilities as testutil
+import tests.utilities as testutil
 
 from mbff.dataset.sources.RCV1v2DatasetSource import RCV1v2DatasetSource
 from mbff.dataset.DatasetMatrix import DatasetMatrix

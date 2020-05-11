@@ -2,7 +2,7 @@ import numpy
 import random
 import pytest
 
-import mbff_tests.utilities as testutil
+import tests.utilities as testutil
 
 from mbff.dataset.sources.SampledBayesianNetworkDatasetSource import SampledBayesianNetworkDatasetSource
 import mbff.utilities.functions as util

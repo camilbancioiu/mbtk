@@ -2,7 +2,7 @@ import math
 import numpy
 
 import mbff.utilities.functions as util
-import mbff_tests.utilities as testutil
+import tests.utilities as testutil
 import pytest
 
 from mbff.math.Variable import Variable, JointVariables

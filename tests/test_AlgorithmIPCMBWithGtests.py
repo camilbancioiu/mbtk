@@ -1,6 +1,6 @@
 import gc
 
-import mbff_tests.utilities as testutil
+import tests.utilities as testutil
 import pytest
 
 from mbff.algorithms.mb.ipcmb import AlgorithmIPCMB
@@ -46,7 +46,6 @@ def test_ipcmb_correctness__unoptimized(ds_lc_repaired_8e3):
         mb, _ = run_IPCMB(ds, target, parameters)
         mb_dsep, _ = run_IPCMB(ds, target, parameters_dsep)
         assert mb == mb_dsep
-
 
 
 

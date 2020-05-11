@@ -1,6 +1,6 @@
 import numpy
 
-import mbff_tests.utilities as testutil
+import tests.utilities as testutil
 
 from mbff.dataset.ExperimentalDatasetDefinition import ExperimentalDatasetDefinition
 from mbff.dataset.BinaryExperimentalDataset import BinaryExperimentalDataset

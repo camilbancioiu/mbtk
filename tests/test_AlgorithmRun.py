@@ -1,6 +1,6 @@
 import numpy
 
-from mbff_tests.MockDatasetSource import MockDatasetSource
+from tests.MockDatasetSource import MockDatasetSource
 
 from mbff.dataset.ExperimentalDatasetDefinition import ExperimentalDatasetDefinition
 from mbff.dataset.ModelBuildingExperimentalDataset import ModelBuildingExperimentalDataset
@@ -8,7 +8,7 @@ from mbff.experiment.AlgorithmRun import AlgorithmAndClassifierRun
 from mbff.algorithms.basic.IGt import AlgorithmIGt
 
 import pytest
-import mbff_tests.utilities as testutil
+import tests.utilities as testutil
 
 
 @pytest.fixture(scope='session')
@@ -44,7 +44,7 @@ def test_algorithm_run(testfolder):
 
     # Verify if the AlgorithmRun now contains the expected results.
     assert algrun.algorithm_name == 'mbff.algorithms.basic.IGt.AlgorithmIGt'
-    assert algrun.classifier_classname == 'mbff_tests.test_AlgorithmRun.MockBernouliClassifier'
+    assert algrun.classifier_classname == 'tests.test_AlgorithmRun.MockBernouliClassifier'
     assert algrun.selected_features == [0, 4, 1, 5]
     assert algrun.duration > 0
 
@@ -71,7 +71,7 @@ def test_algorithm_run_configuration():
     algrun = AlgorithmAndClassifierRun(None, configuration, parameters)
 
     assert algrun.algorithm_name == 'mbff.algorithms.basic.IGt.AlgorithmIGt'
-    assert algrun.classifier_classname == 'mbff_tests.test_AlgorithmRun.MockBernouliClassifier'
+    assert algrun.classifier_classname == 'tests.test_AlgorithmRun.MockBernouliClassifier'
 
 
 

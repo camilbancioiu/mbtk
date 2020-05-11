@@ -114,6 +114,7 @@ def test_ipcmb_finding_Markov_blankets_in_graphs__as_in_pcmb_article():
 
 
 
+@pytest.mark.slow
 def test_ipcmb_on_alarm(bn_alarm):
     parameters = make_parameters(22, bn_alarm)
     mb = AlgorithmIPCMB(None, parameters).select_features()

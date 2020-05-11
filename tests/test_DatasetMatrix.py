@@ -3,7 +3,7 @@ import scipy
 
 from pathlib import Path
 
-import mbff_tests.utilities as testutil
+import tests.utilities as testutil
 import pytest
 
 from mbff.dataset.DatasetMatrix import DatasetMatrix
