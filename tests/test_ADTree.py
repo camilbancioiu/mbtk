@@ -1,58 +1,13 @@
-import numpy
-import scipy
-
-
 from mbff.structures.ADTree import ADTree
 from mbff.math.PMF import PMF, CPMF
 import mbff.math.DoFCalculators
 import mbff.math.G_test__unoptimized
 import mbff.math.G_test__with_AD_tree
 
-import pytest
 
-
-@pytest.fixture(scope='session')
-def adtree_small_1():
-    dataset = scipy.sparse.csr_matrix(numpy.array([
-        [1, 2, 3, 2, 2, 3, 3, 3],
-        [2, 1, 1, 2, 1, 2, 2, 2]]).transpose())
-    column_values = {
-        0: [1, 2, 3],
-        1: [1, 2]}
-    return ADTree(dataset, column_values)
-
-
-
-@pytest.fixture(scope='session')
-def adtree_small_2():
-    dataset = scipy.sparse.csr_matrix(numpy.array([
-        [1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2],
-        [1, 1, 2, 2, 3, 3, 4, 4, 1, 1, 2, 2, 3, 3, 4, 4],
-        [1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2]]).transpose())
-    column_values = {
-        0: [1, 2],
-        1: [1, 2, 3, 4],
-        2: [1, 2]}
-    return ADTree(dataset, column_values)
-
-
-
-@pytest.fixture
-def adtree_small_3():
-    dataset = scipy.sparse.csr_matrix(numpy.array([
-        [1, 1, 2, 1, 1, 2, 1, 2, 2, 2, 2, 2, 1, 2, 2, 2],
-        [2, 2, 1, 3, 3, 2, 2, 1, 1, 2, 3, 3, 1, 1, 2, 3],
-        [1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2]]).transpose())
-    column_values = {
-        0: [1, 2],
-        1: [1, 2, 3, 4],
-        2: [1, 2]}
-    return ADTree(dataset, column_values)
-
-
-
-def test_simple_ADTree_query_count(adtree_small_1):
-    adtree = adtree_small_1
+def test_simple_ADTree_query_count(data_small_1):
+    dataset, column_values = data_small_1
+    adtree = ADTree(dataset, column_values)
 
     assert adtree.query_count({}) == 8
     assert adtree.query_count({0: 1}) == 1
@@ -73,8 +28,9 @@ def test_simple_ADTree_query_count(adtree_small_1):
 
 
 
-def test_simple_ADTree_query_count2(adtree_small_3):
-    adtree = adtree_small_3
+def test_simple_ADTree_query_count2(data_small_3):
+    dataset, column_values = data_small_3
+    adtree = ADTree(dataset, column_values)
 
     assert adtree.query_count({}) == 16
     assert adtree.query_count({0: 1}) == 6
@@ -84,8 +40,9 @@ def test_simple_ADTree_query_count2(adtree_small_3):
 
 
 
-def test_simple_ADTree_query(adtree_small_1):
-    adtree = adtree_small_1
+def test_simple_ADTree_query(data_small_1):
+    dataset, column_values = data_small_1
+    adtree = ADTree(dataset, column_values)
 
     assert adtree.query({}) == 1 / 1
 
@@ -116,8 +73,9 @@ def test_simple_ADTree_query(adtree_small_1):
 
 
 
-def test_making_pmf(adtree_small_2):
-    adtree = adtree_small_2
+def test_making_pmf(data_small_2):
+    dataset, column_values = data_small_2
+    adtree = ADTree(dataset, column_values)
 
     pmf = adtree.make_pmf([0])
     assert sorted(list(pmf.items())) == [(1, 1 / 2), (2, 1 / 2)]
@@ -130,8 +88,9 @@ def test_making_pmf(adtree_small_2):
 
 
 
-def test_simple_ADTree_structure(adtree_small_1):
-    adtree = adtree_small_1
+def test_simple_ADTree_structure(data_small_1):
+    dataset, column_values = data_small_1
+    adtree = ADTree(dataset, column_values)
 
     assert adtree.root is not None
     assert adtree.root.count == 8
@@ -264,8 +223,9 @@ def test_making_pmf_larger_dataset(ds_survey_5e2, adtree_survey_5e2_llta20):
 
 
 
-def test_simple_ADTree_structure_2(adtree_small_2):
-    adtree = adtree_small_2
+def test_simple_ADTree_structure_2(data_small_2):
+    dataset, column_values = data_small_2
+    adtree = ADTree(dataset, column_values)
 
     assert adtree.root is not None
     assert adtree.root.count == 16

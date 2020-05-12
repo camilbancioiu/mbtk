@@ -1,6 +1,7 @@
 pytest_plugins = ['tests.fixtures_survey',
                   'tests.fixtures_alarm',
-                  'tests.fixtures_lc']
+                  'tests.fixtures_lc',
+                  'tests.fixtures_small']
 
 
 def pytest_configure(config):
