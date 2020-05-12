@@ -6,6 +6,7 @@ from mbff.math.Variable import Omega
 from mbff.dataset.DatasetMatrix import DatasetMatrix
 from mbff.dataset.sources.SampledBayesianNetworkDatasetSource import SampledBayesianNetworkDatasetSource
 from mbff.structures.ADTree import ADTree
+from mbff.structures.ADTreeDebug import ADTreeDebug
 import mbff.utilities.functions as util
 
 
@@ -76,13 +77,16 @@ def prepare_AD_tree(configuration, datasetmatrix):
     if path.exists():
         with path.open('rb') as f:
             adtree = pickle.load(f)
-        adtree.debug = debug
-        if adtree.debug >= 1:
+        if debug >= 1:
+            adtree.debug = debug
             adtree.debug_prepare__querying()
     else:
         matrix = datasetmatrix.X
         column_values = datasetmatrix.get_values_per_column('X')
-        adtree = ADTree(matrix, column_values, leaf_list_threshold, debug)
+        if debug >= 1:
+            adtree = ADTreeDebug(matrix, column_values, leaf_list_threshold, debug)
+        else:
+            adtree = ADTree(matrix, column_values, leaf_list_threshold)
         if path is not None:
             with path.open('wb') as f:
                 pickle.dump(adtree, f)
