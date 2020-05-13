@@ -12,7 +12,6 @@ import mbff.structures.ADTree
 from scipy.stats import chi2
 
 
-
 class G_test(mbff.math.G_test__unoptimized.G_test):
 
     def __init__(self, datasetmatrix, parameters):
@@ -53,8 +52,8 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
 
     def use_preloaded_AD_tree(self, preloaded_AD_tree):
         self.AD_tree = preloaded_AD_tree
-        self.AD_tree.debug = self.debug - 1
-        if self.AD_tree.debug >= 1:
+        if self.debug >= 2:
+            self.AD_tree.debug = self.debug - 1
             self.AD_tree.debug_prepare__querying()
         if self.debug >= 1: print('Using preloaded AD-tree.')
 
@@ -64,8 +63,8 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
         with adtree_load_path.open('rb') as f:
             self.AD_tree = pickle.load(f)
 
-        self.AD_tree.debug = self.debug - 1
-        if self.AD_tree.debug >= 1:
+        if self.debug >= 2:
+            self.AD_tree.debug = self.debug - 1
             self.AD_tree.debug_prepare__querying()
         if self.debug >= 1: print('AD-tree loaded.')
 

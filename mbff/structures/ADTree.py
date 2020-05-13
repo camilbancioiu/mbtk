@@ -3,9 +3,6 @@ import collections
 
 from mbff.math.PMF import PMF
 from mbff.structures.ContingencyTree import ContingencyTreeNode
-from mbff.structures.Exceptions import ADTreeCannotDescend_MCVNode
-from mbff.structures.Exceptions import ADTreeCannotDescend_LeafListNode
-from mbff.structures.Exceptions import ADTreeCannotDescend_ZeroCountNode
 
 
 class ADTree:
@@ -62,53 +59,6 @@ class ADTree:
 
     def get_ADNode_class(self):
         return ADNode
-
-
-    def find_node_for_values(self, values, current_node=None):
-        if current_node is None:
-            current_node = self.root
-
-        if len(values) == 0:
-            return current_node
-
-        if current_node.leaf_list_node is True:
-            raise ADTreeCannotDescend_LeafListNode(self, values, current_node)
-
-        # Retrieve the column index we are currently on, within the tree, and
-        # what value has been requested in the query for that column index.
-        column_indices = sorted(list(values.keys()))
-        column_index = column_indices[0]
-        value = values[column_index]
-
-        # Retrieve the Vary node among our immediate children that represents
-        # the current column index.
-        vary = current_node.get_Vary_child_for_column(column_index)
-
-        # Retrieve the ADNode among the children of the aforementioned Vary
-        # node which represents the value that was requested in the query for
-        # the current column index.
-        child = vary.get_AD_child_for_value(value)
-
-        # Prepare the query that will be passed down to the descendants, which
-        # has the current column index removed from it (but otherwise identical).
-        next_values = values.copy()
-        next_values.pop(column_index)
-
-        # We previously retrieved the ADNode that represents the current piece
-        # of the query we're processing (i.e. current column index and its
-        # value from the query). Now we must see whether this ADNode is None or
-        # not, because 'None' has special meaning in an AD-tree.
-        if child is not None:
-            # The ADNode for the current value exists, query it deeper.
-            return self.find_node_for_values(next_values, child)
-        else:
-            if vary.most_common_value != value:
-                # The ADNode is None, because of zero count.
-                raise ADTreeCannotDescend_ZeroCountNode(self, values)
-            else:
-                # The ADNode is None, because it would represent the most
-                # common value.
-                raise ADTreeCannotDescend_MCVNode(self, values)
 
 
     def make_pmf(self, variables):
@@ -174,12 +124,12 @@ class ADTree:
 
         # Retrieve the Vary node among our immediate Vary children that
         # represents the current column index.
-        vary = query_node.get_Vary_child_for_column(column_index)
+        vary = query_node.get_Vary_child_for_column(column_index, self)
 
         # Retrieve the ADNode among the children of the aforementioned Vary
         # node which represents the value that was requested in the query for
         # the current column index.
-        child = vary.get_AD_child_for_value(value)
+        child = vary.get_AD_child_for_value(value, self)
 
         # Prepare the query that will be passed down to the descendants, which
         # has the current column index removed from it (but otherwise identical).
@@ -273,6 +223,8 @@ class ADNode:
         column_count = tree.matrix.get_shape()[1]
         for column_index in range(self.column_index + 1, column_count):
             node = VaryNodeClass(tree, column_index, self.row_selection, level=self.level + 1)
+            # TODO insert directly at a proper index, after having created
+            # Vary_children with None elements?
             self.Vary_children.append(node)
 
 
@@ -280,7 +232,7 @@ class ADNode:
         return VaryNode
 
 
-    def get_Vary_child_for_column(self, column_index):
+    def get_Vary_child_for_column(self, column_index, tree):
         for child in self.Vary_children:
             if child.column_index == column_index:
                 return child
@@ -288,7 +240,10 @@ class ADNode:
 
 
     def __getstate__(self):
-        return (self.count, self.column_index, self.value, self.leaf_list_node, self.Vary_children, self.row_selection)
+        row_selection = None
+        if self.leaf_list_node:
+            row_selection = self.row_selection
+        return (self.count, self.column_index, self.value, self.leaf_list_node, self.Vary_children, row_selection)
 
 
     def __setstate__(self, state):
@@ -316,11 +271,11 @@ class ADNode:
 
         non_mcv_ct = ContingencyTreeNode(self.column_index, self.value, None)
         next_column = columns[0]
-        vary = self.get_Vary_child_for_column(next_column)
+        vary = self.get_Vary_child_for_column(next_column, tree)
 
         for value in vary.values:
             if value != vary.most_common_value:
-                child = vary.get_AD_child_for_value(value)
+                child = vary.get_AD_child_for_value(value, tree)
                 if child is not None:
                     child_ct = child.make_contingency_tree(tree, columns[1:])
                     non_mcv_ct.append_child(child_ct)
@@ -366,6 +321,8 @@ class VaryNode:
         self.level = level
         self.row_selection = row_selection
         self.column_index = column_index
+
+        # TODO replace with a dict()? but dicts are huge
         self.AD_children = []
 
         row_subselections = self.create_row_subselections_by_value(tree.matrix)
@@ -384,6 +341,8 @@ class VaryNode:
             node = None
             if len(row_selection) > 0 and value != self.most_common_value:
                 node = ADNodeClass(tree, self.column_index, value, row_selection, level=self.level + 1)
+            # TODO insert directly at a proper index, after having created
+            # AD_children with None elements?
             self.AD_children.append(node)
 
 
@@ -423,7 +382,7 @@ class VaryNode:
         return row_subselections
 
 
-    def get_AD_child_for_value(self, value):
+    def get_AD_child_for_value(self, value, tree):
         for child in self.AD_children:
             if child is None:
                 continue
