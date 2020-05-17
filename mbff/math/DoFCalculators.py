@@ -17,7 +17,10 @@ class UnadjustedDoF:
             self.matrix = self.G_test.matrix
             self.column_values = self.G_test.column_values
             self.N = self.G_test.N
-            self.debug = self.G_test.debug
+            try:
+                self.debug = self.G_test.debug
+            except AttributeError:
+                self.debug = 0
 
         self.reset()
 
@@ -123,7 +126,8 @@ class CachedStructuralDoF(UnadjustedDoF):
         if self.load_path is not None and self.load_path.exists():
             with self.load_path.open('rb') as f:
                 self.DoF_cache = pickle.load(f)
-            if self.debug > 1: print('DoF cache loaded from {} and contains {} entries'.format(self.load_path, len(self.DoF_cache)))
+            if self.debug > 1:
+                print('DoF cache loaded from {} and contains {} entries'.format(self.load_path, len(self.DoF_cache)))
 
 
     def calculate_DoF(self, X, Y, Z):
@@ -214,4 +218,6 @@ class CachedStructuralDoF(UnadjustedDoF):
         if self.save_path is not None:
             with self.save_path.open('wb') as f:
                 pickle.dump(self.DoF_cache, f)
-            if self.debug > 1: print('DoF cache saved to {} while containing {} entries'.format(self.save_path, len(self.DoF_cache)))
+
+            if self.debug > 1:
+                print('DoF cache saved to {} while containing {} entries'.format(self.save_path, len(self.DoF_cache)))

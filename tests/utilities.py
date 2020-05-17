@@ -5,8 +5,6 @@ from pathlib import Path
 from mbff.math.Variable import Omega
 from mbff.dataset.DatasetMatrix import DatasetMatrix
 from mbff.dataset.sources.SampledBayesianNetworkDatasetSource import SampledBayesianNetworkDatasetSource
-from mbff.structures.ADTree import ADTree
-from mbff.structures.ADTreeDebug import ADTreeDebug
 import mbff.utilities.functions as util
 
 
@@ -48,7 +46,6 @@ def make_test_bayesian_network(configuration):
 
 
 
-
 def ensure_tmp_subfolder(subfolder):
     path = tmp_folder / subfolder
     path.mkdir(parents=True, exist_ok=True)
@@ -71,7 +68,7 @@ def prepare_AD_tree(configuration, datasetmatrix):
     adtrees_folder = tmp_folder / 'adtrees'
     adtrees_folder.mkdir(parents=True, exist_ok=True)
     path = adtrees_folder / (configuration['label'] + '.pickle')
-    debug = configuration['debug']
+    debug = configuration.get('debug', 0)
     leaf_list_threshold = configuration['leaf_list_threshold']
     adtree = None
     if path.exists():
@@ -83,10 +80,8 @@ def prepare_AD_tree(configuration, datasetmatrix):
     else:
         matrix = datasetmatrix.X
         column_values = datasetmatrix.get_values_per_column('X')
-        if debug >= 1:
-            adtree = ADTreeDebug(matrix, column_values, leaf_list_threshold, debug)
-        else:
-            adtree = ADTree(matrix, column_values, leaf_list_threshold)
+        adtree_class = configuration['ci_test_ad_tree_class']
+        adtree = adtree_class(matrix, column_values, leaf_list_threshold, debug)
         if path is not None:
             with path.open('wb') as f:
                 pickle.dump(adtree, f)

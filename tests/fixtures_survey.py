@@ -59,7 +59,6 @@ def adtree_survey_2e3_llta0(ds_survey_2e3):
     configuration = dict()
     configuration['label'] = 'adtree_survey_2e3_llta0'
     configuration['leaf_list_threshold'] = 0
-    configuration['debug'] = 1
     return testutil.prepare_AD_tree(configuration, ds_survey_2e3.datasetmatrix)
 
 
@@ -69,5 +68,4 @@ def adtree_survey_5e2_llta20(ds_survey_5e2):
     configuration = dict()
     configuration['label'] = 'adtree_survey_5e2_llta20'
     configuration['leaf_list_threshold'] = 20
-    configuration['debug'] = 1
     return testutil.prepare_AD_tree(configuration, ds_survey_5e2.datasetmatrix)

@@ -67,5 +67,4 @@ def adtree_lc_repaired_8e3_llta200(ds_lc_repaired_8e3):
     configuration = dict()
     configuration['label'] = 'adtree_lc_repaired_8e3_llta200'
     configuration['leaf_list_threshold'] = 200
-    configuration['debug'] = 1
     return testutil.prepare_AD_tree(configuration, ds_lc_repaired_8e3.datasetmatrix)

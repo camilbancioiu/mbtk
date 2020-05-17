@@ -6,6 +6,8 @@ import pytest
 from mbff.algorithms.mb.ipcmb import AlgorithmIPCMB
 import mbff.math.G_test__unoptimized
 import mbff.math.G_test__with_AD_tree
+import mbff.structures.ADTree
+import mbff.structures.DynamicADTree
 import mbff.math.G_test__with_dcMI
 import mbff.math.DSeparationCITest
 import mbff.math.DoFCalculators as DoFCalculators
@@ -20,7 +22,7 @@ def testfolders():
     folders = dict()
     root = testutil.ensure_empty_tmp_subfolder('test_ipcmb_with_gtests')
 
-    subfolders = ['dofCache', 'ci_test_results', 'jht']
+    subfolders = ['dofCache', 'ci_test_results', 'jht', 'dynamic_adtrees']
     for subfolder in subfolders:
         path = root / subfolder
         path.mkdir(parents=True, exist_ok=True)
@@ -59,6 +61,28 @@ def test_ipcmb_correctness__adtree(ds_lc_repaired_8e3, adtree_lc_repaired_8e3_ll
     adtree = adtree_lc_repaired_8e3_llta200
     LLT = 200
     parameters = make_parameters__adtree(DoFCalculators.StructuralDoF, LLT, adtree)
+    parameters['ci_test_ad_tree_class'] = mbff.structures.ADTree.ADTree
+    parameters_dsep = make_parameters__dsep()
+
+    targets = range(ds.datasetmatrix.get_column_count('X'))
+    for target in targets:
+        mb, _ = run_IPCMB(ds, target, parameters)
+        mb_dsep, _ = run_IPCMB(ds, target, parameters_dsep)
+        assert mb == mb_dsep
+
+
+
+@pytest.mark.slow
+def test_ipcmb_correctness__dynamic_adtree(ds_lc_repaired_8e3, testfolders):
+    """
+    This test ensures that IPC-MB correctly finds all the MBs
+    in the repaired LUNGCANCER dataset when using the G-test with AD-tree.
+    """
+    ds = ds_lc_repaired_8e3
+    LLT = 200
+    path = testfolders['dynamic_adtrees'] / (ds.label + '.pickle')
+    parameters = make_parameters__adtree(DoFCalculators.StructuralDoF, LLT, None, path, path)
+    parameters['ci_test_ad_tree_class'] = mbff.structures.DynamicADTree.DynamicADTree
     parameters_dsep = make_parameters__dsep()
 
     targets = range(ds.datasetmatrix.get_column_count('X'))
@@ -265,6 +289,7 @@ def make_parameters__adtree(dof_class, llt, adtree=None, path_load=None, path_sa
     parameters['ci_test_dof_calculator_class'] = dof_class
     parameters['ci_test_gc_collect_rate'] = 0
     parameters['ci_test_ad_tree_preloaded'] = adtree
+    parameters['ci_test_ad_tree_class'] = mbff.structures.ADTree.ADTree
     parameters['ci_test_ad_tree_path__load'] = path_load
     parameters['ci_test_ad_tree_path__save'] = path_save
     parameters['ci_test_ad_tree_leaf_list_threshold'] = llt
