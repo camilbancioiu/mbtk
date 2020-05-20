@@ -15,6 +15,8 @@ class DynamicADTree(ADTree):
 
 class DynamicADNode(ADNode):
 
+    __slots__ = 'level'
+
     def get_VaryNode_class(self):
         return DynamicVaryNode
 
@@ -27,22 +29,26 @@ class DynamicADNode(ADNode):
         vary = super().get_Vary_child_for_column(column_index, tree)
         if vary is None:
             VaryNodeClass = self.get_VaryNode_class()
-            vary = VaryNodeClass(tree, column_index, self.row_selection, level=self.level + 1)
+            try:
+                vary = VaryNodeClass(tree, column_index, self.row_selection, level=self.level + 1)
+            except AttributeError:
+                raise
             self.Vary_children.append(vary)
         return vary
 
 
     def __getstate__(self):
-        return (self.count, self.column_index, self.value, self.leaf_list_node, self.Vary_children, self.row_selection)
+        return (self.count, self.column_index, self.value, self.leaf_list_node, self.Vary_children, self.row_selection, self.level)
 
 
     def __setstate__(self, state):
-        (self.count, self.column_index, self.value, self.leaf_list_node, self.Vary_children, self.row_selection) = state
-
+        (self.count, self.column_index, self.value, self.leaf_list_node, self.Vary_children, self.row_selection, self.level) = state
 
 
 
 class DynamicVaryNode(VaryNode):
+
+    __slots__ = 'level'
 
     def get_ADNode_class(self):
         return DynamicADNode

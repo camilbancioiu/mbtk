@@ -4,8 +4,9 @@ from mbff.math.G_test__with_AD_tree import G_test
 class G_test_debug(G_test):
 
     def __init__(self, datasetmatrix, parameters):
-        super().__init__(datasetmatrix, parameters)
+        self.parameters = parameters
         self.debug = self.parameters.get('ci_test_debug', 0)
+        super().__init__(datasetmatrix, parameters)
 
 
     def use_preloaded_AD_tree(self, preloaded_AD_tree):
@@ -28,7 +29,7 @@ class G_test_debug(G_test):
 
     def build_AD_tree(self):
         if self.debug >= 1: print("Building the AD-tree...")
-        super().build_AD_tree(self)
+        super().build_AD_tree()
         if self.debug >= 1: print("AD-tree built in {:>10.4f}s".format(self.AD_tree_build_duration))
 
 

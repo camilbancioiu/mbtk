@@ -6,6 +6,7 @@ import pytest
 from mbff.algorithms.mb.ipcmb import AlgorithmIPCMB
 import mbff.math.G_test__unoptimized
 import mbff.math.G_test__with_AD_tree
+import mbff.math.debug.G_test__with_AD_tree__debug
 import mbff.structures.ADTree
 import mbff.structures.DynamicADTree
 import mbff.math.G_test__with_dcMI
@@ -30,6 +31,50 @@ def testfolders():
 
     folders['root'] = root
     return folders
+
+
+
+@pytest.mark.skip
+def test_ipcmb_efficiency__unoptimized(ds_alarm_8e3):
+    ds = ds_alarm_8e3
+    parameters = make_parameters__unoptimized(DoFCalculators.StructuralDoF)
+
+    print()
+    targets = range(ds.datasetmatrix.get_column_count('X'))
+    for target in targets:
+        mb, _ = run_IPCMB(ds, target, parameters)
+        print('MB({}) = {}'.format(target, mb))
+
+
+
+@pytest.mark.skip
+def test_ipcmb_efficiency__with_dcMI(testfolders, ds_alarm_8e3):
+    ds = ds_alarm_8e3
+    jht_path = testfolders['jht'] / 'jht_{}.pickle'.format(ds.label)
+    dof_path = testfolders['dofCache'] / 'dof_cache_{}.pickle'.format(ds.label)
+    parameters = make_parameters__dcmi(DoFCalculators.CachedStructuralDoF, jht_path, dof_path)
+
+    print()
+    targets = range(ds.datasetmatrix.get_column_count('X'))
+    for target in targets:
+        mb, _ = run_IPCMB(ds, target, parameters)
+        print('MB({}) = {}'.format(target, mb))
+
+
+
+@pytest.mark.skip
+def test_ipcmb_efficiency__with_dynamic_adtree(testfolders, ds_alarm_8e3):
+    ds = ds_alarm_8e3
+    LLT = 0
+    path = testfolders['dynamic_adtrees'] / (ds.label + '.pickle')
+    parameters = make_parameters__adtree(DoFCalculators.StructuralDoF, LLT, None, path, path)
+    parameters['ci_test_ad_tree_class'] = mbff.structures.DynamicADTree.DynamicADTree
+
+    print()
+    targets = range(ds.datasetmatrix.get_column_count('X'))
+    for target in targets:
+        mb, _ = run_IPCMB(ds, target, parameters)
+        print('MB({}) = {}'.format(target, mb))
 
 
 
