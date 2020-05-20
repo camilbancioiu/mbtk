@@ -12,7 +12,6 @@ import mbff.structures.ADTree
 from scipy.stats import chi2
 
 
-
 class G_test(mbff.math.G_test__unoptimized.G_test):
 
     def __init__(self, datasetmatrix, parameters):
@@ -45,6 +44,7 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
                 self.load_AD_tree(adtree_load_path)
             else:
                 self.build_AD_tree()
+                self.save_AD_tree()
 
         # By definition, an empty query passed to the AD-tree returns the total
         # number of rows in the dataset.
@@ -53,37 +53,27 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
 
     def use_preloaded_AD_tree(self, preloaded_AD_tree):
         self.AD_tree = preloaded_AD_tree
-        self.AD_tree.debug = self.debug - 1
-        if self.AD_tree.debug >= 1:
-            self.AD_tree.debug_prepare__querying()
-        if self.debug >= 1: print('Using preloaded AD-tree.')
 
 
     def load_AD_tree(self, adtree_load_path):
-        if self.debug >= 1: print("Loading the AD-tree from {} ...".format(adtree_load_path))
         with adtree_load_path.open('rb') as f:
             self.AD_tree = pickle.load(f)
 
-        self.AD_tree.debug = self.debug - 1
-        if self.AD_tree.debug >= 1:
-            self.AD_tree.debug_prepare__querying()
-        if self.debug >= 1: print('AD-tree loaded.')
-
 
     def build_AD_tree(self):
-        if self.debug >= 1: print("Building the AD-tree...")
+        ADTreeClass = self.parameters['ci_test_ad_tree_class']
         leaf_list_threshold = self.parameters['ci_test_ad_tree_leaf_list_threshold']
         self.AD_tree_build_start_time = time.time()
-        self.AD_tree = mbff.structures.ADTree.ADTree(self.matrix, self.column_values, leaf_list_threshold, self.debug)
+        self.AD_tree = ADTreeClass(self.matrix, self.column_values, leaf_list_threshold)
         self.AD_tree_build_end_time = time.time()
         self.AD_tree_build_duration = self.AD_tree_build_end_time - self.AD_tree_build_start_time
-        if self.debug >= 1: print("AD-tree built in {:>10.4f}s".format(self.AD_tree_build_duration))
 
+
+    def save_AD_tree(self):
         adtree_save_path = self.parameters.get('ci_test_ad_tree_path__save', None)
         if adtree_save_path is not None:
             with adtree_save_path.open('wb') as f:
                 pickle.dump(self.AD_tree, f)
-        if self.debug >= 1: print("AD-tree saved to", adtree_save_path)
 
 
     def G_test_conditionally_independent(self, X, Y, Z):
@@ -122,14 +112,6 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
         result.set_distribution('chi2', p, {'DoF': DoF})
 
         result.extra_info = ' DoF {}'.format(DoF)
-
-        if self.AD_tree.debug >= 1:
-            result.extra_info = (
-                '\nAD-Tree:'
-                ' total of {n_pmf} contingency tables; currently {n_pmf_ll} contingency tables from leaf-lists;'
-                ' queries {n_queries},'
-                ' of which leaf-list queries {n_queries_ll}'
-            ).format(**self.AD_tree.__dict__)
 
         return result
 

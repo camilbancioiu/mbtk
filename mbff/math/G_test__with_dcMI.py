@@ -25,12 +25,10 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
     def prepare_JHT(self):
         jht_load_path = self.parameters.get('ci_test_jht_path__load', None)
         if jht_load_path is not None and jht_load_path.exists():
-            if self.debug >= 1: print('Loading the JHT from {} ...'.format(jht_load_path))
             with jht_load_path.open('rb') as f:
                 self.JHT = pickle.load(f)
             self.JHT_reads = self.JHT['reads']
             self.JHT_misses = self.JHT['misses']
-            if self.debug >= 1: print('JHT loaded.')
 
 
     def G_test_conditionally_independent(self, X, Y, Z):
@@ -98,14 +96,12 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
 
         try:
             H = self.JHT[jht_key]
-            if self.debug >= 2: print('\tJHT hit: found H={:8.6f} for {}'.format(H, jht_key))
         except KeyError:
             self.JHT_misses += 1
             joint_variables = self.datasetmatrix.get_variables('X', jht_key)
             pmf = PMF(joint_variables)
             H = - pmf.expected_value(lambda v, p: math.log(p))
             self.JHT[jht_key] = H
-            if self.debug >= 2: print('\tJHT miss and update: store H={:8.6f} for {}'.format(H, jht_key))
             if self.DoF_calculator.requires_pmfs:
                 self.DoF_calculator.set_context_pmfs(pmf, None, None, None)
 
@@ -121,4 +117,3 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
             self.JHT['misses'] = self.JHT_misses
             with jht_save_path.open('wb') as f:
                 pickle.dump(self.JHT, f)
-        if self.debug >= 1: print('JHT has been saved to {}'.format(jht_save_path))

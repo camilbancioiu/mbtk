@@ -87,7 +87,6 @@ def adtree_alarm_8e3_llta0(ds_alarm_8e3):
     configuration = dict()
     configuration['label'] = 'adtree_alarm_8e3_llta0'
     configuration['leaf_list_threshold'] = 0
-    configuration['debug'] = 1
     return testutil.prepare_AD_tree(configuration, ds_alarm_8e3.datasetmatrix)
 
 
@@ -97,7 +96,6 @@ def adtree_alarm_3e3_llta100(ds_alarm_3e3):
     configuration = dict()
     configuration['label'] = 'adtree_alarm_3e3_llta100'
     configuration['leaf_list_threshold'] = 100
-    configuration['debug'] = 1
     return testutil.prepare_AD_tree(configuration, ds_alarm_3e3.datasetmatrix)
 
 
@@ -107,7 +105,6 @@ def adtree_alarm_5e2_llta0(ds_alarm_5e2):
     configuration = dict()
     configuration['label'] = 'adtree_alarm_5e2_llta20'
     configuration['leaf_list_threshold'] = 20
-    configuration['debug'] = 1
     return testutil.prepare_AD_tree(configuration, ds_alarm_5e2.datasetmatrix)
 
 
@@ -117,5 +114,4 @@ def adtree_alarm_3e2_llta0(ds_alarm_3e2):
     configuration = dict()
     configuration['label'] = 'adtree_alarm_3e2_llta0'
     configuration['leaf_list_threshold'] = 0
-    configuration['debug'] = 1
     return testutil.prepare_AD_tree(configuration, ds_alarm_3e2.datasetmatrix)

@@ -15,7 +15,6 @@ class G_test:
 
     def __init__(self, datasetmatrix, parameters):
         self.parameters = parameters
-        self.debug = self.parameters.get('ci_test_debug', 0)
         self.ci_test_name = '.'.join([self.__module__, self.__class__.__name__])
         self.parameters['ci_test_name'] = self.ci_test_name
 
@@ -48,12 +47,9 @@ class G_test:
             result.computed_d_separation = self.source_bn.d_separated(X, Z, Y)
 
         self.ci_test_results.append(result)
-        self.print_ci_test_result(result)
-
         self.ci_test_counter += 1
-        if self.gc_collect_rate != 0:
-            if self.ci_test_counter % self.gc_collect_rate == 0:
-                gc.collect()
+
+        self.perform_gc()
 
         if result.insufficient_samples:
             raise InsufficientSamplesForCITest(result)
@@ -161,20 +157,15 @@ class G_test:
         return frozenset(variable_set)
 
 
+    def perform_gc(self):
+        if self.gc_collect_rate != 0:
+            if self.ci_test_counter % self.gc_collect_rate == 0:
+                gc.collect()
+
+
     def end(self):
         save_path = self.parameters.get('ci_test_results_path__save', None)
         if save_path is not None:
             with save_path.open('wb') as f:
                 pickle.dump(self.ci_test_results, f)
-        if self.debug >= 1: print('CI test results saved to {}'.format(save_path))
         self.DoF_calculator.end()
-
-
-    def print_ci_test_result(self, result):
-        if self.debug >= 1:
-            if result.accurate():
-                if self.parameters.get('ci_test_results__print_accurate', True):
-                    print(result)
-            if not result.accurate():
-                if self.parameters.get('ci_test_results__print_inaccurate', True):
-                    print(result)

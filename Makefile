@@ -20,11 +20,11 @@ doc-clean: Makefile
 doc-rebuild: doc-clean doc
 	@notify-send "Make" "Sphinx documentation rebuilt."
 
-test: Makefile
+test-all: Makefile
 	pytest $(PYTEST_WORKERS) --capture=tee-sys
 	notify-send "Make" "Testing complete."
 
-test-quick: Makefile
+test: Makefile
 	pytest $(PYTEST_WORKERS) --capture=tee-sys -m "not slow"
 	notify-send "Make" "Testing complete."
 
