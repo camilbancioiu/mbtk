@@ -1,5 +1,6 @@
 import pytest
 from pathlib import Path
+from mbff.structures.ADTree import ADTree
 import tests.utilities as testutil
 import mbff.utilities.functions as util
 
@@ -58,6 +59,7 @@ def ds_survey_5e2():
 def adtree_survey_2e3_llta0(ds_survey_2e3):
     configuration = dict()
     configuration['label'] = 'adtree_survey_2e3_llta0'
+    configuration['ci_test_ad_tree_class'] = ADTree
     configuration['leaf_list_threshold'] = 0
     return testutil.prepare_AD_tree(configuration, ds_survey_2e3.datasetmatrix)
 
@@ -67,5 +69,6 @@ def adtree_survey_2e3_llta0(ds_survey_2e3):
 def adtree_survey_5e2_llta20(ds_survey_5e2):
     configuration = dict()
     configuration['label'] = 'adtree_survey_5e2_llta20'
+    configuration['ci_test_ad_tree_class'] = ADTree
     configuration['leaf_list_threshold'] = 20
     return testutil.prepare_AD_tree(configuration, ds_survey_5e2.datasetmatrix)

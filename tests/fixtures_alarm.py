@@ -1,6 +1,7 @@
 import pytest
 from pathlib import Path
 import tests.utilities as testutil
+from mbff.structures.ADTree import ADTree
 import mbff.utilities.functions as util
 
 
@@ -86,6 +87,7 @@ def ds_alarm_3e2():
 def adtree_alarm_8e3_llta0(ds_alarm_8e3):
     configuration = dict()
     configuration['label'] = 'adtree_alarm_8e3_llta0'
+    configuration['ci_test_ad_tree_class'] = ADTree
     configuration['leaf_list_threshold'] = 0
     return testutil.prepare_AD_tree(configuration, ds_alarm_8e3.datasetmatrix)
 
@@ -95,6 +97,7 @@ def adtree_alarm_8e3_llta0(ds_alarm_8e3):
 def adtree_alarm_3e3_llta100(ds_alarm_3e3):
     configuration = dict()
     configuration['label'] = 'adtree_alarm_3e3_llta100'
+    configuration['ci_test_ad_tree_class'] = ADTree
     configuration['leaf_list_threshold'] = 100
     return testutil.prepare_AD_tree(configuration, ds_alarm_3e3.datasetmatrix)
 
@@ -104,6 +107,7 @@ def adtree_alarm_3e3_llta100(ds_alarm_3e3):
 def adtree_alarm_5e2_llta0(ds_alarm_5e2):
     configuration = dict()
     configuration['label'] = 'adtree_alarm_5e2_llta20'
+    configuration['ci_test_ad_tree_class'] = ADTree
     configuration['leaf_list_threshold'] = 20
     return testutil.prepare_AD_tree(configuration, ds_alarm_5e2.datasetmatrix)
 
@@ -113,5 +117,6 @@ def adtree_alarm_5e2_llta0(ds_alarm_5e2):
 def adtree_alarm_3e2_llta0(ds_alarm_3e2):
     configuration = dict()
     configuration['label'] = 'adtree_alarm_3e2_llta0'
+    configuration['ci_test_ad_tree_class'] = ADTree
     configuration['leaf_list_threshold'] = 0
     return testutil.prepare_AD_tree(configuration, ds_alarm_3e2.datasetmatrix)

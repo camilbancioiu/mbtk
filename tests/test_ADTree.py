@@ -139,6 +139,7 @@ def test_compare_g_tests__survey(ds_survey_5e2, adtree_survey_5e2_llta20):
     parameters = dict()
     parameters['ci_test_debug'] = 0
     parameters['ci_test_significance'] = 0.95
+    parameters['ci_test_ad_tree_class'] = ADTree
     parameters['ci_test_ad_tree_leaf_list_threshold'] = 20
     parameters['ci_test_ad_tree_preloaded'] = adtree
     parameters['omega'] = ds.omega
@@ -173,6 +174,7 @@ def test_compare_g_tests__alarm(ds_alarm_5e2, adtree_alarm_5e2_llta0):
     parameters = dict()
     parameters['ci_test_debug'] = 0
     parameters['ci_test_significance'] = 0.95
+    parameters['ci_test_ad_tree_class'] = ADTree
     parameters['ci_test_ad_tree_leaf_list_threshold'] = 20
     parameters['ci_test_ad_tree_preloaded'] = adtree
     parameters['omega'] = ds.omega

@@ -81,7 +81,11 @@ def prepare_AD_tree(configuration, datasetmatrix):
         matrix = datasetmatrix.X
         column_values = datasetmatrix.get_values_per_column('X')
         adtree_class = configuration['ci_test_ad_tree_class']
-        adtree = adtree_class(matrix, column_values, leaf_list_threshold, debug)
+        try:
+            adtree = adtree_class(matrix, column_values, leaf_list_threshold, debug)
+        except TypeError:
+            adtree = adtree_class(matrix, column_values, leaf_list_threshold)
+
         if path is not None:
             with path.open('wb') as f:
                 pickle.dump(adtree, f)

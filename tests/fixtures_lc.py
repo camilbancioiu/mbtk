@@ -1,5 +1,6 @@
 import pytest
 from pathlib import Path
+from mbff.structures.ADTree import ADTree
 import tests.utilities as testutil
 import mbff.utilities.functions as util
 
@@ -66,5 +67,6 @@ def ds_lc_repaired_8e3():
 def adtree_lc_repaired_8e3_llta200(ds_lc_repaired_8e3):
     configuration = dict()
     configuration['label'] = 'adtree_lc_repaired_8e3_llta200'
+    configuration['ci_test_ad_tree_class'] = ADTree
     configuration['leaf_list_threshold'] = 200
     return testutil.prepare_AD_tree(configuration, ds_lc_repaired_8e3.datasetmatrix)
