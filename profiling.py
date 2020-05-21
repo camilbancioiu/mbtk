@@ -26,16 +26,25 @@ def testfolders():
 
 
 
-def dataset():
+def dataset(size):
     configuration = dict()
-    configuration['label'] = 'ds_lc_repaired_4e4'
+    configuration['label'] = 'ds_lc_repaired_{}'.format(int(size))
     configuration['sourcepath'] = testutil.bif_folder / 'lc_repaired.bif'
-    configuration['sample_count'] = int(4e4)
+    configuration['sample_count'] = int(size)
     configuration['values_as_indices'] = True
     configuration['objectives'] = []
     configuration['method'] = 'exact'
     configuration['random_seed'] = 1984
     return testutil.MockDataset(configuration)
+
+
+
+def make_parameters__unoptimized(dof_class):
+    parameters = dict()
+    parameters['ci_test_class'] = mbff.math.G_test__unoptimized.G_test
+    parameters['ci_test_dof_calculator_class'] = dof_class
+    parameters['ci_test_gc_collect_rate'] = 0
+    return parameters
 
 
 
@@ -95,8 +104,20 @@ def run_IPCMB(ds, target, parameters):
 
 
 
+def run_unoptimized():
+    ds = dataset(4e3)
+    parameters = make_parameters__unoptimized(DoFCalculators.StructuralDoF)
+
+    print('start')
+    targets = range(ds.datasetmatrix.get_column_count('X'))
+    for target in targets:
+        mb, _ = run_IPCMB(ds, target, parameters)
+        print('MB({}) = {}'.format(target, mb))
+
+
+
 def run_dynadtree():
-    ds = dataset()
+    ds = dataset(4e4)
     LLT = 0
     folders = testfolders()
     path = folders['dynamic_adtrees'] / (ds.label + '.pickle')
@@ -112,7 +133,7 @@ def run_dynadtree():
 
 
 def run_dcmi():
-    ds = dataset()
+    ds = dataset(4e4)
     folders = testfolders()
     jht_path = folders['jht'] / 'jht_{}.pickle'.format(ds.label)
     dof_path = folders['dofCache'] / 'dof_cache_{}.pickle'.format(ds.label)
@@ -124,6 +145,14 @@ def run_dcmi():
         mb, _ = run_IPCMB(ds, target, parameters)
         print('MB({}) = {}'.format(target, mb))
 
+
+
+def profile_unoptimized():
+    cProfile.run('run_unoptimized()', 'unoptimized.pstats')
+    p = pstats.Stats('unoptimized.pstats')
+    # functions = '|'.join(['count_values'])
+    # p.sort_stats(SortKey.CUMULATIVE).print_stats(50, functions)
+    p.sort_stats(SortKey.CUMULATIVE).print_stats(50)
 
 
 
@@ -149,7 +178,9 @@ if __name__ == '__main__':
         profile = 'dcmi'
 
     print('profile:', profile)
-    if profile == 'dynadtree':
+    if profile == 'unoptimized':
+        profile_unoptimized()
+    elif profile == 'dynadtree':
         profile_dynadtree()
     elif profile == 'dcmi':
         profile_dcmi()
