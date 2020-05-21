@@ -1,6 +1,7 @@
 import itertools
 from collections import Counter
 from mbff.utilities import functions as util
+import numpy
 
 
 class PMF:
@@ -74,8 +75,10 @@ class PMF:
 
 
     def count_values(self):
-        counter = Counter(self.variable.instances())
-        return counter
+        instances = self.variable.instances()
+        if isinstance(instances, numpy.ndarray):
+            return dict(zip(*numpy.unique(instances, return_counts=True)))
+        return Counter(instances)
 
 
     def normalize_counts(self, update_probabilities=False):
