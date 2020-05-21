@@ -124,7 +124,7 @@ def test_ipcmb_correctness__dynamic_adtree(ds_lc_repaired_8e3, testfolders):
     in the repaired LUNGCANCER dataset when using the G-test with AD-tree.
     """
     ds = ds_lc_repaired_8e3
-    LLT = 200
+    LLT = 0
     path = testfolders['dynamic_adtrees'] / (ds.label + '.pickle')
     parameters = make_parameters__adtree(DoFCalculators.StructuralDoF, LLT, None, path, path)
     parameters['ci_test_ad_tree_class'] = mbff.structures.DynamicADTree.DynamicADTree

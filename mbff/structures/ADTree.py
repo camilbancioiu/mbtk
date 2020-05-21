@@ -375,9 +375,10 @@ class VaryNode:
         # Iterate over the rows in self.row_selection, putting each row_index
         # into a list corresponding to its value, in the row_subselections
         # dictionary.
+        column = matrix.getcol(self.column_index).transpose().toarray().ravel()
+
         for row_index in self.row_selection:
-            value = matrix[row_index, self.column_index]
-            row_subselections[value].append(row_index)
+            row_subselections[column[row_index]].append(row_index)
 
         return row_subselections
 
