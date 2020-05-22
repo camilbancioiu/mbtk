@@ -23,7 +23,7 @@ def testfolders():
     folders = dict()
     root = testutil.ensure_empty_tmp_subfolder('test_ipcmb_with_gtests')
 
-    subfolders = ['dofCache', 'ci_test_results', 'jht', 'dynamic_adtrees']
+    subfolders = ['dofCache', 'ci_test_results', 'jht', 'adtrees', 'dynamic_adtrees']
     for subfolder in subfolders:
         path = root / subfolder
         path.mkdir(parents=True, exist_ok=True)
@@ -69,6 +69,22 @@ def test_ipcmb_efficiency__with_dynamic_adtree(testfolders, ds_alarm_8e3):
     path = testfolders['dynamic_adtrees'] / (ds.label + '.pickle')
     parameters = make_parameters__adtree(DoFCalculators.StructuralDoF, LLT, None, path, path)
     parameters['ci_test_ad_tree_class'] = mbff.structures.DynamicADTree.DynamicADTree
+
+    print()
+    targets = range(ds.datasetmatrix.get_column_count('X'))
+    for target in targets:
+        mb, _ = run_IPCMB(ds, target, parameters)
+        print('MB({}) = {}'.format(target, mb))
+
+
+
+@pytest.mark.skip
+def test_ipcmb_efficiency__with_adtree(testfolders, ds_alarm_8e3):
+    ds = ds_alarm_8e3
+    LLT = 0
+    path = testfolders['adtrees'] / (ds.label + '.pickle')
+    parameters = make_parameters__adtree(DoFCalculators.StructuralDoF, LLT, None, path, path)
+    parameters['ci_test_ad_tree_class'] = mbff.structures.ADTree.ADTree
 
     print()
     targets = range(ds.datasetmatrix.get_column_count('X'))
