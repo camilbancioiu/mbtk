@@ -1,15 +1,29 @@
 from mbff.structures.ADTree import ADTree, ADNode, VaryNode
 
 
+def connect_AD_tree_classes():
+    """
+    Ensure the classes used by this AD-tree implementation reference each
+    other properly. The mbff.structures package contains multiple AD-tree
+    implementations that inherit the base ADTree class. Each of these
+    implementations will have its own implementations for the ADNode and
+    VaryNode classes, and they must reference each other correctly as well.
+
+    This function is called after all the three required classes have been
+    defined.
+    """
+    DynamicADTree.ADNodeClass = DynamicADNode
+    DynamicADNode.VaryNodeClass = DynamicVaryNode
+    DynamicVaryNode.ADNodeClass = DynamicADNode
+
+
+
 class DynamicADTree(ADTree):
 
+    ADNodeClass = None
+
     def create(self):
-        ADNodeClass = self.get_ADNode_class()
-        self.root = ADNodeClass(self, -1, -1, row_selection=None, level=0)
-
-
-    def get_ADNode_class(self):
-        return DynamicADNode
+        self.root = self.ADNodeClass(self, -1, -1, row_selection=None, level=0)
 
 
 
@@ -17,9 +31,7 @@ class DynamicADNode(ADNode):
 
     __slots__ = 'level'
 
-    def get_VaryNode_class(self):
-        return DynamicVaryNode
-
+    VaryNodeClass = None
 
     def create_Vary_children(self, tree):
         pass
@@ -28,9 +40,8 @@ class DynamicADNode(ADNode):
     def get_Vary_child_for_column(self, column_index, tree):
         vary = super().get_Vary_child_for_column(column_index, tree)
         if vary is None:
-            VaryNodeClass = self.get_VaryNode_class()
             try:
-                vary = VaryNodeClass(tree, column_index, self.row_selection, level=self.level + 1)
+                vary = self.VaryNodeClass(tree, column_index, self.row_selection, level=self.level + 1)
             except AttributeError:
                 raise
             self.Vary_children.append(vary)
@@ -50,5 +61,8 @@ class DynamicVaryNode(VaryNode):
 
     __slots__ = 'level'
 
-    def get_ADNode_class(self):
-        return DynamicADNode
+    ADNodeClass = None
+
+
+
+connect_AD_tree_classes()

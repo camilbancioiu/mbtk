@@ -5,6 +5,23 @@ from mbff.math.PMF import PMF
 from mbff.structures.ContingencyTree import ContingencyTreeNode
 
 
+def connect_AD_tree_classes():
+    """
+    Ensure the classes used by this AD-tree implementation reference each
+    other properly. The mbff.structures package contains multiple AD-tree
+    implementations that inherit the base ADTree class. Each of these
+    implementations will have its own implementations for the ADNode and
+    VaryNode classes, and they must reference each other correctly as well.
+
+    This function is called after all the three required classes have been
+    defined.
+    """
+    ADTree.ADNodeClass = ADNode
+    ADNode.VaryNodeClass = VaryNode
+    VaryNode.ADNodeClass = ADNode
+
+
+
 class ADTree:
     """
     An implementation of the All-Dimensions tree (AD-tree), a data structure
@@ -35,6 +52,8 @@ class ADTree:
     missing values, which is done by performing multiple extra queries.
     """
 
+    ADNodeClass = None
+
     def __init__(self, matrix, column_values, leaf_list_threshold=0):
         self.matrix = matrix
         self.column_values = column_values
@@ -50,15 +69,10 @@ class ADTree:
 
 
     def create(self):
-        ADNodeClass = self.get_ADNode_class()
         self.start_time = time.time()
-        self.root = ADNodeClass(self, -1, -1, row_selection=None, level=0)
+        self.root = self.ADNodeClass(self, -1, -1, row_selection=None, level=0)
         self.end_time = time.time()
         self.duration = self.end_time - self.start_time
-
-
-    def get_ADNode_class(self):
-        return ADNode
 
 
     def make_pmf(self, variables):
@@ -190,10 +204,25 @@ class ADTree:
 
 
 
+class JointVariablesIDs:
+    """
+    JointVariablesIDs mimics the mbff.math.Variable.JointVariables class. There
+    is only one property, variableIDs, which the method ADtree.make_pmf() will
+    set to the list of variables for which it constructed the PMF out of the
+    data in the AD-tree. This is required by the classes in DoFCalculators,
+    which require the variable IDs to be present in PMF.variable.variableIDs.
+    """
+    def __init__(self, variableIDs):
+        self.variableIDs = variableIDs
+
+
+
 class ADNode:
 
     __slots__ = ('level', 'row_selection', 'count', 'column_index', 'value',
                  'leaf_list_node', 'Vary_children')
+
+    VaryNodeClass = None
 
     def __init__(self, tree, column_index, value, row_selection=None, level=0):
         self.level = level
@@ -219,7 +248,7 @@ class ADNode:
         if self.leaf_list_node:
             return
 
-        VaryNodeClass = self.get_VaryNode_class()
+        VaryNodeClass = self.VaryNodeClass
         column_count = tree.matrix.get_shape()[1]
         for column_index in range(self.column_index + 1, column_count):
             node = VaryNodeClass(tree, column_index, self.row_selection, level=self.level + 1)
@@ -228,11 +257,10 @@ class ADNode:
             self.Vary_children.append(node)
 
 
-    def get_VaryNode_class(self):
-        return VaryNode
-
-
     def get_Vary_child_for_column(self, column_index, tree):
+        # Apparently, this `for` loop over the self.Vary_children list is faster
+        # than having self.Vary_children as a dictionary and looking up values
+        # with column_index as key. TODO do more detailed profiling
         for child in self.Vary_children:
             if child.column_index == column_index:
                 return child
@@ -317,6 +345,8 @@ class VaryNode:
     __slots__ = ('level', 'row_selection', 'column_index',
                  'AD_children', 'values', 'most_common_value')
 
+    ADNodeClass = None
+
     def __init__(self, tree, column_index, row_selection=None, level=0):
         self.level = level
         self.row_selection = row_selection
@@ -335,7 +365,7 @@ class VaryNode:
 
 
     def create_AD_children(self, tree, row_subselections):
-        ADNodeClass = self.get_ADNode_class()
+        ADNodeClass = self.ADNodeClass
         for value in self.values:
             row_selection = row_subselections[value]
             node = None
@@ -384,6 +414,9 @@ class VaryNode:
 
 
     def get_AD_child_for_value(self, value, tree):
+        # Apparently, this `for` loop over the self.AD_children list is faster
+        # than having self.AD_children as a dictionary and looking up values
+        # with `value` as key. TODO do more detailed profiling
         for child in self.AD_children:
             if child is None:
                 continue
@@ -405,13 +438,4 @@ class VaryNode:
 
 
 
-class JointVariablesIDs:
-    """
-    JointVariablesIDs mimics the mbff.math.Variable.JointVariables class. There
-    is only one property, variableIDs, which the method ADtree.make_pmf() will
-    set to the list of variables for which it constructed the PMF out of the
-    data in the AD-tree. This is required by the classes in DoFCalculators,
-    which require the variable IDs to be present in PMF.variable.variableIDs.
-    """
-    def __init__(self, variableIDs):
-        self.variableIDs = variableIDs
+connect_AD_tree_classes()
