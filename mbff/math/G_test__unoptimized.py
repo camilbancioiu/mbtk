@@ -127,9 +127,9 @@ class G_test:
 
 
     def calculate_cpmfs(self, VarX, VarY, VarZ):
-        PrXYcZ = CPMF(JointVariables(VarX, VarY), VarZ)
-        PrXcZ = CPMF(VarX, VarZ)
-        PrYcZ = CPMF(VarY, VarZ)
+        PrXYcZ = CPMF(JointVariables(VarX, VarY), VarZ, initpmf=False)
+        PrXcZ = CPMF(VarX, VarZ, initpmf=False)
+        PrYcZ = CPMF(VarY, VarZ, initpmf=False)
         PrZ = PMF(VarZ)
 
         return (PrXYcZ, PrXcZ, PrYcZ, PrZ)
