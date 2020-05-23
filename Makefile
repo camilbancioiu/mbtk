@@ -30,3 +30,6 @@ test: Makefile
 
 test-clean:
 	rm -rf tests/testfiles/tmp/*
+
+clean:
+	find -name __pycache__ | xargs rm -rf
