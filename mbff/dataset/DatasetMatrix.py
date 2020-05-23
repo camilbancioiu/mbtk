@@ -519,7 +519,7 @@ class DatasetMatrix:
         with (matrix_path / 'column_labels_Y.txt').open(mode='rt') as f:
             self.column_labels_Y = list(map(str.strip, list(f)))
 
-        self.final = True
+        self.finalize()
 
 
     def finalize(self):
