@@ -56,6 +56,7 @@ class ADTree:
 
     def __init__(self, matrix, column_values, leaf_list_threshold=0):
         self.matrix = matrix
+        self.column_cache = dict()
         self.column_values = column_values
         self.ad_node_count = 0
         self.vary_node_count = 0
@@ -355,7 +356,7 @@ class VaryNode:
         # TODO replace with a dict()? but dicts are huge
         self.AD_children = []
 
-        row_subselections = self.create_row_subselections_by_value(tree.matrix)
+        row_subselections = self.create_row_subselections_by_value(tree)
         self.values = tree.column_values[column_index]
         self.most_common_value = self.discoverMCV(row_subselections)
 
@@ -388,7 +389,7 @@ class VaryNode:
         (self.column_index, self.values, self.AD_children, self.most_common_value) = state
 
 
-    def create_row_subselections_by_value(self, matrix):
+    def create_row_subselections_by_value(self, tree):
         """
         Group the rows of the matrix by their value in the first column,
         but regardless of the rest of the columns. Only iterates over the rows
@@ -399,13 +400,17 @@ class VaryNode:
         if self.row_selection is None:
             # If row_selection isn't set yet, initialize it to cover all the
             # rows.
-            row_count = matrix.get_shape()[0]
+            row_count = tree.matrix.get_shape()[0]
             self.row_selection = range(0, row_count)
 
         # Iterate over the rows in self.row_selection, putting each row_index
         # into a list corresponding to its value, in the row_subselections
         # dictionary.
-        column = matrix.getcol(self.column_index).transpose().toarray().ravel()
+        try:
+            column = tree.column_cache[self.column_index]
+        except KeyError:
+            column = tree.matrix.getcol(self.column_index).transpose().toarray().ravel()
+            tree.column_cache[self.column_index] = column
 
         for row_index in self.row_selection:
             row_subselections[column[row_index]].append(row_index)
