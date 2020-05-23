@@ -2,6 +2,7 @@ import itertools
 from collections import Counter
 from mbff.utilities import functions as util
 import numpy
+import scipy
 
 
 class PMF:
@@ -9,8 +10,16 @@ class PMF:
     def __init__(self, variable):
         self.tolerance_pdiff = 1e-10
         self.variable = variable
+
         if variable is not None:
-            self.total_count = len(self.variable)
+            self.variableIDs = self.variable.variableIDs
+            if isinstance(variable, scipy.sparse.csc_matrix):
+                self.variable = self.variable.toarray()
+                self.total_count = self.variable.shape[0]
+                self.value_counts = self.count_values()
+                self.probabilities = self.normalize_counts()
+            else:
+                self.total_count = len(self.variable)
             self.value_counts = self.count_values()
             self.probabilities = self.normalize_counts()
         else:
@@ -75,9 +84,12 @@ class PMF:
 
 
     def count_values(self):
+        if isinstance(self.variable, numpy.ndarray):
+            unique, counts = numpy.unique(self.variable, return_counts=True, axis=0)
+            return dict(zip(map(tuple, unique), counts))
         instances = self.variable.instances()
         if isinstance(instances, numpy.ndarray):
-            return dict(zip(*numpy.unique(instances, return_counts=True)))
+            return dict(zip(*numpy.unique(instances, return_counts=True, axis=0)))
         return Counter(instances)
 
 

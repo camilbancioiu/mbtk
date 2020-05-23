@@ -106,7 +106,9 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
             H = self.JHT[jht_key]
         except KeyError:
             self.JHT_misses += 1
-            joint_variables = self.datasetmatrix.get_variables('X', jht_key)
+            jht_key_lst = list(jht_key)
+            joint_variables = self.datasetmatrix.get_variables('X', jht_key_lst, slicing=True)
+            joint_variables.variableIDs = jht_key_lst
             pmf = PMF(joint_variables)
             H = - pmf.expected_value(lambda v, p: math.log(p))
             self.JHT[jht_key] = H

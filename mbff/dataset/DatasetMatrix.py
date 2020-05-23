@@ -222,9 +222,12 @@ class DatasetMatrix:
         return variable
 
 
-    def get_variables(self, matrix_label, columns):
+    def get_variables(self, matrix_label, columns, slicing=False):
         if columns is None:
             return None
+
+        if slicing:
+            return self.get_matrix(matrix_label)[:, columns]
 
         if isinstance(columns, int):
             column = columns
