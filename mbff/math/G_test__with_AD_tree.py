@@ -34,6 +34,7 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
             # way), and we've been passed a reference to it. We simply use that
             # reference from now on.
             self.use_preloaded_AD_tree(preloaded_AD_tree)
+            print('using preloaded AD-tree')
         else:
             # There is no preloaded AD tree available, so we try to load
             # it ourselves from the path provided as a parameter; if that
@@ -42,6 +43,7 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
             adtree_load_path = self.parameters.get('ci_test_ad_tree_path__load', None)
             if adtree_load_path is not None and adtree_load_path.exists():
                 self.load_AD_tree(adtree_load_path)
+                print('loaded AD-tree')
             else:
                 self.build_AD_tree()
                 self.save_AD_tree()
