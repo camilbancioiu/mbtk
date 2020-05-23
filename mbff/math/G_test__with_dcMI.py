@@ -23,6 +23,14 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
 
 
     def prepare_JHT(self):
+        preloaded_JHT = self.parameters.get('ci_test_jht_preloaded', None)
+        if preloaded_JHT is not None:
+            self.JHT = preloaded_JHT
+            self.JHT_reads = self.JHT['reads']
+            self.JHT_misses = self.JHT['misses']
+            print('using preloaded JHT')
+            return
+
         jht_load_path = self.parameters.get('ci_test_jht_path__load', None)
         if jht_load_path is not None and jht_load_path.exists():
             with jht_load_path.open('rb') as f:

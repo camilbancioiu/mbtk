@@ -34,7 +34,7 @@ def testfolders():
 
 
 
-@pytest.mark.skip
+@pytest.mark.slow
 def test_ipcmb_efficiency__unoptimized(ds_alarm_8e3):
     ds = ds_alarm_8e3
     parameters = make_parameters__unoptimized(DoFCalculators.StructuralDoF)
@@ -42,12 +42,13 @@ def test_ipcmb_efficiency__unoptimized(ds_alarm_8e3):
     print()
     targets = range(ds.datasetmatrix.get_column_count('X'))
     for target in targets:
-        mb, _ = run_IPCMB(ds, target, parameters)
+        print('target', target)
+        mb, _, _ = run_IPCMB(ds, target, parameters)
         print('MB({}) = {}'.format(target, mb))
 
 
 
-@pytest.mark.skip
+@pytest.mark.slow
 def test_ipcmb_efficiency__with_dcMI(testfolders, ds_alarm_8e3):
     ds = ds_alarm_8e3
     jht_path = testfolders['jht'] / 'jht_{}.pickle'.format(ds.label)
@@ -57,12 +58,16 @@ def test_ipcmb_efficiency__with_dcMI(testfolders, ds_alarm_8e3):
     print()
     targets = range(ds.datasetmatrix.get_column_count('X'))
     for target in targets:
-        mb, _ = run_IPCMB(ds, target, parameters)
+        print('target', target)
+        mb, _, ipcmb = run_IPCMB(ds, target, parameters)
         print('MB({}) = {}'.format(target, mb))
 
+        jht = ipcmb.CITest.JHT
+        parameters['ci_test_jht_preloaded'] = jht
 
 
-@pytest.mark.skip
+
+@pytest.mark.slow
 def test_ipcmb_efficiency__with_dynamic_adtree(testfolders, ds_alarm_8e3):
     ds = ds_alarm_8e3
     LLT = 0
@@ -73,12 +78,15 @@ def test_ipcmb_efficiency__with_dynamic_adtree(testfolders, ds_alarm_8e3):
     print()
     targets = range(ds.datasetmatrix.get_column_count('X'))
     for target in targets:
-        mb, _ = run_IPCMB(ds, target, parameters)
+        print('target', target)
+        mb, _, ipcmb = run_IPCMB(ds, target, parameters)
         print('MB({}) = {}'.format(target, mb))
 
+        adtree = ipcmb.CITest.AD_tree
+        parameters['ci_test_ad_tree_preloaded'] = adtree
 
 
-@pytest.mark.skip
+@pytest.mark.slow
 def test_ipcmb_efficiency__with_adtree(testfolders, ds_alarm_8e3):
     ds = ds_alarm_8e3
     LLT = 0
@@ -89,8 +97,12 @@ def test_ipcmb_efficiency__with_adtree(testfolders, ds_alarm_8e3):
     print()
     targets = range(ds.datasetmatrix.get_column_count('X'))
     for target in targets:
-        mb, _ = run_IPCMB(ds, target, parameters)
+        print('target', target)
+        mb, _, ipcmb = run_IPCMB(ds, target, parameters)
         print('MB({}) = {}'.format(target, mb))
+
+        adtree = ipcmb.CITest.AD_tree
+        parameters['ci_test_ad_tree_preloaded'] = adtree
 
 
 
@@ -106,8 +118,8 @@ def test_ipcmb_correctness__unoptimized(ds_lc_repaired_8e3):
 
     targets = range(ds.datasetmatrix.get_column_count('X'))
     for target in targets:
-        mb, _ = run_IPCMB(ds, target, parameters)
-        mb_dsep, _ = run_IPCMB(ds, target, parameters_dsep)
+        mb, _, _ = run_IPCMB(ds, target, parameters)
+        mb_dsep, _, _ = run_IPCMB(ds, target, parameters_dsep)
         assert mb == mb_dsep
 
 
@@ -125,11 +137,16 @@ def test_ipcmb_correctness__adtree(ds_lc_repaired_8e3, adtree_lc_repaired_8e3_ll
     parameters['ci_test_ad_tree_class'] = mbff.structures.ADTree.ADTree
     parameters_dsep = make_parameters__dsep()
 
+    print()
     targets = range(ds.datasetmatrix.get_column_count('X'))
     for target in targets:
-        mb, _ = run_IPCMB(ds, target, parameters)
-        mb_dsep, _ = run_IPCMB(ds, target, parameters_dsep)
+        mb, _, ipcmb = run_IPCMB(ds, target, parameters)
+        mb_dsep, _, _ = run_IPCMB(ds, target, parameters_dsep)
         assert mb == mb_dsep
+
+        print('target', target)
+        adtree = ipcmb.CITest.AD_tree
+        parameters['ci_test_ad_tree_preloaded'] = adtree
 
 
 
@@ -146,11 +163,16 @@ def test_ipcmb_correctness__dynamic_adtree(ds_lc_repaired_8e3, testfolders):
     parameters['ci_test_ad_tree_class'] = mbff.structures.DynamicADTree.DynamicADTree
     parameters_dsep = make_parameters__dsep()
 
+    print()
     targets = range(ds.datasetmatrix.get_column_count('X'))
     for target in targets:
-        mb, _ = run_IPCMB(ds, target, parameters)
-        mb_dsep, _ = run_IPCMB(ds, target, parameters_dsep)
+        mb, _, ipcmb = run_IPCMB(ds, target, parameters)
+        mb_dsep, _, _ = run_IPCMB(ds, target, parameters_dsep)
         assert mb == mb_dsep
+
+        print('target', target)
+        adtree = ipcmb.CITest.AD_tree
+        parameters['ci_test_ad_tree_preloaded'] = adtree
 
 
 
@@ -167,8 +189,8 @@ def test_ipcmb_correctness__dcmi(ds_lc_repaired_8e3, testfolders):
 
     targets = range(ds.datasetmatrix.get_column_count('X'))
     for target in targets:
-        mb, _ = run_IPCMB(ds, target, parameters)
-        mb_dsep, _ = run_IPCMB(ds, target, parameters_dsep)
+        mb, _, _ = run_IPCMB(ds, target, parameters)
+        mb_dsep, _, _ = run_IPCMB(ds, target, parameters_dsep)
         assert mb == mb_dsep
 
 
@@ -191,8 +213,8 @@ def test_dof_computation_methods__dcmi_vs_adtree(ds_survey_2e3, adtree_survey_2e
 
     targets = range(ds.datasetmatrix.get_column_count('X'))
     for target in targets:
-        mb_dcmi, ci_tests_dcmi = run_IPCMB(ds, target, parameters_dcmi)
-        mb_adtree, ci_tests_adtree = run_IPCMB(ds, target, parameters_adtree)
+        mb_dcmi, ci_tests_dcmi, _ = run_IPCMB(ds, target, parameters_dcmi)
+        mb_adtree, ci_tests_adtree, _ = run_IPCMB(ds, target, parameters_adtree)
 
         assertEqualCITestResults(ci_tests_adtree, ci_tests_dcmi)
         assert mb_dcmi == mb_adtree
@@ -212,8 +234,8 @@ def test_CachedStructuralDoF_vs_StructuralDof_on_G_test__unoptimized(ds_survey_2
 
     targets = range(ds.datasetmatrix.get_column_count('X'))
     for target in targets:
-        mb_sdof, results_sdof = run_IPCMB(ds, target, parameters_sdof)
-        mb_csdof, results_csdof = run_IPCMB(ds, target, parameters_csdof)
+        mb_sdof, results_sdof, _ = run_IPCMB(ds, target, parameters_sdof)
+        mb_csdof, results_csdof, _ = run_IPCMB(ds, target, parameters_csdof)
 
         assertEqualCITestResults(results_sdof, results_csdof)
         assert mb_sdof == mb_csdof
@@ -311,7 +333,7 @@ def run_IPCMB(ds, target, parameters):
     ipcmb = make_IPCMB(ds, target, parameters)
     mb = ipcmb.select_features()
     ci_tests = ipcmb.CITest.ci_test_results
-    return (mb, ci_tests)
+    return (mb, ci_tests, ipcmb)
 
 
 
