@@ -333,9 +333,9 @@ class ADNode:
                 key = [column[row_index, 0]]
                 ct.add_count_to_leaf(columns, key, 1)
         else:
-            # TODO try to optimize this loop
+            submatrix = matrix[:, columns].toarray()
             for row_index in self.row_selection:
-                key = [matrix[row_index, column_index] for column_index in columns]
+                key = submatrix[row_index, :]
                 ct.add_count_to_leaf(columns, key, 1)
         return ct
 
