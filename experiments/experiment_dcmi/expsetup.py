@@ -23,7 +23,7 @@ class CustomExperimentalSetup(util.ExperimentalSetup):
         self.ADTree = None
         self.SampleCountString = None
         self.SampleCount = None
-        self.AllowedDatasetNames = ['alarm', 'pathfinder']
+        self.AllowedDatasetNames = ['alarm', 'pathfinder', 'andes']
         self.AllowedLLTArgument = [0, 5, 10]
         self.DefaultTags = ['unoptimized', 'adtree-llt0', 'adtree-llt5', 'adtree-llt10', 'dcmi']
 

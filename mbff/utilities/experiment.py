@@ -88,7 +88,8 @@ def configure_objects_subparser__exds(subparsers):
     subparser = subparsers.add_parser('exds')
     subparser.add_argument('verb', choices=['show', 'build', 'lock', 'unlock', 'delete'],
                            default='show', nargs='?')
-    subparser.add_argument('--type', type=str, default='')
+    subparser.add_argument('--type', type=str, default='',
+                           help='lock type to use for `lock` and `unlock`')
 
 
 
@@ -97,7 +98,8 @@ def configure_objects_subparser__exp(subparsers):
     subparser.add_argument('verb', choices=['show', 'run', 'lock', 'unlock', 'delete'],
                            default='show', nargs='?')
     subparser.add_argument('--index', type=str, default=None)
-    subparser.add_argument('--type', type=str, default='')
+    subparser.add_argument('--type', type=str, default='',
+                           help='lock type to use for `lock` and `unlock`')
 
 
 
