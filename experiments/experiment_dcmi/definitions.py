@@ -12,7 +12,6 @@ sys.path.insert(0, str(MBFF_PATH))
 
 ################################################################################
 # Create the Experimental Dataset Definition
-
 from mbff.dataset.ExperimentalDatasetDefinition import ExperimentalDatasetDefinition
 from mbff.dataset.ExperimentalDataset import ExperimentalDataset
 from mbff.dataset.sources.SampledBayesianNetworkDatasetSource import SampledBayesianNetworkDatasetSource
@@ -41,7 +40,6 @@ def exds_definition(experimental_setup):
 
 ################################################################################
 # Create the Experiment Definition
-
 from mbff.experiment.ExperimentDefinition import ExperimentDefinition
 from mbff.experiment.ExperimentRun import ExperimentRun
 from mbff.experiment.AlgorithmRun import AlgorithmRun
@@ -50,7 +48,10 @@ from mbff.algorithms.mb.ipcmb import AlgorithmIPCMB
 
 
 def experiment_definition(experimental_setup):
-    experiment_name = 'dcMIEvExpII_{}'.format(experimental_setup.SampleCountString)
+    dataset_name = experimental_setup.DatasetName
+    sample_count_str = experimental_setup.SampleCountString
+
+    experiment_name = 'dcMIEvExpII_{}_{}'.format(dataset_name, sample_count_str)
     experimentDef = ExperimentDefinition(experimental_setup.Paths.ExpRunRepository, experiment_name)
     experimentDef.experiment_run_class = ExperimentRun
     experimentDef.algorithm_run_class = AlgorithmRun
