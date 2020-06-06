@@ -21,15 +21,19 @@ from mbff.dataset.sources.SampledBayesianNetworkDatasetSource import SampledBaye
 def exds_definition(experimental_setup):
     """Argument SampleCountString should be a positive integer in exponential
     notation, e.g. 4e4 or 2e5"""
-    exds_name = 'synthetic_alarm_{}'.format(experimental_setup.SampleCountString)
+
+    dataset_name = experimental_setup.DatasetName
+    sample_count = experimental_setup.SampleCount
+    sample_count_str = experimental_setup.SampleCountString
+    exds_name = 'synthetic_{}_{}'.format(dataset_name, sample_count_str)
 
     exdsDef = ExperimentalDatasetDefinition(experimental_setup.Paths.ExDsRepository, exds_name)
     exdsDef.exds_class = ExperimentalDataset
     exdsDef.source = SampledBayesianNetworkDatasetSource
     exdsDef.source_configuration = {
-        'sourcepath': experimental_setup.Paths.BIFRepository / 'alarm.bif',
-        'sample_count': experimental_setup.SampleCount,
-        'random_seed': 81628965211 + experimental_setup.SampleCount
+        'sourcepath': experimental_setup.Paths.BIFRepository / (dataset_name + '.bif'),
+        'sample_count': sample_count,
+        'random_seed': 81628965211 + sample_count
     }
 
     return exdsDef
