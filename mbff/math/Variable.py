@@ -74,6 +74,7 @@ class JointVariables(Variable):
         self.variables = self.flatten_variables_list(variables)
         self.ID = None
         self.name = '{' + ', '.join([var.name for var in self.variables]) + '}'
+        # TODO get rid of self.variableIDs, and replace with self.ID everywhere?
         self.variableIDs = [var.ID for var in self.variables]
 
         if self.all_variables_have_instances():

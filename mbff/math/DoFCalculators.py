@@ -149,26 +149,24 @@ class CachedStructuralDoF(UnadjustedDoF):
         # JointVariables. If PrZ is the PMF of a single variable, it is skipped
         # from caching.
         if PrXYZ is not None:
-            self.cache_DoFs_for_pmf(PrXYZ, PrXYZ.variable.variableIDs)
+            self.cache_DoFs_for_pmf(PrXYZ)
         if PrXZ is not None:
-            self.cache_DoFs_for_pmf(PrXZ, PrXZ.variable.variableIDs)
+            self.cache_DoFs_for_pmf(PrXZ)
         if PrYZ is not None:
-            self.cache_DoFs_for_pmf(PrYZ, PrYZ.variable.variableIDs)
+            self.cache_DoFs_for_pmf(PrYZ)
 
         # Handle PrZ separately, to check if was instantiated with a single
         # variable (when a JointVariables object is expected).
         if PrZ is not None:
-            ZvariableIDs = None
-            try:
-                ZvariableIDs = PrZ.variable.variableIDs
-            except AttributeError:
-                pass
-
-            if ZvariableIDs is not None:
-                self.cache_DoFs_for_pmf(PrZ, ZvariableIDs)
+            self.cache_DoFs_for_pmf(PrZ)
 
 
-    def cache_DoFs_for_pmf(self, pmf, variables):
+    def cache_DoFs_for_pmf(self, pmf):
+        try:
+            variables = pmf.variable.variableIDs
+        except AttributeError:
+            return
+
         if len(variables) <= 1:
             return
 
