@@ -21,11 +21,11 @@ doc-rebuild: doc-clean doc
 	@notify-send "Make" "Sphinx documentation rebuilt."
 
 test-all: Makefile
-	pytest $(PYTEST_WORKERS) --capture=tee-sys
+	pytest $(PYTEST_WORKERS) --capture=tee-sys -m "not demo"
 	notify-send "Make" "Testing complete."
 
 test: Makefile
-	pytest $(PYTEST_WORKERS) --capture=tee-sys -m "not slow"
+	pytest $(PYTEST_WORKERS) --capture=tee-sys -m "not slow and not demo"
 	notify-send "Make" "Testing complete."
 
 test-clean:
@@ -33,3 +33,7 @@ test-clean:
 
 clean:
 	find -name __pycache__ | xargs rm -rf
+
+demo: Makefile
+	pytest $(PYTEST_WORKERS) --capture=tee-sys -m "demo"
+	notify-send "Make" "Testing complete."

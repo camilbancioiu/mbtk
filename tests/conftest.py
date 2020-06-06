@@ -9,3 +9,8 @@ def pytest_configure(config):
     config.addinivalue_line(
         "markers", "slow: designates slow tests"
     )
+    # register the 'demo' marker
+    config.addinivalue_line(
+        "markers", "demo: designates demonstrative tests, which only showcase \
+            efficiency, and don't actually test anything"
+    )

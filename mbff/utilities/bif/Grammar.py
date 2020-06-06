@@ -2,7 +2,7 @@ bif_grammar = """
 %import common.ESCAPED_STRING
 %import common.LETTER
 %import common.DIGIT
-%import common.DECIMAL
+%import common.NUMBER
 %import common.INT
 %import common.WS
 %ignore WS
@@ -30,7 +30,7 @@ variable_identifier : identifier
 
 variable_list : variable_identifier ("," variable_identifier)*
 variable_value_list : variable_value ("," variable_value)*
-probability_value : DECIMAL
+probability_value : NUMBER
 probabilities_list : probability_value ("," probability_value)*
 
 

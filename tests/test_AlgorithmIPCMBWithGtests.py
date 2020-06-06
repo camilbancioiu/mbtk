@@ -34,7 +34,7 @@ def testfolders():
 
 
 
-@pytest.mark.slow
+@pytest.mark.demo
 def test_ipcmb_efficiency__unoptimized(ds_alarm_8e3):
     ds = ds_alarm_8e3
     parameters = make_parameters__unoptimized(DoFCalculators.StructuralDoF)
@@ -48,7 +48,7 @@ def test_ipcmb_efficiency__unoptimized(ds_alarm_8e3):
 
 
 
-@pytest.mark.slow
+@pytest.mark.demo
 def test_ipcmb_efficiency__with_dcMI(testfolders, ds_alarm_8e3):
     ds = ds_alarm_8e3
     jht_path = testfolders['jht'] / 'jht_{}.pickle'.format(ds.label)
@@ -67,7 +67,7 @@ def test_ipcmb_efficiency__with_dcMI(testfolders, ds_alarm_8e3):
 
 
 
-@pytest.mark.slow
+@pytest.mark.demo
 def test_ipcmb_efficiency__with_dynamic_adtree(testfolders, ds_alarm_8e3):
     ds = ds_alarm_8e3
     LLT = 0
@@ -87,7 +87,7 @@ def test_ipcmb_efficiency__with_dynamic_adtree(testfolders, ds_alarm_8e3):
 
 
 
-@pytest.mark.slow
+@pytest.mark.demo
 def test_ipcmb_efficiency__with_adtree(testfolders, ds_alarm_8e3):
     ds = ds_alarm_8e3
     LLT = 0
@@ -138,14 +138,12 @@ def test_ipcmb_correctness__adtree(ds_lc_repaired_8e3, adtree_lc_repaired_8e3_ll
     parameters['ci_test_ad_tree_class'] = mbff.structures.ADTree.ADTree
     parameters_dsep = make_parameters__dsep()
 
-    print()
     targets = range(ds.datasetmatrix.get_column_count('X'))
     for target in targets:
         mb, _, ipcmb = run_IPCMB(ds, target, parameters)
         mb_dsep, _, _ = run_IPCMB(ds, target, parameters_dsep)
         assert mb == mb_dsep
 
-        print('target', target)
         adtree = ipcmb.CITest.AD_tree
         parameters['ci_test_ad_tree_preloaded'] = adtree
 
@@ -164,14 +162,12 @@ def test_ipcmb_correctness__dynamic_adtree(ds_lc_repaired_8e3, testfolders):
     parameters['ci_test_ad_tree_class'] = mbff.structures.DynamicADTree.DynamicADTree
     parameters_dsep = make_parameters__dsep()
 
-    print()
     targets = range(ds.datasetmatrix.get_column_count('X'))
     for target in targets:
         mb, _, ipcmb = run_IPCMB(ds, target, parameters)
         mb_dsep, _, _ = run_IPCMB(ds, target, parameters_dsep)
         assert mb == mb_dsep
 
-        print('target', target)
         adtree = ipcmb.CITest.AD_tree
         parameters['ci_test_ad_tree_preloaded'] = adtree
 
