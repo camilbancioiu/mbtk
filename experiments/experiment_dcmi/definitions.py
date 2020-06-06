@@ -46,7 +46,7 @@ from mbff.algorithms.mb.ipcmb import AlgorithmIPCMB
 
 
 def experiment_definition(experimental_setup):
-    experiment_name = 'dcMIEvExp_{}'.format(experimental_setup.SampleCountString)
+    experiment_name = 'dcMIEvExpII_{}'.format(experimental_setup.SampleCountString)
     experimentDef = ExperimentDefinition(experimental_setup.Paths.ExpRunRepository, experiment_name)
     experimentDef.experiment_run_class = ExperimentRun
     experimentDef.algorithm_run_class = AlgorithmRun

@@ -32,10 +32,10 @@ def configure_objects_subparser__summary(subparsers):
 
 
 
-def handle_command(experimental_setup):
+def handle_command(arguments, experimental_setup):
     command_handled = False
-    command_object = experimental_setup.Arguments.object
-    command_verb = experimental_setup.Arguments.verb
+    command_object = arguments.object
+    command_verb = arguments.verb
 
     if command_object == 'adtree':
         if command_verb == 'build':

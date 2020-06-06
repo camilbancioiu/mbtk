@@ -28,13 +28,13 @@ def create_algrun_parameters(experimental_setup):
 
     parameters_dsep = create_algrun_parameters__dsep(experimental_setup, default_parameters)
     parameters_unoptimized = create_algrun_parameters__unoptimized(experimental_setup, default_parameters)
-    parameters_adtree = create_algrun_parameters__adtree(experimental_setup, default_parameters)
+    parameters_adtree_static = create_algrun_parameters__adtree_static(experimental_setup, default_parameters)
     parameters_dcmi = create_algrun_parameters__dcmi(experimental_setup, default_parameters)
 
     parameters_list = [] \
         + parameters_dsep \
         + parameters_unoptimized \
-        + parameters_adtree \
+        + parameters_adtree_static \
         + parameters_dcmi
 
     for index, parameters in enumerate(parameters_list):
@@ -111,7 +111,7 @@ def create_algrun_parameters__unoptimized(experimental_setup, default_parameters
 
 
 # Create AlgorithmRun parameters using the G-test optimized with an AD-tree @LLT=0
-def create_algrun_parameters__adtree(experimental_setup, default_parameters):
+def create_algrun_parameters__adtree_static(experimental_setup, default_parameters):
     bayesian_network = default_parameters['source_bayesian_network']
     target_count = len(bayesian_network)
     citrrepo = experimental_setup.Paths.CITestResultRepository
@@ -131,7 +131,7 @@ def create_algrun_parameters__adtree(experimental_setup, default_parameters):
                 'ci_test_ad_tree_llt_argument': llt,
                 'ci_test_ad_tree_path__load': experimental_setup.get_ADTree_path_for_llt_argument(llt),
                 'ci_test_results_path__save': citrrepo / citr_filename,
-                'tags': ['adtree', 'adtree-llt{}'.format(llt), 'fast', 'has_dependencies'],
+                'tags': ['adtree-static', 'adtree-llt{}'.format(llt), 'fast', 'has_dependencies'],
                 'ID': 'run_{index}_T{target}__@LLT={ci_test_ad_tree_llt_argument}',
             }
             parameters.update(default_parameters)

@@ -11,10 +11,27 @@ class ExperimentalPathSet:
 
 
     def __str__(self):
-        output = ''
-        for key in sorted(self.__dict__.keys()):
-            output += '{k:>26}: {v}\n'.format(k=key, v=self.__dict__[key])
-        return output
+        max_name_width = max(map(len, self.__dict__.keys()))
+        format_string = '{key:>' + str(max_name_width) + '}: {path}'
+
+        keys = sorted(self.__dict__.keys())
+        output = []
+        for key in keys:
+            path = self.shorten_path(key)
+            output.append(format_string.format(key=key, path=path))
+        return '\n'.join(output)
+
+
+    def shorten_path(self, key):
+        path = self.__dict__[key]
+        try:
+            path = path.relative_to(self.Root)
+        except ValueError:
+            try:
+                path = path.relative_to(self.Root.parent)
+            except ValueError:
+                pass
+        return path
 
 
 
@@ -100,7 +117,7 @@ def configure_objects_subparser__datapoints(subparsers):
 
 
 
-def handle_command(experimental_setup):
+def handle_command(arguments, experimental_setup):
     command_handled = False
     command_object = experimental_setup.Arguments.object
     command_verb = experimental_setup.Arguments.verb
