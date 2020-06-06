@@ -1,69 +1,65 @@
 #!/usr/bin/env bash
 
-expshell="python3 main.py"
+expshell="py main.py"
 
-function adtrees() {
-  echo "Building AD-tree, pruning 0"
-  $expshell $1 --llt 0 adtree build
+function build_adtrees() {
+    local dataset_name=$1
+    local sample_count=$2
+    local tree_type=$3
+    local experiment=$expshell $dataset_name $sample_count
 
-  echo "Building AD-tree, pruning 5"
-  $expshell $1 --llt 5 adtree build
+    echo "Building AD-tree, pruning 0"
+    $experiment --llt 0 adtree build --type=$tree_type
 
-  echo "Building AD-tree, pruning 10"
-  $expshell $1 --llt 10 adtree build
+    echo "Building AD-tree, pruning 5"
+    $experiment --llt 5 adtree build --type=$tree_type
+
+    echo "Building AD-tree, pruning 10"
+    $experiment --llt 10 adtree build --type=$tree_type
 }
 
 function run_unoptimized() {
-  $expshell $1 exp unlock
-  $expshell $1 --algrun-tag unoptimized --dont-preload-adtree exp run
+    local dataset_name=$1
+    local sample_count=$2
+    local experiment=$expshell $dataset_name $sample_count
+    $experiment exp unlock
+    $experiment --algrun-tag=unoptimized exp run
 }
 
 function run_dcmi() {
-  $expshell $1 exp unlock
-  $expshell $1 --algrun-tag dcmi --dont-preload-adtree exp run
+    local dataset_name=$1
+    local sample_count=$2
+    local experiment=$expshell $dataset_name $sample_count
+    $experiment exp unlock
+    $experiment --algrun-tag=dcmi exp run
 }
 
-function run_adtree() {
-  $expshell $1 exp unlock
-  $expshell $1 --llt $2 --algrun-tag adtree-llt$2 exp run
-}
-
-function run_all_adtree() {
-  run_adtree $1 0
-  run_adtree $1 5
-  run_adtree $1 10
+function run_adtree_static() {
+    local dataset_name=$1
+    local sample_count=$2
+    local experiment=$expshell $dataset_name $sample_count
+    $experiment exp unlock
+    $experiment --llt=$2 --algrun-tag=adtree-static-llt$2 exp run
 }
 
 function fullexperiment() {
-  echo "=========================================="
-  echo "Running full experiment for sample size $1"
+    local dataset_name=$1
+    local sample_count=$2
+    local experiment=$expshell $dataset_name $sample_count
 
-  adtrees $1
+    echo "=========================================="
+    echo "Running full experiment for dataset $dataset_name and sample size $sample_count"
 
-  run_unoptimized $1
+    $experiment exds build
 
-  run_dcmi $1
+    run_unoptimized $dataset_name $sample_count
 
-  run_adtree $1 0
+    run_dcmi $dataset_name $sample_count
 
-  run_adtree $1 5
+    build_adtrees $dataset_name $sample_count "static"
+    run_adtree_static $dataset_name $sample_count 0
+    run_adtree_static $dataset_name $sample_count 5
+    run_adtree_static $dataset_name $sample_count 10
 
-  run_adtree $1 10
+    build_adtrees $dataset_name $sample_count "dynamic"
 }
-
-echo "run_adtree 8e4 5"
-run_adtree 8e4 5
-
-echo "run_adtree 8e4 10"
-run_adtree 8e4 10
-
-$expshell --llt 5  2e3 adtree analyze
-$expshell --llt 10 2e3 adtree analyze
-$expshell --llt 5  8e3 adtree analyze
-$expshell --llt 10 8e3 adtree analyze
-$expshell --llt 5  2e4 adtree analyze
-$expshell --llt 10 2e4 adtree analyze
-$expshell --llt 5  4e4 adtree analyze
-$expshell --llt 10 4e4 adtree analyze
-$expshell --llt 5  8e4 adtree analyze
-$expshell --llt 10 8e4 adtree analyze

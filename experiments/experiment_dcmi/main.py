@@ -76,7 +76,7 @@ if __name__ == '__main__':
         experimental_setup.filter_algruns_by_tag(arguments.algrun_tag)
 
     # By default, the experiment will preload the saved AD-tree, required by
-    # algorithm configurations that require it (tagged with `adtree-static`),
+    # algorithm configurations that require it (tagged with `adtree`),
     # although this only happens if there are such configurations selected for
     # running, after filtering by `algrun_tag`.
     should_preload_adtree = \
@@ -86,7 +86,9 @@ if __name__ == '__main__':
 
     if should_preload_adtree is True:
         if experimental_setup.is_tag_present_in_any_algrun('adtree-static'):
-            experimental_setup.preload_ADTree()
+            experimental_setup.preload_static_ADTree()
+        if experimental_setup.is_tag_present_in_any_algrun('adtree-dynamic'):
+            experimental_setup.preload_dynamic_ADTree()
 
     # Handle the (object, verb) command in the arguments
     command_handled = util.handle_command(arguments, experimental_setup)

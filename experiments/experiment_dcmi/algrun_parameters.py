@@ -11,6 +11,9 @@ MBFF_PATH = EXPERIMENTS_ROOT.parents[0]
 sys.path.insert(0, str(MBFF_PATH))
 
 
+import mbff.structures.ADTree
+import mbff.structures.DynamicADTree
+
 import mbff.math.DSeparationCITest
 import mbff.math.G_test__with_AD_tree
 import mbff.math.G_test__unoptimized
@@ -29,13 +32,15 @@ def create_algrun_parameters(experimental_setup):
 
     parameters_dsep = create_algrun_parameters__dsep(experimental_setup, default_parameters)
     parameters_unoptimized = create_algrun_parameters__unoptimized(experimental_setup, default_parameters)
-    parameters_adtree_static = create_algrun_parameters__adtree_static(experimental_setup, default_parameters)
+    parameters_adtree_static = create_algrun_parameters__adtree(experimental_setup, default_parameters, 'static')
+    parameters_adtree_dynamic = create_algrun_parameters__adtree(experimental_setup, default_parameters, 'dynamic')
     parameters_dcmi = create_algrun_parameters__dcmi(experimental_setup, default_parameters)
 
     parameters_list = [] \
         + parameters_dsep \
         + parameters_unoptimized \
         + parameters_adtree_static \
+        + parameters_adtree_dynamic \
         + parameters_dcmi
 
     for index, parameters in enumerate(parameters_list):
@@ -132,8 +137,8 @@ def create_algrun_parameters__unoptimized(experimental_setup, default_parameters
     return parameters_list
 
 
-# Create AlgorithmRun parameters using the G-test optimized with an AD-tree @LLT=0
-def create_algrun_parameters__adtree_static(experimental_setup, default_parameters):
+# Create AlgorithmRun parameters using the G-test optimized with an AD-tree
+def create_algrun_parameters__adtree(experimental_setup, default_parameters, tree_type):
     bayesian_network = default_parameters['source_bayesian_network']
     target_count = len(bayesian_network)
     citrrepo = experimental_setup.Paths.CITestResultRepository
@@ -141,20 +146,30 @@ def create_algrun_parameters__adtree_static(experimental_setup, default_paramete
     dof__structural = mbff.math.DoFCalculators.StructuralDoF
     exds_name = experimental_setup.ExDsDef.name
 
+    ADTreeClass = None
+    if tree_type == 'static':
+        ADTreeClass = mbff.structures.ADTree.ADTree
+    if tree_type == 'dynamic':
+        ADTreeClass = mbff.structures.DynamicADTree.DynamicADTree
+
     parameters_list = list()
     for target in range(target_count):
-        for llt in experimental_setup.AllowedLLTArgument:
-            citr_filename = 'ci_test_results_{}_T{}_ADtree_LLT{}.pickle'.format(exds_name, target, llt)
+        for llt in experimental_setup.AllowedLLTArguments:
+            citr_filename = 'ci_test_results_{}_T{}_ADtree_static_LLT{}.pickle'.format(exds_name, target, llt)
+            tag_adtree_type = 'adtree-{}'.format(tree_type)
+            tag_adtree_type_llt = 'adtree-{}-llt{}'.format(tree_type, llt)
             parameters = {
                 'target': target,
                 'ci_test_class': g_test__adtree,
                 'ci_test_dof_calculator_class': dof__structural,
-                'ci_test_ad_tree_leaf_list_threshold': experimental_setup.calculate_absolute_LLT_from_llt_argument(llt),
+                'ci_test_ad_tree_class': ADTreeClass,
+                'ci_test_ad_tree_type': tree_type,
+                'ci_test_ad_tree_leaf_list_threshold': experimental_setup.calculate_absolute_LLT(llt),
                 'ci_test_ad_tree_llt_argument': llt,
-                'ci_test_ad_tree_path__load': experimental_setup.get_ADTree_path_for_llt_argument(llt),
+                'ci_test_ad_tree_path__load': experimental_setup.get_ADTree_path(tree_type, llt),
                 'ci_test_results_path__save': citrrepo / citr_filename,
-                'tags': ['adtree-static', 'adtree-llt{}'.format(llt), 'fast', 'has_dependencies'],
-                'ID': 'run_{index}_T{target}__@LLT={ci_test_ad_tree_llt_argument}',
+                'tags': ['adtree', tag_adtree_type, tag_adtree_type_llt, 'fast', 'has_dependencies'],
+                'ID': 'run_{index}_T{target}__adtree_{ci_test_ad_tree_type}_@LLT={ci_test_ad_tree_llt_argument}',
             }
             parameters.update(default_parameters)
             parameters_list.append(parameters)

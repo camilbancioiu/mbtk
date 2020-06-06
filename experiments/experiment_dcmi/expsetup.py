@@ -20,11 +20,12 @@ class CustomExperimentalSetup(util.ExperimentalSetup):
         self.Omega = None
         self.CITest_Significance = None
         self.LLT = None
-        self.ADTree = None
+        self.ADTreeStatic = None
+        self.ADTreeDynamic = None
         self.SampleCountString = None
         self.SampleCount = None
         self.AllowedDatasetNames = ['alarm', 'pathfinder', 'andes']
-        self.AllowedLLTArgument = [0, 5, 10]
+        self.AllowedLLTArguments = [0, 5, 10]
         self.DefaultTags = ['unoptimized', 'adtree-llt0', 'adtree-llt5', 'adtree-llt10', 'dcmi']
 
 
@@ -35,51 +36,62 @@ class CustomExperimentalSetup(util.ExperimentalSetup):
         self.DatasetName = self.Arguments.dataset_name
         self.SampleCountString = self.Arguments.sample_count
         self.SampleCount = int(float(self.SampleCountString))
-
         self.LLTArgument = self.Arguments.llt
-        self.LLT = self.calculate_absolute_LLT_from_llt_argument(self.LLTArgument)
-
+        self.LLT = self.calculate_absolute_LLT(self.LLTArgument)
         self.Omega = mbff.math.Variable.Omega(self.SampleCount)
 
 
-    def calculate_absolute_LLT_from_llt_argument(self, llt):
+    def calculate_absolute_LLT(self, llt):
         return int(self.SampleCount * llt / 1000)
 
 
     def update_paths(self):
         super().update_paths()
         self.Paths.ADTreeRepository = self.Paths.Experiment / 'adtrees'
-        self.Paths.JHTRepository = self.Paths.Experiment / 'jht'
-        self.Paths.CITestResultRepository = self.Paths.Experiment / 'ci_test_results'
-        self.Paths.DoFCacheRepository = self.Paths.Experiment / 'dof_cache'
-
         self.Paths.ADTreeRepository.mkdir(parents=True, exist_ok=True)
+
+        self.Paths.JHTRepository = self.Paths.Experiment / 'jht'
         self.Paths.JHTRepository.mkdir(parents=True, exist_ok=True)
-        self.Paths.CITestResultRepository.mkdir(parents=True, exist_ok=True)
+
+        self.Paths.DoFCacheRepository = self.Paths.Experiment / 'dof_cache'
         self.Paths.DoFCacheRepository.mkdir(parents=True, exist_ok=True)
 
-        self.Paths.ADTree = self.get_ADTree_path_for_llt_argument(self.LLTArgument)
+        self.Paths.CITestResultRepository = self.Paths.Experiment / 'ci_test_results'
+        self.Paths.CITestResultRepository.mkdir(parents=True, exist_ok=True)
+
+        self.Paths.ADTreeStatic = self.get_ADTree_path('static', self.LLTArgument)
+        self.Paths.ADTreeDynamic = self.get_ADTree_path('dynamic', self.LLTArgument)
 
 
-    def get_ADTree_path_for_llt_argument(self, llt):
-        adtree_filename = 'adtree_{}_llt{}.pickle'.format(self.ExDsDef.name, llt)
+    def get_ADTree_path(self, tree_type, llt):
+        adtree_filename = 'adtree_{}_llt{}.pickle'.format(tree_type, llt)
         return self.Paths.ADTreeRepository / adtree_filename
 
 
-    def preload_ADTree(self):
+    def preload_static_ADTree(self):
         import gc
-        print('Starting AD-tree preloading...')
-        with self.Paths.ADTree.open('rb') as f:
-            self.ADTree = pickle.load(f)
+        print('Starting static AD-tree preloading...')
+        with self.Paths.ADTreeStatic.open('rb') as f:
+            self.ADTreeStatic = pickle.load(f)
         gc.collect()
-        print('AD-tree preloading complete.')
-        self.set_preloaded_ADTree_to_relevant_algrun_parameters()
+        print('Static AD-tree preloading complete.')
+        self.set_preloaded_ADTree_to_algrun_parameters('adtree-static', self.ADTreeStatic)
 
 
-    def set_preloaded_ADTree_to_relevant_algrun_parameters(self):
+    def preload_dynamic_ADTree(self):
+        import gc
+        print('Starting dynamic AD-tree preloading...')
+        with self.Paths.ADTreeDynamic.open('rb') as f:
+            self.ADTreeDynamic = pickle.load(f)
+        gc.collect()
+        print('Dynamic AD-tree preloading complete.')
+        self.set_preloaded_ADTree_to_algrun_parameters('adtree-dynamic', self.ADTreeDynamic)
+
+
+    def set_preloaded_ADTree_to_algrun_parameters(self, tag, tree):
         for parameters in self.AlgorithmRunParameters:
-            if 'adtree' in parameters['tags']:
-                parameters['ci_test_ad_tree_preloaded'] = self.ADTree
+            if tag in parameters['tags']:
+                parameters['ci_test_ad_tree_preloaded'] = tree
                 del parameters['ci_test_ad_tree_path__load']
 
 
@@ -103,5 +115,5 @@ class CustomExperimentalSetup(util.ExperimentalSetup):
 
 
     def validate_llt(self, llt):
-        if llt not in self.AllowedLLTArgument:
-            raise ValueError('Allowed values for the --llt argument are {}'.format(self.AllowedLLTArgument))
+        if llt not in self.AllowedLLTArguments:
+            raise ValueError('Allowed values for the --llt argument are {}'.format(self.AllowedLLTArguments))
