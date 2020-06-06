@@ -148,24 +148,12 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
             PrZ = self.AD_tree.make_pmf(Z)
             (PrXYcZ, PrXYZ) = self.make_cpmf_PrXYcZ(X, Y, Z, PrZ)
             (PrXcZ, PrXZ) = self.make_cpmf_PrXcZ(X, Z, PrZ)
-            (PrYcZ, PrYZ) = self.make_cpmf_PrYcZ(Y, Z, PrZ)
+            (PrYcZ, PrYZ) = self.make_cpmf_PrXcZ(Y, Z, PrZ)
 
             if self.DoF_calculator.requires_pmfs:
                 self.DoF_calculator.set_context_pmfs(PrXYZ, PrXZ, PrYZ, PrZ)
 
         return (PrXYcZ, PrXcZ, PrYcZ, PrZ)
-
-
-    def make_omega_cpmf_from_pmf(self, pmf):
-        cpmf = CPMF(None, None)
-        cpmf.conditional_probabilities[1] = pmf
-        return cpmf
-
-
-    def make_omega_pmf(self):
-        pmf = PMF(None)
-        pmf.probabilities[1] = 1.0
-        return pmf
 
 
     def make_cpmf_PrXYcZ(self, X, Y, Z, PrZ=None):
@@ -226,7 +214,3 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
                 pass
 
         return (PrXcZ, PrXZ)
-
-
-    def make_cpmf_PrYcZ(self, Y, Z, PrZ=None):
-        return self.make_cpmf_PrXcZ(Y, Z, PrZ)

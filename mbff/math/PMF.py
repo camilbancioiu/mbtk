@@ -1,6 +1,7 @@
 import itertools
 from collections import Counter
 from mbff.utilities import functions as util
+import numpy
 
 
 class PMF:
@@ -74,8 +75,10 @@ class PMF:
 
 
     def count_values(self):
-        counter = Counter(self.variable.instances())
-        return counter
+        instances = self.variable.instances()
+        if isinstance(instances, numpy.ndarray):
+            return dict(zip(*numpy.unique(instances, return_counts=True)))
+        return Counter(instances)
 
 
     def normalize_counts(self, update_probabilities=False):
@@ -140,8 +143,12 @@ class PMF:
 
 class CPMF(PMF):
 
-    def __init__(self, variable, given):
-        super().__init__(variable)
+    def __init__(self, variable, given, initpmf=True):
+        if initpmf:
+            super().__init__(variable)
+        else:
+            self.tolerance_pdiff = 1e-10
+            self.variable = variable
         self.conditional_probabilities = dict()
         self.tolerance_pdiff = 1e-10
 
@@ -189,10 +196,17 @@ class CPMF(PMF):
         conditional_counts = {}
         for (v, cv) in zip(self.variable.instances(), self.conditioning_variable.instances()):
             try:
-                conditional_counts[cv].count_instance(v)
+                pmf = conditional_counts[cv]
             except KeyError:
-                conditional_counts[cv] = PMF(None)
-                conditional_counts[cv].count_instance(v)
+                pmf = PMF(None)
+                conditional_counts[cv] = pmf
+            # Avoiding the call to pmf.count_instance() for efficiency,
+            # inlining it here instead.
+            try:
+                pmf.value_counts[v] += 1
+            except KeyError:
+                pmf.value_counts[v] = 1
+            pmf.total_count += 1
         return conditional_counts
 
 
