@@ -4,7 +4,7 @@ import mbff.math.Variable
 import mbff.utilities.experiment as util
 
 
-class CustomExperimentalPathSet(util.ExperimentalPathSet):
+class DCMIEvExpPathSet(util.ExperimentalPathSet):
 
     def __init__(self, root):
         super().__init__(root)
@@ -12,7 +12,7 @@ class CustomExperimentalPathSet(util.ExperimentalPathSet):
 
 
 
-class CustomExperimentalSetup(util.ExperimentalSetup):
+class DCMIEvExpSetup(util.ExperimentalSetup):
 
     def __init__(self):
         super().__init__()

@@ -58,10 +58,10 @@ if __name__ == '__main__':
     arguments = argparser.parse_args()
 
     # Create the experimental setup, based on CLI arguments
-    experimental_setup = expsetup.CustomExperimentalSetup()
+    experimental_setup = expsetup.DCMIEvExpSetup()
     experimental_setup.set_arguments(arguments)
     experimental_setup.CITest_Significance = 0.95
-    experimental_setup.Paths = expsetup.CustomExperimentalPathSet(EXPERIMENTS_ROOT)
+    experimental_setup.Paths = expsetup.DCMIEvExpPathSet(EXPERIMENTS_ROOT)
     experimental_setup.ExDsDef = definitions.exds_definition(experimental_setup)
     experimental_setup.ExperimentDef = definitions.experiment_definition(experimental_setup)
     experimental_setup.update_paths()
