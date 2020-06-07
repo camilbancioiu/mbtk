@@ -13,7 +13,7 @@ def configure_objects_subparser__adtree(subparsers):
                            choices=['build', 'analyze', 'print-analysis',
                                     'test-load', 'update'],
                            default='print-analysis', nargs='?')
-    subparser.add_argument('--type',
+    subparser.add_argument('--tree-type',
                            choices=['static', 'dynamic'],
                            type=str, action='store')
 
@@ -81,8 +81,8 @@ def command_adtree_build(experimental_setup):
     else:
         exds.build()
 
-    tree_type = experimental_setup.Arguments.type
-    adtree_save_path = experimental_setup.get_ADTree_path_by_type()
+    tree_type = experimental_setup.Arguments.tree_type
+    adtree_save_path = experimental_setup.get_ADTree_path()
     ADTreeClass = None
     if tree_type == 'static':
         ADTreeClass = mbff.structures.ADTree.ADTree
@@ -118,8 +118,8 @@ def command_adtree_build_analysis(experimental_setup):
     analysis_path = experimental_setup.ExperimentDef.path / 'adtree_analysis'
     analysis_path.mkdir(parents=True, exist_ok=True)
 
-    tree_type = experimental_setup.Arguments.type
-    tree_path = experimental_setup.get_ADTree_path_by_type()
+    tree_type = experimental_setup.Arguments.tree_type
+    tree_path = experimental_setup.get_ADTree_path()
 
     tree_analysis_path = analysis_path / tree_path.name
     with tree_path.open('rb') as f:
@@ -148,7 +148,7 @@ def command_adtree_build_analysis(experimental_setup):
 def command_adtree_print_analysis(experimental_setup):
     analysis_path = experimental_setup.ExperimentDef.path / 'adtree_analysis'
 
-    tree_path = experimental_setup.get_ADTree_path_by_type()
+    tree_path = experimental_setup.get_ADTree_path()
     tree_analysis_path = analysis_path / tree_path.name
     with tree_analysis_path.open('rb') as f:
         analysis = pickle.load(f)

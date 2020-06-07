@@ -20,8 +20,6 @@ class DCMIEvExpSetup(util.ExperimentalSetup):
         self.Omega = None
         self.CITest_Significance = None
         self.LLT = None
-        self.ADTreeStatic = None
-        self.ADTreeDynamic = None
         self.SampleCountString = None
         self.SampleCount = None
         self.AllowedDatasetNames = ['alarm', 'pathfinder', 'andes']
@@ -59,21 +57,14 @@ class DCMIEvExpSetup(util.ExperimentalSetup):
         self.Paths.CITestResultRepository = self.Paths.Experiment / 'ci_test_results'
         self.Paths.CITestResultRepository.mkdir(parents=True, exist_ok=True)
 
-        self.Paths.ADTreeStatic = self.get_ADTree_path('static', self.LLTArgument)
-        self.Paths.ADTreeDynamic = self.get_ADTree_path('dynamic', self.LLTArgument)
 
-
-    def get_ADTree_path(self, tree_type, llt):
+    def get_ADTree_path(self, tree_type=None, llt=None):
+        if tree_type is None:
+            tree_type = self.Arguments.tree_type
+        if llt is None:
+            llt = self.LLTArgument
         adtree_filename = 'adtree_{}_llt{}.pickle'.format(tree_type, llt)
         return self.Paths.ADTreeRepository / adtree_filename
-
-
-    def get_ADTree_path_by_type(self):
-        tree_type = self.Arguments.type
-        if tree_type == 'static':
-            return self.Paths.ADTreeStatic
-        if tree_type == 'dynamic':
-            return self.Paths.ADTreeDynamic
 
 
     def preload_static_ADTree(self):
