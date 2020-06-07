@@ -61,6 +61,23 @@ class DCMIEvExpSetup(util.ExperimentalSetup):
         return self.Paths.ADTreeRepository / adtree_filename
 
 
+    def preload_ADTrees(self):
+        preloaded_adtrees = dict()
+        for parameters in self.AlgorithmRunParameters:
+            if 'adtree' in parameters['tags']:
+                tree_path = parameters.get('ci_test_ad_tree_path__load', None)
+                if tree_path is not None:
+                    adtree = None
+                    try:
+                        adtree = preloaded_adtrees[tree_path]
+                    except KeyError:
+                        with tree_path.open('rb') as f:
+                            adtree = pickle.load(f)
+                        preloaded_adtrees[tree_path] = adtree
+                    parameters['ci_test_ad_tree_preloaded'] = adtree
+                    del parameters['ci_test_ad_tree_path__load']
+
+
     def preload_static_ADTree(self):
         import gc
         print('Starting static AD-tree preloading...')

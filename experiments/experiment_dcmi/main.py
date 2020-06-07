@@ -22,9 +22,8 @@ def create_argparser(expsetup):
     argparser = argparse.ArgumentParser()
 
     # Primary arguments, which must be provided before an 'object' argument
-    argparser.add_argument('--dont-preload-adtree', action='store_true')
+    argparser.add_argument('--preload-adtrees', type=bool, default=True)
     argparser.add_argument('--algrun-tag', type=str, default=None, nargs='?')
-
     argparser.add_argument('dataset_name', type=str, default=None,
                            choices=expsetup.AllowedDatasetNames)
     argparser.add_argument('sample_count', type=str, default=None)
@@ -84,13 +83,10 @@ if __name__ == '__main__':
     should_preload_adtree = \
         arguments.object == 'exp' \
         and arguments.verb == 'run' \
-        and not arguments.dont_preload_adtree
+        and arguments.preload_adtrees
 
     if should_preload_adtree is True:
-        if experimental_setup.is_tag_present_in_any_algrun('adtree-static'):
-            experimental_setup.preload_static_ADTree()
-        if experimental_setup.is_tag_present_in_any_algrun('adtree-dynamic'):
-            experimental_setup.preload_dynamic_ADTree()
+        experimental_setup.preload_ADTrees()
 
     # Handle the (object, verb) command in the arguments
     command_handled = util.handle_command(arguments, experimental_setup)
