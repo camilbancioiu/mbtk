@@ -58,10 +58,12 @@ function fullexperiment() {
 
     run_dcmi $dataset_name $sample_count
 
-    build_adtrees $dataset_name $sample_count static
-    run_adtree $dataset_name $sample_count static 0
-    run_adtree $dataset_name $sample_count static 5
-    run_adtree $dataset_name $sample_count static 10
+    if [ "$dataset_name" == "alarm" ]; then
+        build_adtrees $dataset_name $sample_count static
+        run_adtree $dataset_name $sample_count static 0
+        run_adtree $dataset_name $sample_count static 5
+        run_adtree $dataset_name $sample_count static 10
+    fi
 
     build_adtrees $dataset_name $sample_count dynamic
     run_adtree $dataset_name $sample_count dynamic 0
