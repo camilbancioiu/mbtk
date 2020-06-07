@@ -19,11 +19,11 @@ class DCMIEvExpSetup(util.ExperimentalSetup):
         self.DatasetName = None
         self.Omega = None
         self.CITest_Significance = None
-        self.LLT = None
         self.SampleCountString = None
         self.SampleCount = None
         self.AllowedDatasetNames = ['alarm', 'pathfinder', 'andes']
-        self.AllowedLLTArguments = [0, 5, 10]
+        self.AllowedADTreeTypes = ['static', 'dynamic']
+        self.AllowedLLT = [0, 5, 10]
         self.DefaultTags = ['unoptimized', 'adtree-llt0', 'adtree-llt5', 'adtree-llt10', 'dcmi']
 
 
@@ -34,13 +34,11 @@ class DCMIEvExpSetup(util.ExperimentalSetup):
         self.DatasetName = self.Arguments.dataset_name
         self.SampleCountString = self.Arguments.sample_count
         self.SampleCount = int(float(self.SampleCountString))
-        self.LLTArgument = self.Arguments.llt
-        self.LLT = self.calculate_absolute_LLT(self.LLTArgument)
         self.Omega = mbff.math.Variable.Omega(self.SampleCount)
 
 
     def calculate_absolute_LLT(self, llt):
-        return int(self.SampleCount * llt / 1000)
+        return int(self.SampleCount * int(llt) / 1000)
 
 
     def update_paths(self):
@@ -58,11 +56,7 @@ class DCMIEvExpSetup(util.ExperimentalSetup):
         self.Paths.CITestResultRepository.mkdir(parents=True, exist_ok=True)
 
 
-    def get_ADTree_path(self, tree_type=None, llt=None):
-        if tree_type is None:
-            tree_type = self.Arguments.tree_type
-        if llt is None:
-            llt = self.LLTArgument
+    def get_ADTree_path(self, tree_type, llt):
         adtree_filename = 'adtree_{}_llt{}.pickle'.format(tree_type, llt)
         return self.Paths.ADTreeRepository / adtree_filename
 
@@ -97,7 +91,6 @@ class DCMIEvExpSetup(util.ExperimentalSetup):
     def validate_arguments(self, arguments):
         self.validate_dataset_name(arguments.dataset_name)
         self.validate_sample_count_string(arguments.sample_count)
-        self.validate_llt(arguments.llt)
 
 
     def validate_dataset_name(self, dataset_name):
@@ -111,8 +104,3 @@ class DCMIEvExpSetup(util.ExperimentalSetup):
         result = validation_regex.match(sample_count_string)
         if result is None:
             raise ValueError("Incorrect format for sample count. E.g. 3e5.")
-
-
-    def validate_llt(self, llt):
-        if llt not in self.AllowedLLTArguments:
-            raise ValueError('Allowed values for the --llt argument are {}'.format(self.AllowedLLTArguments))

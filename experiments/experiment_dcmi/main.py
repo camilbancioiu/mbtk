@@ -18,15 +18,15 @@ import definitions
 import algrun_parameters
 
 
-def create_argparser():
+def create_argparser(expsetup):
     argparser = argparse.ArgumentParser()
 
     # Primary arguments, which must be provided before an 'object' argument
     argparser.add_argument('--dont-preload-adtree', action='store_true')
     argparser.add_argument('--algrun-tag', type=str, default=None, nargs='?')
-    argparser.add_argument('--llt', type=int, default=0, nargs='?')
 
-    argparser.add_argument('dataset_name', type=str, default=None)
+    argparser.add_argument('dataset_name', type=str, default=None,
+                           choices=expsetup.AllowedDatasetNames)
     argparser.add_argument('sample_count', type=str, default=None)
 
     object_subparsers = argparser.add_subparsers(dest='object')
@@ -42,7 +42,7 @@ def create_argparser():
     util.configure_objects_subparser__datapoints(object_subparsers)
 
     # Custom commands, specific to the dcMI experiment
-    commands.configure_objects_subparser__adtree(object_subparsers)
+    commands.configure_objects_subparser__adtree(object_subparsers, experimental_setup)
     commands.configure_objects_subparser__plot(object_subparsers)
     commands.configure_objects_subparser__summary(object_subparsers)
 
@@ -53,12 +53,14 @@ def create_argparser():
 # Command-line interface
 if __name__ == '__main__':
 
+    # Instantiate the experimental setup
+    experimental_setup = expsetup.DCMIEvExpSetup()
+
     # Parse CLI arguments
-    argparser = create_argparser()
+    argparser = create_argparser(experimental_setup)
     arguments = argparser.parse_args()
 
-    # Create the experimental setup, based on CLI arguments
-    experimental_setup = expsetup.DCMIEvExpSetup()
+    # Configure the experimental setup based on the CLI arguments
     experimental_setup.set_arguments(arguments)
     experimental_setup.CITest_Significance = 0.95
     experimental_setup.Paths = expsetup.DCMIEvExpPathSet(EXPERIMENTS_ROOT)

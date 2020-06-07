@@ -7,14 +7,17 @@ from operator import attrgetter
 import mbff.math.G_test__with_AD_tree
 
 
-def configure_objects_subparser__adtree(subparsers):
+def configure_objects_subparser__adtree(subparsers, expsetup):
     subparser = subparsers.add_parser('adtree')
     subparser.add_argument('verb',
                            choices=['build', 'analyze', 'print-analysis',
                                     'test-load', 'update'],
                            default='print-analysis', nargs='?')
     subparser.add_argument('--tree-type',
-                           choices=['static', 'dynamic'],
+                           choices=expsetup.AllowedADTreeTypes,
+                           type=str, action='store')
+    subparser.add_argument('--llt',
+                           choices=expsetup.AllowedLLT,
                            type=str, action='store')
 
 
@@ -82,7 +85,10 @@ def command_adtree_build(experimental_setup):
         exds.build()
 
     tree_type = experimental_setup.Arguments.tree_type
-    adtree_save_path = experimental_setup.get_ADTree_path()
+    llt = experimental_setup.Arguments.llt
+    absolute_llt = experimental_setup.calculate_absolute_LLT(llt)
+
+    adtree_save_path = experimental_setup.get_ADTree_path(tree_type, llt)
     ADTreeClass = None
     if tree_type == 'static':
         ADTreeClass = mbff.structures.ADTree.ADTree
@@ -96,14 +102,11 @@ def command_adtree_build(experimental_setup):
     column_values = exds.matrix.get_values_per_column('X')
     start_time = time.time()
 
-    try:
-        adtree = ADTreeClass(matrix, column_values, experimental_setup.LLT, debug=2)
-    except TypeError:
-        adtree = ADTreeClass(matrix, column_values, experimental_setup.LLT)
+    adtree = ADTreeClass(matrix, column_values, absolute_llt)
 
     duration = time.time() - start_time
     print("AD-tree ({}) with LLT={} built in {:>10.4f}s".format(
-        tree_type, experimental_setup.LLTArgument, duration))
+        tree_type, llt, duration))
 
     if adtree_save_path is not None:
         with adtree_save_path.open('wb') as f:
@@ -119,7 +122,8 @@ def command_adtree_build_analysis(experimental_setup):
     analysis_path.mkdir(parents=True, exist_ok=True)
 
     tree_type = experimental_setup.Arguments.tree_type
-    tree_path = experimental_setup.get_ADTree_path()
+    llt = experimental_setup.Arguments.llt
+    tree_path = experimental_setup.get_ADTree_path(tree_type, llt)
 
     tree_analysis_path = analysis_path / tree_path.name
     with tree_path.open('rb') as f:
@@ -148,7 +152,9 @@ def command_adtree_build_analysis(experimental_setup):
 def command_adtree_print_analysis(experimental_setup):
     analysis_path = experimental_setup.ExperimentDef.path / 'adtree_analysis'
 
-    tree_path = experimental_setup.get_ADTree_path()
+    tree_type = experimental_setup.Arguments.tree_type
+    llt = experimental_setup.Arguments.llt
+    tree_path = experimental_setup.get_ADTree_path(tree_type, llt)
     tree_analysis_path = analysis_path / tree_path.name
     with tree_analysis_path.open('rb') as f:
         analysis = pickle.load(f)
