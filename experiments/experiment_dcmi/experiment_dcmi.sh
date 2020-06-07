@@ -9,13 +9,13 @@ function build_adtrees() {
     local experiment=$expshell $dataset_name $sample_count
 
     echo "Building AD-tree, pruning 0"
-    $experiment --llt 0 adtree build --type=$tree_type
+    $experiment adtree build --tree-type=$tree_type --llt=0
 
     echo "Building AD-tree, pruning 5"
-    $experiment --llt 5 adtree build --type=$tree_type
+    $experiment --llt 5 adtree build --tree-type=$tree_type --llt=5
 
     echo "Building AD-tree, pruning 10"
-    $experiment --llt 10 adtree build --type=$tree_type
+    $experiment --llt 10 adtree build --tree-type=$tree_type --llt=10
 }
 
 function run_unoptimized() {
@@ -34,12 +34,14 @@ function run_dcmi() {
     $experiment --algrun-tag=dcmi exp run
 }
 
-function run_adtree_static() {
+function run_adtree() {
     local dataset_name=$1
     local sample_count=$2
+    local tree_type=$3
+    local llt=$4
     local experiment=$expshell $dataset_name $sample_count
     $experiment exp unlock
-    $experiment --llt=$2 --algrun-tag=adtree-static-llt$2 exp run
+    $experiment --algrun-tag="adtree-$tree_type-llt$llt" exp run
 }
 
 function fullexperiment() {
@@ -56,10 +58,13 @@ function fullexperiment() {
 
     run_dcmi $dataset_name $sample_count
 
-    build_adtrees $dataset_name $sample_count "static"
-    run_adtree_static $dataset_name $sample_count 0
-    run_adtree_static $dataset_name $sample_count 5
-    run_adtree_static $dataset_name $sample_count 10
+    build_adtrees $dataset_name $sample_count static
+    run_adtree $dataset_name $sample_count static 0
+    run_adtree $dataset_name $sample_count static 5
+    run_adtree $dataset_name $sample_count static 10
 
-    build_adtrees $dataset_name $sample_count "dynamic"
+    build_adtrees $dataset_name $sample_count dynamic
+    run_adtree $dataset_name $sample_count dynamic 0
+    run_adtree $dataset_name $sample_count dynamic 5
+    run_adtree $dataset_name $sample_count dynamic 10
 }
