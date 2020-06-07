@@ -10,15 +10,15 @@ import mbff.math.G_test__with_AD_tree
 def configure_objects_subparser__adtree(subparsers, expsetup):
     subparser = subparsers.add_parser('adtree')
     subparser.add_argument('verb',
-                           choices=['build', 'analyze', 'print-analysis',
+                           choices=['show', 'build', 'analyze', 'print-analysis',
                                     'test-load', 'update'],
-                           default='print-analysis', nargs='?')
+                           default='show', nargs='?')
     subparser.add_argument('--tree-type',
                            choices=expsetup.AllowedADTreeTypes,
-                           type=str, action='store')
+                           type=str, action='store', default=None)
     subparser.add_argument('--llt',
                            choices=expsetup.AllowedLLT,
-                           type=str, action='store')
+                           type=str, action='store', default=None)
 
 
 
@@ -47,7 +47,9 @@ def handle_command(arguments, experimental_setup):
     command_verb = arguments.verb
 
     if command_object == 'adtree':
-        if command_verb == 'build':
+        if command_verb == 'show':
+            command_adtree_show(experimental_setup)
+        elif command_verb == 'build':
             command_adtree_build(experimental_setup)
             command_handled = True
         elif command_verb == 'analyze':
@@ -77,6 +79,13 @@ def handle_command(arguments, experimental_setup):
 
 
 
+def command_adtree_show(experimental_setup):
+    adtree_repo = experimental_setup.Paths.ADTreeRepository
+    for adtree_file in adtree_repo.iterdir():
+        print(adtree_file.name)
+
+
+
 def command_adtree_build(experimental_setup):
     exds = experimental_setup.ExDsDef.create_exds()
     if experimental_setup.ExDsDef.exds_ready():
@@ -85,7 +94,13 @@ def command_adtree_build(experimental_setup):
         exds.build()
 
     tree_type = experimental_setup.Arguments.tree_type
+    if tree_type is None:
+        raise ValueError('AD-tree type must be provided (one of {})'.format(
+            experimental_setup.AllowedADTreeTypes))
     llt = experimental_setup.Arguments.llt
+    if llt is None:
+        raise ValueError('LLT must be provided (one of {})'.format(
+            experimental_setup.AllowedLLT))
     absolute_llt = experimental_setup.calculate_absolute_LLT(llt)
 
     adtree_save_path = experimental_setup.get_ADTree_path(tree_type, llt)

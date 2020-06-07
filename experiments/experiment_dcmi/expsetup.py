@@ -23,7 +23,7 @@ class DCMIEvExpSetup(util.ExperimentalSetup):
         self.SampleCount = None
         self.AllowedDatasetNames = ['alarm', 'pathfinder', 'andes']
         self.AllowedADTreeTypes = ['static', 'dynamic']
-        self.AllowedLLT = [0, 5, 10]
+        self.AllowedLLT = ['0', '5', '10']
         self.DefaultTags = ['unoptimized', 'adtree-llt0', 'adtree-llt5', 'adtree-llt10', 'dcmi']
 
 
@@ -76,33 +76,6 @@ class DCMIEvExpSetup(util.ExperimentalSetup):
                         preloaded_adtrees[tree_path] = adtree
                     parameters['ci_test_ad_tree_preloaded'] = adtree
                     del parameters['ci_test_ad_tree_path__load']
-
-
-    def preload_static_ADTree(self):
-        import gc
-        print('Starting static AD-tree preloading...')
-        with self.Paths.ADTreeStatic.open('rb') as f:
-            self.ADTreeStatic = pickle.load(f)
-        gc.collect()
-        print('Static AD-tree preloading complete.')
-        self.set_preloaded_ADTree_to_algrun_parameters('adtree-static', self.ADTreeStatic)
-
-
-    def preload_dynamic_ADTree(self):
-        import gc
-        print('Starting dynamic AD-tree preloading...')
-        with self.Paths.ADTreeDynamic.open('rb') as f:
-            self.ADTreeDynamic = pickle.load(f)
-        gc.collect()
-        print('Dynamic AD-tree preloading complete.')
-        self.set_preloaded_ADTree_to_algrun_parameters('adtree-dynamic', self.ADTreeDynamic)
-
-
-    def set_preloaded_ADTree_to_algrun_parameters(self, tag, tree):
-        for parameters in self.AlgorithmRunParameters:
-            if tag in parameters['tags']:
-                parameters['ci_test_ad_tree_preloaded'] = tree
-                del parameters['ci_test_ad_tree_path__load']
 
 
     def validate_arguments(self, arguments):

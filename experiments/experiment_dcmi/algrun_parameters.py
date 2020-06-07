@@ -154,7 +154,7 @@ def create_algrun_parameters__adtree(experimental_setup, default_parameters, tre
 
     parameters_list = list()
     for target in range(target_count):
-        for llt in experimental_setup.AllowedLLTArguments:
+        for llt in experimental_setup.AllowedLLT:
             citr_filename = 'ci_test_results_{}_T{}_ADtree_static_LLT{}.pickle'.format(exds_name, target, llt)
             tag_adtree_type = 'adtree-{}'.format(tree_type)
             tag_adtree_type_llt = 'adtree-{}-llt{}'.format(tree_type, llt)

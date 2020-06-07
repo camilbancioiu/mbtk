@@ -16,13 +16,18 @@ class ExperimentalPathSet:
 
         keys = sorted(self.__dict__.keys())
         output = []
+        output.append(format_string.format(key='Root', path=self.Root))
         for key in keys:
+            if key == 'Root':
+                continue
             path = self.shorten_path(key)
             output.append(format_string.format(key=key, path=path))
         return '\n'.join(output)
 
 
     def shorten_path(self, key):
+        if key == 'Root':
+            return self.Root
         path = self.__dict__[key]
         try:
             path = path.relative_to(self.Root)
