@@ -82,14 +82,12 @@ def command_adtree_build(experimental_setup):
         exds.build()
 
     tree_type = experimental_setup.Arguments.type
+    adtree_save_path = experimental_setup.get_ADTree_path_by_type()
     ADTreeClass = None
-    adtree_save_path = None
     if tree_type == 'static':
         ADTreeClass = mbff.structures.ADTree.ADTree
-        adtree_save_path = experimental_setup.Paths.ADTreeStatic
     elif tree_type == 'dynamic':
         ADTreeClass = mbff.structures.DynamicADTree.DynamicADTree
-        adtree_save_path = experimental_setup.Paths.ADTreeDynamic
     else:
         raise ValueError('AD-tree type may be either static or dynamic.')
 
@@ -121,11 +119,7 @@ def command_adtree_build_analysis(experimental_setup):
     analysis_path.mkdir(parents=True, exist_ok=True)
 
     tree_type = experimental_setup.Arguments.type
-    tree_path = None
-    if tree_type == 'static':
-        tree_path = experimental_setup.Paths.ADTreeStatic
-    if tree_type == 'dynamic':
-        tree_path = experimental_setup.Paths.ADTreeDynamic
+    tree_path = experimental_setup.get_ADTree_path_by_type()
 
     tree_analysis_path = analysis_path / tree_path.name
     with tree_path.open('rb') as f:
@@ -154,13 +148,7 @@ def command_adtree_build_analysis(experimental_setup):
 def command_adtree_print_analysis(experimental_setup):
     analysis_path = experimental_setup.ExperimentDef.path / 'adtree_analysis'
 
-    tree_type = experimental_setup.Arguments.type
-    tree_path = None
-    if tree_type == 'static':
-        tree_path = experimental_setup.Paths.ADTreeStatic
-    if tree_type == 'dynamic':
-        tree_path = experimental_setup.Paths.ADTreeDynamic
-
+    tree_path = experimental_setup.get_ADTree_path_by_type()
     tree_analysis_path = analysis_path / tree_path.name
     with tree_analysis_path.open('rb') as f:
         analysis = pickle.load(f)

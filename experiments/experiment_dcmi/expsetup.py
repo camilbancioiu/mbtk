@@ -68,6 +68,14 @@ class CustomExperimentalSetup(util.ExperimentalSetup):
         return self.Paths.ADTreeRepository / adtree_filename
 
 
+    def get_ADTree_path_by_type(self):
+        tree_type = self.Arguments.type
+        if tree_type == 'static':
+            return self.Paths.ADTreeStatic
+        if tree_type == 'dynamic':
+            return self.Paths.ADTreeDynamic
+
+
     def preload_static_ADTree(self):
         import gc
         print('Starting static AD-tree preloading...')
