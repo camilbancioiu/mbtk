@@ -106,7 +106,7 @@ def test_ipcmb_efficiency__with_dcMI__andes(testfolders, ds_andes_4e3):
 
 def run_demo_ipcmb_test__dynamic_adtree(folders, ds):
     LLT = 0
-    path = testfolders['dynamic_adtrees'] / (ds.label + '.pickle')
+    path = folders['dynamic_adtrees'] / (ds.label + '.pickle')
     parameters = ipcmb_tests.make_parameters__adtree(DoFCalculators.StructuralDoF, LLT, None, path, path)
     parameters['ci_test_ad_tree_class'] = mbff.structures.DynamicADTree.DynamicADTree
     parameters['source_bayesian_network'] = None
