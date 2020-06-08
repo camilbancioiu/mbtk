@@ -88,6 +88,8 @@ def test_ipcmb_efficiency__with_dcMI__andes(testfolders, ds_andes_4e3):
 
         jht = ipcmb.CITest.JHT
         parameters['ci_test_jht_preloaded'] = jht
+        gc.collect()
+
     end = time.time()
     print('End time', time.ctime(end))
     print('Duration', end - start)
@@ -135,6 +137,8 @@ def test_ipcmb_efficiency__with_dynamic_adtree__andes(testfolders, ds_andes_4e3)
 
         adtree = ipcmb.CITest.AD_tree
         parameters['ci_test_ad_tree_preloaded'] = adtree
+        gc.collect()
+
     end = time.time()
     print('End time', time.ctime(end))
     print('Duration', end - start)
