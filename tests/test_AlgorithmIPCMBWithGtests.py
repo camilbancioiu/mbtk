@@ -90,7 +90,7 @@ def test_ipcmb_efficiency__with_dcMI__andes(testfolders, ds_andes_4e3):
         parameters['ci_test_jht_preloaded'] = jht
     end = time.time()
     print('End time', end)
-    print('Duration', end - time)
+    print('Duration', end - start)
 
 
 
@@ -121,6 +121,8 @@ def test_ipcmb_efficiency__with_dynamic_adtree__andes(testfolders, ds_andes_4e3)
     path = testfolders['dynamic_adtrees'] / (ds.label + '.pickle')
     parameters = make_parameters__adtree(DoFCalculators.StructuralDoF, LLT, None, path, path)
     parameters['ci_test_ad_tree_class'] = mbff.structures.DynamicADTree.DynamicADTree
+    parameters['source_bayesian_network'] = None
+    parameters['algorithm_debug'] = 1
 
     print()
     targets = range(ds.datasetmatrix.get_column_count('X'))
@@ -135,7 +137,7 @@ def test_ipcmb_efficiency__with_dynamic_adtree__andes(testfolders, ds_andes_4e3)
         parameters['ci_test_ad_tree_preloaded'] = adtree
     end = time.time()
     print('End time', end)
-    print('Duration', end - time)
+    print('Duration', end - start)
 
 
 
