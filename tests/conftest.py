@@ -16,3 +16,12 @@ def pytest_configure(config):
         "markers", "demo: designates demonstrative tests, which only showcase \
             efficiency, and don't actually test anything"
     )
+    config.addinivalue_line(
+        "markers", "demo-alarm: demo tests on alarm"
+    )
+    config.addinivalue_line(
+        "markers", "demo-pathfinder: demo tests on pathfinder"
+    )
+    config.addinivalue_line(
+        "markers", "demo-andes: demo tests on andes"
+    )
