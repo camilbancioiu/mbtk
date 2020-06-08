@@ -113,12 +113,14 @@ def run_demo_ipcmb_test__dynamic_adtree(folders, ds):
     parameters['algorithm_debug'] = 1
 
     print()
+    print()
     gc_total_duration = 0
     targets = range(ds.datasetmatrix.get_column_count('X'))
     print('DS has {} targets.'.format(targets))
     start = time.time()
     print('Start time', time.ctime(start), flush=True)
     for target in targets:
+        print()
         print('target', target)
         target_start = time.time()
         mb, _, ipcmb = ipcmb_tests.run_IPCMB(ds, target, parameters)
@@ -150,12 +152,14 @@ def run_demo_ipcmb_test__dcmi(folders, ds):
     parameters['algorithm_debug'] = 1
 
     print()
+    print()
     targets = range(ds.datasetmatrix.get_column_count('X'))
     print('DS has {} targets.'.format(targets))
     gc_total_duration = 0
     start = time.time()
     print('Start time', time.ctime(start))
     for target in targets:
+        print()
         print('target', target)
         target_start = time.time()
         mb, _, ipcmb = ipcmb_tests.run_IPCMB(ds, target, parameters)
