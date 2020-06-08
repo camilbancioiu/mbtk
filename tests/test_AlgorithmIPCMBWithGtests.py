@@ -12,6 +12,7 @@ import mbff.structures.DynamicADTree
 import mbff.math.G_test__with_dcMI
 import mbff.math.DSeparationCITest
 import mbff.math.DoFCalculators as DoFCalculators
+import time
 
 DebugLevel = 0
 CITestDebugLevel = 0
@@ -67,7 +68,7 @@ def test_ipcmb_efficiency__with_dcMI(testfolders, ds_alarm_8e3):
 
 
 
-@pytest.mark.demo
+@pytest.mark.demo_andes
 def test_ipcmb_efficiency__with_dcMI__andes(testfolders, ds_andes_4e3):
     ds = ds_andes_4e3
     jht_path = testfolders['jht'] / 'jht_{}.pickle'.format(ds.label)
@@ -78,6 +79,8 @@ def test_ipcmb_efficiency__with_dcMI__andes(testfolders, ds_andes_4e3):
 
     print()
     targets = range(ds.datasetmatrix.get_column_count('X'))
+    start = time.time()
+    print('Start time', start)
     for target in targets:
         print('target', target)
         mb, _, ipcmb = run_IPCMB(ds, target, parameters)
@@ -85,6 +88,9 @@ def test_ipcmb_efficiency__with_dcMI__andes(testfolders, ds_andes_4e3):
 
         jht = ipcmb.CITest.JHT
         parameters['ci_test_jht_preloaded'] = jht
+    end = time.time()
+    print('End time', end)
+    print('Duration', end - time)
 
 
 
@@ -108,7 +114,7 @@ def test_ipcmb_efficiency__with_dynamic_adtree(testfolders, ds_alarm_8e3):
 
 
 
-@pytest.mark.demo
+@pytest.mark.demo_andes
 def test_ipcmb_efficiency__with_dynamic_adtree__andes(testfolders, ds_andes_4e3):
     ds = ds_andes_4e3
     LLT = 0
@@ -118,6 +124,8 @@ def test_ipcmb_efficiency__with_dynamic_adtree__andes(testfolders, ds_andes_4e3)
 
     print()
     targets = range(ds.datasetmatrix.get_column_count('X'))
+    start = time.time()
+    print('Start time', start)
     for target in targets:
         print('target', target)
         mb, _, ipcmb = run_IPCMB(ds, target, parameters)
@@ -125,6 +133,9 @@ def test_ipcmb_efficiency__with_dynamic_adtree__andes(testfolders, ds_andes_4e3)
 
         adtree = ipcmb.CITest.AD_tree
         parameters['ci_test_ad_tree_preloaded'] = adtree
+    end = time.time()
+    print('End time', end)
+    print('Duration', end - time)
 
 
 
