@@ -115,6 +115,7 @@ def run_demo_ipcmb_test__dynamic_adtree(folders, ds):
     print()
     print()
     gc_total_duration = 0
+    ipcmb_total_duration = 0
     targets = range(ds.datasetmatrix.get_column_count('X'))
     print('DS has {} targets.'.format(targets))
     start = time.time()
@@ -125,6 +126,7 @@ def run_demo_ipcmb_test__dynamic_adtree(folders, ds):
         target_start = time.time()
         mb, _, ipcmb = ipcmb_tests.run_IPCMB(ds, target, parameters)
         target_duration = time.time() - target_start
+        ipcmb_total_duration += target_duration
         print('[{:>}]\tMB({}) = {}'.format(target_duration, target, mb))
 
         adtree = ipcmb.CITest.AD_tree
@@ -140,6 +142,7 @@ def run_demo_ipcmb_test__dynamic_adtree(folders, ds):
     end = time.time()
     print('End time', time.ctime(end))
     print('Duration', end - start)
+    print('IPC-MB duration', ipcmb_total_duration)
     print('GC duration', gc_total_duration)
 
 
@@ -156,6 +159,7 @@ def run_demo_ipcmb_test__dcmi(folders, ds):
     targets = range(ds.datasetmatrix.get_column_count('X'))
     print('DS has {} targets.'.format(targets))
     gc_total_duration = 0
+    ipcmb_total_duration = 0
     start = time.time()
     print('Start time', time.ctime(start))
     for target in targets:
@@ -165,6 +169,7 @@ def run_demo_ipcmb_test__dcmi(folders, ds):
         mb, _, ipcmb = ipcmb_tests.run_IPCMB(ds, target, parameters)
         target_end = time.time()
         target_duration = target_end - target_start
+        ipcmb_total_duration += target_duration
         print('[{:>}]\tMB({}) = {}'.format(target_duration, target, mb))
 
         jht = ipcmb.CITest.JHT
@@ -180,3 +185,5 @@ def run_demo_ipcmb_test__dcmi(folders, ds):
     end = time.time()
     print('End time', time.ctime(end))
     print('Duration', end - start)
+    print('IPC-MB duration', ipcmb_total_duration)
+    print('GC duration', gc_total_duration)
