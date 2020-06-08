@@ -1,5 +1,6 @@
 import pickle
 import shutil
+import time
 from pathlib import Path
 
 from mbff.math.Variable import Omega
@@ -11,6 +12,8 @@ import mbff.utilities.functions as util
 test_folder = Path('tests', 'testfiles')
 bif_folder = Path('tests', 'bif_files')
 tmp_folder = Path(test_folder, 'tmp')
+locks_folder = Path(test_folder, 'locks')
+locks_folder.mkdir(parents=True, exist_ok=True)
 
 
 class MockDataset:
@@ -23,24 +26,48 @@ class MockDataset:
 
 
 
+class Lock:
+
+    def __init__(self, lockname, op):
+        self.lockfile = locks_folder / (str(lockname) + '.lock')
+        self.op = op
+
+
+    def __enter__(self):
+        while self.lockfile.exists():
+            time.sleep(0.1)
+        if self.op == 'w':
+            self.lockfile.touch()
+
+
+    def __exit__(self, exception_type, value, tb):
+        if self.op == 'w':
+            self.lockfile.unlink()
+
+
+
 def make_test_datasetmatrix(configuration):
     folder = tmp_folder / 'mockdataset'
     label = configuration['label']
     try:
-        datasetmatrix = DatasetMatrix(label)
-        datasetmatrix.load(folder)
+        with Lock('dm-' + label, 'r'):
+            datasetmatrix = DatasetMatrix(label)
+            datasetmatrix.load(folder)
     except FileNotFoundError:
-        sbnds = SampledBayesianNetworkDatasetSource(configuration)
-        sbnds.reset_random_seed = True
-        datasetmatrix = sbnds.create_dataset_matrix(label)
-        datasetmatrix.finalize()
-        datasetmatrix.save(folder)
+        with Lock('dm-' + label, 'w'):
+            sbnds = SampledBayesianNetworkDatasetSource(configuration)
+            sbnds.reset_random_seed = True
+            datasetmatrix = sbnds.create_dataset_matrix(label)
+            datasetmatrix.finalize()
+            datasetmatrix.save(folder)
     return datasetmatrix
 
 
 
 def make_test_bayesian_network(configuration):
-    bn = util.read_bif_file(configuration['sourcepath'], use_cache=True)
+    bn = None
+    with Lock('bn-' + configuration['sourcepath'].name, 'w'):
+        bn = util.read_bif_file(configuration['sourcepath'], use_cache=True)
     bn.finalize()
     return bn
 
@@ -72,21 +99,23 @@ def prepare_AD_tree(configuration, datasetmatrix):
     leaf_list_threshold = configuration['leaf_list_threshold']
     adtree = None
     if path.exists():
-        with path.open('rb') as f:
-            adtree = pickle.load(f)
-        if debug >= 1:
-            adtree.debug = debug
-            adtree.debug_prepare__querying()
+        with Lock(path.name, 'r'):
+            with path.open('rb') as f:
+                adtree = pickle.load(f)
+            if debug >= 1:
+                adtree.debug = debug
+                adtree.debug_prepare__querying()
     else:
-        matrix = datasetmatrix.X
-        column_values = datasetmatrix.get_values_per_column('X')
-        adtree_class = configuration['ci_test_ad_tree_class']
-        try:
-            adtree = adtree_class(matrix, column_values, leaf_list_threshold, debug)
-        except TypeError:
-            adtree = adtree_class(matrix, column_values, leaf_list_threshold)
+        with Lock(path.name, 'w'):
+            matrix = datasetmatrix.X
+            column_values = datasetmatrix.get_values_per_column('X')
+            adtree_class = configuration['ci_test_ad_tree_class']
+            try:
+                adtree = adtree_class(matrix, column_values, leaf_list_threshold, debug)
+            except TypeError:
+                adtree = adtree_class(matrix, column_values, leaf_list_threshold)
 
-        if path is not None:
-            with path.open('wb') as f:
-                pickle.dump(adtree, f)
+            if path is not None:
+                with path.open('wb') as f:
+                    pickle.dump(adtree, f)
     return adtree
