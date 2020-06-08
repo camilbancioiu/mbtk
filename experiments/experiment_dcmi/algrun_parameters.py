@@ -1,6 +1,5 @@
 import sys
 import os
-import pickle
 from pathlib import Path
 
 
@@ -54,7 +53,8 @@ def create_algrun_parameters(experimental_setup):
 
 def create_default_parameters(experimental_setup):
     bn_sourcepath = experimental_setup.ExDsDef.source_configuration['sourcepath']
-    bayesian_network = prepare_bayesian_network(bn_sourcepath)
+    bayesian_network = util.read_bif_file(bn_sourcepath, use_cache=True)
+    bayesian_network.finalize()
 
     default_parameters = {
         'omega': experimental_setup.Omega,
@@ -65,26 +65,6 @@ def create_default_parameters(experimental_setup):
     }
 
     return default_parameters
-
-
-
-def prepare_bayesian_network(sourcepath, force_rebuild=False):
-    bayesian_network = None
-
-    # BIF files might be large, so we read them from source and then we pickle
-    # them to files. If a pickle-file is found, read it instead of the
-    # requested BIF file.
-    cachefile = sourcepath.with_suffix('.pickle')
-    if cachefile.exists() and force_rebuild is False:
-        with cachefile.open('rb') as f:
-            bayesian_network = pickle.load(f)
-        return bayesian_network
-
-    bayesian_network = util.read_bif_file(sourcepath)
-    bayesian_network.finalize()
-    with cachefile.open('wb') as f:
-        pickle.dump(bayesian_network, f)
-    return bayesian_network
 
 
 # Create AlgorithmRun parameters using the D-separation CI test

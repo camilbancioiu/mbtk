@@ -40,7 +40,7 @@ def make_test_datasetmatrix(configuration):
 
 
 def make_test_bayesian_network(configuration):
-    bn = util.read_bif_file(configuration['sourcepath'])
+    bn = util.read_bif_file(configuration['sourcepath'], use_cache=True)
     bn.finalize()
     return bn
 

@@ -28,11 +28,12 @@ test: Makefile
 	pytest $(PYTEST_WORKERS) --capture=tee-sys -m "not slow and not demo"
 	notify-send "Make" "Testing complete."
 
-test-clean:
-	rm -rf tests/testfiles/tmp/*
-
 clean:
 	find -name __pycache__ | xargs rm -rf
+
+test-clean: clean
+	rm -rf tests/testfiles/tmp/*
+	rm -rf tests/bif_files/*.pickle
 
 demo: Makefile
 	pytest $(PYTEST_WORKERS) --capture=tee-sys -m "demo"

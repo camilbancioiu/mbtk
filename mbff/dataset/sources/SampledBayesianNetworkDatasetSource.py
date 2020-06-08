@@ -15,7 +15,7 @@ class SampledBayesianNetworkDatasetSource(DatasetSource):
 
     def __init__(self, configuration, finalize_bn=True):
         self.configuration = configuration
-        self.bayesian_network = util.read_bif_file(self.configuration['sourcepath'])
+        self.bayesian_network = util.read_bif_file(self.configuration['sourcepath'], use_cache=False)
         if finalize_bn:
             self.bayesian_network.finalize()
         self.reset_random_seed = True

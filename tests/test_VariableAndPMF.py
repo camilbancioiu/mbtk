@@ -228,7 +228,7 @@ def test_conditional_pmf__from_bayesian_network():
     configuration['values_as_indices'] = False
     configuration['objectives'] = ['R', 'TRN']
 
-    bayesian_network = util.read_bif_file(configuration['sourcepath'])
+    bayesian_network = util.read_bif_file(configuration['sourcepath'], use_cache=False)
     bayesian_network.finalize()
 
     sbnds = SampledBayesianNetworkDatasetSource(configuration)

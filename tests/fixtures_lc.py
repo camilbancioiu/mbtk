@@ -7,7 +7,7 @@ import mbff.utilities.functions as util
 
 @pytest.fixture(scope='session')
 def bn_lungcancer():
-    bn = util.read_bif_file(Path(testutil.bif_folder, 'lungcancer.bif'))
+    bn = util.read_bif_file(Path(testutil.bif_folder, 'lungcancer.bif'), use_cache=False)
     bn.finalize()
     return bn
 
@@ -15,7 +15,7 @@ def bn_lungcancer():
 
 @pytest.fixture(scope='session')
 def bn_lc_repaired():
-    bn = util.read_bif_file(Path(testutil.bif_folder, 'lc_repaired.bif'))
+    bn = util.read_bif_file(Path(testutil.bif_folder, 'lc_repaired.bif'), use_cache=False)
     bn.finalize()
     return bn
 

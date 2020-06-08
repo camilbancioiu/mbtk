@@ -10,7 +10,7 @@ def test_reading_bif_file():
     survey_bif = Path(testutil.bif_folder, 'survey.bif')
 
     bn_expected = default_Bayesian_network()
-    bn_read = util.read_bif_file(survey_bif)
+    bn_read = util.read_bif_file(survey_bif, use_cache=False)
 
     assertBayesianNetworkEqual(bn_expected, bn_read)
 

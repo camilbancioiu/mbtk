@@ -7,7 +7,7 @@ import mbff.utilities.functions as util
 
 @pytest.fixture(scope='session')
 def bn_survey():
-    bn = util.read_bif_file(Path(testutil.bif_folder, 'survey.bif'))
+    bn = util.read_bif_file(Path(testutil.bif_folder, 'survey.bif'), use_cache=False)
     bn.finalize()
     return bn
 

@@ -7,7 +7,7 @@ import mbff.utilities.functions as util
 
 @pytest.fixture(scope='session')
 def bn_alarm():
-    bn = util.read_bif_file(Path(testutil.bif_folder, 'alarm.bif'))
+    bn = util.read_bif_file(Path(testutil.bif_folder, 'alarm.bif'), use_cache=False)
     bn.finalize()
     return bn
 
