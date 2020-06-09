@@ -46,6 +46,7 @@ def create_algrun_parameters(experimental_setup):
         parameters['index'] = index
         ID_format = parameters['ID']
         parameters['ID'] = ID_format.format(**parameters)
+        parameters['source_bayesian_network'] = None
 
     return parameters_list
 
