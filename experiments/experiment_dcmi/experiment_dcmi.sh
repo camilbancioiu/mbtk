@@ -1,74 +1,86 @@
 #!/usr/bin/env bash
 
 expshell="python3 main.py"
+dataset_name=$1
+sample_count=$2
+action=$3
+experiment="$expshell $dataset_name $sample_count"
+
 
 function build_adtrees() {
-    local dataset_name=$1
-    local sample_count=$2
-    local tree_type=$3
-    local experiment="$expshell $dataset_name $sample_count"
+    local tree_type=$1
 
-    echo "Building AD-tree, pruning 0"
+    echo "Building $tree_type AD-tree, pruning 0"
     $experiment adtree build --tree-type=$tree_type --llt=0
 
-    echo "Building AD-tree, pruning 5"
+    echo "Building $tree_type AD-tree, pruning 5"
     $experiment adtree build --tree-type=$tree_type --llt=5
 
-    echo "Building AD-tree, pruning 10"
+    echo "Building $tree_type AD-tree, pruning 10"
     $experiment adtree build --tree-type=$tree_type --llt=10
 }
 
+
+
 function run_unoptimized() {
-    local dataset_name=$1
-    local sample_count=$2
-    local experiment="$expshell $dataset_name $sample_count"
     $experiment exp unlock
     $experiment --algrun-tag=unoptimized exp run
 }
 
+
+
 function run_dcmi() {
-    local dataset_name=$1
-    local sample_count=$2
-    local experiment="$expshell $dataset_name $sample_count"
     $experiment exp unlock
     $experiment --algrun-tag=dcmi exp run
 }
 
+
+
 function run_adtree() {
-    local dataset_name=$1
-    local sample_count=$2
-    local tree_type=$3
-    local llt=$4
-    local experiment="$expshell $dataset_name $sample_count"
+    local tree_type=$1
+    local llt=$2
     $experiment exp unlock
     $experiment --algrun-tag="adtree-$tree_type-llt$llt" exp run
 }
 
-function fullexperiment() {
-    local dataset_name=$1
-    local sample_count=$2
-    local experiment="$expshell $dataset_name $sample_count"
 
-    echo "=========================================="
-    echo "Running full experiment for dataset $dataset_name and sample size $sample_count"
 
-    $experiment exds build
-
-    run_unoptimized $dataset_name $sample_count
-
-    run_dcmi $dataset_name $sample_count
+function prepare_experiment() {
 
     if [ "$dataset_name" == "alarm" ]; then
-        build_adtrees $dataset_name $sample_count static
-        run_adtree $dataset_name $sample_count static 0
-        run_adtree $dataset_name $sample_count static 5
-        run_adtree $dataset_name $sample_count static 10
+        build_adtrees static
     fi
 
-    build_adtrees $dataset_name $sample_count dynamic
-    run_adtree $dataset_name $sample_count dynamic 0
-    run_adtree $dataset_name $sample_count dynamic 5
-    run_adtree $dataset_name $sample_count dynamic 10
 }
 
-fullexperiment "$@"
+if [ "$action" == "prep" ]; then
+    $experiment exds build
+    build_adtrees dynamic
+    if [ "$dataset_name" == "alarm" ]; then
+        build_adtrees static
+    fi
+fi
+
+if [ "$action" == "unoptimized" ]; then
+    run_unoptimized
+fi
+
+if [ "$action" == "dcmi" ]; then
+    run_dcmi
+fi
+
+if [ "$action" == "static-adtree" ]; then
+    if [ "$dataset_name" == "alarm" ]; then
+        run_adtree static 0
+        run_adtree static 5
+        run_adtree static 10
+    else
+        echo "Not running static-adtree on $dataset_name, only on 'alarm'."
+    fi
+fi
+
+if [ "$action" == "dynamic-adtree" ]; then
+    run_adtree dynamic 0
+    run_adtree dynamic 5
+    run_adtree dynamic 10
+fi
