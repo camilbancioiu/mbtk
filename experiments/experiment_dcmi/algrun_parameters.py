@@ -43,10 +43,13 @@ def create_algrun_parameters(experimental_setup):
         + parameters_dcmi
 
     for index, parameters in enumerate(parameters_list):
+        # By setting 'source_bayesian_network' to None, the d-sep validation of
+        # CI test results is disabled. The d-sep test is currently inefficient
+        # and can last for a very long time for complex Bayesian networks.
+        parameters['source_bayesian_network'] = None
         parameters['index'] = index
         ID_format = parameters['ID']
         parameters['ID'] = ID_format.format(**parameters)
-        parameters['source_bayesian_network'] = None
 
     return parameters_list
 

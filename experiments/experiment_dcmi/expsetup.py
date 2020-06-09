@@ -56,6 +56,19 @@ class DCMIEvExpSetup(util.ExperimentalSetup):
         self.Paths.CITestResultRepository.mkdir(parents=True, exist_ok=True)
 
 
+    def filter_algruns(self):
+        targets_to_skip = None
+        if self.DatasetName == 'pathfinder':
+            targets_to_skip = [0]
+
+        if targets_to_skip is None:
+            return
+
+        for parameters in self.AlgorithmRunParameters:
+            if parameters['target'] in targets_to_skip:
+                parameters['skip'] = True
+
+
     def get_ADTree_path(self, tree_type, llt):
         adtree_filename = 'adtree_{}_llt{}.pickle'.format(tree_type, llt)
         return self.Paths.ADTreeRepository / adtree_filename

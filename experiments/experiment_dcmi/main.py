@@ -68,6 +68,10 @@ if __name__ == '__main__':
     experimental_setup.update_paths()
     experimental_setup.AlgorithmRunParameters = algrun_parameters.create_algrun_parameters(experimental_setup)
 
+    # Apply a custom filter to the AlgorithmRunParameters. See the method
+    # itself for details.
+    experimental_setup.filter_algruns()
+
     # The experiment defines many algorithm configurations, in the field
     # experimental_setup.AlgorithmRunParameters. If only a subset should be
     # acted upon at the moment, an `algrun_tag` can be specified on the CLI,

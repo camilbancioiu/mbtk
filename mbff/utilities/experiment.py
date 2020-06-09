@@ -55,6 +55,11 @@ class ExperimentalSetup:
         self.Paths.ExDs = self.ExDsDef.path
 
 
+    def filter_algruns(self):
+        # Allow subclasses to implement arbitrary filtering in this method.
+        pass
+
+
     def filter_algruns_by_tag(self, tag):
         self.AlgorithmRunParameters = self.get_algruns_by_tag(tag)
 

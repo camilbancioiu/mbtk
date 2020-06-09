@@ -28,10 +28,15 @@ class ExperimentRun:
         self.definition.ensure_subfolder('algorithm_run_datapoints')
 
         self.prepare_exds()
+        gc.collect()
 
         self.begin_run()
 
         for algorithm_run_parameters in self.definition.algorithm_run_parameters:
+            if algorithm_run_parameters.get('skip', False):
+                if not self.definition.quiet:
+                    print('Skipped {}.'.format(algorithm_run_parameters['ID']))
+                continue
             self.run_algorithm(algorithm_run_parameters)
             gc.collect()
 
