@@ -61,6 +61,11 @@ if [ "$action" == "prep" ]; then
     fi
 fi
 
+if [ "$action" == "prep-static" ]; then
+    $experiment exds build
+    build_adtrees static
+fi
+
 if [ "$action" == "unoptimized" ]; then
     run_unoptimized
 fi
