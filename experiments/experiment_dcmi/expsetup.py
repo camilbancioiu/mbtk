@@ -21,7 +21,7 @@ class DCMIEvExpSetup(util.ExperimentalSetup):
         self.CITest_Significance = None
         self.SampleCountString = None
         self.SampleCount = None
-        self.AllowedDatasetNames = ['alarm', 'pathfinder', 'andes']
+        self.AllowedDatasetNames = ['alarm', 'pathfinder', 'andes', 'munin']
         self.AllowedADTreeTypes = ['static', 'dynamic']
         self.AllowedLLT = ['0', '5', '10']
         self.DefaultTags = ['unoptimized', 'adtree-llt0', 'adtree-llt5', 'adtree-llt10', 'dcmi']
