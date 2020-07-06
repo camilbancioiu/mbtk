@@ -45,13 +45,9 @@ function run_adtree() {
 
 
 
-function prepare_experiment() {
-
-    if [ "$dataset_name" == "alarm" ]; then
-        build_adtrees static
-    fi
-
-}
+if [ "$action" == "exds" ]; then
+  $experiment exds build
+fi
 
 if [ "$action" == "prep" ]; then
     $experiment exds build
