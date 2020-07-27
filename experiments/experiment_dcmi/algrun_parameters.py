@@ -139,7 +139,7 @@ def create_algrun_parameters__adtree(experimental_setup, default_parameters, tre
     parameters_list = list()
     for target in range(target_count):
         for llt in experimental_setup.AllowedLLT:
-            citr_filename = 'ci_test_results_{}_T{}_ADtree_static_LLT{}.pickle'.format(exds_name, target, llt)
+            citr_filename = 'ci_test_results_{}_T{}_ADtree_{}_LLT{}.pickle'.format(exds_name, target, tree_type, llt)
             tag_adtree_type = 'adtree-{}'.format(tree_type)
             tag_adtree_type_llt = 'adtree-{}-llt{}'.format(tree_type, llt)
             parameters = {
@@ -151,6 +151,7 @@ def create_algrun_parameters__adtree(experimental_setup, default_parameters, tre
                 'ci_test_ad_tree_leaf_list_threshold': experimental_setup.calculate_absolute_LLT(llt),
                 'ci_test_ad_tree_llt_argument': llt,
                 'ci_test_ad_tree_path__load': experimental_setup.get_ADTree_path(tree_type, llt),
+                'ci_test_ad_tree_path__save': experimental_setup.get_ADTree_path(tree_type, llt),
                 'ci_test_results_path__save': citrrepo / citr_filename,
                 'tags': ['adtree', tag_adtree_type, tag_adtree_type_llt, 'fast', 'has_dependencies'],
                 'ID': 'run_{index}_T{target}__adtree_{ci_test_ad_tree_type}_@LLT={ci_test_ad_tree_llt_argument}',
