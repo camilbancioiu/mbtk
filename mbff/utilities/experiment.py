@@ -65,7 +65,9 @@ class ExperimentalSetup:
 
 
     def get_algruns_by_tag(self, tag):
-        return [p for p in self.AlgorithmRunParameters if tag in p['tags']]
+        for p in self.AlgorithmRunParameters:
+            if tag in p['tags']:
+                yield p
 
 
     def is_tag_present_in_any_algrun(self, tag):

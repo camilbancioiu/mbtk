@@ -27,6 +27,7 @@ def configure_objects_subparser__plot(subparsers):
     subparser.add_argument('verb', choices=['create'],
                            default='create', nargs='?')
     subparser.add_argument('--metric', type=str, nargs='?',
+                           choices=['duration', 'duration-cummulative'],
                            default='duration-cummulative')
     subparser.add_argument('--file', type=str, nargs='?', default=None)
     subparser.add_argument('tags', type=str)
@@ -340,11 +341,10 @@ def load_citr(experimental_setup):
 
 
 def load_citr_for_algrun_list(algruns):
-    citr = list()
     for algrun in algruns:
         results = load_citr_from_algrun_parameters(algrun)
-        citr.extend(results)
-    return citr
+        for result in results:
+            yield result
 
 
 
@@ -407,7 +407,8 @@ def validate_all_citrs_equal(citr):
 
 
 def load_citr_from_algrun_parameters(parameters):
-    with parameters['ci_test_results_path__save'].open('rb') as f:
+    path = parameters['ci_test_results_path__save']
+    with path.open('rb') as f:
         results = pickle.load(f)
     return results
 

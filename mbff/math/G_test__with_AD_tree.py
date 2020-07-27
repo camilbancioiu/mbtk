@@ -212,3 +212,9 @@ class G_test(mbff.math.G_test__unoptimized.G_test):
                 pass
 
         return (PrXcZ, PrXZ)
+
+
+    def end(self):
+        super().end()
+
+        self.save_AD_tree()

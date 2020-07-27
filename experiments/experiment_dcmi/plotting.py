@@ -1,4 +1,5 @@
 import itertools
+import operator
 
 
 def make_plot_data(metric, citr):
@@ -6,12 +7,11 @@ def make_plot_data(metric, citr):
 
     if metric == 'duration':
         for key, results in citr.items():
-            data[key] = [result.duration for result in results]
+            data[key] = map(operator.attrgetter('duration'), results)
     if metric == 'duration-cummulative':
         for key, results in citr.items():
-            durations = [result.duration for result in results]
-            durations_cummulative = list(itertools.accumulate(durations))
-            data[key] = durations_cummulative
+            durations = map(operator.attrgetter('duration'), results)
+            data[key] = itertools.accumulate(durations)
 
     return data
 
@@ -30,8 +30,6 @@ def make_plot_Xaxis(data):
 def plot(data, adtree_analysis, plot_save_filename):
     import matplotlib.pyplot as Plotter
 
-    Xaxis = make_plot_Xaxis(data)
-
     Plotter.figure(figsize=(10, 6))
     # Plotter.clf()
     # Plotter.cla()
@@ -42,8 +40,11 @@ def plot(data, adtree_analysis, plot_save_filename):
     Plotter.xlabel('CI Test number')
     Plotter.ylabel('Time (s)')
 
+    Xaxis = None
     for run in sorted(data.keys()):
-        Yvalues = data[run]
+        Yvalues = list(data[run])
+        if Xaxis is None:
+            Xaxis = list(range(len(Yvalues)))
         if len(Yvalues) > 0:
             Plotter.plot(Xaxis, Yvalues, lw=1.5)
 
