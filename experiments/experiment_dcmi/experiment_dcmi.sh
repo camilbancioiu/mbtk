@@ -7,6 +7,7 @@ action=$3
 experiment="$expshell $dataset_name $sample_count"
 
 
+
 function build_adtrees() {
     local tree_type=$1
 
@@ -60,6 +61,11 @@ fi
 if [ "$action" == "prep-static" ]; then
     $experiment exds build
     build_adtrees static
+fi
+
+if [ "$action" == "prep-dynamic" ]; then
+    $experiment exds build
+    build_adtrees dynamic
 fi
 
 if [ "$action" == "unoptimized" ]; then
