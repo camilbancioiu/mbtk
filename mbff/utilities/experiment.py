@@ -61,7 +61,7 @@ class ExperimentalSetup:
 
 
     def filter_algruns_by_tag(self, tag):
-        self.AlgorithmRunParameters = self.get_algruns_by_tag(tag)
+        self.AlgorithmRunParameters = list(self.get_algruns_by_tag(tag))
 
 
     def get_algruns_by_tag(self, tag):

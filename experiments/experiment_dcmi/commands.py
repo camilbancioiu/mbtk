@@ -274,18 +274,21 @@ def command_summary_create(experimental_setup):
     adtree_analysis = load_adtrees_analysis(experimental_setup)
 
     for tag in tags:
-        algruns = experimental_setup.get_algruns_by_tag(tag)
+        print()
+        print('tag \'{}\':'.format(tag))
+        algruns = list(experimental_setup.get_algruns_by_tag(tag))
+        print('\tRuns:', len(algruns))
         datapoints = load_datapoints(experimental_setup, algruns)
-        citr = load_citr_for_algrun_list(algruns)
+        citr = list(load_citr_for_algrun_list(algruns))
         ci_durations = list(map(attrgetter('duration'), citr))
         total_duration = sum(map(attrgetter('duration'), datapoints))
         total_ci_duration = sum(ci_durations)
-        print('tag \'{}\':'.format(tag))
         print('\tDatapoints:', len(datapoints))
         print('\tTotal CI count:', len(citr))
         print('\tTotal duration (s):', total_duration)
         print('\tTotal CI duration (s):', total_ci_duration)
         print('\tAvg. CI duration (s):', total_ci_duration / len(citr))
+        print('\tAvg. CI count per s:', len(citr) / total_ci_duration)
         print('\tMax. CI duration (s):', max(ci_durations))
         print('\tMedian CI duration (s):', median(ci_durations))
 
@@ -299,17 +302,29 @@ def command_summary_create(experimental_setup):
         if tag == 'dcmi':
             jht = load_jht(experimental_setup)
             size = asizeof(jht)
-            entries = len(jht) - 2
             reads = jht['reads']
             misses = jht['misses']
+            del jht['reads']
+            del jht['misses']
+            entries = len(jht)
             hits = reads - misses
             hitrate = hits / reads
+            max_key_size = max(map(len, jht.keys()))
             print('\tJHT size:', naturalsize(size))
             print('\tJHT entries:', entries)
             print('\tJHT reads:', reads)
             print('\tJHT hits:', hits)
             print('\tJHT misses:', misses)
             print('\tJHT hit rate:', hitrate)
+            print('\tJHT max key size:', max_key_size)
+
+            dof_cache = load_dof_cache(experimental_setup)
+            size = asizeof(dof_cache)
+            entries = len(dof_cache)
+            max_key_size = max(map(len, dof_cache.keys()))
+            print('\tDoF cache size:', naturalsize(size))
+            print('\tDoF cache entries:', entries)
+            print('\tDoF cache max key size:', max_key_size)
 
 
 
@@ -349,10 +364,9 @@ def load_citr_for_algrun_list(algruns):
 
 
 def load_adtrees_analysis(experimental_setup):
-    adtrees_analysis = dict()
-
     analysis_path = experimental_setup.ExperimentDef.path / 'adtree_analysis'
 
+    adtrees_analysis = dict()
     for parameters in experimental_setup.AlgorithmRunParameters:
         try:
             tree_analysis_path = analysis_path / (parameters['ci_test_ad_tree_path__load'].name)
@@ -362,7 +376,9 @@ def load_adtrees_analysis(experimental_setup):
         try:
             with tree_analysis_path.open('rb') as f:
                 analysis = pickle.load(f)
-            key = 'adtree-llt{}'.format(parameters['ci_test_ad_tree_llt_argument'])
+            llt = parameters['ci_test_ad_tree_llt_argument']
+            tree_type = parameters['ci_test_ad_tree_type']
+            key = 'adtree-{}-llt{}'.format(tree_type, llt)
             adtrees_analysis[key] = analysis
         except FileNotFoundError:
             continue
@@ -373,11 +389,11 @@ def load_adtrees_analysis(experimental_setup):
 
 def load_jht(experimental_setup):
     # Only one JHT is expected for an experimental setup, so we return the
-    # first we find.
+    # first we find, when iterating over all AlgorithmRunParameters.
     jht = None
     for parameters in experimental_setup.AlgorithmRunParameters:
         try:
-            jht_path = parameters['ci_test_jht_path__load']
+            jht_path = parameters['ci_test_jht_path__save']
         except KeyError:
             continue
 
@@ -386,6 +402,25 @@ def load_jht(experimental_setup):
         return jht
 
     return jht
+
+
+
+def load_dof_cache(experimental_setup):
+    dof_cache = None
+    # Only one DoF calculator cache is expected for an experimental setup, so
+    # we return the first we find, when iterating over all
+    # AlgorithmRunParameters.
+    for parameters in experimental_setup.AlgorithmRunParameters:
+        try:
+            dof_cache_path = parameters['ci_test_dof_calculator_cache_path__save']
+        except KeyError:
+            continue
+
+        with dof_cache_path.open('rb') as f:
+            dof_cache = pickle.load(f)
+        return dof_cache
+
+    return dof_cache
 
 
 
