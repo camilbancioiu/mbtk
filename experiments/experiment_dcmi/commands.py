@@ -4,6 +4,10 @@ import pickle
 from pprint import pprint
 from operator import attrgetter
 
+from humanize import naturalsize
+from pympler.asizeof import asizeof
+from statistics import median
+
 import mbff.math.G_test__with_AD_tree
 
 
@@ -39,6 +43,7 @@ def configure_objects_subparser__summary(subparsers):
     subparser.add_argument('verb', choices=['create'], default='create',
                            nargs='?')
     subparser.add_argument('tags', type=str, default=None, nargs='?')
+    subparser.add_argument('--refresh', action='store_true', default=False)
 
 
 
@@ -247,84 +252,106 @@ def command_plot_create(experimental_setup):
 
 
 def command_summary_create(experimental_setup):
-    # Sample count is already selected
-    # group datapoints by tag, or by default tags
-    # summary per group:
-    # * number of datapoints
-    # * total duration
-    # * total CI duration
-    # * AD-tree analysis, for AD-tree runs
-    #       - size in MB
-    #       - node count
-    #       - LLT absolute count
-    # * JHT analysis, for dcMI runs
-    #       - size in MB
-    #       - entry count
-    #       - hit rate
-    from humanize import naturalsize
-    from pympler.asizeof import asizeof
-    from statistics import median
-
     tags = experimental_setup.Arguments.tags
     if tags is None:
         tags = experimental_setup.DefaultTags
     else:
         tags = tags.split(',')
 
+    summaries = experimental_setup.ExperimentDef.path / 'summaries'
+    summaries.mkdir(parents=True, exist_ok=True)
+
     adtree_analysis = load_adtrees_analysis(experimental_setup)
 
     for tag in tags:
+        summary_path = summaries / '{}.pickle'.format(tag)
+        summary = None
+        cached = ''
+        try:
+            if experimental_setup.Arguments.refresh:
+                raise FileNotFoundError
+            with summary_path.open('rb') as f:
+                summary = pickle.load(f)
+            cached = ' (cached)'
+        except FileNotFoundError:
+            summary = create_summary(experimental_setup, tag, adtree_analysis)
+            cached = ''
+            with summary_path.open('wb') as f:
+                pickle.dump(summary, f)
+
         print()
-        print('tag \'{}\':'.format(tag))
-        algruns = list(experimental_setup.get_algruns_by_tag(tag))
-        print('\tRuns:', len(algruns))
-        datapoints = load_datapoints(experimental_setup, algruns)
+        print('tag \'{}\'{}:'.format(tag, cached))
+
+        for key, value in summary.items():
+            print('\t' + key, value)
+
+
+
+def create_summary(experimental_setup, tag, adtree_analysis):
+    summary = dict()
+
+    algruns = list(experimental_setup.get_algruns_by_tag(tag))
+    summary['Runs:'] = len(algruns)
+
+    citr = list()
+    try:
         citr = list(load_citr_for_algrun_list(algruns))
-        ci_durations = list(map(attrgetter('duration'), citr))
-        total_duration = sum(map(attrgetter('duration'), datapoints))
-        total_ci_duration = sum(ci_durations)
-        print('\tDatapoints:', len(datapoints))
-        print('\tTotal CI count:', len(citr))
-        print('\tTotal duration (s):', total_duration)
-        print('\tTotal CI duration (s):', total_ci_duration)
-        print('\tAvg. CI duration (s):', total_ci_duration / len(citr))
-        print('\tAvg. CI count per s:', len(citr) / total_ci_duration)
-        print('\tMax. CI duration (s):', max(ci_durations))
-        print('\tMedian CI duration (s):', median(ci_durations))
+    except FileNotFoundError:
+        pass
 
-        if tag.startswith('adtree'):
-            analysis = adtree_analysis[tag]
-            print('\tAD-tree size:', naturalsize(analysis['size']))
-            print('\tAD-tree nodes:', analysis['nodes'])
-            print('\tAD-tree absolute LLT:', analysis['LLT'])
-            print('\tAD-tree build time:', analysis['duration'])
+    if len(citr) == 0:
+        summary['Error'] = 'No CI tests found'
+        return summary
 
-        if tag == 'dcmi':
-            jht = load_jht(experimental_setup)
-            size = asizeof(jht)
-            reads = jht['reads']
-            misses = jht['misses']
-            del jht['reads']
-            del jht['misses']
-            entries = len(jht)
-            hits = reads - misses
-            hitrate = hits / reads
-            max_key_size = max(map(len, jht.keys()))
-            print('\tJHT size:', naturalsize(size))
-            print('\tJHT entries:', entries)
-            print('\tJHT reads:', reads)
-            print('\tJHT hits:', hits)
-            print('\tJHT misses:', misses)
-            print('\tJHT hit rate:', hitrate)
-            print('\tJHT max key size:', max_key_size)
+    datapoints = load_datapoints(experimental_setup, algruns)
+    ci_durations = list(map(attrgetter('duration'), citr))
+    total_duration = sum(map(attrgetter('duration'), datapoints))
+    total_ci_duration = sum(ci_durations)
 
-            dof_cache = load_dof_cache(experimental_setup)
-            size = asizeof(dof_cache)
-            entries = len(dof_cache)
-            max_key_size = max(map(len, dof_cache.keys()))
-            print('\tDoF cache size:', naturalsize(size))
-            print('\tDoF cache entries:', entries)
-            print('\tDoF cache max key size:', max_key_size)
+    summary['Datapoints:'] = len(datapoints)
+    summary['Total CI count:'] = len(citr)
+    summary['Total duration (s):'] = total_duration
+    summary['Total CI duration (s):'] = total_ci_duration
+    summary['Avg. CI duration (s):'] = total_ci_duration / len(citr)
+    summary['Avg. CI count per s:'] = len(citr) / total_ci_duration
+    summary['Max. CI duration (s):'] = max(ci_durations)
+    summary['Median CI duration (s):'] = median(ci_durations)
+
+    if tag.startswith('adtree'):
+        analysis = adtree_analysis[tag]
+        summary['AD-tree size:'] = naturalsize(analysis['size'])
+        summary['AD-tree nodes:'] = analysis['nodes']
+        summary['AD-tree absolute LLT:'] = analysis['LLT']
+        summary['AD-tree build time:'] = analysis['duration']
+
+    if tag == 'dcmi':
+        jht = load_jht(experimental_setup)
+        size = asizeof(jht)
+        reads = jht['reads']
+        misses = jht['misses']
+        del jht['reads']
+        del jht['misses']
+        entries = len(jht)
+        hits = reads - misses
+        hitrate = hits / reads
+        max_key_size = max(map(len, jht.keys()))
+        summary['JHT size:'] = naturalsize(size)
+        summary['JHT entries:'] = entries
+        summary['JHT reads:'] = reads
+        summary['JHT hits:'] = hits
+        summary['JHT misses:'] = misses
+        summary['JHT hit rate:'] = hitrate
+        summary['JHT max key size:'] = max_key_size
+
+        dof_cache = load_dof_cache(experimental_setup)
+        size = asizeof(dof_cache)
+        entries = len(dof_cache)
+        max_key_size = max(map(len, dof_cache.keys()))
+        summary['DoF cache size:'] = naturalsize(size)
+        summary['DoF cache entries:'] = entries
+        summary['DoF cache max key size:'] = max_key_size
+
+    return summary
 
 
 

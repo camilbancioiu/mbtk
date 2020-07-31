@@ -24,7 +24,10 @@ class DCMIEvExpSetup(util.ExperimentalSetup):
         self.AllowedDatasetNames = ['alarm', 'pathfinder', 'andes', 'munin']
         self.AllowedADTreeTypes = ['static', 'dynamic']
         self.AllowedLLT = ['0', '5', '10']
-        self.DefaultTags = ['unoptimized', 'adtree-llt0', 'adtree-llt5', 'adtree-llt10', 'dcmi']
+        self.DefaultTags = ['unoptimized', 'adtree-static-llt0',
+                            'adtree-static-llt5', 'adtree-static-llt10',
+                            'adtree-dynamic-llt0', 'adtree-dynamic-llt5',
+                            'adtree-dynamic-llt10', 'dcmi']
 
 
     def set_arguments(self, arguments):
