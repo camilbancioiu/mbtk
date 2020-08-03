@@ -290,6 +290,10 @@ def command_summary_create(experimental_setup):
 def create_summary(experimental_setup, tag, adtree_analysis):
     summary = dict()
 
+    # Test early whether the AD-tree analysis is both required and available
+    if tag.startswith('adtree'):
+        analysis = adtree_analysis[tag]
+
     algruns = list(experimental_setup.get_algruns_by_tag(tag))
     summary['Runs:'] = len(algruns)
 
