@@ -1,6 +1,7 @@
 import re
 import pickle
 import mbff.math.Variable
+from mbff.experiment.ExperimentDefinition import ExperimentDefinition
 import mbff.utilities.experiment as util
 
 
@@ -9,6 +10,35 @@ class DCMIEvExpPathSet(util.ExperimentalPathSet):
     def __init__(self, root):
         super().__init__(root)
         self.BIFRepository = self.Root / 'bif_repository'
+
+
+
+class DCMIEvExperimentDefinition(ExperimentDefinition):
+
+    def __init__(self, experiments_folder, name, dataset, samples):
+        super().__init__(experiments_folder, name)
+        self.subexperiment_name = '{}_{}'.format(dataset, samples)
+
+
+    def ensure_subfolder(self, subfolder_name):
+        subfolder = self.path / subfolder_name / self.subexperiment_name
+        subfolder.mkdir(parents=True, exist_ok=True)
+        return subfolder
+
+
+    def get_lock(self, lock_type=''):
+        if lock_type == '':
+            lock_type = self.default_lock_type
+        return self.subfolder('locks') / ('locked_{}'.format(lock_type))
+
+
+    def get_locks(self):
+        return [lockfile.name for lockfile in self.subfolder('locks').glob('locked_*')]
+
+
+    def subfolder_exists(self, subfolder):
+        subfolder = self.path / subfolder / self.subexperiment_name
+        return subfolder.exists()
 
 
 
@@ -21,7 +51,7 @@ class DCMIEvExpSetup(util.ExperimentalSetup):
         self.CITest_Significance = None
         self.SampleCountString = None
         self.SampleCount = None
-        self.AllowedDatasetNames = ['alarm', 'pathfinder', 'andes', 'munin']
+        self.AllowedDatasetNames = ['alarm', 'andes', 'munin']
         self.AllowedADTreeTypes = ['static', 'dynamic']
         self.AllowedLLT = ['0', '5', '10']
         self.DefaultTags = ['unoptimized', 'adtree-static-llt0',
@@ -46,30 +76,17 @@ class DCMIEvExpSetup(util.ExperimentalSetup):
 
     def update_paths(self):
         super().update_paths()
-        self.Paths.ADTreeRepository = self.Paths.Experiment / 'adtrees'
-        self.Paths.ADTreeRepository.mkdir(parents=True, exist_ok=True)
-
-        self.Paths.JHTRepository = self.Paths.Experiment / 'jht'
-        self.Paths.JHTRepository.mkdir(parents=True, exist_ok=True)
-
-        self.Paths.DoFCacheRepository = self.Paths.Experiment / 'dof_cache'
-        self.Paths.DoFCacheRepository.mkdir(parents=True, exist_ok=True)
-
-        self.Paths.CITestResultRepository = self.Paths.Experiment / 'ci_test_results'
-        self.Paths.CITestResultRepository.mkdir(parents=True, exist_ok=True)
+        self.Paths.Datapoints = self.ExperimentDef.subfolder('algorithm_run_datapoints')
+        self.Paths.ADTreeRepository = self.ExperimentDef.subfolder('adtrees')
+        self.Paths.ADTreeAnalysisRepository = self.ExperimentDef.subfolder('adtree_analysis')
+        self.Paths.JHTRepository = self.ExperimentDef.subfolder('jht')
+        self.Paths.DoFCacheRepository = self.ExperimentDef.subfolder('dof_cache')
+        self.Paths.CITestResultRepository = self.ExperimentDef.subfolder('ci_test_results')
+        self.Paths.Summaries = self.ExperimentDef.subfolder('summaries')
 
 
     def filter_algruns(self):
-        targets_to_skip = None
-        if self.DatasetName == 'pathfinder':
-            targets_to_skip = [0]
-
-        if targets_to_skip is None:
-            return
-
-        for parameters in self.AlgorithmRunParameters:
-            if parameters['target'] in targets_to_skip:
-                parameters['skip'] = True
+        pass
 
 
     def get_ADTree_path(self, tree_type, llt):

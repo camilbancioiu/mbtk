@@ -3,13 +3,10 @@ from mbff.utilities.LockablePath import LockablePath
 
 class ExperimentDefinition(LockablePath):
 
-    def __init__(self, experiments_folder, name, path=None):
-        if path is None:
-            path = name
-
+    def __init__(self, experiments_folder, name):
         self.experiments_folder = experiments_folder
         self.name = name
-        super().__init__(self.experiments_folder, path)
+        super().__init__(self.experiments_folder, self.name)
         self.default_lock_type = 'experiment'
         self.experiment_run_class = None
         self.algorithm_run_class = None

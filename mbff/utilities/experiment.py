@@ -170,7 +170,8 @@ def handle_command(arguments, experimental_setup):
 
     elif command_object == 'exp':
         if command_verb == 'show':
-            pass
+            print('Not implemented yet')
+            command_handled = True
         elif command_verb == 'run':
             command_exp_run(experimental_setup)
             command_handled = True

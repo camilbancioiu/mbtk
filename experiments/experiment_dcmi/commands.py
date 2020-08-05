@@ -14,8 +14,7 @@ import mbff.math.G_test__with_AD_tree
 def configure_objects_subparser__adtree(subparsers, expsetup):
     subparser = subparsers.add_parser('adtree')
     subparser.add_argument('verb',
-                           choices=['show', 'build', 'analyze', 'print-analysis',
-                                    'test-load', 'update'],
+                           choices=['show', 'build', 'analyze', 'print-analysis'],
                            default='show', nargs='?')
     subparser.add_argument('--tree-type',
                            choices=expsetup.AllowedADTreeTypes,
@@ -69,12 +68,6 @@ def handle_command(arguments, experimental_setup):
             command_handled = True
         elif command_verb == 'print-analysis':
             command_adtree_print_analysis(experimental_setup)
-            command_handled = True
-        elif command_verb == 'test-load':
-            command_adtree_test_load(experimental_setup)
-            command_handled = True
-        elif command_verb == 'update':
-            command_adtree_update(experimental_setup)
             command_handled = True
 
     if command_object == 'plot':
@@ -150,8 +143,7 @@ def command_adtree_build(experimental_setup):
 def command_adtree_build_analysis(experimental_setup):
     from pympler.asizeof import asizeof
 
-    analysis_path = experimental_setup.ExperimentDef.path / 'adtree_analysis'
-    analysis_path.mkdir(parents=True, exist_ok=True)
+    analysis_path = experimental_setup.Paths.ADTreeAnalysisRepository
 
     tree_type = experimental_setup.Arguments.tree_type
     llt = experimental_setup.Arguments.llt
@@ -182,7 +174,7 @@ def command_adtree_build_analysis(experimental_setup):
 
 
 def command_adtree_print_analysis(experimental_setup):
-    analysis_path = experimental_setup.ExperimentDef.path / 'adtree_analysis'
+    analysis_path = experimental_setup.Paths.ADTreeAnalysisRepository
 
     tree_type = experimental_setup.Arguments.tree_type
     llt = experimental_setup.Arguments.llt
@@ -195,63 +187,15 @@ def command_adtree_print_analysis(experimental_setup):
 
 
 
-def command_adtree_test_load(experimental_setup):
-    print('Loading AD-tree from {}...'.format(experimental_setup.Paths.ADTree))
-    start_time = time.time()
-
-    adtree = load_adtree(experimental_setup.Paths.ADTree)
-
-    adtree_node_count = adtree.ad_node_count + adtree.vary_node_count
-    duration = time.time() - start_time
-    print('AD-tree loaded in {:.2f}s. It contains {} nodes, ({} AD; {} Vary).'
-          .format(duration, adtree_node_count, adtree.ad_node_count, adtree.vary_node_count))
-
-    input('Press <ENTER> to run GC after loading the AD-tree...')
-    gc.collect()
-
-    input('Press <ENTER> to run GC after setting adtree = None...')
-    adtree = None
-    del adtree
-    gc.collect()
-
-    input('Press <ENTER> to exit...')
-
-
-
-def command_adtree_update(experimental_setup):
-    path = experimental_setup.Paths.ADTree
-    print('Loading AD-tree from {}...'.format(path))
-    adtree = load_adtree(path)
-    print('AD-tree loaded, running GC...')
-    gc.collect()
-    print('Saving the AD-tree as updated to {}...'.format(path))
-    with path.open('wb') as f:
-        pickle.dump(adtree, f)
-    print('Done')
-
-
-
-def load_adtree(path):
-    adtree = None
-
-    with path.open('rb') as f:
-        unpickler = pickle.Unpickler(f)
-        adtree = unpickler.load()
-
-    del unpickler
-
-    return adtree
-
-
-
 def command_plot_create(experimental_setup):
     metric = experimental_setup.Arguments.metric
     plot_save_filename = experimental_setup.Arguments.file
 
     if plot_save_filename is not None:
-        plot_path = experimental_setup.ExperimentDef.path / 'plots'
-        plot_path.mkdir(parents=True, exist_ok=True)
-        plot_save_filename = plot_path / (plot_save_filename + '.png')
+        plot_path = experimental_setup.Paths.Plots
+        if not plot_save_filename.endswith('.png'):
+            plot_save_filename += '.png'
+        plot_save_filename = plot_path / plot_save_filename
 
     citr = load_citr(experimental_setup)
     adtree_analysis = load_adtrees_analysis(experimental_setup)
@@ -274,9 +218,7 @@ def command_summary_create(experimental_setup):
     else:
         tags = tags.split(',')
 
-    summaries = experimental_setup.ExperimentDef.path / 'summaries'
-    summaries.mkdir(parents=True, exist_ok=True)
-
+    summaries = experimental_setup.Paths.Summaries
     adtree_analysis = load_adtrees_analysis(experimental_setup)
 
     for tag in tags:
@@ -378,7 +320,7 @@ def create_summary(experimental_setup, tag, adtree_analysis):
 def load_datapoints(experimental_setup, algruns):
     datapoints = []
 
-    datapoints_folder = experimental_setup.ExperimentDef.subfolder('algorithm_run_datapoints')
+    datapoints_folder = experimental_setup.Paths.Datapoints
     for algrun in algruns:
         datapoint_file = datapoints_folder / '{}.pickle'.format(algrun['ID'])
         try:
