@@ -2,6 +2,5 @@ adtrees
 bif_repository
 ci_test_results
 exds_repository
-exprun_repository
 __pycache__
 *.png
