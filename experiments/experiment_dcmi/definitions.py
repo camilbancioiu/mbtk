@@ -52,7 +52,10 @@ def experiment_definition(experimental_setup):
     sample_count_str = experimental_setup.SampleCountString
 
     experiment_name = 'dcMIEvExpII_{}_{}'.format(dataset_name, sample_count_str)
-    experimentDef = ExperimentDefinition(experimental_setup.Paths.ExpRunRepository, experiment_name)
+    experimentDef = ExperimentDefinition(
+        experimental_setup.Paths.ExpRunRepository,
+        experiment_name,
+    )
     experimentDef.experiment_run_class = ExperimentRun
     experimentDef.algorithm_run_class = AlgorithmRun
     experimentDef.algorithm_run_configuration = {

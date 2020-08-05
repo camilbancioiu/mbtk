@@ -47,6 +47,12 @@ def configure_objects_subparser__summary(subparsers):
 
 
 
+def configure_objects_subparser__structure(subparsers):
+    subparser = subparsers.add_parser('structure')
+    subparser.add_argument('verb', choices=['rebuild'], nargs=1)
+
+
+
 def handle_command(arguments, experimental_setup):
     command_handled = False
     command_object = arguments.object
@@ -79,6 +85,11 @@ def handle_command(arguments, experimental_setup):
     if command_object == 'summary':
         if command_verb == 'create':
             command_summary_create(experimental_setup)
+            command_handled = True
+
+    if command_object == 'structure':
+        if command_verb == 'rebuild':
+            command_structure_rebuild(experimental_setup)
             command_handled = True
 
     return command_handled
@@ -248,6 +259,11 @@ def command_plot_create(experimental_setup):
     import plotting
     data = plotting.make_plot_data(metric, citr)
     plotting.plot(data, adtree_analysis, plot_save_filename)
+
+
+
+def command_structure_rebuild(experimental_setup):
+    pass
 
 
 
