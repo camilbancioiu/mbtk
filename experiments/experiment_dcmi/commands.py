@@ -353,7 +353,7 @@ def load_citr_for_algrun_list(algruns):
 
 
 def load_adtrees_analysis(experimental_setup):
-    analysis_path = experimental_setup.ExperimentDef.path / 'adtree_analysis'
+    analysis_path = experimental_setup.Paths.ADTreeAnalysisRepository
 
     adtrees_analysis = dict()
     for parameters in experimental_setup.AlgorithmRunParameters:
