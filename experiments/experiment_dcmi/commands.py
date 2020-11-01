@@ -39,7 +39,7 @@ def configure_objects_subparser__plot(subparsers):
 
 def configure_objects_subparser__summary(subparsers):
     subparser = subparsers.add_parser('summary')
-    subparser.add_argument('verb', choices=['create'], default='create',
+    subparser.add_argument('verb', choices=['show'], default='show',
                            nargs='?')
     subparser.add_argument('tags', type=str, default=None, nargs='?')
     subparser.add_argument('--refresh', action='store_true', default=False)
@@ -76,8 +76,8 @@ def handle_command(arguments, experimental_setup):
             command_handled = True
 
     if command_object == 'summary':
-        if command_verb == 'create':
-            command_summary_create(experimental_setup)
+        if command_verb == 'show':
+            command_summary_show(experimental_setup)
             command_handled = True
 
     if command_object == 'structure':
@@ -211,7 +211,7 @@ def command_structure_rebuild(experimental_setup):
 
 
 
-def command_summary_create(experimental_setup):
+def command_summary_show(experimental_setup):
     tags = experimental_setup.Arguments.tags
     if tags is None:
         tags = experimental_setup.DefaultTags
@@ -239,6 +239,10 @@ def command_summary_create(experimental_setup):
 
         print()
         print('tag \'{}\'{}:'.format(tag, cached))
+
+        if tag.startswith('adtree'):
+            analysis = adtree_analysis[tag]
+            summary['AD-tree absolute size (B):'] = analysis['size']
 
         for key, value in summary.items():
             print('\t' + key, value)
