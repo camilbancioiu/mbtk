@@ -33,6 +33,7 @@ def configure_objects_subparser__plot(subparsers):
                            choices=['duration', 'duration-cummulative'],
                            default='duration-cummulative')
     subparser.add_argument('--file', type=str, nargs='?', default=None)
+    subparser.add_argument('--treedata', action='store_true', default=False)
     subparser.add_argument('tags', type=str)
 
 
@@ -198,7 +199,9 @@ def command_plot_create(experimental_setup):
         plot_save_filename = plot_path / plot_save_filename
 
     citr = load_citr(experimental_setup)
-    adtree_analysis = load_adtrees_analysis(experimental_setup)
+    adtree_analysis = None
+    if experimental_setup.Arguments.treedata is True:
+        adtree_analysis = load_adtrees_analysis(experimental_setup)
 
     import plotting
     data = plotting.make_plot_data(metric, citr)
@@ -241,8 +244,11 @@ def command_summary_show(experimental_setup):
         print('tag \'{}\'{}:'.format(tag, cached))
 
         if tag.startswith('adtree'):
-            analysis = adtree_analysis[tag]
-            summary['AD-tree absolute size (B):'] = analysis['size']
+            try:
+                analysis = adtree_analysis[tag]
+                summary['AD-tree absolute size (B):'] = analysis['size']
+            except KeyError:
+                pass
 
         for key, value in summary.items():
             print('\t' + key, value)

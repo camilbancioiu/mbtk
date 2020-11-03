@@ -65,10 +65,10 @@ def plot(data, adtree_analysis, plot_save_filename):
 def make_plot_legend(data, adtree_analysis):
     legend = list()
     for tag in sorted(data.keys()):
-        if tag in adtree_analysis:
+        try:
             analysis = adtree_analysis[tag]
             entry = make_plot_legend_entry_for_adtree_run(tag, analysis)
-        else:
+        except (KeyError, TypeError):
             entry = tag
         legend.append(entry)
 
