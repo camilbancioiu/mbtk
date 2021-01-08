@@ -83,6 +83,7 @@ class DCMIEvExpSetup(util.ExperimentalSetup):
         self.Paths.DoFCacheRepository = self.ExperimentDef.subfolder('dof_cache')
         self.Paths.CITestResultRepository = self.ExperimentDef.subfolder('ci_test_results')
         self.Paths.Summaries = self.ExperimentDef.subfolder('summaries')
+        self.Paths.Plots = self.ExperimentDef.subfolder('plots')
 
 
     def filter_algruns(self):
