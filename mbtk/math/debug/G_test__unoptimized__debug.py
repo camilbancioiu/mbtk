@@ -1,4 +1,4 @@
-from mbff.math.G_test__unoptimized import G_test
+from mbtk.math.G_test__unoptimized import G_test
 
 
 class G_test_debug(G_test):

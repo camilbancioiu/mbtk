@@ -2,7 +2,7 @@
 Class ``DatasetSource``
 ==============================
 
-.. automodule:: mbff.dataset.sources.DatasetSource
+.. automodule:: mbtk.dataset.sources.DatasetSource
   :members:
   :undoc-members:
 

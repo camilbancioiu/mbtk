@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 
 # Assume that the 'experiments' folder, which contains this file, is directly
-# near the 'mbff' package.
+# near the 'mbtk' package.
 EXPERIMENTS_ROOT = Path(os.getcwd()).parents[0]
 MBFF_PATH = EXPERIMENTS_ROOT.parents[0]
 sys.path.insert(0, str(MBFF_PATH))

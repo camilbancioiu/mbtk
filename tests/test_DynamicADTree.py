@@ -1,4 +1,4 @@
-from mbff.structures.DynamicADTree import DynamicADTree
+from mbtk.structures.DynamicADTree import DynamicADTree
 from tests.test_ADTree import assert_pmf_adtree_vs_datasetmatrix
 
 

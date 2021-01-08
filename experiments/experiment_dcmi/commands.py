@@ -8,7 +8,7 @@ from humanize import naturalsize
 from pympler.asizeof import asizeof
 from statistics import median
 
-import mbff.math.G_test__with_AD_tree
+import mbtk.math.G_test__with_AD_tree
 
 
 def configure_objects_subparser__adtree(subparsers, expsetup):
@@ -116,9 +116,9 @@ def command_adtree_build(experimental_setup):
     adtree_save_path = experimental_setup.get_ADTree_path(tree_type, llt)
     ADTreeClass = None
     if tree_type == 'static':
-        ADTreeClass = mbff.structures.ADTree.ADTree
+        ADTreeClass = mbtk.structures.ADTree.ADTree
     elif tree_type == 'dynamic':
-        ADTreeClass = mbff.structures.DynamicADTree.DynamicADTree
+        ADTreeClass = mbtk.structures.DynamicADTree.DynamicADTree
     else:
         raise ValueError('AD-tree type may be either static or dynamic.')
 
@@ -439,19 +439,19 @@ def load_citr_from_algrun_parameters(parameters):
 
 
 def filter_algrun_parameters_Gtest_unoptimized(AlgorithmRunParameters):
-    ci_test_class = mbff.math.G_test__unoptimized.G_test
+    ci_test_class = mbtk.math.G_test__unoptimized.G_test
     return filter_algurn_parameters_by_ci_test_class(AlgorithmRunParameters, ci_test_class)
 
 
 
 def filter_algrun_parameters_Gtest_ADtree(AlgorithmRunParameters):
-    ci_test_class = mbff.math.G_test__with_AD_tree.G_test
+    ci_test_class = mbtk.math.G_test__with_AD_tree.G_test
     return filter_algurn_parameters_by_ci_test_class(AlgorithmRunParameters, ci_test_class)
 
 
 
 def filter_algrun_parameters_Gtest_dcMI(AlgorithmRunParameters):
-    ci_test_class = mbff.math.G_test__with_dcMI.G_test
+    ci_test_class = mbtk.math.G_test__with_dcMI.G_test
     return filter_algurn_parameters_by_ci_test_class(AlgorithmRunParameters, ci_test_class)
 
 

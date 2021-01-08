@@ -2,5 +2,5 @@
 Information Theory
 ===================================
 
-.. automodule:: mbff.math.infotheory
+.. automodule:: mbtk.math.infotheory
   :members:

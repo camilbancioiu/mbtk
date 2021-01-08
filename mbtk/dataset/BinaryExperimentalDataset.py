@@ -1,19 +1,19 @@
 import numpy
 
-from mbff.dataset.ModelBuildingExperimentalDataset import ModelBuildingExperimentalDataset
+from mbtk.dataset.ModelBuildingExperimentalDataset import ModelBuildingExperimentalDataset
 
 class BinaryExperimentalDataset(ModelBuildingExperimentalDataset):
     """
     An experimental dataset which contains only binary data. This means that
     the three :py:class:`DatasetMatrix
-    <mbff.dataset.DatasetMatrix.DatasetMatrix>` instances (``self.matrix``,
+    <mbtk.dataset.DatasetMatrix.DatasetMatrix>` instances (``self.matrix``,
     ``self.matrix_train``, ``self.matrix_test``) are treated as if the contain
     only values ``0`` and ``1``.
 
     The :py:class:`BinaryExperimentalDataset` class provides an extra
     processing step to the default splitting operation performed by
     :py:meth:`ModelBuildingExperimentalDataset.build()
-    <mbff.dataset.ExperimentalDataset.ModelBuildingExperimentalDataset.build>`.
+    <mbtk.dataset.ExperimentalDataset.ModelBuildingExperimentalDataset.build>`.
     """
 
     def perform_random_dataset_split(self):

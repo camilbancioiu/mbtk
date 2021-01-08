@@ -1,9 +1,9 @@
 import tests.utilities as testutil
 
-from mbff.dataset.DatasetMatrix import DatasetMatrix
-from mbff.dataset.ExperimentalDatasetDefinition import ExperimentalDatasetDefinition
-from mbff.dataset.ModelBuildingExperimentalDataset import ModelBuildingExperimentalDataset
-from mbff.dataset.sources.RCV1v2DatasetSource import RCV1v2DatasetSource
+from mbtk.dataset.DatasetMatrix import DatasetMatrix
+from mbtk.dataset.ExperimentalDatasetDefinition import ExperimentalDatasetDefinition
+from mbtk.dataset.ModelBuildingExperimentalDataset import ModelBuildingExperimentalDataset
+from mbtk.dataset.sources.RCV1v2DatasetSource import RCV1v2DatasetSource
 
 
 def test_exds_build():

@@ -6,8 +6,8 @@ from pathlib import Path
 import tests.utilities as testutil
 import pytest
 
-from mbff.dataset.DatasetMatrix import DatasetMatrix
-from mbff.dataset.Exceptions import DatasetMatrixNotFinalizedError
+from mbtk.dataset.DatasetMatrix import DatasetMatrix
+from mbtk.dataset.Exceptions import DatasetMatrixNotFinalizedError
 
 
 def test_saving_and_loading():

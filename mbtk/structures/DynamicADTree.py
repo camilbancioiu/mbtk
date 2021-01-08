@@ -1,10 +1,10 @@
-from mbff.structures.ADTree import ADTree, ADNode, VaryNode
+from mbtk.structures.ADTree import ADTree, ADNode, VaryNode
 
 
 def connect_AD_tree_classes():
     """
     Ensure the classes used by this AD-tree implementation reference each
-    other properly. The mbff.structures package contains multiple AD-tree
+    other properly. The mbtk.structures package contains multiple AD-tree
     implementations that inherit the base ADTree class. Each of these
     implementations will have its own implementations for the ADNode and
     VaryNode classes, and they must reference each other correctly as well.

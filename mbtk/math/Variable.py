@@ -2,7 +2,7 @@ import operator
 import itertools
 from collections import Counter
 
-from mbff.math.Exceptions import VariableInstancesOfUnequalCount
+from mbtk.math.Exceptions import VariableInstancesOfUnequalCount
 
 
 class Variable:

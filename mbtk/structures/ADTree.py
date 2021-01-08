@@ -1,14 +1,14 @@
 import time
 import collections
 
-from mbff.math.PMF import PMF
-from mbff.structures.ContingencyTree import ContingencyTreeNode
+from mbtk.math.PMF import PMF
+from mbtk.structures.ContingencyTree import ContingencyTreeNode
 
 
 def connect_AD_tree_classes():
     """
     Ensure the classes used by this AD-tree implementation reference each
-    other properly. The mbff.structures package contains multiple AD-tree
+    other properly. The mbtk.structures package contains multiple AD-tree
     implementations that inherit the base ADTree class. Each of these
     implementations will have its own implementations for the ADNode and
     VaryNode classes, and they must reference each other correctly as well.
@@ -207,7 +207,7 @@ class ADTree:
 
 class JointVariablesIDs:
     """
-    JointVariablesIDs mimics the mbff.math.Variable.JointVariables class. There
+    JointVariablesIDs mimics the mbtk.math.Variable.JointVariables class. There
     is only one property, variableIDs, which the method ADtree.make_pmf() will
     set to the list of variables for which it constructed the PMF out of the
     data in the AD-tree. This is required by the classes in DoFCalculators,

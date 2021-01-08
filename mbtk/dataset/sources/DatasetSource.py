@@ -1,7 +1,7 @@
 import numpy
 import scipy
 
-from mbff.dataset.DatasetMatrix import DatasetMatrix
+from mbtk.dataset.DatasetMatrix import DatasetMatrix
 
 
 class DatasetSource:
@@ -22,7 +22,7 @@ class DatasetSource:
         """
         The required method of a :py:class:`DatasetSource` class. This method
         reads an external source of data and produces a
-        :py:class:`DatasetMatrix <mbff.dataset.DatasetMatrix.DatasetMatrix>`
+        :py:class:`DatasetMatrix <mbtk.dataset.DatasetMatrix.DatasetMatrix>`
         instance based on ``configuration``.
 
         :param str label: The label of the ``DatasetMatrix``

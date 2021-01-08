@@ -4,8 +4,8 @@ import contextlib
 import pickle
 import gc
 
-from mbff.utilities.MultiFileWriter import MultiFileWriter
-from mbff.experiment.Exceptions import ExperimentFolderLockedException
+from mbtk.utilities.MultiFileWriter import MultiFileWriter
+from mbtk.experiment.Exceptions import ExperimentFolderLockedException
 
 
 class ExperimentRun:

@@ -1,18 +1,18 @@
 import time
 import pickle
 
-from mbff.math.CITestResult import CITestResult
-from mbff.math.PMF import PMF, CPMF
+from mbtk.math.CITestResult import CITestResult
+from mbtk.math.PMF import PMF, CPMF
 
-import mbff.math.infotheory as infotheory
-import mbff.math.G_test__unoptimized
+import mbtk.math.infotheory as infotheory
+import mbtk.math.G_test__unoptimized
 
-import mbff.structures.ADTree
+import mbtk.structures.ADTree
 
 from scipy.stats import chi2
 
 
-class G_test(mbff.math.G_test__unoptimized.G_test):
+class G_test(mbtk.math.G_test__unoptimized.G_test):
 
     def __init__(self, datasetmatrix, parameters):
         super().__init__(datasetmatrix, parameters)

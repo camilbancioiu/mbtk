@@ -1,6 +1,6 @@
 import itertools
 from collections import Counter
-from mbff.utilities import functions as util
+from mbtk.utilities import functions as util
 import numpy
 
 
@@ -243,7 +243,7 @@ def process_pmf_key(key):
 
 
 def cpmf_diff(A, B):
-    import mbff.utilities.colors as col
+    import mbtk.utilities.colors as col
 
     output = ""
     pdiff_threshold = 1e-10
@@ -292,7 +292,7 @@ def cpmf_diff(A, B):
 
 
 def pmf_diff(A, B):
-    import mbff.utilities.colors as col
+    import mbtk.utilities.colors as col
 
     output = ""
     pdiff_threshold = 1e-10

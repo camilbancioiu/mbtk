@@ -1,14 +1,14 @@
 import math
 import numpy
 
-import mbff.utilities.functions as util
+import mbtk.utilities.functions as util
 import tests.utilities as testutil
 import pytest
 
-from mbff.math.Variable import Variable, JointVariables
-from mbff.math.PMF import PMF, CPMF, process_pmf_key
-from mbff.math.Exceptions import VariableInstancesOfUnequalCount
-from mbff.dataset.sources.SampledBayesianNetworkDatasetSource import SampledBayesianNetworkDatasetSource
+from mbtk.math.Variable import Variable, JointVariables
+from mbtk.math.PMF import PMF, CPMF, process_pmf_key
+from mbtk.math.Exceptions import VariableInstancesOfUnequalCount
+from mbtk.dataset.sources.SampledBayesianNetworkDatasetSource import SampledBayesianNetworkDatasetSource
 
 delta = 0.008
 

@@ -3,10 +3,10 @@ import shutil
 import time
 from pathlib import Path
 
-from mbff.math.Variable import Omega
-from mbff.dataset.DatasetMatrix import DatasetMatrix
-from mbff.dataset.sources.SampledBayesianNetworkDatasetSource import SampledBayesianNetworkDatasetSource
-import mbff.utilities.functions as util
+from mbtk.math.Variable import Omega
+from mbtk.dataset.DatasetMatrix import DatasetMatrix
+from mbtk.dataset.sources.SampledBayesianNetworkDatasetSource import SampledBayesianNetworkDatasetSource
+import mbtk.utilities.functions as util
 
 
 test_folder = Path('tests', 'testfiles')

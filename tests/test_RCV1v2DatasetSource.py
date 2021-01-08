@@ -3,8 +3,8 @@ import scipy
 
 import tests.utilities as testutil
 
-from mbff.dataset.sources.RCV1v2DatasetSource import RCV1v2DatasetSource
-from mbff.dataset.DatasetMatrix import DatasetMatrix
+from mbtk.dataset.sources.RCV1v2DatasetSource import RCV1v2DatasetSource
+from mbtk.dataset.DatasetMatrix import DatasetMatrix
 
 
 

@@ -1,6 +1,6 @@
 import numpy
 
-from mbff.dataset.sources.BinarySyntheticDatasetSource import BinarySyntheticDatasetSource
+from mbtk.dataset.sources.BinarySyntheticDatasetSource import BinarySyntheticDatasetSource
 
 
 def test_generating_the_datasetmatrix():

@@ -4,22 +4,22 @@ from pathlib import Path
 
 
 # Assume that the 'experiments' folder, which contains this file, is directly
-# near the 'mbff' package.
+# near the 'mbtk' package.
 EXPERIMENTS_ROOT = Path(os.getcwd())
 MBFF_PATH = EXPERIMENTS_ROOT.parents[0]
 sys.path.insert(0, str(MBFF_PATH))
 
 
-import mbff.structures.ADTree
-import mbff.structures.DynamicADTree
+import mbtk.structures.ADTree
+import mbtk.structures.DynamicADTree
 
-import mbff.math.DSeparationCITest
-import mbff.math.G_test__with_AD_tree
-import mbff.math.G_test__unoptimized
-import mbff.math.G_test__with_dcMI
-import mbff.math.DoFCalculators
+import mbtk.math.DSeparationCITest
+import mbtk.math.G_test__with_AD_tree
+import mbtk.math.G_test__unoptimized
+import mbtk.math.G_test__with_dcMI
+import mbtk.math.DoFCalculators
 
-import mbff.utilities.functions as util
+import mbtk.utilities.functions as util
 
 
 ################################################################################
@@ -76,7 +76,7 @@ def create_algrun_parameters__dsep(experimental_setup, default_parameters):
     bayesian_network = default_parameters['source_bayesian_network']
     target_count = len(bayesian_network)
     citrrepo = experimental_setup.Paths.CITestResultRepository
-    dsep = mbff.math.DSeparationCITest.DSeparationCITest
+    dsep = mbtk.math.DSeparationCITest.DSeparationCITest
     exds_name = experimental_setup.ExDsDef.name
 
     parameters_list = list()
@@ -100,8 +100,8 @@ def create_algrun_parameters__unoptimized(experimental_setup, default_parameters
     bayesian_network = default_parameters['source_bayesian_network']
     target_count = len(bayesian_network)
     citrrepo = experimental_setup.Paths.CITestResultRepository
-    g_test__unoptimized = mbff.math.G_test__unoptimized.G_test
-    dof__structural = mbff.math.DoFCalculators.StructuralDoF
+    g_test__unoptimized = mbtk.math.G_test__unoptimized.G_test
+    dof__structural = mbtk.math.DoFCalculators.StructuralDoF
     exds_name = experimental_setup.ExDsDef.name
 
     parameters_list = list()
@@ -126,15 +126,15 @@ def create_algrun_parameters__adtree(experimental_setup, default_parameters, tre
     bayesian_network = default_parameters['source_bayesian_network']
     target_count = len(bayesian_network)
     citrrepo = experimental_setup.Paths.CITestResultRepository
-    g_test__adtree = mbff.math.G_test__with_AD_tree.G_test
-    dof__structural = mbff.math.DoFCalculators.StructuralDoF
+    g_test__adtree = mbtk.math.G_test__with_AD_tree.G_test
+    dof__structural = mbtk.math.DoFCalculators.StructuralDoF
     exds_name = experimental_setup.ExDsDef.name
 
     ADTreeClass = None
     if tree_type == 'static':
-        ADTreeClass = mbff.structures.ADTree.ADTree
+        ADTreeClass = mbtk.structures.ADTree.ADTree
     if tree_type == 'dynamic':
-        ADTreeClass = mbff.structures.DynamicADTree.DynamicADTree
+        ADTreeClass = mbtk.structures.DynamicADTree.DynamicADTree
 
     parameters_list = list()
     for target in range(target_count):
@@ -167,8 +167,8 @@ def create_algrun_parameters__dcmi(experimental_setup, default_parameters):
     bayesian_network = default_parameters['source_bayesian_network']
     target_count = len(bayesian_network)
     citrrepo = experimental_setup.Paths.CITestResultRepository
-    g_test__dcmi = mbff.math.G_test__with_dcMI.G_test
-    dof__structural_cached = mbff.math.DoFCalculators.CachedStructuralDoF
+    g_test__dcmi = mbtk.math.G_test__with_dcMI.G_test
+    dof__structural_cached = mbtk.math.DoFCalculators.CachedStructuralDoF
     exds_name = experimental_setup.ExDsDef.name
 
     jht_filename = 'jht_{}.pickle'.format(experimental_setup.ExDsDef.name)

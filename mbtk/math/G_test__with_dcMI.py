@@ -1,14 +1,14 @@
 import math
 import pickle
 
-from mbff.math.CITestResult import CITestResult
-from mbff.math.PMF import PMF
+from mbtk.math.CITestResult import CITestResult
+from mbtk.math.PMF import PMF
 
-import mbff.math.G_test__unoptimized
+import mbtk.math.G_test__unoptimized
 from scipy.stats import chi2
 
 
-class G_test(mbff.math.G_test__unoptimized.G_test):
+class G_test(mbtk.math.G_test__unoptimized.G_test):
 
     def __init__(self, datasetmatrix, parameters):
         super().__init__(datasetmatrix, parameters)

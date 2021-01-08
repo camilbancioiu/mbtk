@@ -9,7 +9,7 @@ Simple example involving :class:`VariableNode` and :class:`ProbabilityDistributi
 
 .. sourcecode:: python
 
-  from mbff.math.BayesianNetwork import *
+  from mbtk.math.BayesianNetwork import *
 
   # VariableNode AGE, with its simple probability distribution
   AGE = VariableNode('AGE')
@@ -50,14 +50,14 @@ Simple example involving :class:`VariableNode` and :class:`ProbabilityDistributi
     'EDU' : EDU
   }
 
-Module :mod:`mbff.math.BayesianNetwork`
+Module :mod:`mbtk.math.BayesianNetwork`
 ------------------------------------------
 
-.. autoclass:: mbff.math.BayesianNetwork.BayesianNetwork
+.. autoclass:: mbtk.math.BayesianNetwork.BayesianNetwork
   :members:
 
-.. autoclass:: mbff.math.BayesianNetwork.VariableNode
+.. autoclass:: mbtk.math.BayesianNetwork.VariableNode
   :members:
 
-.. autoclass:: mbff.math.BayesianNetwork.ProbabilityDistributionOfVariableNode
+.. autoclass:: mbtk.math.BayesianNetwork.ProbabilityDistributionOfVariableNode
   :members:

@@ -2,8 +2,8 @@ import numpy
 import scipy
 import random
 
-from mbff.dataset.sources.DatasetSource import DatasetSource
-from mbff.dataset.DatasetMatrix import DatasetMatrix
+from mbtk.dataset.sources.DatasetSource import DatasetSource
+from mbtk.dataset.DatasetMatrix import DatasetMatrix
 
 
 class BinarySyntheticDatasetSource(DatasetSource):

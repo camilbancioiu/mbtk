@@ -1,8 +1,8 @@
 import re
 import pickle
-import mbff.math.Variable
-from mbff.experiment.ExperimentDefinition import ExperimentDefinition
-import mbff.utilities.experiment as util
+import mbtk.math.Variable
+from mbtk.experiment.ExperimentDefinition import ExperimentDefinition
+import mbtk.utilities.experiment as util
 
 
 class DCMIEvExpPathSet(util.ExperimentalPathSet):
@@ -67,7 +67,7 @@ class DCMIEvExpSetup(util.ExperimentalSetup):
         self.DatasetName = self.Arguments.dataset_name
         self.SampleCountString = self.Arguments.sample_count
         self.SampleCount = int(float(self.SampleCountString))
-        self.Omega = mbff.math.Variable.Omega(self.SampleCount)
+        self.Omega = mbtk.math.Variable.Omega(self.SampleCount)
 
 
     def calculate_absolute_LLT(self, llt):

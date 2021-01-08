@@ -2,7 +2,7 @@
 Class ``ExperimentalDataset``
 ==============================
 
-.. automodule:: mbff.dataset.ExperimentalDataset
+.. automodule:: mbtk.dataset.ExperimentalDataset
   :members:
   :undoc-members:
 

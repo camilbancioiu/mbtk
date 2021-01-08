@@ -2,7 +2,7 @@
 Class ``BinarySyntheticDatasetSource``
 =======================================
 
-.. automodule:: mbff.dataset.sources.BinarySyntheticDatasetSource
+.. automodule:: mbtk.dataset.sources.BinarySyntheticDatasetSource
   :members:
   :undoc-members:
 

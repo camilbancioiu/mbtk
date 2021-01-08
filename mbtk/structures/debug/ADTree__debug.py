@@ -1,6 +1,6 @@
 import os
 import time
-from mbff.structures.ADTree import ADTree, ADNode, VaryNode
+from mbtk.structures.ADTree import ADTree, ADNode, VaryNode
 
 
 class ADTreeDebug(ADTree):

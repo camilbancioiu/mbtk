@@ -1,8 +1,8 @@
-from mbff.structures.ADTree import ADTree
-from mbff.math.PMF import PMF, CPMF
-import mbff.math.DoFCalculators
-import mbff.math.G_test__unoptimized
-import mbff.math.G_test__with_AD_tree
+from mbtk.structures.ADTree import ADTree
+from mbtk.math.PMF import PMF, CPMF
+import mbtk.math.DoFCalculators
+import mbtk.math.G_test__unoptimized
+import mbtk.math.G_test__with_AD_tree
 
 
 def test_simple_ADTree_query_count(data_small_1):
@@ -144,10 +144,10 @@ def test_compare_g_tests__survey(ds_survey_5e2, adtree_survey_5e2_llta20):
     parameters['ci_test_ad_tree_preloaded'] = adtree
     parameters['omega'] = ds.omega
     parameters['source_bayesian_network'] = ds.bayesiannetwork
-    parameters['ci_test_dof_calculator_class'] = mbff.math.DoFCalculators.StructuralDoF
+    parameters['ci_test_dof_calculator_class'] = mbtk.math.DoFCalculators.StructuralDoF
 
-    G_unoptimized = mbff.math.G_test__unoptimized.G_test(ds.datasetmatrix, parameters)
-    G_with_AD_tree = mbff.math.G_test__with_AD_tree.G_test(ds.datasetmatrix, parameters)
+    G_unoptimized = mbtk.math.G_test__unoptimized.G_test(ds.datasetmatrix, parameters)
+    G_with_AD_tree = mbtk.math.G_test__with_AD_tree.G_test(ds.datasetmatrix, parameters)
 
     tests = [
         (0, 1, set()),
@@ -179,10 +179,10 @@ def test_compare_g_tests__alarm(ds_alarm_5e2, adtree_alarm_5e2_llta0):
     parameters['ci_test_ad_tree_preloaded'] = adtree
     parameters['omega'] = ds.omega
     parameters['source_bayesian_network'] = ds.bayesiannetwork
-    parameters['ci_test_dof_calculator_class'] = mbff.math.DoFCalculators.StructuralDoF
+    parameters['ci_test_dof_calculator_class'] = mbtk.math.DoFCalculators.StructuralDoF
 
-    G_unoptimized = mbff.math.G_test__unoptimized.G_test(ds.datasetmatrix, parameters)
-    G_with_AD_tree = mbff.math.G_test__with_AD_tree.G_test(ds.datasetmatrix, parameters)
+    G_unoptimized = mbtk.math.G_test__unoptimized.G_test(ds.datasetmatrix, parameters)
+    G_with_AD_tree = mbtk.math.G_test__with_AD_tree.G_test(ds.datasetmatrix, parameters)
 
     tests = [
         (0, 1, set()),

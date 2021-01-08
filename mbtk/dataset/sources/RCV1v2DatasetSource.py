@@ -1,10 +1,10 @@
 import numpy
 import scipy
 
-from mbff.dataset.sources.DatasetSource import DatasetSource
-from mbff.dataset.DatasetMatrix import DatasetMatrix
+from mbtk.dataset.sources.DatasetSource import DatasetSource
+from mbtk.dataset.DatasetMatrix import DatasetMatrix
 
-import mbff.utilities.functions as util
+import mbtk.utilities.functions as util
 
 
 class RCV1v2DatasetSource(DatasetSource):
@@ -39,7 +39,7 @@ class RCV1v2DatasetSource(DatasetSource):
     def create_dataset_matrix(self, label='rcv1v2', feature_type='', filters=None):
         """
         Create a :class:`DatasetMatrix
-        <mbff.dataset.DatasetMatrix.DatasetMatrix>` object containing a
+        <mbtk.dataset.DatasetMatrix.DatasetMatrix>` object containing a
         document-term matrix based on the documents in the RCV1v2 dataset
         (previously downloaded).
 
@@ -63,7 +63,7 @@ class RCV1v2DatasetSource(DatasetSource):
 
         :param str label: The label to be set on the returned ``DatasetMatrix`` instance.
         :return: A ``DatasetMatrix`` containing a document-term matrix in ``X`` and a class-assignment matrix in ``Y``.
-        :rtype: mbff.dataset.DatasetMatrix.DatasetMatrix
+        :rtype: mbtk.dataset.DatasetMatrix.DatasetMatrix
         """
         if filters is None:
             filters = dict()

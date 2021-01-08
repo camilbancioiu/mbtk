@@ -4,8 +4,8 @@ import pytest
 
 import tests.utilities as testutil
 
-from mbff.dataset.sources.SampledBayesianNetworkDatasetSource import SampledBayesianNetworkDatasetSource
-import mbff.utilities.functions as util
+from mbtk.dataset.sources.SampledBayesianNetworkDatasetSource import SampledBayesianNetworkDatasetSource
+import mbtk.utilities.functions as util
 
 
 @pytest.mark.slow

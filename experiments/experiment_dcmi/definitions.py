@@ -4,7 +4,7 @@ from pathlib import Path
 
 
 # Assume that the 'experiments' folder, which contains this file, is directly
-# near the 'mbff' package.
+# near the 'mbtk' package.
 EXPERIMENTS_ROOT = Path(os.getcwd())
 MBFF_PATH = EXPERIMENTS_ROOT.parents[0]
 sys.path.insert(0, str(MBFF_PATH))
@@ -12,9 +12,9 @@ sys.path.insert(0, str(MBFF_PATH))
 
 ################################################################################
 # Create the Experimental Dataset Definition
-from mbff.dataset.ExperimentalDatasetDefinition import ExperimentalDatasetDefinition
-from mbff.dataset.ExperimentalDataset import ExperimentalDataset
-from mbff.dataset.sources.SampledBayesianNetworkDatasetSource import SampledBayesianNetworkDatasetSource
+from mbtk.dataset.ExperimentalDatasetDefinition import ExperimentalDatasetDefinition
+from mbtk.dataset.ExperimentalDataset import ExperimentalDataset
+from mbtk.dataset.sources.SampledBayesianNetworkDatasetSource import SampledBayesianNetworkDatasetSource
 
 
 def exds_definition(experimental_setup):
@@ -41,10 +41,10 @@ def exds_definition(experimental_setup):
 ################################################################################
 # Create the Experiment Definition
 from expsetup import DCMIEvExperimentDefinition
-from mbff.experiment.ExperimentRun import ExperimentRun
-from mbff.experiment.AlgorithmRun import AlgorithmRun
-from mbff.experiment.AlgorithmRunDatapoint import AlgorithmRunDatapoint
-from mbff.algorithms.mb.ipcmb import AlgorithmIPCMB
+from mbtk.experiment.ExperimentRun import ExperimentRun
+from mbtk.experiment.AlgorithmRun import AlgorithmRun
+from mbtk.experiment.AlgorithmRunDatapoint import AlgorithmRunDatapoint
+from mbtk.algorithms.mb.ipcmb import AlgorithmIPCMB
 
 
 def experiment_definition(experimental_setup):

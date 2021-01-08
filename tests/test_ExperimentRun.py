@@ -7,14 +7,14 @@ import tests.utilities as testutil
 import pytest
 from tests.MockDatasetSource import MockDatasetSource
 
-from mbff.dataset.ExperimentalDatasetDefinition import ExperimentalDatasetDefinition
-from mbff.dataset.ModelBuildingExperimentalDataset import ModelBuildingExperimentalDataset
-from mbff.experiment.ExperimentDefinition import ExperimentDefinition
-from mbff.experiment.ExperimentRun import ExperimentRun
-from mbff.experiment.AlgorithmRun import AlgorithmAndClassifierRun
-from mbff.experiment.AlgorithmRunDatapoint import AlgorithmAndClassifierRunDatapoint
-from mbff.experiment.Exceptions import ExperimentFolderLockedException
-from mbff.algorithms.basic.IGt import AlgorithmIGt
+from mbtk.dataset.ExperimentalDatasetDefinition import ExperimentalDatasetDefinition
+from mbtk.dataset.ModelBuildingExperimentalDataset import ModelBuildingExperimentalDataset
+from mbtk.experiment.ExperimentDefinition import ExperimentDefinition
+from mbtk.experiment.ExperimentRun import ExperimentRun
+from mbtk.experiment.AlgorithmRun import AlgorithmAndClassifierRun
+from mbtk.experiment.AlgorithmRunDatapoint import AlgorithmAndClassifierRunDatapoint
+from mbtk.experiment.Exceptions import ExperimentFolderLockedException
+from mbtk.algorithms.basic.IGt import AlgorithmIGt
 
 
 def test_experiment_run__simple():

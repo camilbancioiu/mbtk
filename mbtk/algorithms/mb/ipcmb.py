@@ -1,5 +1,5 @@
 import itertools
-from mbff.math.Exceptions import InsufficientSamplesForCITest
+from mbtk.math.Exceptions import InsufficientSamplesForCITest
 
 from pprint import pprint
 

@@ -2,9 +2,9 @@ import numpy
 
 import tests.utilities as testutil
 
-from mbff.dataset.ExperimentalDatasetDefinition import ExperimentalDatasetDefinition
-from mbff.dataset.BinaryExperimentalDataset import BinaryExperimentalDataset
-from mbff.dataset.sources.BinarySyntheticDatasetSource import BinarySyntheticDatasetSource
+from mbtk.dataset.ExperimentalDatasetDefinition import ExperimentalDatasetDefinition
+from mbtk.dataset.BinaryExperimentalDataset import BinaryExperimentalDataset
+from mbtk.dataset.sources.BinarySyntheticDatasetSource import BinarySyntheticDatasetSource
 
 
 def test_feature_removal__no_thresholds():

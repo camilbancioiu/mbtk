@@ -1,7 +1,7 @@
-from mbff.math.Variable import JointVariables
-import mbff.math.Variable
-import mbff.math.G_test__unoptimized
-import mbff.math.DoFCalculators
+from mbtk.math.Variable import JointVariables
+import mbtk.math.Variable
+import mbtk.math.G_test__unoptimized
+import mbtk.math.DoFCalculators
 
 import pytest
 
@@ -17,13 +17,13 @@ def test_G_value__alarm(ds_alarm_8e3):
     parameters['ci_test_debug'] = 0
     parameters['omega'] = Omega
     parameters['source_bayesian_network'] = bn
-    parameters['ci_test_dof_calculator_class'] = mbff.math.DoFCalculators.UnadjustedDoF
+    parameters['ci_test_dof_calculator_class'] = mbtk.math.DoFCalculators.UnadjustedDoF
 
     X = 35
     Y = 3
     Z = {32, 1, 34, 36}
 
-    G_test = mbff.math.G_test__unoptimized.G_test(dataset, parameters)
+    G_test = mbtk.math.G_test__unoptimized.G_test(dataset, parameters)
     G_test.conditionally_independent(X, Y, Z)
 
 
@@ -48,9 +48,9 @@ def test_G_value__lungcancer(ds_lungcancer_4e4):
     parameters['ci_test_debug'] = 0
     parameters['omega'] = Omega
     parameters['source_bayesian_network'] = bn
-    parameters['ci_test_dof_calculator_class'] = mbff.math.DoFCalculators.StructuralDoF
+    parameters['ci_test_dof_calculator_class'] = mbtk.math.DoFCalculators.StructuralDoF
 
-    G_test = mbff.math.G_test__unoptimized.G_test(lungcancer, parameters)
+    G_test = mbtk.math.G_test__unoptimized.G_test(lungcancer, parameters)
 
     assertCITestAccurate(G_test, ASIA, SMOKE, Omega)
     assertCITestAccurate(G_test, ASIA, LUNG, Omega)
@@ -78,11 +78,11 @@ def test_G_value__lungcancer(ds_lungcancer_4e4):
 
 
 def assertCITestAccurate(G_test, X, Y, Z):
-    if isinstance(Z, mbff.math.Variable.Omega):
+    if isinstance(Z, mbtk.math.Variable.Omega):
         Z_ID = []
     elif isinstance(Z, JointVariables):
         Z_ID = Z.variableIDs
-    elif isinstance(Z, mbff.math.Variable.Variable):
+    elif isinstance(Z, mbtk.math.Variable.Variable):
         Z_ID = [Z.ID]
 
     result = G_test.G_test_conditionally_independent(X.ID, Y.ID, Z_ID)

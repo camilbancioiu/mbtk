@@ -1,9 +1,9 @@
 import pytest
 import time
 import gc
-import mbff.math.DoFCalculators as DoFCalculators
+import mbtk.math.DoFCalculators as DoFCalculators
 
-import mbff.structures.DynamicADTree
+import mbtk.structures.DynamicADTree
 import tests.test_AlgorithmIPCMBWithGtests as ipcmb_tests
 import tests.utilities as testutil
 
@@ -44,7 +44,7 @@ def test_ipcmb_efficiency__with_adtree(testfolders, ds_alarm_8e3):
     LLT = 0
     path = testfolders['adtrees'] / (ds.label + '.pickle')
     parameters = ipcmb_tests.make_parameters__adtree(DoFCalculators.StructuralDoF, LLT, None, path, path)
-    parameters['ci_test_ad_tree_class'] = mbff.structures.ADTree.ADTree
+    parameters['ci_test_ad_tree_class'] = mbtk.structures.ADTree.ADTree
 
     print()
     targets = range(ds.datasetmatrix.get_column_count('X'))
@@ -108,7 +108,7 @@ def run_demo_ipcmb_test__dynamic_adtree(folders, ds):
     LLT = 0
     path = folders['dynamic_adtrees'] / (ds.label + '.pickle')
     parameters = ipcmb_tests.make_parameters__adtree(DoFCalculators.StructuralDoF, LLT, None, path, path)
-    parameters['ci_test_ad_tree_class'] = mbff.structures.DynamicADTree.DynamicADTree
+    parameters['ci_test_ad_tree_class'] = mbtk.structures.DynamicADTree.DynamicADTree
     parameters['source_bayesian_network'] = None
     parameters['algorithm_debug'] = 1
 

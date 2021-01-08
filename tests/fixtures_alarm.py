@@ -1,8 +1,8 @@
 import pytest
 from pathlib import Path
 import tests.utilities as testutil
-from mbff.structures.ADTree import ADTree
-import mbff.utilities.functions as util
+from mbtk.structures.ADTree import ADTree
+import mbtk.utilities.functions as util
 
 
 @pytest.fixture(scope='session')

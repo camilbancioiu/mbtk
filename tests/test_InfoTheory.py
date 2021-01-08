@@ -1,7 +1,7 @@
 import numpy
 
-import mbff.math.infotheory as infotheory
-from mbff.math.Variable import Variable
+import mbtk.math.infotheory as infotheory
+from mbtk.math.Variable import Variable
 
 
 def almostEqual(x, y):

@@ -3,7 +3,7 @@
 ===============================================
 
 Before reading about this module further, it is recommended to understand
-the :class:`mbff.dataset.DatasetMatrix.DatasetMatrix` class.
+the :class:`mbtk.dataset.DatasetMatrix.DatasetMatrix` class.
 
 About RCV1v2
 ------------
@@ -26,17 +26,17 @@ download and unpack the required files.
 Reading RCV1v2 documents
 ------------------------
 
-The :class:`RCV1v2DatasetSource <mbff.dataset.sources.RCV1v2DatasetSource>`
+The :class:`RCV1v2DatasetSource <mbtk.dataset.sources.RCV1v2DatasetSource>`
 class reads the files of the RCV1v2 package and constructs a collection of
 documents by the "bag of words" principle. Namely, the document is represented
 by the words that it contains and the number of occurences of each of its
 words.
 
 Instantiating a new :class:`RCV1v2DatasetSource
-<mbff.dataset.sources.RCV1v2DatasetSource>` requires a ``configuration``
+<mbtk.dataset.sources.RCV1v2DatasetSource>` requires a ``configuration``
 dictionary passed to the constructor. This dictionary will affect all
 subsequent calls to :meth:`create_dataset_matrix()
-<mbff.dataset.sources.RCV1v2DatasetSource.RCV1v2DatasetSource.create_dataset_matrix>`.
+<mbtk.dataset.sources.RCV1v2DatasetSource.RCV1v2DatasetSource.create_dataset_matrix>`.
 It may contain the following:
 
 * ``configuration['sourcefolder']`` must contain the path to the folder
@@ -56,14 +56,14 @@ It may contain the following:
 * ``configuration['feature_type']`` must contain either one of the strings
   ``'wordcount'`` or ``'binary'``. If missing, it is automatically set to
   ``'wordcount'``. Its value determines what type of values will be written
-  in the :class:`DatasetMatrix <mbff.dataset.DatasetMatrix.DatasetMatrix>`
+  in the :class:`DatasetMatrix <mbtk.dataset.DatasetMatrix.DatasetMatrix>`
   object returned by :meth:`create_dataset_matrix
-  <mbff.dataset.sources.RCV1v2DatasetSource.RCV1v2DatasetSource.create_dataset_matrix>`.
+  <mbtk.dataset.sources.RCV1v2DatasetSource.RCV1v2DatasetSource.create_dataset_matrix>`.
 
 After instantiating, call the :meth:`create_dataset_matrix()
-<mbff.dataset.sources.RCV1v2DatasetSource.RCV1v2DatasetSource.create_dataset_matrix>`
+<mbtk.dataset.sources.RCV1v2DatasetSource.RCV1v2DatasetSource.create_dataset_matrix>`
 method to get a :class:`DatasetMatrix
-<mbff.dataset.DatasetMatrix.DatasetMatrix>` object, which contains the
+<mbtk.dataset.DatasetMatrix.DatasetMatrix>` object, which contains the
 documents in RCV1v2 represented as a `document-term matrix`_, as follows:
 
   .. _document-term matrix: https://en.wikipedia.org/wiki/Document-term_matrix
@@ -93,7 +93,7 @@ Examples
 .. sourcecode:: python
 
   from pathlib import Path
-  from mbff.dataset.sources.RCV1v2DatasetSource import RCV1v2DatasetSource
+  from mbtk.dataset.sources.RCV1v2DatasetSource import RCV1v2DatasetSource
 
   configuration = {
           'sourcefolder': Path('/var/work/Personal/PhD/Datasets/Reuters/RCV1-v2'),
@@ -103,10 +103,10 @@ Examples
   source = RCV1v2DatasetSource(configuration)
   # TODO
 
-Module :mod:`mbff.dataset.sources.RCV1v2DatasetSource`
+Module :mod:`mbtk.dataset.sources.RCV1v2DatasetSource`
 ------------------------------------------------------
 
-.. automodule:: mbff.dataset.sources.RCV1v2DatasetSource
+.. automodule:: mbtk.dataset.sources.RCV1v2DatasetSource
   :members:
   :undoc-members:
 

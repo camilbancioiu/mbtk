@@ -1,11 +1,11 @@
 import sys
 import tests.utilities as testutil
-from mbff.algorithms.mb.ipcmb import AlgorithmIPCMB
-import mbff.structures.ADTree
-import mbff.structures.DynamicADTree
-import mbff.math.G_test__with_dcMI
-import mbff.math.G_test__with_AD_tree
-import mbff.math.DoFCalculators as DoFCalculators
+from mbtk.algorithms.mb.ipcmb import AlgorithmIPCMB
+import mbtk.structures.ADTree
+import mbtk.structures.DynamicADTree
+import mbtk.math.G_test__with_dcMI
+import mbtk.math.G_test__with_AD_tree
+import mbtk.math.DoFCalculators as DoFCalculators
 
 import cProfile
 import pstats
@@ -42,7 +42,7 @@ def dataset(size):
 
 def make_parameters__unoptimized(dof_class):
     parameters = dict()
-    parameters['ci_test_class'] = mbff.math.G_test__unoptimized.G_test
+    parameters['ci_test_class'] = mbtk.math.G_test__unoptimized.G_test
     parameters['ci_test_dof_calculator_class'] = dof_class
     parameters['ci_test_gc_collect_rate'] = 0
     return parameters
@@ -51,11 +51,11 @@ def make_parameters__unoptimized(dof_class):
 
 def make_parameters__adtree(dof_class, llt, adtree=None, path_load=None, path_save=None):
     parameters = dict()
-    parameters['ci_test_class'] = mbff.math.G_test__with_AD_tree.G_test
+    parameters['ci_test_class'] = mbtk.math.G_test__with_AD_tree.G_test
     parameters['ci_test_dof_calculator_class'] = dof_class
     parameters['ci_test_gc_collect_rate'] = 0
     parameters['ci_test_ad_tree_preloaded'] = adtree
-    parameters['ci_test_ad_tree_class'] = mbff.structures.ADTree.ADTree
+    parameters['ci_test_ad_tree_class'] = mbtk.structures.ADTree.ADTree
     parameters['ci_test_ad_tree_path__load'] = path_load
     parameters['ci_test_ad_tree_path__save'] = path_save
     parameters['ci_test_ad_tree_leaf_list_threshold'] = llt
@@ -65,7 +65,7 @@ def make_parameters__adtree(dof_class, llt, adtree=None, path_load=None, path_sa
 
 def make_parameters__dcmi(dof_class, jht_path=None, dof_path=None):
     parameters = dict()
-    parameters['ci_test_class'] = mbff.math.G_test__with_dcMI.G_test
+    parameters['ci_test_class'] = mbtk.math.G_test__with_dcMI.G_test
     parameters['ci_test_dof_calculator_class'] = dof_class
     parameters['ci_test_gc_collect_rate'] = 0
     parameters['ci_test_jht_path__load'] = jht_path
@@ -122,7 +122,7 @@ def run_dynadtree():
     folders = testfolders()
     path = folders['dynamic_adtrees'] / (ds.label + '.pickle')
     parameters = make_parameters__adtree(DoFCalculators.StructuralDoF, LLT, None, path, path)
-    parameters['ci_test_ad_tree_class'] = mbff.structures.DynamicADTree.DynamicADTree
+    parameters['ci_test_ad_tree_class'] = mbtk.structures.DynamicADTree.DynamicADTree
 
     print('start')
     targets = range(ds.datasetmatrix.get_column_count('X'))
@@ -138,7 +138,7 @@ def run_adtree():
     folders = testfolders()
     path = folders['adtrees'] / (ds.label + '.pickle')
     parameters = make_parameters__adtree(DoFCalculators.StructuralDoF, LLT, None, path, path)
-    parameters['ci_test_ad_tree_class'] = mbff.structures.ADTree.ADTree
+    parameters['ci_test_ad_tree_class'] = mbtk.structures.ADTree.ADTree
 
     print('start')
     targets = range(ds.datasetmatrix.get_column_count('X'))

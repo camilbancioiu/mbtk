@@ -3,9 +3,9 @@ import os
 import shutil
 from pathlib import Path
 
-import mbff.utilities.functions as util
-from mbff.dataset.ExperimentalDataset import ExperimentalDataset
-from mbff.dataset.DatasetMatrix import DatasetMatrix
+import mbtk.utilities.functions as util
+from mbtk.dataset.ExperimentalDataset import ExperimentalDataset
+from mbtk.dataset.DatasetMatrix import DatasetMatrix
 
 
 class ModelBuildingExperimentalDataset(ExperimentalDataset):
@@ -19,7 +19,7 @@ class ModelBuildingExperimentalDataset(ExperimentalDataset):
     following attributes:
 
     :var definition: An instance of :py:class:`ExperimentalDatasetDefinition
-        <mbff.dataset.ExperimentalDatasetDefinition.ExperimentalDatasetDefinition>`,
+        <mbtk.dataset.ExperimentalDatasetDefinition.ExperimentalDatasetDefinition>`,
         which contains the details about how to build the initial ``self.matrix`` from
         a dataset source, how to split it into *training samples* and *test
         samples* and the folder where to save / to load the matrices from.
@@ -85,7 +85,7 @@ class ModelBuildingExperimentalDataset(ExperimentalDataset):
         """
         Save the training and testing matrices of this
         ModelBuildingExperimentalDataset to ``self.definition.path``. Simply
-        calls :py:meth:`save() <mbff.dataset.DatasetMatrix.DatasetMatrix.save>`
+        calls :py:meth:`save() <mbtk.dataset.DatasetMatrix.DatasetMatrix.save>`
         on ``self.matrix_train`` and ``self.matrix_test``.
 
         :return: Nothing
@@ -165,7 +165,7 @@ class ModelBuildingExperimentalDataset(ExperimentalDataset):
             * ``self.matrix`` for ``label == "full"``
             * ``self.matrix_train`` for ``label == "train"``
             * ``self.matrix_test`` for ``label == "test"``
-        :rtype: mbff.dataset.DatasetMatrix.DatasetMatrix
+        :rtype: mbtk.dataset.DatasetMatrix.DatasetMatrix
         :raises ValueError: if ``label`` is not one of ``"full"``, ``"train"`` or ``"test"``
         """
         if label == 'full':

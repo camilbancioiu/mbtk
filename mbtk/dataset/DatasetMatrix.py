@@ -1,9 +1,9 @@
 import numpy
 import scipy
 import scipy.io
-import mbff.utilities.functions as util
-from mbff.math.Variable import Variable, JointVariables
-from mbff.dataset.Exceptions import DatasetMatrixNotFinalizedError, DatasetMatrixFinalizedError
+import mbtk.utilities.functions as util
+from mbtk.math.Variable import Variable, JointVariables
+from mbtk.dataset.Exceptions import DatasetMatrixNotFinalizedError, DatasetMatrixFinalizedError
 
 
 class DatasetMatrix:
@@ -195,7 +195,7 @@ class DatasetMatrix:
             ``"X"`` or ``"Y"``.
         :param int column: 0-based integer index of the column to retrieve.
         :return: A ``Variable`` object wrapping the requested column.
-        :rtype: ``py:class:mbff.math.Variable``
+        :rtype: ``py:class:mbtk.math.Variable``
         :raises ValueError: if ``matrix_label`` is neither ``"X"`` nor ``"Y""``.
         """
         if column is None:

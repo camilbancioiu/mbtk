@@ -1,7 +1,7 @@
 import pytest
 from pathlib import Path
 import tests.utilities as testutil
-import mbff.utilities.functions as util
+import mbtk.utilities.functions as util
 
 
 @pytest.fixture(scope='session')

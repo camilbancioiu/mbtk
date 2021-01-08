@@ -1,11 +1,11 @@
 import pytest
 
-from mbff.structures.BayesianNetwork import BayesianNetwork
-from mbff.math.DSeparationCITest import DSeparationCITest
-from mbff.algorithms.mb.ipcmb import AlgorithmIPCMB
+from mbtk.structures.BayesianNetwork import BayesianNetwork
+from mbtk.math.DSeparationCITest import DSeparationCITest
+from mbtk.algorithms.mb.ipcmb import AlgorithmIPCMB
 
-import mbff.math.G_test__unoptimized
-import mbff.math.DoFCalculators
+import mbtk.math.G_test__unoptimized
+import mbtk.math.DoFCalculators
 
 
 @pytest.mark.slow
@@ -16,12 +16,12 @@ def test_ipcmb_finding_Markov_blankets_in_datasetmatrix(ds_survey_2e4):
 
     parameters = dict()
     parameters['target'] = 3
-    parameters['ci_test_class'] = mbff.math.G_test__unoptimized.G_test
+    parameters['ci_test_class'] = mbtk.math.G_test__unoptimized.G_test
     parameters['ci_test_significance'] = 0.90
     parameters['ci_test_debug'] = 0
     parameters['omega'] = omega
     parameters['source_bayesian_network'] = bn
-    parameters['ci_test_dof_calculator_class'] = mbff.math.DoFCalculators.StructuralDoF
+    parameters['ci_test_dof_calculator_class'] = mbtk.math.DoFCalculators.StructuralDoF
 
     ipcmb = AlgorithmIPCMB(datasetmatrix, parameters)
     mb = ipcmb.select_features()

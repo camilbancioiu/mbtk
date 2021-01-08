@@ -1,7 +1,7 @@
 import operator
 import numpy
 import math
-import mbff.math.infotheory as infotheory
+import mbtk.math.infotheory as infotheory
 
 
 class AlgorithmIGt:

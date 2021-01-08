@@ -1,8 +1,8 @@
 import scipy
 import numpy
 
-from mbff.algorithms.basic.IGt import AlgorithmIGt
-from mbff.dataset.DatasetMatrix import DatasetMatrix
+from mbtk.algorithms.basic.IGt import AlgorithmIGt
+from mbtk.dataset.DatasetMatrix import DatasetMatrix
 
 
 def test_selecting_features():

@@ -1,6 +1,6 @@
 import time
 
-import mbff.utilities.colors as col
+import mbtk.utilities.colors as col
 
 
 class CITestResult:

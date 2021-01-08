@@ -1,7 +1,7 @@
 import math
 
-from mbff.math.PMF import PMF, CPMF
-from mbff.math.Variable import JointVariables
+from mbtk.math.PMF import PMF, CPMF
+from mbtk.math.Variable import JointVariables
 
 
 def mutual_information(PrXY, PrX, PrY, base=2):

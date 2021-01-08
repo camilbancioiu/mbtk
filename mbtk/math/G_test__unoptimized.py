@@ -1,11 +1,11 @@
 import pickle
 
-from mbff.math.CITestResult import CITestResult
+from mbtk.math.CITestResult import CITestResult
 
-import mbff.math.infotheory as infotheory
-from mbff.math.PMF import PMF, CPMF
-from mbff.math.Variable import JointVariables
-from mbff.math.Exceptions import InsufficientSamplesForCITest
+import mbtk.math.infotheory as infotheory
+from mbtk.math.PMF import PMF, CPMF
+from mbtk.math.Variable import JointVariables
+from mbtk.math.Exceptions import InsufficientSamplesForCITest
 
 from scipy.stats import chi2
 import gc

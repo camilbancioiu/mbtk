@@ -58,8 +58,8 @@ def read_bif_file(sourcepath, use_cache=True):
 
 def parse_bif_file(path):
     from lark import Lark
-    from mbff.utilities.bif.Grammar import bif_grammar
-    from mbff.utilities.bif.Transformers import get_transformer_chain
+    from mbtk.utilities.bif.Grammar import bif_grammar
+    from mbtk.utilities.bif.Transformers import get_transformer_chain
     parser = Lark(bif_grammar)
     tree = parser.parse(path.read_text())
 

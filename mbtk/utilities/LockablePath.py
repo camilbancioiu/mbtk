@@ -1,7 +1,7 @@
 from pathlib import Path
 import shutil
 
-from mbff.utilities.Exceptions import LockablePathException
+from mbtk.utilities.Exceptions import LockablePathException
 
 
 class LockablePath:

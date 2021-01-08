@@ -1,4 +1,4 @@
-from mbff.utilities.LockablePath import LockablePath
+from mbtk.utilities.LockablePath import LockablePath
 
 
 class ExperimentDefinition(LockablePath):

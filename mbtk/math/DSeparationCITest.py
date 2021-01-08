@@ -1,5 +1,5 @@
 import pickle
-from mbff.math.CITestResult import CITestResult
+from mbtk.math.CITestResult import CITestResult
 
 
 class DSeparationCITest:

@@ -1,7 +1,7 @@
 from collections import OrderedDict
 from lark import Transformer
 
-from mbff.structures.BayesianNetwork import BayesianNetwork, VariableNode, ProbabilityDistributionOfVariableNode
+from mbtk.structures.BayesianNetwork import BayesianNetwork, VariableNode, ProbabilityDistributionOfVariableNode
 
 
 def get_transformer_chain():

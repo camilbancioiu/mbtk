@@ -2,9 +2,9 @@ import numpy
 import scipy
 import random
 
-from mbff.dataset.sources.DatasetSource import DatasetSource
-from mbff.dataset.DatasetMatrix import DatasetMatrix
-import mbff.utilities.functions as util
+from mbtk.dataset.sources.DatasetSource import DatasetSource
+from mbtk.dataset.DatasetMatrix import DatasetMatrix
+import mbtk.utilities.functions as util
 
 
 class SampledBayesianNetworkDatasetSource(DatasetSource):

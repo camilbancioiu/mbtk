@@ -1,9 +1,9 @@
 from collections import OrderedDict
 from pathlib import Path
 
-import mbff.utilities.functions as util
+import mbtk.utilities.functions as util
 import tests.utilities as testutil
-from mbff.structures.BayesianNetwork import BayesianNetwork, VariableNode, ProbabilityDistributionOfVariableNode
+from mbtk.structures.BayesianNetwork import BayesianNetwork, VariableNode, ProbabilityDistributionOfVariableNode
 
 
 def test_reading_bif_file():

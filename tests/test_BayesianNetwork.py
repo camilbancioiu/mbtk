@@ -4,8 +4,8 @@ from collections import Counter
 import numpy
 import pytest
 
-from mbff.structures.BayesianNetwork import BayesianNetwork, VariableNode, ProbabilityDistributionOfVariableNode
-from mbff.structures.Exceptions import BayesianNetworkNotFinalizedError
+from mbtk.structures.BayesianNetwork import BayesianNetwork, VariableNode, ProbabilityDistributionOfVariableNode
+from mbtk.structures.Exceptions import BayesianNetworkNotFinalizedError
 
 
 def test_probability_distribution():
