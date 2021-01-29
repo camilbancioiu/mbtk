@@ -1,0 +1,21 @@
+============================= test session starts ==============================
+platform linux -- Python 3.8.3, pytest-5.4.2, py-1.8.1, pluggy-0.13.1 -- /usr/bin/python3
+cachedir: .pytest_cache
+rootdir: /home/camil.bancioiu/PhD/MBFF
+plugins: parallel-0.1.0
+collecting ... collected 93 items / 91 deselected / 2 selected
+
+tests/test_Demo.py::test_ipcmb_efficiency__with_dynamic_adtree__pathfinder Demo test with a dynamic AD-tree on Pathfinder
+
+
+DS has range(0, 109) targets.
+Start time Mon Jun  8 17:04:22 2020
+
+target 0
+Begin IPCMB
+Returning the entire MB: set()
+[1.0428876876831055]	MB(0) = []
+gc.collect()... ok, took 2.2505457401275635s
+
+target 1
+Begin IPCMB

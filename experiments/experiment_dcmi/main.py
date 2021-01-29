@@ -6,8 +6,8 @@ import argparse
 # Assume that the 'experiments' folder, which contains this file, is directly
 # near the 'mbtk' package.
 EXPERIMENTS_ROOT = Path(os.getcwd()).parents[0]
-MBFF_PATH = EXPERIMENTS_ROOT.parents[0]
-sys.path.insert(0, str(MBFF_PATH))
+MBTK_PATH = EXPERIMENTS_ROOT.parents[0]
+sys.path.insert(0, str(MBTK_PATH))
 
 import mbtk.utilities.experiment as util
 
@@ -31,7 +31,7 @@ def create_argparser(expsetup):
     object_subparsers = argparser.add_subparsers(dest='object')
     object_subparsers.required = True
 
-    # Commands provided by the MBFF library
+    # Commands provided by the MBTK library
     util.configure_objects_subparser__paths(object_subparsers)
     util.configure_objects_subparser__exp_def(object_subparsers)
     util.configure_objects_subparser__exds_def(object_subparsers)

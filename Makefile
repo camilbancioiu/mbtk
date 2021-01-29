@@ -1,7 +1,7 @@
 # You can set these variables from the command line.
 SPHINXOPTS    = -c ./doc
 SPHINXBUILD   = sphinx-build
-SPHINXPROJ    = MBFF
+SPHINXPROJ    = MBTK
 SOURCEDIR     = doc
 BUILDDIR      = doc/_build
 
