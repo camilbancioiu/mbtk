@@ -24,9 +24,10 @@ The MBTK contains many utilities, but also complete implementations of algorithm
 
 ### Algorithms
 
-* Iterative Parent-Child Markov Blanket algorithm (IPC-MB), implemented in a simple and general way, isolated from any independence test. (ADD LINK)
+* Iterative Parent-Child Markov Blanket algorithm (IPC-MB), implemented in a simple and general way, isolated from any independence test; for details on IPC-MB, see the [original article](https://link.springer.com/chapter/10.1007%2F978-3-540-68825-9_10).
 
 ### Mathematics
 
-* G-test implemented in the canonical form; performs queries on the dataset alone; used mostly as a baseline for efficiency comparisons.
-* G-test implemented with AD-trees, 
+* G-test implemented in the canonical form; performs queries on the data set alone; used mostly as a baseline for efficiency comparisons.
+* G-test implemented with AD-trees (configurable for static or dynamic tree); when using the static AD-tree, the data set is not queried for independence tests at all, but the tree must be built completely before the algorithm starts; when using the dynamic AD-tree, no building step is required before the algorithm starts, but access to the data set becomes required when a query cannot be satisfied by the tree alone.
+* G-test implemented with the `dcMI` optimization, which decomposes the `G` statistic into joint entropy terms and caches them for future reuse; access to the data set is required when a test cannot be computed with the cached terms alone.
