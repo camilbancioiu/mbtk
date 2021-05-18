@@ -9,6 +9,14 @@ import tests.utilities as testutil
 
 
 @pytest.fixture(scope='session')
+def demonstration_state():
+    state = dict()
+    state['durations'] = dict()
+    return state
+
+
+
+@pytest.fixture(scope='session')
 def testfolders():
     folders = dict()
     root = testutil.ensure_empty_tmp_subfolder('test_demo_ipcmb_with_gtests')
@@ -39,7 +47,7 @@ def test_ipcmb_efficiency__unoptimized(ds_alarm_8e3):
 
 
 @pytest.mark.demo
-def test_ipcmb_efficiency__with_adtree(testfolders, ds_alarm_8e3):
+def test_ipcmb_efficiency__with_static_adtree(testfolders, ds_alarm_8e3):
     ds = ds_alarm_8e3
     LLT = 0
     path = testfolders['adtrees'] / (ds.label + '.pickle')
@@ -53,6 +61,7 @@ def test_ipcmb_efficiency__with_adtree(testfolders, ds_alarm_8e3):
         mb, _, ipcmb = ipcmb_tests.run_IPCMB(ds, target, parameters)
         print('MB({}) = {}'.format(target, mb))
 
+        # Reuse the AD-tree when discovering the MB of the next target
         adtree = ipcmb.CITest.AD_tree
         parameters['ci_test_ad_tree_preloaded'] = adtree
 
@@ -60,14 +69,14 @@ def test_ipcmb_efficiency__with_adtree(testfolders, ds_alarm_8e3):
 
 @pytest.mark.demo
 @pytest.mark.demo_alarm
-def test_ipcmb_efficiency__with_dynamic_adtree(testfolders, ds_alarm_8e3):
+def test_ipcmb_efficiency__with_dynamic_adtree(testfolders, ds_alarm_8e3, demonstration_state):
     run_demo_ipcmb_test__dynamic_adtree(testfolders, ds_alarm_8e3)
 
 
 
 @pytest.mark.demo
 @pytest.mark.demo_alarm
-def test_ipcmb_efficiency__with_dcMI(testfolders, ds_alarm_8e3):
+def test_ipcmb_efficiency__with_dcMI(testfolders, ds_alarm_8e3, demonstration_state):
     run_demo_ipcmb_test__dcmi(testfolders, ds_alarm_8e3)
 
 
@@ -112,38 +121,11 @@ def run_demo_ipcmb_test__dynamic_adtree(folders, ds):
     parameters['source_bayesian_network'] = None
     parameters['algorithm_debug'] = 1
 
-    print()
-    print()
-    gc_total_duration = 0
-    ipcmb_total_duration = 0
-    targets = range(ds.datasetmatrix.get_column_count('X'))
-    print('DS has {} targets.'.format(targets))
-    start = time.time()
-    print('Start time', time.ctime(start), flush=True)
-    for target in targets:
-        print()
-        print('target', target)
-        target_start = time.time()
-        mb, _, ipcmb = ipcmb_tests.run_IPCMB(ds, target, parameters)
-        target_duration = time.time() - target_start
-        ipcmb_total_duration += target_duration
-        print('[{:>}]\tMB({}) = {}'.format(target_duration, target, mb))
-
+    def post_run(ipcmb, parameters):
         adtree = ipcmb.CITest.AD_tree
         parameters['ci_test_ad_tree_preloaded'] = adtree
 
-        print('gc.collect()... ', end='')
-        gc_start = time.time()
-        gc.collect()
-        gc_duration = time.time() - gc_start
-        print('ok, took {}s'.format(gc_duration))
-        gc_total_duration += gc_duration
-
-    end = time.time()
-    print('End time', time.ctime(end))
-    print('Duration', end - start)
-    print('IPC-MB duration', ipcmb_total_duration)
-    print('GC duration', gc_total_duration)
+    run_demo_ipcmb_test__optimized(folders, ds, parameters, 'dynamic AD-tree', post_run)
 
 
 
@@ -154,36 +136,35 @@ def run_demo_ipcmb_test__dcmi(folders, ds):
     parameters['source_bayesian_network'] = None
     parameters['algorithm_debug'] = 1
 
+    def post_run(ipcmb, parameters):
+        jht = ipcmb.CITest.JHT
+        parameters['ci_test_jht_preloaded'] = jht
+
+    run_demo_ipcmb_test__optimized(folders, ds, parameters, 'dcMI', post_run)
+
+
+
+def run_demo_ipcmb_test__optimized(folders, ds, parameters, name, post_run):
     print()
     print()
     targets = range(ds.datasetmatrix.get_column_count('X'))
-    print('DS has {} targets.'.format(targets))
-    gc_total_duration = 0
+    print('Data set has {} variables.'.format(len(targets)))
     ipcmb_total_duration = 0
     start = time.time()
-    print('Start time', time.ctime(start))
     for target in targets:
         print()
-        print('target', target)
+        print('Discovering Markov blanket of variable {} using IPC-MB optimized with {}'.format(target, name))
         target_start = time.time()
         mb, _, ipcmb = ipcmb_tests.run_IPCMB(ds, target, parameters)
         target_end = time.time()
         target_duration = target_end - target_start
         ipcmb_total_duration += target_duration
-        print('[{:>}]\tMB({}) = {}'.format(target_duration, target, mb))
+        print('Duration {:>.3}s'.format(target_duration))
 
-        jht = ipcmb.CITest.JHT
-        parameters['ci_test_jht_preloaded'] = jht
-
-        print('gc.collect()... ', end='')
-        gc_start = time.time()
+        post_run(ipcmb, parameters)
         gc.collect()
-        gc_duration = time.time() - gc_start
-        print('ok, took {}s'.format(gc_duration))
-        gc_total_duration += gc_duration
 
     end = time.time()
+    print('Demo complete')
     print('End time', time.ctime(end))
-    print('Duration', end - start)
-    print('IPC-MB duration', ipcmb_total_duration)
-    print('GC duration', gc_total_duration)
+    print('Total IPC-MB running time {:.3}'.format(ipcmb_total_duration))

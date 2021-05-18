@@ -36,5 +36,12 @@ test-clean: clean
 	rm -rf tests/bif_files/*.pickle
 
 demo: Makefile
-	pytest $(PYTEST_WORKERS) --capture=tee-sys -m "demo"
+	pytest --workers 1 --capture=tee-sys -m "demo"
 	notify-send "Make" "Testing complete."
+
+demo-alarm: Makefile
+	cat tests/demo.txt
+	@echo
+	@echo "Press [ENTER] to continue"
+	@read
+	pytest --workers 1 --capture=tee-sys -m "demo_alarm"

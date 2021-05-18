@@ -28,7 +28,6 @@ class G_test(mbtk.math.G_test__unoptimized.G_test):
             self.JHT = preloaded_JHT
             self.JHT_reads = self.JHT['reads']
             self.JHT_misses = self.JHT['misses']
-            print('using preloaded JHT')
             return
 
         jht_load_path = self.parameters.get('ci_test_jht_path__load', None)
