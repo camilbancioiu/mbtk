@@ -1,0 +1,20 @@
+This is a short demonstration that highlights the efficiency of the dcMI
+optimization applied on the computation of the conditional G-test. It consists
+of a small experiment which involves discovering the Markov blankets of all the
+variables in a Bayesian network. The discovery itself is performed by the
+IPC-MB algorithm, repeated for each variable as its target.
+
+For this demonstration, dcMI will be compared with another optimization, namely
+the dynamic AD-tree. Both are added to IPC-MB, one at a time, to reduce the
+discovery time. Therefore the demonstrative experiment will be run twice:
+firstly with a dynamic AD-tree, secondly with dcMI.
+
+IPC-MB durations are gathered while the experiment progresses and they will be
+reported at the end.
+
+The data set is synthetically generated at random from the ALARM network, which
+contains 37 variables. A total of 8000 complete samples are generated in memory
+for this demonstration, before the experiment starts.
+
+The demonstration should require less than 3 minutes to complete (usually less
+than 2 minutes, even on modest machines).

@@ -67,16 +67,27 @@ def test_ipcmb_efficiency__with_static_adtree(testfolders, ds_alarm_8e3):
 
 
 
+DEMO_DYN_ADTREE_HEADER = """
+=======================================================================
+Starting demonstrative experiment run using IPC-MB optimized with a dynamic AD-tree."""
+
 @pytest.mark.demo
 @pytest.mark.demo_alarm
 def test_ipcmb_efficiency__with_dynamic_adtree(testfolders, ds_alarm_8e3, demonstration_state):
+    print(DEMO_DYN_ADTREE_HEADER)
     run_demo_ipcmb_test__dynamic_adtree(testfolders, ds_alarm_8e3)
 
 
 
+DEMO_DCMI_HEADER = """
+=======================================================================
+Starting demonstrative experiment run using IPC-MB optimized with dcMI."""
+
 @pytest.mark.demo
 @pytest.mark.demo_alarm
 def test_ipcmb_efficiency__with_dcMI(testfolders, ds_alarm_8e3, demonstration_state):
+    print()
+    print(DEMO_DCMI_HEADER)
     run_demo_ipcmb_test__dcmi(testfolders, ds_alarm_8e3)
 
 
@@ -145,15 +156,13 @@ def run_demo_ipcmb_test__dcmi(folders, ds):
 
 
 def run_demo_ipcmb_test__optimized(folders, ds, parameters, name, post_run):
-    print()
-    print()
     targets = range(ds.datasetmatrix.get_column_count('X'))
     print('Data set has {} variables.'.format(len(targets)))
     ipcmb_total_duration = 0
     start = time.time()
     for target in targets:
         print()
-        print('Discovering Markov blanket of variable {} using IPC-MB optimized with {}'.format(target, name))
+        print('Discovering Markov blanket using IPC-MB optimized with {}, target variable {} of {}'.format(name, target, len(targets) - 1))
         target_start = time.time()
         mb, _, ipcmb = ipcmb_tests.run_IPCMB(ds, target, parameters)
         target_end = time.time()
