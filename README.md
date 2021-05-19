@@ -4,6 +4,8 @@ MBTK is a library that assists in the research and development of Markov boundar
 
 The MBTK itself was already used to build successful experiments. Most notably, the `experiments/experiment_dcmi` folder in MBTK contains the configuration and customizations needed to evaluate the `dcMI` optimization for the computation of the G-test, as part of a comparative experiment involving the IPC-MB algorithm (article currently in review). A previous iteration of MBTK (see [MBFF](https://github.com/camilbancioiu/MBFF)) was used to build an experiment that evaluated 4 individual optimizations for the older KS algorithm ([published at ROMJIST](https://www.romjist.ro/abstract-620.html), an open-access journal).
 
+For a demonstration of MBTK, see [below](#demonstration).
+
 ## Components
 
 The MBTK contains many utilities, but also complete implementations of algorithms, data structures and optimizations.
