@@ -1,4 +1,4 @@
-import os
+import sys
 import math
 import time
 import statistics
@@ -37,7 +37,7 @@ def main():
     print()
     print('Press [ENTER] to continue')
     input()
-    os.stdout.flush()
+    sys.stdout.flush()
 
     folders = testfolders()
     ds = ds_alarm_8e3()
@@ -45,17 +45,17 @@ def main():
     durations = dict()
 
     print(experiment_header('dynamic AD-tree'))
-    os.stdout.flush()
+    sys.stdout.flush()
     durations['dynadt'] = run_demo_ipcmb_test__dynamic_adtree(folders, ds)
 
     print()
     print(experiment_header('dcMI'))
-    os.stdout.flush()
+    sys.stdout.flush()
     durations['dcmi'] = run_demo_ipcmb_test__dcmi(folders, ds)
 
     print()
     print(header('Results'))
-    os.stdout.flush()
+    sys.stdout.flush()
     print()
 
     table = '{:<30}|{:>8.4}{:>8.4}{:>8.4}'
@@ -63,7 +63,7 @@ def main():
     print('_' * 60)
     print(table_row(table, 'IPC-MB with dynamic AD-tree', durations['dynadt']))
     print(table_row(table, 'IPC-MB with dcMI', durations['dcmi']))
-    os.stdout.flush()
+    sys.stdout.flush()
 
 
 
@@ -159,7 +159,7 @@ def run_demo_ipcmb_test__optimized(folders, ds, parameters, name, post_run):
     for target in targets:
         print()
         print('Discovering Markov blanket using IPC-MB optimized with {}, target variable {} of {}'.format(name, target, len(targets) - 1))
-        os.stdout.flush()
+        sys.stdout.flush()
         target_start = time.time()
         mb, _, ipcmb = ipcmb_tests.run_IPCMB(ds, target, parameters)
         target_end = time.time()
@@ -171,7 +171,7 @@ def run_demo_ipcmb_test__optimized(folders, ds, parameters, name, post_run):
 
         post_run(ipcmb, parameters)
         gc.collect()
-        os.stdout.flush()
+        sys.stdout.flush()
 
     return durations
 
