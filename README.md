@@ -12,14 +12,14 @@ The following Python packages are imported by MBTK.
 * `numpy`
 * `scipy`
 * `pytest`
-* `larkparser`
+* `lark-parser`
 * `pympler`
 * `matplotlib`
 * `pudb`
 
 Please install them with `pip install -r requirements.txt`. 
 
-Alternatively, use `pip install numpy scipy pytest larkparser pympler matplotlib pudb` directly.
+Alternatively, use `pip install numpy scipy pytest lark-parser pympler matplotlib pudb` directly.
 
 ## Components
 

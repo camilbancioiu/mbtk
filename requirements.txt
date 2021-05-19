@@ -1,7 +1,7 @@
 numpy
 scipy
 pytest
-larkparser
+lark-parser
 pympler
 matplotlib
 pudb
