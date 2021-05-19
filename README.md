@@ -49,4 +49,6 @@ The MBTK contains many utilities, but also complete implementations of algorithm
 
 ## Demonstration
 
+_Make sure the [dependencies](#dependencies) have been installed before attempting to run the demonstration._
+
 A demonstrative experiment can be performed by running `python demo.py` in the root MBTK folder. The `demo.py` script will run the IPC-MB algorithm for each of the 37 variables of a synthetic data set. This experiment consists of two runs: one where IPC-MB is optimized with a dynamic AD-tree and one where IPC-MB is optimized with `dcMI`. This demonstrative experiment compares `dcMI` and the dynamic AD-tree, highlighting their difference in efficiency when added to IPC-MB.
