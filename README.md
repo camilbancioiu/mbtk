@@ -8,7 +8,7 @@ For a demonstration of MBTK, see [below](#demonstration).
 
 ## Dependencies
 
-The following Python packages are imported by MBTK. Please install them with `pip`.
+The following Python packages are imported by MBTK. 
 * `numpy`
 * `scipy`
 * `pytest`
@@ -16,6 +16,10 @@ The following Python packages are imported by MBTK. Please install them with `pi
 * `pympler`
 * `matplotlib`
 * `pudb`
+
+Please install them with `pip install -r requirements.txt`. 
+
+Alternatively, use `pip install numpy scipy pytest larkparser pympler matplotlib pudb` directly.
 
 ## Components
 

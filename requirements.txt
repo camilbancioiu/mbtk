@@ -1,0 +1,7 @@
+numpy
+scipy
+pytest
+larkparser
+pympler
+matplotlib
+pudb
