@@ -4,8 +4,6 @@ MBTK is a library that assists in the research and development of Markov boundar
 
 The MBTK itself was already used to build successful experiments. Most notably, the `experiments/experiment_dcmi` folder in MBTK contains the configuration and customizations needed to evaluate the `dcMI` optimization for the computation of the G-test, as part of a comparative experiment involving the IPC-MB algorithm (article currently in review). A previous iteration of MBTK (see [MBFF](https://github.com/camilbancioiu/MBFF)) was used to build an experiment that evaluated 4 individual optimizations for the older KS algorithm ([published at ROMJIST](https://www.romjist.ro/abstract-620.html), an open-access journal).
 
-A demonstration script for MBTK is currently being prepared.
-
 ## Components
 
 The MBTK contains many utilities, but also complete implementations of algorithms, data structures and optimizations.
@@ -31,3 +29,7 @@ The MBTK contains many utilities, but also complete implementations of algorithm
 * G-test implemented in the canonical form; performs queries on the data set alone; used mostly as a baseline for efficiency comparisons.
 * G-test implemented with AD-trees (configurable for static or dynamic tree); when using the static AD-tree, the data set is not queried for independence tests at all, but the tree must be built completely before the algorithm starts; when using the dynamic AD-tree, no building step is required before the algorithm starts, but access to the data set becomes required when a query cannot be satisfied by the tree alone.
 * G-test implemented with the `dcMI` optimization, which decomposes the `G` statistic into joint entropy terms and caches them for future reuse; access to the data set is required when a test cannot be computed with the cached terms alone.
+
+## Demonstration
+
+A demonstrative experiment can be performed by running `python3 demo.py` in the root MBTK folder. The `demo.py` script will run the IPC-MB algorithm for each of the 37 variables of a synthetic data set. This experiment consists of two runs: one where IPC-MB is optimized with a dynamic AD-tree and one where IPC-MB is optimized with `dcMI`. This demonstrative experiment compares `dcMI` and the dynamic AD-tree, highlighting their difference in efficiency when added to IPC-MB.

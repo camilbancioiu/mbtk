@@ -38,11 +38,3 @@ test-clean: clean
 demo: Makefile
 	pytest --workers 1 --capture=tee-sys -m "demo"
 	notify-send "Make" "Testing complete."
-
-demo-alarm: Makefile
-	@cat tests/demo.txt
-	@echo
-	@echo "Press [ENTER] to continue"
-	@read
-	@echo "Demonstration started, please wait..."
-	@pytest --workers 1 --capture=tee-sys -m "demo_alarm"
