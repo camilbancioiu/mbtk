@@ -17,9 +17,9 @@ The following Python packages are imported by MBTK.
 * `matplotlib`
 * `pudb`
 
-Please install them with `pip install -r requirements.txt`. 
+Please install them with `pip install --user -r requirements.txt`. 
 
-Alternatively, use `pip install numpy scipy pytest lark-parser pympler matplotlib pudb` directly.
+Alternatively, use `pip install --user numpy scipy pytest lark-parser pympler matplotlib pudb` directly.
 
 ## Components
 
