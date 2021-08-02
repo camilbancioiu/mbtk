@@ -44,6 +44,15 @@ class AlgorithmIPCMB:
 
 
     def select_features(self):
+        """Alias of self.discover_mb()"""
+        return self.discover_mb()
+
+
+    def discover_mb(self):
+        """
+        Run IPC-MB to discover the Markov boundary of the variable defined
+        in the preconfigured parameters.
+        """
         selected_features = sorted(list(self.IPCMB(self.target)))
         self.CITest.end()
         return selected_features

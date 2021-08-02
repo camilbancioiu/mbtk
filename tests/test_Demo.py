@@ -32,6 +32,7 @@ def testfolders():
 
 
 
+@pytest.mark.demo
 def test_ipcmb_efficiency__unoptimized(ds_alarm_8e3):
     ds = ds_alarm_8e3
     parameters = ipcmb_tests.make_parameters__unoptimized(DoFCalculators.StructuralDoF)
@@ -45,6 +46,7 @@ def test_ipcmb_efficiency__unoptimized(ds_alarm_8e3):
 
 
 
+@pytest.mark.demo
 def test_ipcmb_efficiency__with_static_adtree(testfolders, ds_alarm_8e3):
     ds = ds_alarm_8e3
     LLT = 0
@@ -88,24 +90,28 @@ def test_ipcmb_efficiency__with_dcMI(testfolders, ds_alarm_8e3, demonstration_st
 
 
 
+@pytest.mark.demo
 def test_ipcmb_efficiency__with_dynamic_adtree__pathfinder(testfolders, ds_pathfinder_4e3):
     print('Demo test with a dynamic AD-tree on Pathfinder')
     run_demo_ipcmb_test__dynamic_adtree(testfolders, ds_pathfinder_4e3)
 
 
 
+@pytest.mark.demo
 def test_ipcmb_efficiency__with_dcMI__pathfinder(testfolders, ds_pathfinder_4e3):
     print('Demo test with dcMI on Pathfinder')
     run_demo_ipcmb_test__dcmi(testfolders, ds_pathfinder_4e3)
 
 
 
+@pytest.mark.demo
 def test_ipcmb_efficiency__with_dynamic_adtree__andes(testfolders, ds_andes_4e3):
     print('Demo test with a dynamic AD-tree on Andes')
     run_demo_ipcmb_test__dynamic_adtree(testfolders, ds_andes_4e3)
 
 
 
+@pytest.mark.demo
 def test_ipcmb_efficiency__with_dcMI__andes(testfolders, ds_andes_4e3):
     print('Demo test with a dcMI on Andes')
     run_demo_ipcmb_test__dcmi(testfolders, ds_andes_4e3)

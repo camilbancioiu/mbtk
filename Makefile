@@ -28,6 +28,14 @@ test: Makefile
 	pytest $(PYTEST_WORKERS) --capture=tee-sys -m "not slow and not demo"
 	notify-send "Make" "Testing complete."
 
+test-serial: Makefile
+	pytest --capture=tee-sys -m "not slow and not demo"
+	notify-send "Make" "Testing complete."
+
+test-all-serial: Makefile
+	pytest --capture=tee-sys -m "not demo"
+	notify-send "Make" "Testing complete."
+
 clean:
 	find -name __pycache__ | xargs rm -rf
 
