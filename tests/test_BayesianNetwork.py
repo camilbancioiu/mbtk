@@ -586,6 +586,24 @@ def test_d_separation__lungcancer(bn_lungcancer):
 
 
 
+def test_find_all_paths(bn_alarm):
+    bn = bn_alarm
+
+    start_variable = 'MINVOL'
+    end_variable = 'SAO2'
+
+    print()
+    start_index = bn.variable_nodes_index(start_variable)
+    end_index = bn.variable_nodes_index(end_variable)
+
+    print(start_index, end_index)
+    paths = bn.find_all_undirected_paths(start_index, end_index)
+
+    for path in paths:
+        print(path)
+
+
+
 def calculate_probdist(column):
     counter = Counter()
     counter.update(column.T.tolist())
