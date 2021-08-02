@@ -5,6 +5,7 @@ from mbtk.math.DSeparationCITest import DSeparationCITest
 from mbtk.algorithms.mb.ipcmb import AlgorithmIPCMB
 
 
+@pytest.mark.slow
 def test_dsep_full_alarm_ipcmb(bn_alarm):
     bn = bn_alarm
     variables = sorted(list(bn.graph_d.keys()))
