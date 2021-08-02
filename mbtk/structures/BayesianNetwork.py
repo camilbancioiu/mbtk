@@ -327,10 +327,7 @@ class BayesianNetwork:
         return self.find_all_paths(self.graph_d, start, end)
 
 
-    def find_all_undirected_paths(self, start, end, path=None):
-        if path is None:
-            path = list()
-
+    def find_all_undirected_paths(self, start, end):
         return self.find_all_paths(self.graph_u, start, end)
 
 
