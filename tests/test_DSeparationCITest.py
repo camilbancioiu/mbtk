@@ -2,7 +2,7 @@ import pytest
 import time
 
 from mbtk.math.DSeparationCITest import DSeparationCITest
-from mbtk.math.CMICalculator import CMICalculator
+from mbtk.math.DSeparationCITest import DSeparationAsCorrelationHeuristic
 from mbtk.algorithms.mb.ipcmb import AlgorithmIPCMB
 from mbtk.algorithms.mb.iamb import AlgorithmIAMB
 
@@ -70,7 +70,7 @@ def make_parameters_iamb(target, bn, variables):
         'target': target,
         'all_variables': variables,
         'ci_test_class': DSeparationCITest,
-        'correlation_heuristic_class': CMICalculator,
+        'correlation_heuristic_class': DSeparationAsCorrelationHeuristic,
         'source_bayesian_network': bn,
         'pc_only': False,
         'ci_test_debug': 0,

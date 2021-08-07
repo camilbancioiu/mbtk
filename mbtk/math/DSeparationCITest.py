@@ -36,3 +36,15 @@ class DSeparationCITest:
         if save_path is not None:
             with save_path.open('wb') as f:
                 pickle.dump(self.ci_test_results, f)
+
+
+
+class DSeparationAsCorrelationHeuristic(DSeparationCITest):
+
+    def compute(self, X, Y, Z):
+        independent = self.conditionally_independent(X, Y, Z)
+
+        if independent:
+            return 0.0
+        else:
+            return 1.0
