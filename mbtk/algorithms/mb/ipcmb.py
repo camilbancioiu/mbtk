@@ -33,13 +33,13 @@ class AlgorithmIPCMB:
         # JMI tables.
         self.SepSetCache = SetCache()
 
-        # This is the test of conditional independence. It is a class that must be
-        # instantiated. The class must have a method called
-        # `conditionally_independent` that receives three arguments: the variable
-        # indices X and Y and a set of indices Z. The test must return True if X
-        # and Y are conditionally independent given Z and False otherwise. In case
-        # the test cannot be performed, the exception CannotPerformCITestException
-        # should be thrown, which is handled by the algorithm as it sees fit.
+        # self.CITest is the test of conditional independence. It must have a
+        # method called `conditionally_independent` that receives three
+        # arguments: the variable indices X and Y and a set of indices Z. The
+        # test must return True if X and Y are conditionally independent given
+        # Z and False otherwise. In case the test cannot be performed, the
+        # exception CannotPerformCITestException should be thrown, which is
+        # handled by the algorithm as it sees fit.
         self.CITest = self.parameters['ci_test_class'](self.datasetmatrix, self.parameters)
 
 
@@ -53,9 +53,9 @@ class AlgorithmIPCMB:
         Run IPC-MB to discover the Markov boundary of the variable defined
         in the preconfigured parameters.
         """
-        selected_features = sorted(list(self.IPCMB(self.target)))
+        markov_boundary = sorted(list(self.IPCMB(self.target)))
         self.CITest.end()
-        return selected_features
+        return markov_boundary
 
 
     def IPCMB(self, T):

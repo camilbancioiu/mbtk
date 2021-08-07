@@ -1,11 +1,11 @@
 import time
 import pickle
 
-from mbtk.math.CITestResult import CITestResult
-from mbtk.math.PMF import PMF, CPMF
+import mbtk.math.PMF as PMF
 
 import mbtk.math.infotheory as infotheory
 import mbtk.math.G_test__unoptimized
+from mbtk.math.CITestResult import CITestResult
 
 import mbtk.structures.ADTree
 
@@ -133,10 +133,10 @@ class G_test(mbtk.math.G_test__unoptimized.G_test):
 
             PrX = self.AD_tree.make_pmf([X])
             PrY = self.AD_tree.make_pmf([Y])
-            PrXYcZ = self.make_omega_cpmf_from_pmf(PrXY)
-            PrXcZ = self.make_omega_cpmf_from_pmf(PrX)
-            PrYcZ = self.make_omega_cpmf_from_pmf(PrY)
-            PrZ = self.make_omega_pmf()
+            PrXYcZ = PMF.make_omega_cpmf_from_pmf(PrXY)
+            PrXcZ = PMF.make_omega_cpmf_from_pmf(PrX)
+            PrYcZ = PMF.make_omega_cpmf_from_pmf(PrY)
+            PrZ = PMF.make_omega_pmf()
 
             if self.DoF_calculator.requires_pmfs:
                 self.DoF_calculator.set_context_pmfs(PrXY, PrX, PrY, None)
@@ -164,7 +164,7 @@ class G_test(mbtk.math.G_test__unoptimized.G_test):
 
         PrXYZ = self.AD_tree.make_pmf(joint_variables)
 
-        PrXYcZ = CPMF(None, None)
+        PrXYcZ = PMF.CPMF(None, None)
 
         for joint_key, joint_p in PrXYZ.items():
             zkey = tuple([joint_key[index[zvar]] for zvar in Z])
@@ -174,7 +174,7 @@ class G_test(mbtk.math.G_test__unoptimized.G_test):
             try:
                 pmf = PrXYcZ.conditional_probabilities[zkey]
             except KeyError:
-                pmf = PMF(None)
+                pmf = PMF.PMF(None)
                 PrXYcZ.conditional_probabilities[zkey] = pmf
             try:
                 pmf.probabilities[varkey] = joint_p / PrZ.p(zkey)
@@ -194,7 +194,7 @@ class G_test(mbtk.math.G_test__unoptimized.G_test):
 
         PrXZ = self.AD_tree.make_pmf(joint_variables)
 
-        PrXcZ = CPMF(None, None)
+        PrXcZ = PMF.CPMF(None, None)
 
         for joint_key, joint_p in PrXZ.items():
             zkey = tuple([joint_key[index[zvar]] for zvar in Z])
@@ -204,7 +204,7 @@ class G_test(mbtk.math.G_test__unoptimized.G_test):
             try:
                 pmf = PrXcZ.conditional_probabilities[zkey]
             except KeyError:
-                pmf = PMF(None)
+                pmf = PMF.PMF(None)
                 PrXcZ.conditional_probabilities[zkey] = pmf
             try:
                 pmf.probabilities[varkey] = joint_p / PrZ.p(zkey)

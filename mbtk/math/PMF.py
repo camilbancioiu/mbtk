@@ -229,6 +229,69 @@ class CPMF(PMF):
         return True
 
 
+def make_cpmf_PrXYcZ(X, Y, Z, PrXYZ, PrZ):
+    joint_variables = [X, Y] + Z
+    index = {var: joint_variables.index(var) for var in joint_variables}
+
+    PrXYcZ = CPMF(None, None)
+
+    for joint_key, joint_p in PrXYZ.items():
+        zkey = tuple([joint_key[index[zvar]] for zvar in Z])
+        varkey = tuple([joint_key[index[var]] for var in joint_variables if var not in Z])
+        if len(zkey) == 1:
+            zkey = zkey[0]
+        try:
+            pmf = PrXYcZ.conditional_probabilities[zkey]
+        except KeyError:
+            pmf = PMF(None)
+            PrXYcZ.conditional_probabilities[zkey] = pmf
+        try:
+            pmf.probabilities[varkey] = joint_p / PrZ.p(zkey)
+        except ZeroDivisionError:
+            pass
+
+    return PrXYcZ
+
+
+def make_cpmf_PrXcZ(X, Z, PrXZ, PrZ):
+    joint_variables = [X] + Z
+    index = {var: joint_variables.index(var) for var in joint_variables}
+
+    PrXcZ = CPMF(None, None)
+
+    for joint_key, joint_p in PrXZ.items():
+        zkey = tuple([joint_key[index[zvar]] for zvar in Z])
+        varkey = [joint_key[index[var]] for var in joint_variables if var not in Z][0]
+        if len(zkey) == 1:
+            zkey = zkey[0]
+        try:
+            pmf = PrXcZ.conditional_probabilities[zkey]
+        except KeyError:
+            pmf = PMF(None)
+            PrXcZ.conditional_probabilities[zkey] = pmf
+        try:
+            pmf.probabilities[varkey] = joint_p / PrZ.p(zkey)
+        except ZeroDivisionError:
+            pass
+
+    return PrXcZ
+
+
+def make_omega_cpmf_from_pmf(pmf):
+    cpmf = CPMF(None, None)
+    cpmf.conditional_probabilities[1] = pmf
+    return cpmf
+
+
+def make_omega_pmf():
+    pmf = PMF(None)
+    pmf.probabilities[1] = 1.0
+    return pmf
+
+
+
+
+
 
 def process_pmf_key(key):
     # If the key is a tuple or list, flatten it.

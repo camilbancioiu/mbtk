@@ -2,8 +2,9 @@ import pickle
 
 from mbtk.math.CITestResult import CITestResult
 
+import mbtk.math.PMF as PMF
+
 import mbtk.math.infotheory as infotheory
-from mbtk.math.PMF import PMF, CPMF
 from mbtk.math.Variable import JointVariables
 from mbtk.math.Exceptions import InsufficientSamplesForCITest
 
@@ -64,13 +65,13 @@ class G_test:
         result.start_timing()
 
         if len(Z) == 0:
-            PrXY = PMF(JointVariables(VarX, VarY))
-            PrX = PMF(VarX)
-            PrY = PMF(VarY)
-            PrZ = self.make_omega_pmf()
-            PrXYcZ = self.make_omega_cpmf_from_pmf(PrXY)
-            PrXcZ = self.make_omega_cpmf_from_pmf(PrX)
-            PrYcZ = self.make_omega_cpmf_from_pmf(PrY)
+            PrXY = PMF.PMF(JointVariables(VarX, VarY))
+            PrX = PMF.PMF(VarX)
+            PrY = PMF.PMF(VarY)
+            PrZ = PMF.make_omega_pmf()
+            PrXYcZ = PMF.make_omega_cpmf_from_pmf(PrXY)
+            PrXcZ = PMF.make_omega_cpmf_from_pmf(PrX)
+            PrYcZ = PMF.make_omega_cpmf_from_pmf(PrY)
 
             if self.DoF_calculator.requires_pmfs:
                 self.DoF_calculator.set_context_pmfs(PrXY, PrX, PrY, None)
@@ -78,14 +79,14 @@ class G_test:
         else:
             Z = list(Z)
 
-            PrXYZ = PMF(JointVariables(VarX, VarY, VarZ))
-            PrXZ = PMF(JointVariables(VarX, VarZ))
-            PrYZ = PMF(JointVariables(VarY, VarZ))
-            PrZ = PMF(VarZ)
+            PrXYZ = PMF.PMF(JointVariables(VarX, VarY, VarZ))
+            PrXZ = PMF.PMF(JointVariables(VarX, VarZ))
+            PrYZ = PMF.PMF(JointVariables(VarY, VarZ))
+            PrZ = PMF.PMF(VarZ)
 
-            PrXcZ = self.make_cpmf_PrXcZ(X, Z, PrXZ, PrZ)
-            PrYcZ = self.make_cpmf_PrXcZ(Y, Z, PrYZ, PrZ)
-            PrXYcZ = self.make_cpmf_PrXYcZ(X, Y, Z, PrXYZ, PrZ)
+            PrXcZ = PMF.make_cpmf_PrXcZ(X, Z, PrXZ, PrZ)
+            PrYcZ = PMF.make_cpmf_PrXcZ(Y, Z, PrYZ, PrZ)
+            PrXYcZ = PMF.make_cpmf_PrXYcZ(X, Y, Z, PrXYZ, PrZ)
 
             if self.DoF_calculator.requires_pmfs:
                 self.DoF_calculator.set_context_pmfs(PrXYZ, PrXZ, PrYZ, PrZ)
@@ -148,88 +149,6 @@ class G_test:
             VarZ = self.datasetmatrix.get_variables('X', Z)
 
         return (VarX, VarY, VarZ)
-
-
-    def calculate_cpmfs(self, VarX, VarY, VarZ):
-        PrXYcZ = CPMF(JointVariables(VarX, VarY), VarZ, initpmf=False)
-        PrXcZ = CPMF(VarX, VarZ, initpmf=False)
-        PrYcZ = CPMF(VarY, VarZ, initpmf=False)
-        PrZ = PMF(VarZ)
-
-        return (PrXYcZ, PrXcZ, PrYcZ, PrZ)
-
-
-    def make_cpmf_PrXYcZ(self, X, Y, Z, PrXYZ, PrZ):
-        joint_variables = [X, Y] + Z
-        index = {var: joint_variables.index(var) for var in joint_variables}
-
-        PrXYcZ = CPMF(None, None)
-
-        for joint_key, joint_p in PrXYZ.items():
-            zkey = tuple([joint_key[index[zvar]] for zvar in Z])
-            varkey = tuple([joint_key[index[var]] for var in joint_variables if var not in Z])
-            if len(zkey) == 1:
-                zkey = zkey[0]
-            try:
-                pmf = PrXYcZ.conditional_probabilities[zkey]
-            except KeyError:
-                pmf = PMF(None)
-                PrXYcZ.conditional_probabilities[zkey] = pmf
-            try:
-                pmf.probabilities[varkey] = joint_p / PrZ.p(zkey)
-            except ZeroDivisionError:
-                pass
-
-        return PrXYcZ
-
-
-    def make_cpmf_PrXcZ(self, X, Z, PrXZ, PrZ):
-        joint_variables = [X] + Z
-        index = {var: joint_variables.index(var) for var in joint_variables}
-
-        PrXcZ = CPMF(None, None)
-
-        for joint_key, joint_p in PrXZ.items():
-            zkey = tuple([joint_key[index[zvar]] for zvar in Z])
-            varkey = [joint_key[index[var]] for var in joint_variables if var not in Z][0]
-            if len(zkey) == 1:
-                zkey = zkey[0]
-            try:
-                pmf = PrXcZ.conditional_probabilities[zkey]
-            except KeyError:
-                pmf = PMF(None)
-                PrXcZ.conditional_probabilities[zkey] = pmf
-            try:
-                pmf.probabilities[varkey] = joint_p / PrZ.p(zkey)
-            except ZeroDivisionError:
-                pass
-
-        return PrXcZ
-
-
-    def make_omega_cpmf_from_pmf(self, pmf):
-        cpmf = CPMF(None, None)
-        cpmf.conditional_probabilities[1] = pmf
-        return cpmf
-
-
-    def make_omega_pmf(self):
-        pmf = PMF(None)
-        pmf.probabilities[1] = 1.0
-        return pmf
-
-
-    def create_flat_variable_set(self, *variables):
-        variable_set = set()
-        for variable in variables:
-            if isinstance(variable, int):
-                # `variable` is a single variable ID, not a set or list of IDs
-                variable_set.add(variable)
-            else:
-                # `variable` is a set or list of IDs
-                variable_set.update(variable)
-
-        return frozenset(variable_set)
 
 
     def perform_gc(self):

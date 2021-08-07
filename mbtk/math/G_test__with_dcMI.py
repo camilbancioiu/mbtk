@@ -124,3 +124,18 @@ class G_test(mbtk.math.G_test__unoptimized.G_test):
             self.JHT['misses'] = self.JHT_misses
             with jht_save_path.open('wb') as f:
                 pickle.dump(self.JHT, f)
+
+
+    def create_flat_variable_set(self, *variables):
+        variable_set = set()
+        for variable in variables:
+            if isinstance(variable, int):
+                # `variable` is a single variable ID, not a set or list of IDs
+                variable_set.add(variable)
+            else:
+                # `variable` is a set or list of IDs
+                variable_set.update(variable)
+
+        return frozenset(variable_set)
+
+
