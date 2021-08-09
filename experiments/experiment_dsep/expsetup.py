@@ -23,7 +23,7 @@ class DsepAlgsEvalExpSetup(util.ExperimentalSetup):
         self.Arguments = None
 
         algs = ['iamb', 'ipcmb']
-        nets = ['alarm']
+        nets = ['alarm', 'mildew', 'child']
         self.AllowedBayesianNetworks = nets
         self.AllowedAlgorithms = algs
 

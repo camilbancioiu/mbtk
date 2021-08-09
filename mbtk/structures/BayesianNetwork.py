@@ -1,4 +1,5 @@
 import itertools
+import functools
 import operator
 import random
 import copy
@@ -328,7 +329,8 @@ class BayesianNetwork:
 
 
     def find_all_undirected_paths(self, start, end):
-        return self.find_all_paths(self.graph_u, start, end)
+        self.explored_graph = self.graph_u
+        return self.find_all_paths_recursive_cached(start, end)
 
 
     def find_all_paths(self, graph, start, end):
@@ -348,6 +350,25 @@ class BayesianNetwork:
         for node in graph[start]:
             if node not in path:
                 newpaths = self.find_all_paths_recursive(graph, node, end, path)
+                for newpath in newpaths:
+                    paths.append(newpath)
+        return paths
+
+
+    @functools.cache
+    def find_all_paths_recursive_cached(self, start, end, path=None):
+        if path is None:
+            path = tuple()
+
+        path = path + (start,)
+        if start == end:
+            return [path]
+        if start not in self.explored_graph:
+            return []
+        paths = []
+        for node in self.explored_graph[start]:
+            if node not in path:
+                newpaths = self.find_all_paths_recursive_cached(node, end, path)
                 for newpath in newpaths:
                     paths.append(newpath)
         return paths
