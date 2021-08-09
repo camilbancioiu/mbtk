@@ -29,7 +29,7 @@ class AlgorithmIAMB:
         ci_test_class = self.parameters['ci_test_class']
         self.CITest = ci_test_class(self.datasetmatrix, self.parameters)
 
-        # self.CI is an alias only
+        # self.CI is an alias
         self.CI = self.CITest.conditionally_independent
 
         # self.dep_heuristic is the correlation heuristic. It must have a
@@ -75,16 +75,14 @@ class AlgorithmIAMB:
 
         while True:
             changed_CMB = False
-            if self.debug >= 1: print('possible candidates', possible_candidates)
+
             candidate = self.highest_correlated_candidate(possible_candidates, CMB)
-            if self.debug >= 1: print('candidate', candidate)
             if not self.CI(self.target, candidate, CMB):
                 CMB.add(candidate)
                 possible_candidates.remove(candidate)
                 changed_CMB = True
-                if self.debug >= 1: print('candidate added', candidate)
+
             if not changed_CMB:
-                if self.debug >= 1: print('breaking')
                 break
 
         return CMB
@@ -105,8 +103,8 @@ class AlgorithmIAMB:
 
 
     def highest_correlated_candidate(self, possible_candidates, CMB):
-        dep = functools.partial(self.dep, CMB)
-        return max(possible_candidates, key=dep)
+        dep_variable = functools.partial(self.dep, CMB)
+        return max(possible_candidates, key=dep_variable)
 
     def dep(self, conditioning_set, candidate):
         return self.dep_heuristic.compute(self.target, candidate, conditioning_set)

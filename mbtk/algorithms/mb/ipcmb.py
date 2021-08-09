@@ -1,5 +1,6 @@
 import itertools
 from mbtk.math.Exceptions import InsufficientSamplesForCITest
+from mbtk.algorithms.mb.setcache import SetCache
 
 from pprint import pprint
 
@@ -28,10 +29,6 @@ class AlgorithmIPCMB:
             self.U = set(self.parameters['all_variables'])
         except KeyError:
             self.U = set(range(self.datasetmatrix.X.get_shape()[1]))
-
-        # Special cache managed by IPCMB. This has nothing to do with AD-trees, dcMI or
-        # JMI tables.
-        self.SepSetCache = SetCache()
 
         # self.CITest is the test of conditional independence. It must have a
         # method called `conditionally_independent` that receives three
@@ -64,6 +61,7 @@ class AlgorithmIPCMB:
         details.
         """
         if self.debug >= 1: print('Begin IPCMB')
+        self.SepSetCache = SetCache()
         CandidatePC_T = self.RecognizePC(T, self.U - {T})
 
         PC = set()
@@ -150,22 +148,3 @@ class AlgorithmIPCMB:
         if self.debug >= 2: print()
         if self.debug >= 2: print('RecognizePC result: {}'.format(AdjacentNodes))
         return AdjacentNodes
-
-
-
-class SetCache:
-
-    def __init__(self):
-        self.cache = dict()
-
-
-    def add(self, cset, *elements):
-        self.cache[frozenset(elements)] = cset
-
-
-    def get(self, *elements):
-        return self.cache[frozenset(elements)]
-
-
-    def contains(self, *elements):
-        return frozenset(elements) in self.cache
