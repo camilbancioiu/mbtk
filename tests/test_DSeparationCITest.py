@@ -1,5 +1,9 @@
 import pytest
 import time
+import collections
+import operator
+
+from pprint import pprint
 
 from mbtk.math.DSeparationCITest import DSeparationCITest
 from mbtk.math.DSeparationCITest import DSeparationAsCorrelationHeuristic
@@ -29,6 +33,31 @@ def test_dsep_full_alarm_ipcmb(bn_alarm):
     total_end_time = time.time()
     duration = total_end_time - total_start_time
     print(f'Total duration {duration}s')
+
+
+def test_dsep_alarm_ipcmb(bn_alarm):
+    bn = bn_alarm
+    variables = sorted(list(bn.graph_d.keys()))
+    print()
+
+    expected_boundaries = expected_markov_boundaries_alarm()
+
+    target = 17
+    target_start_time = time.time()
+    parameters = make_parameters_ipcmb(target, bn, variables)
+    ipcmb = AlgorithmIPCMB(None, parameters)
+    mb = ipcmb.discover_mb()
+    target_end_time = time.time()
+    duration = target_end_time - target_start_time
+    print(f'[{duration:6.2f} s] Variable {target:3}, Markov boundary {mb}')
+    assert mb == expected_boundaries[target]
+
+    citr = ipcmb.CITest.ci_test_results
+    print('ci tests', len(citr))
+
+    condset = operator.attrgetter('Z')
+    cond_counter = collections.Counter(map(len, map(condset, citr)))
+    pprint(cond_counter)
 
 
 def make_parameters_ipcmb(target, bn, variables):
@@ -76,6 +105,7 @@ def make_parameters_pcmb(target, bn, variables):
         'ci_test_debug': 0,
         'algorithm_debug': 0
     }
+
 
 @pytest.mark.slow
 def test_dsep_full_alarm_iamb(bn_alarm):

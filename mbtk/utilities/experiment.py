@@ -52,12 +52,11 @@ class ExperimentalSetup:
 
     def update_paths(self):
         self.Paths.Experiment = self.ExperimentDef.path
-        self.Paths.ExDs = self.ExDsDef.path
 
-
-    def filter_algruns(self):
-        # Allow subclasses to implement arbitrary filtering in this method.
-        pass
+        try:
+            self.Paths.ExDs = self.ExDsDef.path
+        except AttributeError:
+            pass
 
 
     def filter_algruns_by_tag(self, tag):

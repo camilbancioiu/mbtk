@@ -40,7 +40,7 @@ def exds_definition(experimental_setup):
 
 ################################################################################
 # Create the Experiment Definition
-from expsetup import DCMIEvExperimentDefinition
+from mbtk.experiment.ExperimentDefinition import ExperimentDefinition
 from mbtk.experiment.ExperimentRun import ExperimentRun
 from mbtk.experiment.AlgorithmRun import AlgorithmRun
 from mbtk.experiment.AlgorithmRunDatapoint import AlgorithmRunDatapoint
@@ -49,12 +49,16 @@ from mbtk.algorithms.mb.ipcmb import AlgorithmIPCMB
 
 def experiment_definition(experimental_setup):
     experiment_name = 'dcMIEvExpII'
-    experimentDef = DCMIEvExperimentDefinition(
+
+    ds = experimental_setup.DatasetName
+    samples = experimental_setup.SampleCountString
+    subexperiment_name = f'{ds}_{samples}'
+    experimentDef = ExperimentDefinition(
         experimental_setup.Paths.ExpRunRepository,
         experiment_name,
-        experimental_setup.DatasetName,
-        experimental_setup.SampleCountString
+        subexperiment_name
     )
+
     experimentDef.experiment_run_class = ExperimentRun
     experimentDef.algorithm_run_class = AlgorithmRun
     experimentDef.algorithm_run_configuration = {

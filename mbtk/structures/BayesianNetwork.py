@@ -353,8 +353,8 @@ class BayesianNetwork:
         return paths
 
 
-    # Implementation from https://stackoverflow.com/a/35531270/583574
     def find_all_paths_nonrecursive(self, graph, start, end):
+        """Implementation from https://stackoverflow.com/a/35531270/583574"""
         visited = set()
         visited.add(start)
 
@@ -383,7 +383,7 @@ class BayesianNetwork:
             else:
                 # push current node and index onto stacks, switch to neighbor
                 nodestack.append(current)
-                indexstack.append(i+1)
+                indexstack.append(i + 1)
                 visited.add(neighbors[i])
                 current = neighbors[i]
                 i = 0

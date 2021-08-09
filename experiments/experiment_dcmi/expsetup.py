@@ -1,7 +1,6 @@
 import re
 import pickle
 import mbtk.math.Variable
-from mbtk.experiment.ExperimentDefinition import ExperimentDefinition
 import mbtk.utilities.experiment as util
 
 
@@ -10,35 +9,6 @@ class DCMIEvExpPathSet(util.ExperimentalPathSet):
     def __init__(self, root):
         super().__init__(root)
         self.BIFRepository = self.Root / 'bif_repository'
-
-
-
-class DCMIEvExperimentDefinition(ExperimentDefinition):
-
-    def __init__(self, experiments_folder, name, dataset, samples):
-        super().__init__(experiments_folder, name)
-        self.subexperiment_name = '{}_{}'.format(dataset, samples)
-
-
-    def ensure_subfolder(self, subfolder_name):
-        subfolder = self.path / subfolder_name / self.subexperiment_name
-        subfolder.mkdir(parents=True, exist_ok=True)
-        return subfolder
-
-
-    def get_lock(self, lock_type=''):
-        if lock_type == '':
-            lock_type = self.default_lock_type
-        return self.subfolder('locks') / ('locked_{}'.format(lock_type))
-
-
-    def get_locks(self):
-        return [lockfile.name for lockfile in self.subfolder('locks').glob('locked_*')]
-
-
-    def subfolder_exists(self, subfolder):
-        subfolder = self.path / subfolder / self.subexperiment_name
-        return subfolder.exists()
 
 
 
@@ -84,10 +54,6 @@ class DCMIEvExpSetup(util.ExperimentalSetup):
         self.Paths.CITestResultRepository = self.ExperimentDef.subfolder('ci_test_results')
         self.Paths.Summaries = self.ExperimentDef.subfolder('summaries')
         self.Paths.Plots = self.ExperimentDef.subfolder('plots')
-
-
-    def filter_algruns(self):
-        pass
 
 
     def get_ADTree_path(self, tree_type, llt):

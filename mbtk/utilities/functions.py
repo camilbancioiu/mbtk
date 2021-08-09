@@ -45,11 +45,6 @@ def read_bif_file(sourcepath, use_cache=True):
     cachefile = sourcepath.with_suffix('.pickle')
     if use_cache:
         if cachefile.exists():
-            import sys
-            import mbtk
-            sys.modules['mbff'] = mbtk
-            sys.modules['mbff.structures'] = mbtk.structures
-            sys.modules['mbff.structures.ADTree'] = mbtk.structures.ADTree
             with cachefile.open('rb') as f:
                 bayesian_network = pickle.load(f)
             return bayesian_network
