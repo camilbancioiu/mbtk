@@ -18,6 +18,7 @@ import mbtk.utilities.experiment as util
 
 # Experiment-specific modules
 import expsetup
+import commands
 
 
 def main():
@@ -36,7 +37,7 @@ def main():
     # Handle the (object, verb) command in the arguments
     command_handled = util.handle_command(arguments, experimental_setup)
     if command_handled is False:
-        print('Command not handled')
+        commands.handle_command(arguments, experimental_setup)
 
 
 def create_argparser(experimental_setup):
@@ -51,6 +52,8 @@ def create_argparser(experimental_setup):
 
     util.configure_objects_subparser__exp(object_subparsers)
     util.configure_objects_subparser__paths(object_subparsers)
+
+    commands.configure_objects_subparser__summary(object_subparsers)
 
     return argparser
 

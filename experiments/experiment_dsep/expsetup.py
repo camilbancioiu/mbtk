@@ -26,7 +26,6 @@ class DsepAlgsEvalExpSetup(util.ExperimentalSetup):
         nets = ['alarm']
         self.AllowedBayesianNetworks = nets
         self.AllowedAlgorithms = algs
-        self.DefaultTags = algs + nets
 
 
     def setup(self, arguments):
