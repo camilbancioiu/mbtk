@@ -34,10 +34,12 @@ class BayesianNetwork:
         self.finalized = False
 
 
+    @functools.cache
     def variable_node_names(self):
         return list(sorted(self.variable_nodes.keys()))
 
 
+    @functools.cache
     def variable_nodes_index(self, varname):
         return self.variable_node_names().index(varname)
 
@@ -120,10 +122,12 @@ class BayesianNetwork:
         return sample_with_indices
 
 
+    @functools.cache
     @finalization_required
     def create_joint_pmf(self, values_as_indices=True):
         pmf = PMF(None)
         pmf.probabilities = self.joint_values_and_probabilities(values_as_indices=values_as_indices)
+        pmf.labels(*list(range(len(self))))
         return pmf
 
 
@@ -154,6 +158,18 @@ class BayesianNetwork:
 
         del current_value[current_variable.name]
         return joint_vp
+
+
+    @functools.cache
+    @finalization_required
+    def create_partial_joint_pmf(self, variables):
+        joint_pmf = self.create_joint_pmf()
+        variables_to_sum_over = set(joint_pmf.labels()) - set(variables)
+
+        for variable in variables_to_sum_over:
+            joint_pmf = joint_pmf.sum_over(variable)
+
+        return joint_pmf
 
 
     def total_possible_values_count(self):

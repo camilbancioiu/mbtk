@@ -156,6 +156,62 @@ def test_conditional_pmf__binary():
 
 
 
+def test_pmf_summing_over_variable():
+    V0 = Variable([0, 1, 1, 1, 0, 1, 0, 1])
+    V1 = Variable([0, 0, 1, 1, 0, 1, 1, 1])
+    V2 = Variable([0, 0, 0, 0, 1, 0, 1, 1])
+    V3 = Variable([0, 0, 0, 0, 0, 0, 1, 1])
+
+    Pr = PMF(JointVariables(V0, V1, V2, V3))
+    Pr.labels('V0', 'V1', 'V2', 'V3')
+    assert Pr.labels() == ('V0', 'V1', 'V2', 'V3')
+
+    assert Pr.p((0, 0, 0, 0)) == 1 / 8
+    assert Pr.p((1, 0, 0, 0)) == 1 / 8
+    assert Pr.p((1, 1, 0, 0)) == 3 / 8
+    assert Pr.p((0, 0, 1, 0)) == 1 / 8
+    assert Pr.p((0, 1, 1, 1)) == 1 / 8
+    assert Pr.p((1, 1, 1, 1)) == 1 / 8
+
+    Pr = Pr.sum_over('V2')
+    assert sum(Pr.probabilities.values()) == 1
+
+    assert Pr.p((0, 0, 0)) == 2 / 8
+    assert Pr.p((1, 0, 0)) == 1 / 8
+    assert Pr.p((1, 1, 0)) == 3 / 8
+    assert Pr.p((0, 1, 1)) == 1 / 8
+    assert Pr.p((1, 1, 1)) == 1 / 8
+    assert Pr.labels() == ('V0', 'V1', 'V3')
+
+    Pr = Pr.sum_over('V1')
+    assert sum(Pr.probabilities.values()) == 1
+
+    assert Pr.p((0, 0)) == 2 / 8
+    assert Pr.p((1, 0)) == 4 / 8
+    assert Pr.p((0, 1)) == 1 / 8
+    assert Pr.p((1, 1)) == 1 / 8
+    assert Pr.labels() == ('V0', 'V3')
+
+    Pr = Pr.sum_over('V0')
+    assert sum(Pr.probabilities.values()) == 1
+
+    print(Pr.probabilities)
+
+    assert Pr.p(0) == 6 / 8
+    assert Pr.p(1) == 2 / 8
+    assert Pr.labels() == ('V3',)
+
+
+
+def test_pmf_remove_from_key():
+    assert PMF.remove_from_key(('A', 'B', 'C', 'D'), 2) == ('A', 'B', 'D')
+    assert PMF.remove_from_key(('A', 'B', 'C', 'D'), 0) == ('B', 'C', 'D')
+    assert PMF.remove_from_key(('A', 'B', 'C', 'D'), 3) == ('A', 'B', 'C')
+    assert PMF.remove_from_key(('A', 'B'), 0) == ('B',)
+    assert PMF.remove_from_key(('A', 'B'), 1) == ('A',)
+    assert PMF.remove_from_key(('A',), 0) == tuple()
+
+
 def test_conditional_pmf__multiple_values():
     sizes = Variable(['small', 'small', 'large', 'small', 'normal', 'small'])
     sizes.ID = 1

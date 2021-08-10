@@ -74,6 +74,34 @@ class PMF:
             return 0.0
 
 
+    def labels(self, *lbs):
+        if len(lbs) == 0:
+            return self.keylabels
+        self.keylabels = tuple(lbs)
+
+
+    def sum_over(self, label):
+        index = self.keylabels.index(label)
+        new_probabilities = dict()
+
+        for key, value in self.probabilities.items():
+            new_key = process_pmf_key(self.remove_from_key(key, index))
+            try:
+                new_probabilities[new_key] += value
+            except KeyError:
+                new_probabilities[new_key] = value
+
+        new_pmf = PMF(None)
+        new_pmf.probabilities = new_probabilities
+        new_pmf.keylabels = self.remove_from_key(self.keylabels, index)
+
+        return new_pmf
+
+
+    def remove_from_key(self, key, index):
+        return tuple(key[:index] + key[index + 1:])
+
+
     def count_values(self):
         instances = self.variable.instances()
         if isinstance(instances, numpy.ndarray):
@@ -287,9 +315,6 @@ def make_omega_pmf():
     pmf = PMF(None)
     pmf.probabilities[1] = 1.0
     return pmf
-
-
-
 
 
 

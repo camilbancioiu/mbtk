@@ -8,6 +8,13 @@ from mbtk.structures.BayesianNetwork import BayesianNetwork, VariableNode, Proba
 from mbtk.structures.Exceptions import BayesianNetworkNotFinalizedError
 
 
+delta = 0.0000001
+
+
+def almostEqual(x, y):
+    return abs(x - y) < delta
+
+
 def test_probability_distribution():
     variable = default_variable__unconditioned()
     probdist = variable.probdist
@@ -40,6 +47,7 @@ def test_creating_complete_joint_pmf(bn_survey):
     joint_pmf = bn.create_joint_pmf(values_as_indices=False)
     assert sum(joint_pmf.values()) == 1.0
     assert len(joint_pmf) == total_possible_values_in_bn
+    assert joint_pmf.labels() == (0, 1, 2, 3, 4, 5)
 
     test_sample = ('young', 'uni', 'self', 'small', 'F', 'train')
     expected_probability = 0.3 * 0.51 * 0.36 * 0.08 * 0.2 * 0.36
@@ -53,6 +61,114 @@ def test_creating_complete_joint_pmf(bn_survey):
     expected_probability = 0.3 * 0.49 * 0.75 * 0.96 * 0.25 * 0.1
     assert joint_pmf.p(test_sample) == expected_probability
 
+
+
+def test_creating_partial_joint_pmf_variant_1(bn_survey):
+    bn = bn_survey
+    AGE = bn.variable_nodes_index('AGE')
+    SEX = bn.variable_nodes_index('SEX')
+    EDU = bn.variable_nodes_index('EDU')
+
+    joint_pmf = bn.create_partial_joint_pmf((AGE, SEX, EDU))
+    assert sum(joint_pmf.values()) == 1
+
+    test_sample = (0, 1, 1)  # ('young', 'F', 'uni')
+    expected_probability = 0.3 * 0.51 * 0.36
+    assert joint_pmf.p(test_sample) == expected_probability
+
+    test_sample = (2, 0, 0)  # ('old', 'M', 'highschool')
+    expected_probability = 0.2 * 0.49 * 0.88
+    assert joint_pmf.p(test_sample) == expected_probability
+
+
+def test_creating_partial_joint_pmf_variant_2(bn_survey):
+    bn = bn_survey
+    EDU = bn.variable_nodes_index('EDU')
+
+
+
+    joint_pmf = bn.create_partial_joint_pmf((EDU,))
+    assert almostEqual(sum(joint_pmf.values()), 1)
+
+    test_sample = (0,)  # ('highschool',)
+    expected_probability = 0 \
+        + 0.3 * 0.49 * 0.75  \
+        + 0.5 * 0.49 * 0.72  \
+        + 0.2 * 0.49 * 0.88  \
+        + 0.3 * 0.51 * 0.64  \
+        + 0.5 * 0.51 * 0.70  \
+        + 0.2 * 0.51 * 0.90  \
+
+    assert joint_pmf.p(test_sample) == expected_probability
+
+    test_sample = (1,)  # ('uni',)
+    expected_probability = 0 \
+        + 0.3 * 0.49 * 0.25  \
+        + 0.5 * 0.49 * 0.28  \
+        + 0.2 * 0.49 * 0.12  \
+        + 0.3 * 0.51 * 0.36  \
+        + 0.5 * 0.51 * 0.30  \
+        + 0.2 * 0.51 * 0.10  \
+
+    assert joint_pmf.p(test_sample) == expected_probability
+
+
+def test_creating_partial_joint_pmf_variant_3(bn_survey):
+    global delta
+    delta = 0.0000001
+
+    bn = bn_survey
+    EDU = bn.variable_nodes_index('EDU')
+    joint_pmf = bn.create_partial_joint_pmf((EDU,))
+    EDU_p_highschool = joint_pmf.p((0,))
+    EDU_p_uni = joint_pmf.p((1,))
+
+    OCC = bn.variable_nodes_index('OCC')
+    R = bn.variable_nodes_index('R')
+    joint_pmf = bn.create_partial_joint_pmf((OCC, R))
+    test_sample = (0, 0)  # ('emp', 'small')
+    expected_probability = 0 \
+        + EDU_p_highschool * 0.96 * 0.25 \
+        + EDU_p_uni * 0.92 * 0.20
+
+    assert almostEqual(joint_pmf.p(test_sample), expected_probability)
+
+    test_sample = (0, 1)  # ('emp', 'big')
+    expected_probability = 0 \
+        + EDU_p_highschool * 0.96 * 0.75 \
+        + EDU_p_uni * 0.92 * 0.80
+
+    assert almostEqual(joint_pmf.p(test_sample), expected_probability)
+
+
+
+def test_creating_partial_joint_pmf_variant_4(bn_survey):
+    bn = bn_survey
+    AGE = bn.variable_nodes_index('AGE')
+    EDU = bn.variable_nodes_index('EDU')
+    TRN = bn.variable_nodes_index('TRN')
+
+    joint_pmf = bn.create_partial_joint_pmf((AGE, EDU, TRN))
+    test_sample = (1, 1, 1)  # ('adult', 'uni', 'train')
+
+    p_train_given_uni = 0 \
+        + 0.92 * 0.2 * 0.42  \
+        + 0.08 * 0.2 * 0.36  \
+        + 0.92 * 0.8 * 0.24  \
+        + 0.08 * 0.8 * 0.21
+
+    p_uni_given_adult = 0 \
+        + 0.28 * 0.49 \
+        + 0.30 * 0.51
+
+    p_adult = 0.5
+
+    expected_probability = 1 \
+        * p_train_given_uni \
+        * p_uni_given_adult \
+        * p_adult
+
+    assert joint_pmf.p(test_sample) == expected_probability
 
 
 def test_sampling_single(bn_survey):
@@ -592,15 +708,13 @@ def test_find_all_paths(bn_alarm):
     start_variable = 'MINVOL'
     end_variable = 'SAO2'
 
-    print()
     start_index = bn.variable_nodes_index(start_variable)
     end_index = bn.variable_nodes_index(end_variable)
 
-    print(start_index, end_index)
     paths = bn.find_all_undirected_paths(start_index, end_index)
+    expected_paths = expected_paths_bn_alarm_MINVOL_to_SAO2()
 
-    for path in paths:
-        print(path)
+    assert paths == expected_paths
 
 
 
@@ -622,6 +736,7 @@ def default_variable__unconditioned():
     return variable
 
 
+
 def assertValidExpectedSample(sample):
     assert isinstance(sample, dict)
     assert len(sample) == 6
@@ -631,3 +746,40 @@ def assertValidExpectedSample(sample):
     assert sample['OCC'] in ['emp', 'self']
     assert sample['R'] in ['small', 'big']
     assert sample['TRN'] in ['car', 'train', 'other']
+
+
+
+def expected_paths_bn_alarm_MINVOL_to_SAO2():
+    return [
+        (22, 18, 26, 19, 34, 9, 1, 3, 29),
+        (22, 18, 26, 19, 34, 9, 1, 33, 28, 29),
+        (22, 18, 26, 19, 34, 33, 1, 3, 29),
+        (22, 18, 26, 19, 34, 33, 28, 29),
+        (22, 18, 26, 36, 34, 9, 1, 3, 29),
+        (22, 18, 26, 36, 34, 9, 1, 33, 28, 29),
+        (22, 18, 26, 36, 34, 33, 1, 3, 29),
+        (22, 18, 26, 36, 34, 33, 28, 29),
+        (22, 18, 30, 29),
+        (22, 18, 33, 1, 3, 29),
+        (22, 18, 33, 28, 29),
+        (22, 18, 33, 34, 9, 1, 3, 29),
+        (22, 18, 34, 9, 1, 3, 29),
+        (22, 18, 34, 9, 1, 33, 28, 29),
+        (22, 18, 34, 33, 1, 3, 29),
+        (22, 18, 34, 33, 28, 29),
+        (22, 34, 9, 1, 3, 29),
+        (22, 34, 9, 1, 33, 18, 30, 29),
+        (22, 34, 9, 1, 33, 28, 29),
+        (22, 34, 18, 30, 29),
+        (22, 34, 18, 33, 1, 3, 29),
+        (22, 34, 18, 33, 28, 29),
+        (22, 34, 19, 26, 18, 30, 29),
+        (22, 34, 19, 26, 18, 33, 1, 3, 29),
+        (22, 34, 19, 26, 18, 33, 28, 29),
+        (22, 34, 33, 1, 3, 29),
+        (22, 34, 33, 18, 30, 29),
+        (22, 34, 33, 28, 29),
+        (22, 34, 36, 26, 18, 30, 29),
+        (22, 34, 36, 26, 18, 33, 1, 3, 29),
+        (22, 34, 36, 26, 18, 33, 28, 29)
+    ]
