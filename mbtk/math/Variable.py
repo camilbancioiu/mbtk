@@ -6,6 +6,8 @@ from mbtk.math.Exceptions import VariableInstancesOfUnequalCount
 
 
 class Variable:
+    ID: int
+    name: str
 
     def __init__(self, instances, name='unnamed'):
         self.ID = -1
@@ -17,6 +19,10 @@ class Variable:
 
     def __len__(self):
         return len(self.instances())
+
+
+    def IDs(self) -> list[int]:
+        return [self.ID]
 
 
     def instances(self):
@@ -35,13 +41,6 @@ class Variable:
             self.values = sorted(list(Counter(self.instances()).keys()))
 
 
-    def simple_representation(self):
-        if self.ID == -1:
-            return self.name
-        else:
-            return self.ID
-
-
 
 class Omega(Variable):
 
@@ -55,10 +54,6 @@ class Omega(Variable):
 
     def instances(self):
         return itertools.repeat(1, times=self.instance_count)
-
-
-    def simple_representation(self):
-        return self.name
 
 
     def __len__(self):
@@ -83,8 +78,9 @@ class JointVariables(Variable):
         self.values = None
 
 
-    def simple_representation(self):
-        return '{' + ', '.join([str(var.simple_representation()) for var in self.variables]) + '}'
+    def IDs(self) -> list[int]:
+        varIDs = [var.IDs() for var in self.variables]
+        return list(itertools.chain(*varIDs))
 
 
     def instances(self):

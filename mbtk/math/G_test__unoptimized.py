@@ -1,9 +1,9 @@
 import pickle
-from typing import cast
+from typing import Union
 
 from mbtk.math.CITestResult import CITestResult
 
-from mbtk.math.PMF import PMF, OmegaPMF, OmegaCPMF
+from mbtk.math.PMF import PMF, CPMF, OmegaPMF, OmegaCPMF
 from mbtk.math.PMF import make_cpmf_PrXYcZ, make_cpmf_PrXcZ
 
 import mbtk.math.infotheory as infotheory
@@ -15,8 +15,9 @@ import gc
 
 
 class G_test:
+    ci_test_results: list[CITestResult]
 
-    def __init__(self, datasetmatrix, parameters):
+    def __init__(self, datasetmatrix, parameters) -> None:
         self.parameters = parameters
         self.ci_test_name = '.'.join([self.__module__, self.__class__.__name__])
         self.parameters['ci_test_name'] = self.ci_test_name
@@ -42,12 +43,14 @@ class G_test:
         self.gc_collect_rate = self.parameters.get('ci_test_gc_collect_rate', 0)
 
 
-    def conditionally_independent(self, X, Y, Z):
+    def conditionally_independent(self, X: int, Y: int, Z: Union[set[int], list[int]]) -> bool:
         self.DoF_calculator.reset()
-        result = self.G_test_conditionally_independent(X, Y, Z)
+        Zl = list(Z)
+        assert isinstance(Zl, list)
+        result = self.G_test_conditionally_independent(X, Y, Zl)
 
         if self.source_bn is not None:
-            result.computed_d_separation = self.source_bn.d_separated(X, Z, Y)
+            result.computed_d_separation = self.source_bn.d_separated(X, Zl, Y)
 
         self.ci_test_results.append(result)
         self.ci_test_counter += 1
@@ -60,13 +63,16 @@ class G_test:
         return result.independent
 
 
-    def G_test_conditionally_independent(self, X: int, Y: int, Z: set[int]) -> CITestResult:
+    def G_test_conditionally_independent(self, X: int, Y: int, Z: list[int]) -> CITestResult:
         (VarX, VarY, VarZ) = self.load_variables(X, Y, Z)
 
         result = CITestResult()
         result.start_timing()
 
         PrZ: PMF
+        PrXcZ: CPMF
+        PrYcZ: CPMF
+        PrXYcZ: CPMF
 
         if len(Z) == 0:
             PrXY = PMF(JointVariables(VarX, VarY))
@@ -81,7 +87,7 @@ class G_test:
                 self.DoF_calculator.set_context_pmfs(PrXY, PrX, PrY, None)
 
         else:
-            Zl = cast(list[int], Z)
+            Zl = list(Z)
 
             PrXYZ = PMF(JointVariables(VarX, VarY, VarZ))
             PrXZ = PMF(JointVariables(VarX, VarZ))

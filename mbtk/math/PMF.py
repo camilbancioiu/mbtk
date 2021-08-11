@@ -1,10 +1,18 @@
+from __future__ import annotations
+
 import itertools
+from typing import cast
 from collections import Counter
+
+from mbtk.math.Variable import Variable
 from mbtk.utilities import functions as util
 import numpy
 
 
 class PMF:
+    tolerance_pdiff: float
+    variable: Variable
+    variableIDs: tuple[int]
 
     def __init__(self, variable):
         self.tolerance_pdiff = 1e-10
@@ -13,10 +21,12 @@ class PMF:
             self.total_count = len(self.variable)
             self.value_counts = self.count_values()
             self.probabilities = self.normalize_counts()
+            self.variableIDs = tuple(variable.IDs())
         else:
             self.value_counts = dict()
             self.probabilities = dict()
             self.total_count = 0
+            self.variableIDs = tuple()
 
 
     def __str__(self):
@@ -74,14 +84,15 @@ class PMF:
             return 0.0
 
 
-    def labels(self, *lbs):
-        if len(lbs) == 0:
-            return self.keylabels
-        self.keylabels = tuple(lbs)
+    def IDs(self, *varIDs: int) -> tuple[int]:
+        if len(varIDs) == 0:
+            return self.variableIDs
+        self.variableIDs = cast(tuple[int], tuple(varIDs))
+        return self.variableIDs
 
 
-    def sum_over(self, label):
-        index = self.keylabels.index(label)
+    def sum_over(self, ID):
+        index = self.variableIDs.index(ID)
         new_probabilities = dict()
 
         for key, value in self.probabilities.items():
@@ -93,7 +104,7 @@ class PMF:
 
         new_pmf = PMF(None)
         new_pmf.probabilities = new_probabilities
-        new_pmf.keylabels = self.remove_from_key(self.keylabels, index)
+        new_pmf.variableIDs = self.remove_from_key(self.variableIDs, index)
 
         return new_pmf
 
@@ -154,6 +165,39 @@ class PMF:
         return instances
 
 
+    def condition_on(self, cond_pmf: PMF) -> CPMF:
+        cond_vars = cond_pmf.IDs()
+
+        if len(cond_vars) == 0:
+            raise ValueError('empty conditioning set')
+
+        cpmf = CPMF(None, None)
+
+        joint_IDs = self.IDs()
+        joint_index = {var: joint_IDs.index(var) for var in joint_IDs}
+        non_cond_vars = [ID for ID in joint_IDs if ID not in cond_vars]
+
+        for joint_key, joint_p in self.items():
+            cond_key = tuple(joint_key[joint_index[cvID]] for cvID in cond_vars)
+            if len(cond_key) == 1:
+                cond_key = cond_key[0]
+
+            non_cond_key = tuple([joint_key[joint_index[ncvID]] for ncvID in non_cond_vars])
+
+            try:
+                pmf = cpmf.conditional_probabilities[cond_key]
+            except KeyError:
+                pmf = PMF(None)
+                cpmf.conditional_probabilities[cond_key] = pmf
+
+            try:
+                pmf.probabilities[non_cond_key] = joint_p / cond_pmf.p(cond_key)
+            except ZeroDivisionError:
+                pass
+
+        return cpmf
+
+
     def __eq__(self, other):
         selfkeyset = set(self.probabilities.keys())
         otherkeyset = set(other.probabilities.keys())
@@ -177,6 +221,7 @@ class CPMF(PMF):
         else:
             self.tolerance_pdiff = 1e-10
             self.variable = variable
+        self.probabilities = None
         self.conditional_probabilities = dict()
         self.tolerance_pdiff = 1e-10
 
@@ -243,7 +288,8 @@ class CPMF(PMF):
             pmf.normalize_counts(update_probabilities=True)
 
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
+        assert isinstance(other, CPMF)
         selfkeyset = set(self.conditional_probabilities.keys())
         otherkeyset = set(other.conditional_probabilities.keys())
         keys_equal = (selfkeyset == otherkeyset)
@@ -274,8 +320,13 @@ class OmegaCPMF(CPMF):
 
 
 
-def make_cpmf_PrXYcZ(X, Y, Z, PrXYZ, PrZ):
-    Z = list(Z)
+def make_cpmf_PrXYcZ(
+    X: int,
+    Y: int,
+    Z: list[int],
+    PrXYZ: PMF,
+    PrZ: PMF,
+) -> CPMF:
     joint_variables = [X, Y] + Z
     index = {var: joint_variables.index(var) for var in joint_variables}
 
@@ -299,8 +350,13 @@ def make_cpmf_PrXYcZ(X, Y, Z, PrXYZ, PrZ):
     return PrXYcZ
 
 
-def make_cpmf_PrXcZ(X, Z, PrXZ, PrZ):
-    Z = list(Z)
+
+def make_cpmf_PrXcZ(
+    X: int,
+    Z: list[int],
+    PrXZ: PMF,
+    PrZ: PMF,
+) -> CPMF:
     joint_variables = [X] + Z
     index = {var: joint_variables.index(var) for var in joint_variables}
 
@@ -322,6 +378,7 @@ def make_cpmf_PrXcZ(X, Z, PrXZ, PrZ):
             pass
 
     return PrXcZ
+
 
 
 def process_pmf_key(key):

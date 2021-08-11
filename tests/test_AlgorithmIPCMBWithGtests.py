@@ -181,7 +181,6 @@ def test_dof_across_Gtest_optimizations__UnadjustedDoF(ds_survey_2e3, adtree_sur
     parameters = dict()
     parameters['G_test__unoptimized'] = make_parameters__unoptimized(dof)
     parameters['G_test__with_AD_tree'] = make_parameters__adtree(dof, LLT, adtree)
-    parameters['G_test__with_dcMI'] = make_parameters__dcmi(dof)
 
     targets = range(ds.datasetmatrix.get_column_count('X'))
     for target in targets:

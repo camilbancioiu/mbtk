@@ -47,7 +47,7 @@ def test_creating_complete_joint_pmf(bn_survey):
     joint_pmf = bn.create_joint_pmf(values_as_indices=False)
     assert sum(joint_pmf.values()) == 1.0
     assert len(joint_pmf) == total_possible_values_in_bn
-    assert joint_pmf.labels() == (0, 1, 2, 3, 4, 5)
+    assert joint_pmf.IDs() == (0, 1, 2, 3, 4, 5)
 
     test_sample = ('young', 'uni', 'self', 'small', 'F', 'train')
     expected_probability = 0.3 * 0.51 * 0.36 * 0.08 * 0.2 * 0.36

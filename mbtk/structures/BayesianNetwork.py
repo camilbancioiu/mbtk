@@ -136,7 +136,7 @@ class BayesianNetwork:
     def create_joint_pmf(self, values_as_indices=True):
         pmf = PMF(None)
         pmf.probabilities = self.joint_values_and_probabilities(values_as_indices=values_as_indices)
-        pmf.labels(*list(range(len(self))))
+        pmf.IDs(*list(range(len(self))))
         return pmf
 
 
@@ -173,7 +173,7 @@ class BayesianNetwork:
     @finalization_required
     def create_partial_joint_pmf(self, variables):
         joint_pmf = self.create_joint_pmf()
-        variables_to_sum_over = set(joint_pmf.labels()) - set(variables)
+        variables_to_sum_over = set(joint_pmf.IDs()) - set(variables)
 
         for variable in variables_to_sum_over:
             joint_pmf = joint_pmf.sum_over(variable)
