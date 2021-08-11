@@ -4,13 +4,14 @@ import mbtk.math.infotheory as infotheory
 from mbtk.math.Variable import Variable
 
 
-def almostEqual(x, y):
+def almostEqual(x: float, y: float) -> bool:
     return abs(x - y) < 1e-10
 
 
 
-def test_MI__binary():
+def test_MI__binary() -> None:
     # Test calculating the mutual information of two binary variables.
+    expected_MI: float
 
     # Both variables lack any information at all (H = 0).
     # Only one pair in the joint pmf: (0,0)

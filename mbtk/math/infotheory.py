@@ -1,10 +1,17 @@
 import math
+from typing import Callable, Union
 
 from mbtk.math.PMF import PMF, CPMF
-from mbtk.math.Variable import JointVariables
+from mbtk.math.Variable import Variable, JointVariables
 
 
-def mutual_information(PrXY, PrX, PrY, base=2):
+def mutual_information(
+    PrXY: PMF,
+    PrX: PMF,
+    PrY: PMF,
+    base=2,
+) -> float:
+
     logarithm = create_logarithm_function(base)
     MI = 0.0
     for (x, px) in PrX.items():
@@ -19,7 +26,14 @@ def mutual_information(PrXY, PrX, PrY, base=2):
 
 
 
-def conditional_mutual_information(PrXYcZ, PrXcZ, PrYcZ, PrZ, base=2):
+def conditional_mutual_information(
+    PrXYcZ: CPMF,
+    PrXcZ: CPMF,
+    PrYcZ: CPMF,
+    PrZ: PMF,
+    base: float = 2,
+) -> float:
+
     logarithm = create_logarithm_function(base)
     cMI = 0.0
     for (z, pz) in PrZ.items():
@@ -35,7 +49,7 @@ def conditional_mutual_information(PrXYcZ, PrXcZ, PrYcZ, PrZ, base=2):
 
 
 
-def calculate_pmf_for_mi(X, Y):
+def calculate_pmf_for_mi(X: Variable, Y: Variable) -> tuple[PMF, PMF, PMF]:
     PrXY = PMF(JointVariables(X, Y))
     PrX = PMF(X)
     PrY = PMF(Y)
@@ -44,7 +58,12 @@ def calculate_pmf_for_mi(X, Y):
 
 
 
-def calculate_pmf_for_cmi(X, Y, Z):
+def calculate_pmf_for_cmi(
+    X: Variable,
+    Y: Variable,
+    Z: Union[Variable, JointVariables],
+) -> tuple[CPMF, CPMF, CPMF, PMF]:
+
     PrXYcZ = CPMF(JointVariables(X, Y), Z)
     PrXcZ = CPMF(X, Z)
     PrYcZ = CPMF(Y, Z)
@@ -54,7 +73,7 @@ def calculate_pmf_for_cmi(X, Y, Z):
 
 
 
-def create_logarithm_function(base):
+def create_logarithm_function(base: Union[str, float]) -> Callable[[float], float]:
     if base == 'e':
         return math.log
     elif base == 2:
@@ -62,4 +81,5 @@ def create_logarithm_function(base):
     elif base == 10:
         return math.log10
     else:
-        return lambda x: math.log(x, base)
+        assert isinstance(base, float)
+        return lambda x: math.log(x, float(base))

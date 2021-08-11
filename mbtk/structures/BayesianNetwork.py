@@ -1,12 +1,16 @@
+from __future__ import annotations
+
 import itertools
 import functools
 import operator
 import random
 import copy
+import pickle
 
 import numpy
 
 from collections import OrderedDict
+from pathlib import Path
 
 from mbtk.math.PMF import PMF
 from mbtk.structures.Exceptions import BayesianNetworkNotFinalizedError
@@ -32,6 +36,11 @@ class BayesianNetwork:
         self.variable_node_names__sampling_order = []
         self.graph = None
         self.finalized = False
+
+
+    @staticmethod
+    def from_bif_file(sourcepath: Path, use_cache=True) -> BayesianNetwork:
+        return read_bif_file(sourcepath, use_cache)
 
 
     @functools.cache
@@ -645,3 +654,39 @@ class ProbabilityDistributionOfVariableNode:
             return "ProbabilityMassDistribution for variable {}, unconditioned".format(self.variable_name)
         else:
             return "ProbabilityMassDistribution for variable {}, conditioned on {}".format(self.variable_name, self.conditioning_variable_names)
+
+
+
+def read_bif_file(sourcepath: Path, use_cache=True) -> BayesianNetwork:
+    bayesian_network = None
+
+    # BIF files might be large, so we read them from source and then we pickle
+    # them to files. If a pickle-file is found, read it instead of the
+    # requested BIF file.
+    cachefile = sourcepath.with_suffix('.pickle')
+    if use_cache:
+        if cachefile.exists():
+            with cachefile.open('rb') as f:
+                bayesian_network = pickle.load(f)
+
+            assert isinstance(bayesian_network, BayesianNetwork)
+            return bayesian_network
+
+    bayesian_network = parse_bif_file(sourcepath)
+    with cachefile.open('wb') as f:
+        pickle.dump(bayesian_network, f)
+
+    assert isinstance(bayesian_network, BayesianNetwork)
+    return bayesian_network
+
+
+
+def parse_bif_file(path):
+    from lark import Lark
+    from mbtk.utilities.bif.Grammar import bif_grammar
+    from mbtk.utilities.bif.Transformers import get_transformer_chain
+    parser = Lark(bif_grammar)
+    tree = parser.parse(path.read_text())
+
+    bayesian_network = get_transformer_chain().transform(tree)
+    return bayesian_network

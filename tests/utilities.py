@@ -4,9 +4,9 @@ import time
 from pathlib import Path
 
 from mbtk.math.Variable import Omega
+from mbtk.structures.BayesianNetwork import BayesianNetwork
 from mbtk.dataset.DatasetMatrix import DatasetMatrix
 from mbtk.dataset.sources.SampledBayesianNetworkDatasetSource import SampledBayesianNetworkDatasetSource
-import mbtk.utilities.functions as util
 
 
 test_folder = Path('tests', 'testfiles')
@@ -67,7 +67,7 @@ def make_test_datasetmatrix(configuration):
 def make_test_bayesian_network(configuration):
     bn = None
     with Lock('bn-' + configuration['sourcepath'].name, 'w'):
-        bn = util.read_bif_file(configuration['sourcepath'], use_cache=True)
+        bn = BayesianNetwork.from_bif_file(configuration['sourcepath'], use_cache=True)
     bn.finalize()
     return bn
 

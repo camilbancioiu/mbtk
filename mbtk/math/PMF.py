@@ -257,7 +257,25 @@ class CPMF(PMF):
         return True
 
 
+
+class OmegaPMF(PMF):
+
+    def __init__(self):
+        super().__init__(None)
+        self.probabilities[1] = 1.0
+
+
+
+class OmegaCPMF(CPMF):
+
+    def __init__(self, pmf: PMF):
+        super().__init__(None, None)
+        self.conditional_probabilities[1] = pmf
+
+
+
 def make_cpmf_PrXYcZ(X, Y, Z, PrXYZ, PrZ):
+    Z = list(Z)
     joint_variables = [X, Y] + Z
     index = {var: joint_variables.index(var) for var in joint_variables}
 
@@ -282,6 +300,7 @@ def make_cpmf_PrXYcZ(X, Y, Z, PrXYZ, PrZ):
 
 
 def make_cpmf_PrXcZ(X, Z, PrXZ, PrZ):
+    Z = list(Z)
     joint_variables = [X] + Z
     index = {var: joint_variables.index(var) for var in joint_variables}
 
@@ -303,19 +322,6 @@ def make_cpmf_PrXcZ(X, Z, PrXZ, PrZ):
             pass
 
     return PrXcZ
-
-
-def make_omega_cpmf_from_pmf(pmf):
-    cpmf = CPMF(None, None)
-    cpmf.conditional_probabilities[1] = pmf
-    return cpmf
-
-
-def make_omega_pmf():
-    pmf = PMF(None)
-    pmf.probabilities[1] = 1.0
-    return pmf
-
 
 
 def process_pmf_key(key):

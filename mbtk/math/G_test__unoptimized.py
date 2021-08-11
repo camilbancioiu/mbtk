@@ -1,8 +1,10 @@
 import pickle
+from typing import cast
 
 from mbtk.math.CITestResult import CITestResult
 
-import mbtk.math.PMF as PMF
+from mbtk.math.PMF import PMF, OmegaPMF, OmegaCPMF
+from mbtk.math.PMF import make_cpmf_PrXYcZ, make_cpmf_PrXcZ
 
 import mbtk.math.infotheory as infotheory
 from mbtk.math.Variable import JointVariables
@@ -58,35 +60,37 @@ class G_test:
         return result.independent
 
 
-    def G_test_conditionally_independent(self, X, Y, Z):
+    def G_test_conditionally_independent(self, X: int, Y: int, Z: set[int]) -> CITestResult:
         (VarX, VarY, VarZ) = self.load_variables(X, Y, Z)
 
         result = CITestResult()
         result.start_timing()
 
+        PrZ: PMF
+
         if len(Z) == 0:
-            PrXY = PMF.PMF(JointVariables(VarX, VarY))
-            PrX = PMF.PMF(VarX)
-            PrY = PMF.PMF(VarY)
-            PrZ = PMF.make_omega_pmf()
-            PrXYcZ = PMF.make_omega_cpmf_from_pmf(PrXY)
-            PrXcZ = PMF.make_omega_cpmf_from_pmf(PrX)
-            PrYcZ = PMF.make_omega_cpmf_from_pmf(PrY)
+            PrXY = PMF(JointVariables(VarX, VarY))
+            PrX = PMF(VarX)
+            PrY = PMF(VarY)
+            PrZ = OmegaPMF()
+            PrXYcZ = OmegaCPMF(PrXY)
+            PrXcZ = OmegaCPMF(PrX)
+            PrYcZ = OmegaCPMF(PrY)
 
             if self.DoF_calculator.requires_pmfs:
                 self.DoF_calculator.set_context_pmfs(PrXY, PrX, PrY, None)
 
         else:
-            Z = list(Z)
+            Zl = cast(list[int], Z)
 
-            PrXYZ = PMF.PMF(JointVariables(VarX, VarY, VarZ))
-            PrXZ = PMF.PMF(JointVariables(VarX, VarZ))
-            PrYZ = PMF.PMF(JointVariables(VarY, VarZ))
-            PrZ = PMF.PMF(VarZ)
+            PrXYZ = PMF(JointVariables(VarX, VarY, VarZ))
+            PrXZ = PMF(JointVariables(VarX, VarZ))
+            PrYZ = PMF(JointVariables(VarY, VarZ))
+            PrZ = PMF(VarZ)
 
-            PrXcZ = PMF.make_cpmf_PrXcZ(X, Z, PrXZ, PrZ)
-            PrYcZ = PMF.make_cpmf_PrXcZ(Y, Z, PrYZ, PrZ)
-            PrXYcZ = PMF.make_cpmf_PrXYcZ(X, Y, Z, PrXYZ, PrZ)
+            PrXcZ = make_cpmf_PrXcZ(X, Zl, PrXZ, PrZ)
+            PrYcZ = make_cpmf_PrXcZ(Y, Zl, PrYZ, PrZ)
+            PrXYcZ = make_cpmf_PrXYcZ(X, Y, Zl, PrXYZ, PrZ)
 
             if self.DoF_calculator.requires_pmfs:
                 self.DoF_calculator.set_context_pmfs(PrXYZ, PrXZ, PrYZ, PrZ)

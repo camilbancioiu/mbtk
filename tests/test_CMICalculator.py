@@ -1,5 +1,9 @@
+import pytest
+
 from mbtk.math.CMICalculator import CMICalculator
 
+
+@pytest.mark.skip
 def test_basic_functionality(bn_alarm):
     bn = bn_alarm
 

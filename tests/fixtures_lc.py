@@ -2,20 +2,22 @@ import pytest
 from pathlib import Path
 from mbtk.structures.ADTree import ADTree
 import tests.utilities as testutil
-import mbtk.utilities.functions as util
+from mbtk.structures.BayesianNetwork import BayesianNetwork
 
 
 @pytest.fixture(scope='session')
-def bn_lungcancer():
-    bn = util.read_bif_file(Path(testutil.bif_folder, 'lungcancer.bif'), use_cache=False)
+def bn_lungcancer() -> BayesianNetwork:
+    path = Path(testutil.bif_folder, 'lungcancer.bif')
+    bn = BayesianNetwork.from_bif_file(path, use_cache=False)
     bn.finalize()
     return bn
 
 
 
 @pytest.fixture(scope='session')
-def bn_lc_repaired():
-    bn = util.read_bif_file(Path(testutil.bif_folder, 'lc_repaired.bif'), use_cache=False)
+def bn_lc_repaired() -> BayesianNetwork:
+    path = Path(testutil.bif_folder, 'lc_repaired.bif')
+    bn = BayesianNetwork.from_bif_file(path, use_cache=False)
     bn.finalize()
     return bn
 
