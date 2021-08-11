@@ -91,8 +91,9 @@ class PMF:
         return self.variableIDs
 
 
-    def sum_over(self, ID):
+    def sum_over(self, ID: int) -> PMF:
         index = self.variableIDs.index(ID)
+        new_probabilities: dict[tuple[int, ...], float]
         new_probabilities = dict()
 
         for key, value in self.probabilities.items():
@@ -317,67 +318,6 @@ class OmegaCPMF(CPMF):
     def __init__(self, pmf: PMF):
         super().__init__(None, None)
         self.conditional_probabilities[1] = pmf
-
-
-
-def make_cpmf_PrXYcZ(
-    X: int,
-    Y: int,
-    Z: list[int],
-    PrXYZ: PMF,
-    PrZ: PMF,
-) -> CPMF:
-    joint_variables = [X, Y] + Z
-    index = {var: joint_variables.index(var) for var in joint_variables}
-
-    PrXYcZ = CPMF(None, None)
-
-    for joint_key, joint_p in PrXYZ.items():
-        zkey = tuple([joint_key[index[zvar]] for zvar in Z])
-        varkey = tuple([joint_key[index[var]] for var in joint_variables if var not in Z])
-        if len(zkey) == 1:
-            zkey = zkey[0]
-        try:
-            pmf = PrXYcZ.conditional_probabilities[zkey]
-        except KeyError:
-            pmf = PMF(None)
-            PrXYcZ.conditional_probabilities[zkey] = pmf
-        try:
-            pmf.probabilities[varkey] = joint_p / PrZ.p(zkey)
-        except ZeroDivisionError:
-            pass
-
-    return PrXYcZ
-
-
-
-def make_cpmf_PrXcZ(
-    X: int,
-    Z: list[int],
-    PrXZ: PMF,
-    PrZ: PMF,
-) -> CPMF:
-    joint_variables = [X] + Z
-    index = {var: joint_variables.index(var) for var in joint_variables}
-
-    PrXcZ = CPMF(None, None)
-
-    for joint_key, joint_p in PrXZ.items():
-        zkey = tuple([joint_key[index[zvar]] for zvar in Z])
-        varkey = [joint_key[index[var]] for var in joint_variables if var not in Z][0]
-        if len(zkey) == 1:
-            zkey = zkey[0]
-        try:
-            pmf = PrXcZ.conditional_probabilities[zkey]
-        except KeyError:
-            pmf = PMF(None)
-            PrXcZ.conditional_probabilities[zkey] = pmf
-        try:
-            pmf.probabilities[varkey] = joint_p / PrZ.p(zkey)
-        except ZeroDivisionError:
-            pass
-
-    return PrXcZ
 
 
 

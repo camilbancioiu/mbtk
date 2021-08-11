@@ -1,5 +1,6 @@
 import functools
 
+
 class AlgorithmIAMB:
 
     def __init__(self, datasetmatrix, parameters):
@@ -85,6 +86,8 @@ class AlgorithmIAMB:
             if not changed_CMB:
                 break
 
+            print(CMB)
+
         return CMB
 
 
@@ -97,6 +100,8 @@ class AlgorithmIAMB:
             if self.CI(self.target, candidate, MB):
                 if self.debug >= 1: print('candidate false positive', candidate)
                 false_positives.add(candidate)
+
+            print(MB)
 
         MB = CMB - false_positives
         return MB

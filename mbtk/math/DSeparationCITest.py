@@ -5,6 +5,7 @@ from mbtk.math.CITestResult import CITestResult
 DSEP_CI_AsTest = 0
 DSEP_CI_ASHeuristic = 1
 
+
 class DSeparationCITest:
 
     def __init__(self, datasetmatrix, parameters):

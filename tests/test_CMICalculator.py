@@ -1,9 +1,7 @@
-import pytest
 
 from mbtk.math.CMICalculator import CMICalculator
 
 
-@pytest.mark.skip
 def test_basic_functionality(bn_alarm):
     bn = bn_alarm
 
@@ -15,6 +13,5 @@ def test_basic_functionality(bn_alarm):
 
     cmi = CMICalculator(None, parameters)
     value = cmi.compute(X, Y, [])
-    print(value)
 
     assert value > 0

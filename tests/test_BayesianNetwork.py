@@ -1,4 +1,5 @@
 import random
+import operator
 from collections import Counter
 
 import numpy
@@ -98,7 +99,7 @@ def test_creating_partial_joint_pmf_variant_2(bn_survey):
         + 0.5 * 0.51 * 0.70  \
         + 0.2 * 0.51 * 0.90  \
 
-    assert joint_pmf.p(test_sample) == expected_probability
+    assert almostEqual(joint_pmf.p(test_sample), expected_probability)
 
     test_sample = (1,)  # ('uni',)
     expected_probability = 0 \
@@ -109,7 +110,7 @@ def test_creating_partial_joint_pmf_variant_2(bn_survey):
         + 0.5 * 0.51 * 0.30  \
         + 0.2 * 0.51 * 0.10  \
 
-    assert joint_pmf.p(test_sample) == expected_probability
+    assert almostEqual(joint_pmf.p(test_sample), expected_probability)
 
 
 
@@ -169,6 +170,70 @@ def test_creating_partial_joint_pmf_variant_4(bn_survey):
         * p_adult
 
     assert joint_pmf.p(test_sample) == expected_probability
+
+
+
+def test_get_ancestors_of_nodes__survey(bn_survey):
+    bn = bn_survey
+
+    node_names = ['OCC']
+    nodes = bn.get_nodes_by_name(node_names)
+
+    subnet_nodes = bn.get_subnetwork_nodes(nodes)
+    subnet_names = list(map(operator.attrgetter('name'), subnet_nodes.values()))
+
+    expected_subnet_names = set(['AGE', 'SEX', 'EDU', 'OCC'])
+    assert set(subnet_names) == expected_subnet_names
+
+
+
+def test_get_ancestors_of_nodes__alarm(bn_alarm):
+    bn = bn_alarm
+
+    node_names = ['PRESS']
+    nodes = bn.get_nodes_by_name(node_names)
+
+    subnet_nodes = bn.get_subnetwork_nodes(nodes)
+    subnet_names = set(map(operator.attrgetter('name'), subnet_nodes.values()))
+
+    expected_subnet_names = set([
+        'PRESS', 'KINKEDTUBE', 'VENTTUBE', 'DISCONNECT',
+        'VENTMACH', 'MINVOLSET', 'INTUBATION'
+    ])
+    assert subnet_names == expected_subnet_names
+
+
+    node_names = ['CO', 'PCWP']
+    nodes = bn.get_nodes_by_name(node_names)
+
+    subnet_nodes = bn.get_subnetwork_nodes(nodes)
+    subnet_names = set(map(operator.attrgetter('name'), subnet_nodes.values()))
+
+    expected_subnet_names = set([
+        'PCWP', 'LVEDVOLUME', 'LVFAILURE', 'HYPOVOLEMIA',
+        'CO', 'STROKEVOLUME', 'HR', 'CATECHOL',
+        'TPR', 'ANAPHYLAXIS', 'ARTCO2', 'VENTALV', 'INTUBATION', 'VENTLUNG',
+        'KINKEDTUBE', 'VENTTUBE', 'DISCONNECT', 'VENTMACH', 'MINVOLSET',
+        'SAO2', 'PVSAT', 'FIO2', 'SHUNT', 'PULMEMBOLUS', 'INSUFFANESTH'
+    ])
+    assert subnet_names == expected_subnet_names
+
+
+
+def test_get_subnetwork__alarm(bn_alarm):
+    bn = bn_alarm
+
+    node_names = ['PRESS', 'DISCONNECT']
+    nodes = bn.get_nodes_by_name(node_names)
+    nodes = tuple(map(operator.attrgetter('ID'), nodes.values()))
+    subnetwork = bn.get_subnetwork(nodes)
+
+    expected_subnet_names = set([
+        'PRESS', 'KINKEDTUBE', 'VENTTUBE', 'DISCONNECT',
+        'VENTMACH', 'MINVOLSET', 'INTUBATION'
+    ])
+
+    assert set(subnetwork.variable_node_names()) == expected_subnet_names
 
 
 

@@ -4,7 +4,6 @@ from typing import Union
 from mbtk.math.CITestResult import CITestResult
 
 from mbtk.math.PMF import PMF, CPMF, OmegaPMF, OmegaCPMF
-from mbtk.math.PMF import make_cpmf_PrXYcZ, make_cpmf_PrXcZ
 
 import mbtk.math.infotheory as infotheory
 from mbtk.math.Variable import JointVariables
@@ -87,16 +86,14 @@ class G_test:
                 self.DoF_calculator.set_context_pmfs(PrXY, PrX, PrY, None)
 
         else:
-            Zl = list(Z)
-
             PrXYZ = PMF(JointVariables(VarX, VarY, VarZ))
             PrXZ = PMF(JointVariables(VarX, VarZ))
             PrYZ = PMF(JointVariables(VarY, VarZ))
             PrZ = PMF(VarZ)
 
-            PrXcZ = make_cpmf_PrXcZ(X, Zl, PrXZ, PrZ)
-            PrYcZ = make_cpmf_PrXcZ(Y, Zl, PrYZ, PrZ)
-            PrXYcZ = make_cpmf_PrXYcZ(X, Y, Zl, PrXYZ, PrZ)
+            PrXcZ = PrXZ.condition_on(PrZ)
+            PrYcZ = PrYZ.condition_on(PrZ)
+            PrXYcZ = PrXYZ.condition_on(PrZ)
 
             if self.DoF_calculator.requires_pmfs:
                 self.DoF_calculator.set_context_pmfs(PrXYZ, PrXZ, PrYZ, PrZ)

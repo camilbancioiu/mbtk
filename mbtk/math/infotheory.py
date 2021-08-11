@@ -31,7 +31,7 @@ def conditional_mutual_information(
     PrXcZ: CPMF,
     PrYcZ: CPMF,
     PrZ: PMF,
-    base: float = 2,
+    base: Union[float, str] = 2,
 ) -> float:
 
     logarithm = create_logarithm_function(base)
@@ -45,7 +45,7 @@ def conditional_mutual_information(
                 else:
                     pcMI = pz * pxycz * logarithm(pxycz / (pxcz * pycz))
                     cMI += pcMI
-    return cMI
+    return abs(cMI)
 
 
 
