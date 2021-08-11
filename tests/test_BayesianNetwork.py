@@ -81,11 +81,10 @@ def test_creating_partial_joint_pmf_variant_1(bn_survey):
     assert joint_pmf.p(test_sample) == expected_probability
 
 
+
 def test_creating_partial_joint_pmf_variant_2(bn_survey):
     bn = bn_survey
     EDU = bn.variable_nodes_index('EDU')
-
-
 
     joint_pmf = bn.create_partial_joint_pmf((EDU,))
     assert almostEqual(sum(joint_pmf.values()), 1)
@@ -111,6 +110,7 @@ def test_creating_partial_joint_pmf_variant_2(bn_survey):
         + 0.2 * 0.51 * 0.10  \
 
     assert joint_pmf.p(test_sample) == expected_probability
+
 
 
 def test_creating_partial_joint_pmf_variant_3(bn_survey):
@@ -169,6 +169,7 @@ def test_creating_partial_joint_pmf_variant_4(bn_survey):
         * p_adult
 
     assert joint_pmf.p(test_sample) == expected_probability
+
 
 
 def test_sampling_single(bn_survey):
