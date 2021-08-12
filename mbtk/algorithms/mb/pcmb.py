@@ -1,6 +1,6 @@
 import itertools
 import functools
-from mbtk.algorithms.mb.setcache import SetCache
+
 
 class AlgorithmPCMB:
     """
@@ -39,6 +39,13 @@ class AlgorithmPCMB:
         # self.CI is an alias
         self.CI = self.CITest.conditionally_independent
 
+        # self.dep_heuristic is the correlation heuristic. It must have a
+        # method called `compute` that receives three arguments: the variable
+        # indices X and Y and a set of indices Z. The method must return a
+        # rational number.
+        correlation_heuristic_class = self.parameters['correlation_heuristic_class']
+        self.dep_heuristic = correlation_heuristic_class(self.datasetmatrix, self.parameters)
+
 
     def select_features(self):
         """Alias of self.discover_mb()"""
@@ -61,7 +68,9 @@ class AlgorithmPCMB:
         self.SepSetZ = dict()
 
         PC = self.GetPC(T)
+        print('PC', PC)
         MB = PC
+        print('MB', MB)
 
         for Y in PC:
             for X in self.GetPC(Y):
@@ -71,6 +80,7 @@ class AlgorithmPCMB:
                         raise Exception("PCMB error")
                     if not self.CI(self.target, X, Z | {Y}):
                         MB.add(X)
+                    print('MB', MB)
 
         return MB
 
@@ -88,18 +98,16 @@ class AlgorithmPCMB:
         PCD = set()
         CandidatePCD = self.U - {T}
 
-        print(f'GetPCD({T})')
+        iteration = 0
 
         while True:
-            changed_PCD = False
-
+            print('iteration', iteration)
             for X in CandidatePCD:
                 self.SepSetCache[X] = self.strongest_separator(PCD, X)
-                print(f'strongest_separator({PCD}, {X}) = {self.SepSetCache[X]}')
             false_positives = self.find_false_candidates(CandidatePCD)
-            print(f'false positives in CandidatePCD {CandidatePCD}:')
-            print(false_positives)
+            print('CandidatePCD with false positives', CandidatePCD)
             CandidatePCD = CandidatePCD - false_positives
+            print('CandidatePCD without false positives', CandidatePCD)
 
             candidate = self.highest_correlated_candidate_sep(CandidatePCD)
             PCD.add(candidate)
@@ -108,11 +116,17 @@ class AlgorithmPCMB:
             for X in PCD:
                 self.SepSetCache[X] = self.strongest_separator(PCD - {X}, X)
             false_positives = self.find_false_candidates(PCD)
+            print('PCD with false positives', PCD)
             PCD = PCD - false_positives
+            print('PCD without false positives', PCD)
 
             if len(false_positives) == 0:
                 break
 
+            iteration += 1
+
+
+        print(f'GetPCD({T}) = {PCD}')
         return PCD
 
 
@@ -123,7 +137,6 @@ class AlgorithmPCMB:
             if self.CI(self.target, X, Z):
                 false_positives.add(X)
                 self.SepSetZ[X] = Z
-                print(f'SepSetZ[{X}] = {Z}')
         return false_positives
 
 
@@ -143,14 +156,14 @@ class AlgorithmPCMB:
 
 
     def dep(self, candidate, conditioning_set):
-        if self.CI(self.target, candidate, conditioning_set):
-            return 0.0
-        else:
-            return 1.0
+        return self.dep_heuristic.compute(
+            self.target,
+            candidate,
+            conditioning_set)
 
 
 def powerset(iterable):
     s = list(iterable)
     return itertools.chain.from_iterable(
-        itertools.combinations(s, r) for r in range(len(s)+1)
+        itertools.combinations(s, r) for r in range(len(s) + 1)
     )

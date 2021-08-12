@@ -3,10 +3,8 @@ import time
 import collections
 import operator
 
-from pprint import pprint
-
 from mbtk.math.DSeparationCITest import DSeparationCITest
-from mbtk.math.CMICalculator import CMICalculator
+from mbtk.math.BNCorrelationEstimator import BNCorrelationEstimator
 from mbtk.algorithms.mb.iamb import AlgorithmIAMB
 from mbtk.algorithms.mb.pcmb import AlgorithmPCMB
 from mbtk.algorithms.mb.ipcmb import AlgorithmIPCMB
@@ -40,7 +38,7 @@ def test_dsep_full_alarm_ipcmb(bn_alarm):
 
     condset = operator.attrgetter('Z')
     cond_counter = collections.Counter(map(len, map(condset, citr)))
-    pprint(cond_counter)
+    print_counter(cond_counter)
 
 
 
@@ -57,8 +55,8 @@ def make_parameters_ipcmb(target, bn, variables):
 
 
 
-@pytest.mark.skip
 @pytest.mark.slow
+@pytest.mark.skip
 def test_dsep_full_alarm_pcmb(bn_alarm):
     bn = bn_alarm
     variables = sorted(list(bn.graph_d.keys()))
@@ -87,6 +85,7 @@ def make_parameters_pcmb(target, bn, variables):
         'target': target,
         'all_variables': variables,
         'ci_test_class': DSeparationCITest,
+        'correlation_heuristic_class': BNCorrelationEstimator,
         'source_bayesian_network': bn,
         'pc_only': False,
         'ci_test_debug': 0,
@@ -106,7 +105,8 @@ def test_dsep_full_alarm_iamb(bn_alarm):
     for target in variables:
         target_start_time = time.time()
         parameters = make_parameters_iamb(target, bn, variables)
-        mb = AlgorithmIAMB(None, parameters).discover_mb()
+        iamb = AlgorithmIAMB(None, parameters)
+        mb = iamb.discover_mb()
         target_end_time = time.time()
         duration = target_end_time - target_start_time
         print(f'[{duration:6.2f} s] Variable {target:3}, Markov boundary {mb}')
@@ -116,13 +116,32 @@ def test_dsep_full_alarm_iamb(bn_alarm):
     duration = total_end_time - total_start_time
     print(f'Total duration {duration}s')
 
+    citr = iamb.CITest.ci_test_results
+    print('ci tests', len(citr))
+    condset = operator.attrgetter('Z')
+    cond_counter = collections.Counter(map(len, map(condset, citr)))
+    print_counter(cond_counter)
+
+    hr = iamb.dep_heuristic.heuristic_results
+    print('heuristic results', len(hr))
+    condset = operator.attrgetter('Z')
+    cond_counter = collections.Counter(map(len, map(condset, hr)))
+    print_counter(cond_counter)
+
+
+def print_counter(counter):
+    for key in sorted(counter.keys()):
+        print(f'{key:3}: {counter[key]:4}')
+
+
+
 
 def make_parameters_iamb(target, bn, variables):
     return {
         'target': target,
         'all_variables': variables,
         'ci_test_class': DSeparationCITest,
-        'correlation_heuristic_class': CMICalculator,
+        'correlation_heuristic_class': BNCorrelationEstimator,
         'source_bayesian_network': bn,
         'pc_only': False,
         'ci_test_debug': 0,

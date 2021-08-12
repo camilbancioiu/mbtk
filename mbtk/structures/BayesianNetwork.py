@@ -219,7 +219,6 @@ class BayesianNetwork:
     def get_subnetwork_nodes(self, nodes: dict[int, VariableNode]) -> dict[int, VariableNode]:
         node_IDs = tuple(nodes.keys())
         subnetwork_node_IDs = self.get_subnetwork_node_IDs(node_IDs)
-        print(subnetwork_node_IDs)
 
         subnetwork_nodes: dict[int, VariableNode] = dict()
         for node_ID in subnetwork_node_IDs:
@@ -298,6 +297,7 @@ class BayesianNetwork:
         self.joint_pmf_size = self.calculate_joint_pmf_size()
 
         self.finalized = True
+
 
 
     def detect_optimal_variable_sampling_order(self):
