@@ -529,7 +529,6 @@ class BayesianNetwork:
 
 
 
-
 class VariableNode:
     """
     Class representing a VariableNode in a :class:`BayesianNetwork`.
