@@ -18,24 +18,24 @@ class AlgorithmRun:
         self.end_time = 0
         self.duration = 0.0
 
-        self.selected_features = []
+        self.mb = []
         self.objective_index = -1
 
 
     def run(self):
         self.start_time = time.time()
-        self.select_features()
+        self.discover_mb()
         self.end_time = time.time()
         self.duration = (self.end_time - self.start_time)
         gc.collect()
 
 
-    def select_features(self):
+    def discover_mb(self):
         if self.exds is not None:
             self.algorithm_instance = self.algorithm(self.exds.matrix, self.parameters)
         else:
             self.algorithm_instance = self.algorithm(None, self.parameters)
-        self.selected_features = self.algorithm_instance.select_features()
+        self.mb = self.algorithm_instance.discover_mb()
 
 
     def __str__(self):
@@ -72,8 +72,8 @@ class AlgorithmAndClassifierRun(AlgorithmRun):
 
 
     def evaluate_classifier(self):
-        self.datasetmatrix_train = self.exds.matrix_train.select_columns_X(self.selected_features)
-        self.datasetmatrix_test = self.exds.matrix_test.select_columns_X(self.selected_features)
+        self.datasetmatrix_train = self.exds.matrix_train.select_columns_X(self.mb)
+        self.datasetmatrix_test = self.exds.matrix_test.select_columns_X(self.mb)
         self.objective_index = self.parameters['objective_index']
 
         self.samples_train = self.datasetmatrix_train.X

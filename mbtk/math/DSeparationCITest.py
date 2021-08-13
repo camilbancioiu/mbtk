@@ -41,8 +41,6 @@ class DSeparationCITest:
         return result
 
 
-
-
     def end(self):
         save_path = self.parameters.get('ci_test_results_path__save', None)
         if save_path is not None:

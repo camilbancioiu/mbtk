@@ -255,7 +255,7 @@ def validate_IPCMB_across_Gtest_implementations(ds, target, parameters_for_imple
 
     if validate_mb:
         ipcmb_dsep = make_IPCMB(ds, target, make_parameters__dsep())
-        mb_dsep = ipcmb_dsep.select_features()
+        mb_dsep = ipcmb_dsep.discover_mb()
         for implementation, result in results.items():
             mb = result[0]
             assert mb == mb_dsep
@@ -275,7 +275,7 @@ def validate_IPCMB_across_Gtest_implementations(ds, target, parameters_for_imple
 
 def run_IPCMB(ds, target, parameters):
     ipcmb = make_IPCMB(ds, target, parameters)
-    mb = ipcmb.select_features()
+    mb = ipcmb.discover_mb()
     ci_tests = ipcmb.CITest.ci_test_results
     return (mb, ci_tests, ipcmb)
 

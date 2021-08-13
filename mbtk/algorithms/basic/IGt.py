@@ -14,6 +14,11 @@ class AlgorithmIGt:
 
 
     def select_features(self):
+        """Alias of self.discover_mb()"""
+        return self.discover_mb()
+
+
+    def discover_mb(self):
         return self.IGt()
 
 
@@ -32,8 +37,8 @@ class AlgorithmIGt:
             IG_per_feature.append((feature_index, feature_IG))
 
         sorted_IG_per_feature = sorted(IG_per_feature, key=operator.itemgetter(1), reverse=True)
-        selected_features = [pair[0] for pair in sorted_IG_per_feature[0:self.Q]]
-        return selected_features
+        mb = [pair[0] for pair in sorted_IG_per_feature[0:self.Q]]
+        return mb
 
 
 
@@ -49,8 +54,8 @@ def algorithm_IGt__binary(datasetmatrix, parameters):
         IG_per_feature.append((feature_index, feature_IG))
 
     sorted_IG_per_feature = sorted(IG_per_feature, key=operator.itemgetter(1), reverse=True)
-    selected_features = [pair[0] for pair in sorted_IG_per_feature[0:Q]]
-    return selected_features
+    mb = [pair[0] for pair in sorted_IG_per_feature[0:Q]]
+    return mb
 
 
 

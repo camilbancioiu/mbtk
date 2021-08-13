@@ -5,7 +5,7 @@ from mbtk.algorithms.basic.IGt import AlgorithmIGt
 from mbtk.dataset.DatasetMatrix import DatasetMatrix
 
 
-def test_selecting_features():
+def test_discover_mb():
     datasetmatrix = default_dataset()
 
     # Select the two best features.
@@ -14,7 +14,7 @@ def test_selecting_features():
         'objective_index': 0
     }
     expected_features = [0, 4]
-    computed_features = AlgorithmIGt(datasetmatrix, parameters).select_features()
+    computed_features = AlgorithmIGt(datasetmatrix, parameters).discover_mb()
     assert computed_features == expected_features
 
     # Select the top four features.
@@ -23,7 +23,7 @@ def test_selecting_features():
         'objective_index': 0
     }
     expected_features = [0, 4, 1, 5]
-    computed_features = AlgorithmIGt(datasetmatrix, parameters).select_features()
+    computed_features = AlgorithmIGt(datasetmatrix, parameters).discover_mb()
     assert computed_features == expected_features
 
     # Select all features, thus seeing them sorted by MI.
@@ -32,7 +32,7 @@ def test_selecting_features():
         'objective_index': 0
     }
     expected_features = [0, 4, 1, 5, 2, 6, 3, 7]
-    computed_features = AlgorithmIGt(datasetmatrix, parameters).select_features()
+    computed_features = AlgorithmIGt(datasetmatrix, parameters).discover_mb()
     assert computed_features == expected_features
 
 

@@ -71,7 +71,7 @@ def test_iamb_correctness__unoptimized(ds_lc_repaired_8e3):
 
 def run_IAMB(ds, target, parameters):
     iamb = make_IAMB(ds, target, parameters)
-    mb = iamb.select_features()
+    mb = iamb.discover_mb()
     ci_tests = iamb.CITest.ci_test_results
     return (mb, ci_tests, iamb)
 

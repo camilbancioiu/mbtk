@@ -24,7 +24,7 @@ def test_ipcmb_finding_Markov_blankets_in_datasetmatrix(ds_survey_2e4):
     parameters['ci_test_dof_calculator_class'] = mbtk.math.DoFCalculators.StructuralDoF
 
     ipcmb = AlgorithmIPCMB(datasetmatrix, parameters)
-    mb = ipcmb.select_features()
+    mb = ipcmb.discover_mb()
     assert mb == [1, 2, 5]
 
 
@@ -43,11 +43,11 @@ def test_ipcmb_finding_Markov_blankets_in_graphs__imitating_survey():
     bn.from_directed_graph(graph)
 
     parameters = make_parameters(3, bn)
-    mb = AlgorithmIPCMB(None, parameters).select_features()
+    mb = AlgorithmIPCMB(None, parameters).discover_mb()
     assert mb == [1, 2, 5]
 
     parameters = make_parameters(1, bn)
-    mb = AlgorithmIPCMB(None, parameters).select_features()
+    mb = AlgorithmIPCMB(None, parameters).discover_mb()
     assert mb == [0, 2, 3, 4]
 
     # Remove the edge 1 → 2 from the Bayesian network.
@@ -56,11 +56,11 @@ def test_ipcmb_finding_Markov_blankets_in_graphs__imitating_survey():
     bn.from_directed_graph(graph)
 
     parameters = make_parameters(3, bn)
-    mb = AlgorithmIPCMB(None, parameters).select_features()
+    mb = AlgorithmIPCMB(None, parameters).discover_mb()
     assert mb == [1, 2, 5]
 
     parameters = make_parameters(1, bn)
-    mb = AlgorithmIPCMB(None, parameters).select_features()
+    mb = AlgorithmIPCMB(None, parameters).discover_mb()
     assert mb == [0, 3, 4]
 
     # Replace the edge from 1 → 3 with 1 → 2.
@@ -69,11 +69,11 @@ def test_ipcmb_finding_Markov_blankets_in_graphs__imitating_survey():
     bn.from_directed_graph(graph)
 
     parameters = make_parameters(3, bn)
-    mb = AlgorithmIPCMB(None, parameters).select_features()
+    mb = AlgorithmIPCMB(None, parameters).discover_mb()
     assert mb == [2, 5]
 
     parameters = make_parameters(1, bn)
-    mb = AlgorithmIPCMB(None, parameters).select_features()
+    mb = AlgorithmIPCMB(None, parameters).discover_mb()
     assert mb == [0, 2, 4]
 
 
@@ -93,23 +93,23 @@ def test_ipcmb_finding_Markov_blankets_in_graphs__as_in_pcmb_article():
 
     parameters = make_parameters(4, bn)
     parameters['pc_only'] = True
-    pc = AlgorithmIPCMB(None, parameters).select_features()
+    pc = AlgorithmIPCMB(None, parameters).discover_mb()
     assert pc == [1]
 
     parameters = make_parameters(4, bn)
-    mb = AlgorithmIPCMB(None, parameters).select_features()
+    mb = AlgorithmIPCMB(None, parameters).discover_mb()
     assert mb == [0, 1]
 
     parameters = make_parameters(0, bn)
-    mb = AlgorithmIPCMB(None, parameters).select_features()
+    mb = AlgorithmIPCMB(None, parameters).discover_mb()
     assert mb == [1, 2, 4]
 
     parameters = make_parameters(2, bn)
-    mb = AlgorithmIPCMB(None, parameters).select_features()
+    mb = AlgorithmIPCMB(None, parameters).discover_mb()
     assert mb == [0, 1, 3]
 
     parameters = make_parameters(1, bn)
-    mb = AlgorithmIPCMB(None, parameters).select_features()
+    mb = AlgorithmIPCMB(None, parameters).discover_mb()
     assert mb == [0, 2, 3, 4]
 
 
@@ -117,23 +117,23 @@ def test_ipcmb_finding_Markov_blankets_in_graphs__as_in_pcmb_article():
 @pytest.mark.slow
 def test_ipcmb_on_alarm(bn_alarm):
     parameters = make_parameters(22, bn_alarm)
-    mb = AlgorithmIPCMB(None, parameters).select_features()
+    mb = AlgorithmIPCMB(None, parameters).discover_mb()
     assert mb == [18, 34]
 
     parameters = make_parameters(1, bn_alarm)
-    mb = AlgorithmIPCMB(None, parameters).select_features()
+    mb = AlgorithmIPCMB(None, parameters).discover_mb()
     assert mb == [3, 9, 17, 29, 32, 33, 34]
 
     parameters = make_parameters(17, bn_alarm)
-    mb = AlgorithmIPCMB(None, parameters).select_features()
+    mb = AlgorithmIPCMB(None, parameters).discover_mb()
     assert mb == [1, 3, 29, 32]
 
     parameters = make_parameters(24, bn_alarm)
-    mb = AlgorithmIPCMB(None, parameters).select_features()
+    mb = AlgorithmIPCMB(None, parameters).discover_mb()
     assert mb == [27]
 
     parameters = make_parameters(34, bn_alarm)
-    mb = AlgorithmIPCMB(None, parameters).select_features()
+    mb = AlgorithmIPCMB(None, parameters).discover_mb()
     assert mb == [1, 9, 18, 19, 22, 33, 36]
 
 

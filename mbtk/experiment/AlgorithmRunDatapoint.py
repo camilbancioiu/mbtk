@@ -9,7 +9,7 @@ class AlgorithmRunDatapoint:
         self.parameters = self.pickleable_parameters(algorithm_run.parameters)
         self.ID = algorithm_run.ID
         self.algorithm_name = algorithm_run.algorithm_name
-        self.selected_features = algorithm_run.selected_features
+        self.mb = algorithm_run.mb
         self.start_time = algorithm_run.start_time
         self.end_time = algorithm_run.end_time
         self.duration = algorithm_run.duration
@@ -29,7 +29,7 @@ class AlgorithmRunDatapoint:
         view['ID'] = self.ID
         view['algorithm_name'] = self.algorithm_name
         view['parameters'] = pprint.pformat(self.parameters)
-        view['select_features'] = pprint.pformat(self.selected_features, indent=2)
+        view['mb'] = pprint.pformat(self.mb, indent=2)
         view['duration'] = humanize.naturaldelta(timedelta(seconds=self.duration))
         view['exact_duration'] = self.duration
         format_string = (

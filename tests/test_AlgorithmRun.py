@@ -45,7 +45,7 @@ def test_algorithm_run(testfolder):
     # Verify if the AlgorithmRun now contains the expected results.
     assert algrun.algorithm_name == 'mbtk.algorithms.basic.IGt.AlgorithmIGt'
     assert algrun.classifier_classname == 'tests.test_AlgorithmRun.MockBernouliClassifier'
-    assert algrun.selected_features == [0, 4, 1, 5]
+    assert algrun.mb == [0, 4, 1, 5]
     assert algrun.duration > 0
 
     expected_classifier_evaluation = {
