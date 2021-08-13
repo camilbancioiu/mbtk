@@ -4,27 +4,26 @@ import analysis
 
 def configure_objects_subparser__summary(subparsers):
     subparser = subparsers.add_parser('summary')
-    subparser.add_argument('verb', choices=['show'], default='show',
-                           nargs='?')
     subparser.add_argument('tags', type=str, default=None, nargs='?')
     subparser.add_argument('--refresh', action='store_true', default=False)
+    subparser.set_defaults(function=command_summary)
 
 
-def handle_command(arguments, experimental_setup):
-    command_handled = False
 
-    command_object = arguments.object
-    command_verb = arguments.verb
+def configure_objects_subparser__sources(subparsers, experimental_setup):
+    subparser_bn = subparsers.add_parser('bn')
+    subparser_bn.add_argument('name', type=str, default=None,
+                              choices=experimental_setup.BayesianNetworks)
+    subparser_bn.set_defaults(source='bn')
 
-    if command_object == 'summary':
-        if command_verb == 'show':
-            command_summary_show(experimental_setup)
-            command_handled = True
-
-    return command_handled
+    subparser_ds = subparsers.add_parser('ds')
+    subparser_ds.add_argument('name', type=str, default=None,
+                              choices=experimental_setup.BayesianNetworks)
+    subparser_ds.set_defaults(source='ds')
 
 
-def command_summary_show(experimental_setup):
+
+def command_summary(experimental_setup):
     summaries = experimental_setup.Paths.Summaries
 
     summary_path = summaries / 'summary.pickle'
