@@ -1,6 +1,8 @@
 import pickle
 import analysis
 
+import expsetup
+
 
 def configure_objects_subparser__summary(subparsers):
     subparser = subparsers.add_parser('summary')
@@ -13,18 +15,18 @@ def configure_objects_subparser__summary(subparsers):
 def configure_objects_subparser__sources(subparsers, experimental_setup):
     subparser_bn = subparsers.add_parser('bn')
     subparser_bn.add_argument('name', type=str, default=None,
-                              choices=experimental_setup.BayesianNetworks)
-    subparser_bn.set_defaults(source='bn')
+                              choices=expsetup.BAYESIAN_NETWORKS)
+    subparser_bn.set_defaults(source_type='bn')
 
     subparser_ds = subparsers.add_parser('ds')
     subparser_ds.add_argument('name', type=str, default=None,
-                              choices=experimental_setup.BayesianNetworks)
-    subparser_ds.set_defaults(source='ds')
+                              choices=expsetup.BAYESIAN_NETWORKS)
+    subparser_ds.set_defaults(source_type='ds')
 
 
 
 def command_summary(experimental_setup):
-    summaries = experimental_setup.Paths.Summaries
+    summaries = experimental_setup.paths.Summaries
 
     summary_path = summaries / 'summary.pickle'
     summary = None
@@ -50,8 +52,9 @@ def command_summary(experimental_setup):
 
 
 def create_summary(experimental_setup):
-    summary = dict()
     algruns = list(experimental_setup.AlgorithmRunParameters)
+
+    summary = dict()
     summary['Runs:'] = len(algruns)
 
     citr_analysis = analysis.create_citr_analysis(algruns)

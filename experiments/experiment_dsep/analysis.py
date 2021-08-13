@@ -10,7 +10,7 @@ def create_citr_analysis(algruns):
     total_citr_count = 0
     for algrun in algruns:
         target = algrun['target']
-        algrun_analysis = create_analysis(algrun)
+        algrun_analysis = create_algrun_citr_analysis(algrun)
         analysis.update(algrun_analysis)
         total_citr_count += algrun_analysis[f'T{target}_citr_count']
 
@@ -18,7 +18,7 @@ def create_citr_analysis(algruns):
     return analysis
 
 
-def create_analysis(algrun):
+def create_algrun_citr_analysis(algrun):
     analysis = dict()
     target = algrun['target']
     results = load_citr_from_algrun_parameters(algrun)
