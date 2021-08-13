@@ -31,8 +31,8 @@ def testfolders():
 
 
 @pytest.mark.slow
-def test_iamb_timing__unoptimized(ds_alarm_5e2):
-    ds = ds_alarm_5e2
+def test_iamb_timing__unoptimized(ds_alarm_8e3):
+    ds = ds_alarm_8e3
     parameters = make_parameters__unoptimized(DoFCalculators.StructuralDoF)
     parameters_dsep = make_parameters__dsep()
 

@@ -1,3 +1,4 @@
+import pickle
 from typing import Union
 
 from mbtk.math.HeuristicResult import HeuristicResult
@@ -34,3 +35,10 @@ class BNCorrelationEstimator:
         result.set_heuristic('BNCorrelationEstimator', value)
         self.heuristic_results.append(result)
         return value
+
+
+    def end(self):
+        save_path = self.parameters.get('heuristic_results_path__save', None)
+        if save_path is not None:
+            with save_path.open('wb') as f:
+                pickle.dump(self.heuristic_results, f)

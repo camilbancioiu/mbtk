@@ -59,3 +59,10 @@ class DSeparationAsCorrelationHeuristic(DSeparationCITest):
             return 0.0
         else:
             return 1.0
+
+
+    def end(self):
+        save_path = self.parameters.get('heuristic_results_path__save', None)
+        if save_path is not None:
+            with save_path.open('wb') as f:
+                pickle.dump(self.heuristic_results, f)

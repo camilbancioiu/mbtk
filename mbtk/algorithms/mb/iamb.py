@@ -53,6 +53,7 @@ class AlgorithmIAMB:
         """
         markov_boundary = sorted(list(self.IAMB(self.target)))
         self.CITest.end()
+        self.dep_heuristic.end()
         return markov_boundary
 
 

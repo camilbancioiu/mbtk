@@ -133,7 +133,11 @@ def configure_objects_subparser__datapoints(subparsers):
 def handle_command(arguments, experimental_setup):
     command_handled = False
     command_object = experimental_setup.Arguments.object
-    command_verb = experimental_setup.Arguments.verb
+
+    try:
+        command_verb = experimental_setup.Arguments.verb
+    except AttributeError:
+        command_verb = ''
 
     if command_object == 'paths':
         if command_verb == 'show':
