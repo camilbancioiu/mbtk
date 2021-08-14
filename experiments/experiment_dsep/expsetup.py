@@ -13,7 +13,9 @@ from mbtk.experiment.AlgorithmRunDatapoint import AlgorithmRunDatapoint
 from mbtk.experiment.ExperimentDefinition import ExperimentDefinition
 from mbtk.experiment.ExperimentRun import ExperimentRun
 from mbtk.math.BNCorrelationEstimator import BNCorrelationEstimator
-import mbtk.math.DSeparationCITest
+from mbtk.math.DSeparationCITest import DSeparationCITest
+from mbtk.math.G_test__unoptimized import G_test
+from mbtk.math.DoFCalculators import StructuralDoF
 
 
 SOURCES = ['bn', 'ds']
@@ -26,6 +28,11 @@ class DsepAlgsEvalExpPathSet(util.ExperimentalPathSet):
     def __init__(self, root):
         super().__init__(root)
         self.BIFRepository = self.Root / 'bif_repository'
+        self.Datapoints = None
+        self.CITestResultRepository = None
+        self.HResultRepository = None
+        self.Summaries = None
+        self.Plots = None
 
 
 
@@ -44,10 +51,11 @@ class DsepAlgsEvalExpSetup(util.ExperimentalSetup):
         self.source_type = ""
         self.sample_count = None
         self.sample_count_string = ""
+        self.ci_test_significance = None
 
         self.setup(arguments)
-        self.define_source()
         self.define_experiment()
+        self.define_source()
         self.update_paths()
         self.create_algrun_parameters()
 
@@ -55,7 +63,7 @@ class DsepAlgsEvalExpSetup(util.ExperimentalSetup):
     def setup(self, arguments):
         self.Arguments = arguments
         self.algorithm_name = self.arguments.algorithm
-        self.algorithm_class = get_algorithm_class(self.algorithm_name)
+        self.algorithm_class = self.get_algorithm_class()
 
         self.source_type = self.arguments.source_type
 
@@ -71,6 +79,7 @@ class DsepAlgsEvalExpSetup(util.ExperimentalSetup):
                 raise ValueError('sample count required')
             self.sample_count_string = self.arguments.sample_count
             self.sample_count = int(float(self.sample_count_string))
+            self.ci_test_significance = 0.95
 
 
     def update_paths(self):
@@ -88,11 +97,10 @@ class DsepAlgsEvalExpSetup(util.ExperimentalSetup):
         definition = ExperimentDefinition(
             self.paths.ExpRunRepository,
             experiment_name,
-            self.create_experiment_run_stem())
+            self.create_experiment_run_stem(self.source_type))
 
         definition.experiment_run_class = ExperimentRun
         definition.algorithm_run_class = AlgorithmRun
-        definition.exds_definition = self.exds_definition
         definition.algorithm_run_configuration = {
             'algorithm': self.algorithm_class
         }
@@ -122,6 +130,7 @@ class DsepAlgsEvalExpSetup(util.ExperimentalSetup):
         }
 
         self.exds_definition = definition
+        self.experiment_definition.exds_definition = self.exds_definition
         self.ExDsDef = self.exds_definition
 
 
@@ -130,6 +139,7 @@ class DsepAlgsEvalExpSetup(util.ExperimentalSetup):
         citrrepo = self.paths.CITestResultRepository
         hrrepo = self.paths.HResultRepository
 
+        ci_test_class = self.get_ci_test_class()
         variables = list(range(len(bayesian_network)))
         parameters_list = list()
         for target in variables:
@@ -137,32 +147,33 @@ class DsepAlgsEvalExpSetup(util.ExperimentalSetup):
                 'target': target,
                 'all_variables': variables,
                 'source_bayesian_network': bayesian_network,
-                'ci_test_class': mbtk.math.DSeparationCITest.DSeparationCITest,
+                'ci_test_class': ci_test_class,
                 'correlation_heuristic_class': BNCorrelationEstimator,
+                'ci_test_dof_calculator_class': StructuralDoF,
+                'ci_test_significance': self.ci_test_significance,
                 'tags': [
                     self.algorithm_name,
                     self.bayesian_network_name
                 ],
             }
 
-            filename_stem = self.create_algrun_filename_stem(parameters)
-            citr_filename = 'citr_' + filename_stem + '.pickle'
+            ID = self.create_algrun_ID(parameters)
+            parameters['ID'] = 'run_' + ID
+            citr_filename = 'citr_' + ID + '.pickle'
             parameters['ci_test_results_path__save'] = citrrepo / citr_filename
-            hr_filename = 'hr_' + filename_stem + '.pickle'
+            hr_filename = 'hr_' + ID + '.pickle'
             parameters['heuristic_results_path__save'] = hrrepo / hr_filename
             parameters_list.append(parameters)
 
         for index, parameters in enumerate(parameters_list):
             parameters['index'] = index
-            parameters['ID'] = 'run_T{target}'.format(**parameters)
 
         self.algorithm_run_parameters = parameters_list
         self.AlgorithmRunParameters = parameters_list
 
 
 
-    def create_experiment_run_stem(self):
-        source_type = self.source_type
+    def create_experiment_run_stem(self, source_type):
         alg = self.algorithm_name
         sample_count = self.sample_count_string
         bayesian_network = self.bayesian_network_name
@@ -174,8 +185,7 @@ class DsepAlgsEvalExpSetup(util.ExperimentalSetup):
             return f'{source_type}_{bayesian_network}_{sample_count}_{alg}'
 
 
-
-    def create_algrun_filename_stem(self, parameters):
+    def create_algrun_ID(self, parameters):
         target = parameters['target']
         if self.source_type == 'bn':
             stem = 'bn_{}_{}_T{}'.format(
@@ -192,12 +202,12 @@ class DsepAlgsEvalExpSetup(util.ExperimentalSetup):
         return stem
 
 
-
     def validate_arguments(self, arguments):
         self.validate_algorithm(arguments.algorithm)
         self.validate_source_type(arguments.source_type)
         self.validate_source_name(arguments.source_name)
-        self.validate_sample_count_string(arguments.sample_count)
+        if arguments.source_type == ['ds']:
+            self.validate_sample_count_string(arguments.sample_count)
 
 
     def validate_algorithm(self, algorithm_name):
@@ -226,10 +236,27 @@ class DsepAlgsEvalExpSetup(util.ExperimentalSetup):
             raise ValueError("Incorrect format for sample count. E.g. 3e5.")
 
 
+    def make_bn_datapoints_path(self):
+        bn_definition = self.make_bn_experiment_definition()
+        return bn_definition.subfolder('algorithm_run_datapoints')
 
-def get_algorithm_class(alg):
-    if alg == 'iamb':
-        return AlgorithmIAMB
 
-    if alg == 'ipcmb':
-        return AlgorithmIPCMB
+    def make_bn_experiment_definition(self):
+        return ExperimentDefinition(
+            self.paths.ExpRunRepository,
+            self.experiment_definition.name,
+            self.create_experiment_run_stem('bn'))
+
+
+    def get_ci_test_class(self):
+        if self.source_type == 'bn':
+            return DSeparationCITest
+        if self.source_type == 'ds':
+            return G_test
+
+
+    def get_algorithm_class(self):
+        if self.algorithm_name == 'iamb':
+            return AlgorithmIAMB
+        if self.algorithm_name == 'ipcmb':
+            return AlgorithmIPCMB

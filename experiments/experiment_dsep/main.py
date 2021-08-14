@@ -22,12 +22,17 @@ def main():
     argparser = create_argparser()
     arguments = argparser.parse_args()
 
-
     experimental_setup = expsetup.DsepAlgsEvalExpSetup(EXPERIMENTS_ROOT, arguments)
 
-    command_handled = util.handle_command(arguments, experimental_setup)
-    if command_handled is False:
-        arguments.function(experimental_setup)
+    try:
+        command_handled = util.handle_command(arguments, experimental_setup)
+        if command_handled is False:
+            arguments.function(experimental_setup)
+    except Exception as e:
+        print(experimental_setup.bayesian_network_name,
+              experimental_setup.sample_count_string,
+              experimental_setup.algorithm_name,
+              e)
 
 
 

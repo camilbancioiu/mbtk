@@ -1,4 +1,5 @@
 import functools
+from mbtk.math.Exceptions import InsufficientSamplesForCITest
 
 
 class AlgorithmIAMB:
@@ -78,11 +79,19 @@ class AlgorithmIAMB:
         while True:
             changed_CMB = False
 
+            if len(possible_candidates) == 0:
+                break
+
             candidate = self.highest_correlated_candidate(possible_candidates, CMB)
-            if not self.CI(self.target, candidate, CMB):
-                CMB.add(candidate)
+            try:
+                if not self.CI(self.target, candidate, CMB):
+                    CMB.add(candidate)
+                    possible_candidates.remove(candidate)
+                    changed_CMB = True
+            except InsufficientSamplesForCITest:
                 possible_candidates.remove(candidate)
-                changed_CMB = True
+                continue
+
 
             if not changed_CMB:
                 break
@@ -94,11 +103,12 @@ class AlgorithmIAMB:
         false_positives = set()
         for candidate in CMB:
             MB = CMB - false_positives - {candidate}
-            if self.debug >= 1: print('current MB', MB)
-            if self.debug >= 1: print('candidate', candidate)
-            if self.CI(self.target, candidate, MB):
-                if self.debug >= 1: print('candidate false positive', candidate)
-                false_positives.add(candidate)
+            try:
+                if self.CI(self.target, candidate, MB):
+                    if self.debug >= 1: print('candidate false positive', candidate)
+                    false_positives.add(candidate)
+            except InsufficientSamplesForCITest:
+                continue
 
         MB = CMB - false_positives
         return MB

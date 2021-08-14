@@ -137,6 +137,7 @@ class AlgorithmIPCMB:
                             if self.debug >= 2: print('\t\t\tFalse')
                             if self.debug >= 2: print('\t\t\tNonPC remains {}'.format(NonPC))
                     except InsufficientSamplesForCITest:
+                        NonPC.add(X)
                         continue
                 if not self.SepSetCache.contains(T, X):
                     self.SepSetCache.add(set(), T, X)

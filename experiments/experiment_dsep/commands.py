@@ -32,7 +32,7 @@ def command_summary(experimental_setup):
     summary = None
     cached = ''
     try:
-        if experimental_setup.Arguments.refresh:
+        if experimental_setup.arguments.refresh:
             raise FileNotFoundError
         with summary_path.open('rb') as f:
             summary = pickle.load(f)
@@ -52,12 +52,10 @@ def command_summary(experimental_setup):
 
 
 def create_summary(experimental_setup):
-    algruns = list(experimental_setup.AlgorithmRunParameters)
-
     summary = dict()
-    summary['Runs:'] = len(algruns)
+    summary['Runs:'] = len(experimental_setup.algorithm_run_parameters)
 
-    citr_analysis = analysis.create_citr_analysis(algruns)
+    citr_analysis = analysis.create_citr_analysis(experimental_setup)
 
     summary.update(citr_analysis)
 
