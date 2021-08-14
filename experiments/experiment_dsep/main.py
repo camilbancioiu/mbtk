@@ -33,6 +33,7 @@ def main():
               experimental_setup.sample_count_string,
               experimental_setup.algorithm_name,
               e)
+        raise
 
 
 
@@ -43,7 +44,7 @@ def create_argparser():
                            choices=expsetup.SOURCES)
     argparser.add_argument('source_name', type=str, default=None,
                            choices=expsetup.BAYESIAN_NETWORKS)
-    argparser.add_argument('--sample-count', type=str, default=None,
+    argparser.add_argument('-s', '--sample-count', type=str, default=None,
                            help='sample count of the datasetmatrix'
                                 ' (required if source_type is "ds", otherwise ignored)')
     argparser.add_argument('algorithm', type=str, default=None,

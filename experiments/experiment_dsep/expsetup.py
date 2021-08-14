@@ -157,7 +157,7 @@ class DsepAlgsEvalExpSetup(util.ExperimentalSetup):
                 ],
             }
 
-            ID = self.create_algrun_ID(parameters)
+            ID = self.create_algrun_ID(parameters, self.source_type)
             parameters['ID'] = 'run_' + ID
             citr_filename = 'citr_' + ID + '.pickle'
             parameters['ci_test_results_path__save'] = citrrepo / citr_filename
@@ -185,21 +185,21 @@ class DsepAlgsEvalExpSetup(util.ExperimentalSetup):
             return f'{source_type}_{bayesian_network}_{sample_count}_{alg}'
 
 
-    def create_algrun_ID(self, parameters):
+    def create_algrun_ID(self, parameters, source_type):
         target = parameters['target']
-        if self.source_type == 'bn':
-            stem = 'bn_{}_{}_T{}'.format(
+        if source_type == 'bn':
+            ID = 'bn_{}_{}_T{}'.format(
                 self.bayesian_network_name,
                 self.algorithm_name,
                 target)
-        if self.source_type == 'ds':
-            stem = 'ds_{}_{}_{}_T{}'.format(
+        if source_type == 'ds':
+            ID = 'ds_{}_{}_{}_T{}'.format(
                 self.bayesian_network_name,
                 self.sample_count_string,
                 self.algorithm_name,
                 target)
 
-        return stem
+        return ID
 
 
     def validate_arguments(self, arguments):

@@ -7,7 +7,11 @@ import expsetup
 def configure_objects_subparser__summary(subparsers):
     subparser = subparsers.add_parser('summary')
     subparser.add_argument('tags', type=str, default=None, nargs='?')
-    subparser.add_argument('--refresh', action='store_true', default=False)
+    subparser.add_argument('-r', '--refresh', action='store_true', default=False)
+    subparser.add_argument('-t', '--target-condset-histogram', action='store_true', default=False)
+    subparser.add_argument('-T', '--total-condset-histogram', action='store_true', default=False)
+    subparser.add_argument('-m', '--target-mb-analysis', action='store_true', default=False)
+    subparser.add_argument('-c', '--target-citr-analysis', action='store_true', default=False)
     subparser.set_defaults(function=command_summary)
 
 
@@ -44,7 +48,12 @@ def command_summary(experimental_setup):
             pickle.dump(summary, f)
 
     print()
-    print('Summary{}:'.format(cached))
+    summary_header = dict()
+    summary_header['cached'] = cached
+    summary_header.update(experimental_setup.__dict__)
+    print('Summary {source_type} {bayesian_network_name} '
+          '{sample_count_string} {algorithm_name}'
+          '{cached}:'.format(**summary_header))
 
     for key, value in summary.items():
         print('\t' + key, value)
