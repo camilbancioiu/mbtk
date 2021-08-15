@@ -38,12 +38,13 @@ def create_citr_analysis(experimental_setup):
     total_histogram = render_condset_size_histogram(total_condset_size_counter)
     total_accurate_citr_count_percentage = total_accurate_citr_count * 100 / total_citr_count
     if arguments.total_condset_histogram:
-        analysis['Total condset size histogram:'] = total_histogram
-    analysis['Total CI count:'] = total_citr_count
-    analysis['Total accurate CI count:'] = total_accurate_citr_count
-    analysis['Total accurate CI count (%):'] = f'{total_accurate_citr_count_percentage:.4}%'
-    analysis['Total MB errors:'] = total_mb_errors
-    analysis['Average condset size per test:'] = calculate_condset_average(total_condset_size_counter)
+        analysis['Total condset size histogram'] = total_histogram
+    analysis['Total CI count'] = total_citr_count
+    analysis['Total accurate CI count'] = total_accurate_citr_count
+    analysis['Total accurate CI count (%)'] = f'{total_accurate_citr_count_percentage:.4}%'
+    analysis['Total MB errors'] = total_mb_errors
+    analysis['Avg. cond. set size'] = calculate_condset_average(total_condset_size_counter)
+    analysis['Distance'] = 'TODO'
     return analysis
 
 
