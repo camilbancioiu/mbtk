@@ -38,11 +38,12 @@ def create_citr_analysis(experimental_setup):
     total_histogram = render_condset_size_histogram(total_condset_size_counter)
     total_accurate_citr_count_percentage = total_accurate_citr_count * 100 / total_citr_count
     if arguments.total_condset_histogram:
-        analysis['Total condset size histogram'] = total_histogram
+        analysis['Total condset size histogram:'] = total_histogram
     analysis['Total CI count:'] = total_citr_count
     analysis['Total accurate CI count:'] = total_accurate_citr_count
-    analysis['Total accurate CI count (%):'] = str(total_accurate_citr_count_percentage) + '%'
+    analysis['Total accurate CI count (%):'] = f'{total_accurate_citr_count_percentage:.4}%'
     analysis['Total MB errors:'] = total_mb_errors
+    analysis['Average condset size per test:'] = calculate_weighted_condset_average(total_condset_size_counter)
     return analysis
 
 
@@ -92,6 +93,16 @@ def create_condset_size_counter(results):
     cond_counter = collections.Counter(map(len, condsets))
 
     return cond_counter
+
+
+
+def calculate_weighted_condset_average(cond_counter):
+    avg = 0
+    for condset_size, count in cond_counter.items():
+        avg += condset_size * count
+
+    total_count = sum(cond_counter.values())
+    return avg / total_count
 
 
 
