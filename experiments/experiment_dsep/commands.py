@@ -63,12 +63,13 @@ def render_tabular_summary(experimental_setup, analysis):
     tests = analysis['Total CI count']
     accurate_tests = analysis['Total accurate CI count (%)']
     avg_condset_size = analysis['Avg. cond. set size']
-    distance = analysis['Distance']
+    avg_distance = analysis['Avg. distance']
 
     accurate_tests = str(accurate_tests).replace('%', '\\%')
     avg_condset_size = f'{avg_condset_size:>5.2f}'
+    avg_distance = f'{avg_distance:>5.3f}'
 
-    values = [network, samples, tests, accurate_tests, avg_condset_size, distance]
+    values = [network, samples, tests, accurate_tests, avg_condset_size, avg_distance]
     values = map(str, values)
     values = '\t& '.join(values)
     row = values + ' \\\\'

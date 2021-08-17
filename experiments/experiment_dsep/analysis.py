@@ -16,6 +16,9 @@ def create_citr_analysis(experimental_setup):
     total_accurate_citr_count = 0
     total_mb_errors = 0
     total_condset_size_counter = collections.Counter()
+    total_distance = 0
+    total_precision = 0
+    total_recall = 0
     for algrun in algruns:
         target = algrun['target']
 
@@ -32,6 +35,9 @@ def create_citr_analysis(experimental_setup):
         total_accurate_citr_count += citr_analysis[f'T{target}_accurate_citr_count']
         try:
             total_mb_errors += mb_analysis[f'T{target}_mb_error_count']
+            total_precision += mb_analysis[f'T{target}_precision']
+            total_recall += mb_analysis[f'T{target}_recall']
+            total_distance += mb_analysis[f'T{target}_distance']
         except KeyError:
             pass
 
@@ -44,7 +50,9 @@ def create_citr_analysis(experimental_setup):
     analysis['Total accurate CI count (%)'] = f'{total_accurate_citr_count_percentage:.4}%'
     analysis['Total MB errors'] = total_mb_errors
     analysis['Avg. cond. set size'] = calculate_condset_average(total_condset_size_counter)
-    analysis['Distance'] = 'TODO'
+    analysis['Avg. precision'] = total_precision / len(algruns)
+    analysis['Avg. recall'] = total_recall / len(algruns)
+    analysis['Avg. distance'] = total_distance / len(algruns)
     return analysis
 
 
@@ -73,16 +81,28 @@ def create_algrun_mb_analysis(experimental_setup, algrun):
     source_type = experimental_setup.source_type
     datapoints_folder = experimental_setup.paths.Datapoints
 
-    mb = load_mb_from_algrun(datapoints_folder, algrun['ID'])
+    mb = set(load_mb_from_algrun(datapoints_folder, algrun['ID']))
     analysis[f'T{target}_mb_size'] = len(mb)
 
     if source_type == 'ds':
         bn_datapoints_folder = experimental_setup.make_bn_datapoints_path()
         algrunID = experimental_setup.create_algrun_ID(algrun, 'bn')
         algrunID = 'run_' + algrunID
-        bn_mb = load_mb_from_algrun(bn_datapoints_folder, algrunID)
-        mb_error = set(mb).symmetric_difference(set(bn_mb))
+        true_mb = set(load_mb_from_algrun(bn_datapoints_folder, algrunID))
+        mb_error = mb.symmetric_difference(true_mb)
+        analysis[f'T{target}_true_mb_size'] = len(true_mb)
         analysis[f'T{target}_mb_error_count'] = len(mb_error)
+
+        true_positives = len(mb & true_mb)
+        try:
+            precision = true_positives / len(mb)
+        except ZeroDivisionError:
+            precision = 0
+        recall = true_positives / len(true_mb)
+        distance = math.sqrt((1 - precision)**2 + (1 - recall)**2)
+        analysis[f'T{target}_precision'] = precision
+        analysis[f'T{target}_recall'] = recall
+        analysis[f'T{target}_distance'] = distance
 
     return analysis
 
