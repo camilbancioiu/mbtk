@@ -1,4 +1,4 @@
-# MBFF custom files and folders to ignore
+# MBTK custom files and folders to ignore
 .project
 testfiles/tmp
 testfiles/notes
