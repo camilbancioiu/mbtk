@@ -7,6 +7,7 @@ def test_basic_functionality(bn_alarm):
 
     parameters = dict()
     parameters['source_bayesian_network'] = bn
+    parameters['heuristic_pmf_source'] = 'bn'
 
     X = bn.variable_nodes_index('INTUBATION')
     Y = bn.variable_nodes_index('MINVOL')

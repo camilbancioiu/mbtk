@@ -99,8 +99,8 @@ class StructuralDoF(UnadjustedDoF):
             PrX.remove_zeros()
             PrY.remove_zeros()
 
-            X_val = len(list(filter(None, PrX.values())))
-            Y_val = len(list(filter(None, PrY.values())))
+            X_val = len(PrX.values())
+            Y_val = len(PrY.values())
 
             structural_dof_xycz = (X_val - 1) * (Y_val - 1)
             DoF += structural_dof_xycz

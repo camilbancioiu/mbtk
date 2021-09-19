@@ -110,3 +110,7 @@ class CMICalculator:
             VarZ = self.datasetmatrix.get_variables('X', Z)
 
         return (VarX, VarY, VarZ)
+
+
+    def end(self):
+        pass
