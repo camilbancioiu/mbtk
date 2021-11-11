@@ -1,8 +1,79 @@
+import pytest
 from mbtk.structures.ADTree import ADTree
 from mbtk.math.PMF import PMF, CPMF
 import mbtk.math.DoFCalculators
 import mbtk.math.G_test__unoptimized
 import mbtk.math.G_test__with_AD_tree
+
+
+@pytest.mark.skip
+def test_simple_ADTree_to_latex(data_small_5):
+    dataset, column_values = data_small_5
+    adtree = ADTree(dataset, column_values)
+    latex = adtree.to_latex()
+
+    assert latex != ''
+
+    feature_names = ['A', 'B']
+    for index, name in enumerate(feature_names):
+        latex = latex.replace(f'Col{index}', name)
+
+    latex = '  ' + latex.replace('\n', '\n  ')
+    latex = latex.replace('{}', '  {}')
+
+    print()
+    print()
+    print(dataset_to_latex(dataset, feature_names))
+
+    print()
+    print(latex)
+
+    count = adtree.query_count({0: 0, 1: 0})
+    print(count)
+    count = adtree.query_count({0: 0, 1: 1})
+    print(count)
+    count = adtree.query_count({0: 0, 1: 2})
+    print(count)
+
+    count = adtree.query_count({0: 1, 1: 0})
+    print(count)
+    count = adtree.query_count({0: 1, 1: 1})
+    print(count)
+    count = adtree.query_count({0: 1, 1: 2})
+    print(count)
+
+    count = adtree.query_count({0: 2, 1: 0})
+    print(count)
+    count = adtree.query_count({0: 2, 1: 1})
+    print(count)
+    count = adtree.query_count({0: 2, 1: 2})
+    print(count)
+
+
+
+def dataset_to_latex(dataset, feature_names):
+    dataset = dataset.transpose()
+    prefix = '  {\\small\n  \\begin{specialtable}[H]\n'
+    prefix += '    \\footnotesize\n    \\centering\n'
+    suffix = '  \\end{specialtable}\n  }\n'
+
+    features = dataset.get_shape()[0]
+    columns = dataset.get_shape()[1]
+    columns_spec = ' '.join('r' * columns) + ' r'
+    table_prefix = '    \\begin{tabular}{' + columns_spec + '}\n'
+    table_suffix = '    \\end{tabular}\n'
+
+    table_content = ''
+    for feature in range(features):
+        feature_name = feature_names[feature]
+        values = dataset.getrow(feature).toarray()[0]
+        values = map(str, values)
+        table_content += '        ' + feature_name + ':& ' + ' & '.join(values) + ' \\\\\n'
+
+    table = table_prefix + table_content + table_suffix
+
+    return prefix + table + suffix
+
 
 
 def test_simple_ADTree_query_count(data_small_1):

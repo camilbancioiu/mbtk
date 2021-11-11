@@ -29,7 +29,7 @@ def data_small_2():
 
 
 
-@pytest.fixture
+@pytest.fixture(scope='session')
 def data_small_3():
     dataset = scipy.sparse.csr_matrix(numpy.array([
         [1, 1, 2, 1, 1, 2, 1, 2, 2, 2, 2, 2, 1, 2, 2, 2],
@@ -43,7 +43,7 @@ def data_small_3():
 
 
 
-@pytest.fixture
+@pytest.fixture(scope='session')
 def data_small_4():
     dataset = scipy.sparse.csr_matrix(numpy.array([
         [1, 2, 2, 1, 2, 2],
@@ -52,5 +52,30 @@ def data_small_4():
     column_values = {
         0: [1, 2],
         1: [1, 2, 3, 4],
+        2: [1, 2]}
+    return (dataset, column_values)
+
+
+
+@pytest.fixture(scope='session')
+def data_small_5():
+    dataset = scipy.sparse.csr_matrix(numpy.array([
+        [0, 1, 2, 1, 1, 2, 2, 2],
+        [1, 0, 0, 2, 2, 1, 1, 1]]).transpose())
+    column_values = {
+        0: [0, 1, 2],
+        1: [0, 1, 2]}
+    return (dataset, column_values)
+
+
+@pytest.fixture(scope='session')
+def data_small_6():
+    dataset = scipy.sparse.csr_matrix(numpy.array([
+        [1, 2, 2, 1, 2, 2],
+        [1, 3, 2, 1, 3, 3],
+        [1, 1, 2, 1, 1, 1]]).transpose())
+    column_values = {
+        0: [1, 2, 3],
+        1: [1, 2, 3],
         2: [1, 2]}
     return (dataset, column_values)

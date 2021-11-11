@@ -92,9 +92,6 @@ class ADTree:
 
     def p(self, values, given=None):
         """An alias of :py:meth:query."""
-        if given is None:
-            given = dict()
-
         return self.query(values, given)
 
 
@@ -165,9 +162,9 @@ class ADTree:
             else:
                 if len(next_values) == 0:
                     # The ADNode is None because it represents the most common
-                    # value MCV, and there are no more values left to iterate
+                    # value MCV and there are no more values left to iterate
                     # down on. Being at the bottom of the tree, we can
-                    # calculate the count it would have contained
+                    # calculate the count it would have contained.
                     return query_node.count - vary.sum_non_MCV_children_count()
                 else:
                     # The ADNode is None because it represents the most common
@@ -202,6 +199,14 @@ class ADTree:
 
     def __str__(self):
         return str(self.root)
+
+
+    def to_latex(self):
+        latex = self.root.to_latex()
+        latex = latex.replace('\n\n', '\n')
+        prefix = '{\\small\n\\begin{align*}\n'
+        suffix = '\\end{align*}\n}'
+        return prefix + latex + suffix
 
 
 
@@ -340,6 +345,18 @@ class ADNode:
         return ct
 
 
+    def to_latex(self):
+        if self.column_index == -1:
+            column = '*'
+        else:
+            column = f'Col{self.column_index} = {self.value}'
+
+        indentation = '{}& ' + '\\qquad ' * (self.level // 2)
+        node = f'AD ({column} \\rightarrow \\textbf{{{self.count}}}) \\\\\n'
+        children = '\n'.join([child.to_latex() for child in self.Vary_children if child is not None])
+        return indentation + node + children
+
+
 
 class VaryNode:
 
@@ -440,6 +457,13 @@ class VaryNode:
 
     def discoverMCV(self, row_subselections):
         return max(self.values, key=lambda v: len(row_subselections[v]))
+
+
+    def to_latex(self):
+        indentation = '{}& ' + '\\qquad ' * (self.level // 2) + '\\quad '
+        node = f'Vary (Col{self.column_index}, \\, MCV = {self.most_common_value}) \\\\\n'
+        children = '\n'.join([child.to_latex() for child in self.AD_children if child is not None])
+        return indentation + node + children
 
 
 
