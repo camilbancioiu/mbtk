@@ -1,12 +1,12 @@
 import math
 import numpy
 
-import mbtk.utilities.functions as util
 import tests.utilities as testutil
 import pytest
 
 from mbtk.math.Variable import Variable, JointVariables
 from mbtk.math.PMF import PMF, CPMF, process_pmf_key
+from mbtk.structures.BayesianNetwork import BayesianNetwork
 from mbtk.math.Exceptions import VariableInstancesOfUnequalCount
 from mbtk.dataset.sources.SampledBayesianNetworkDatasetSource import SampledBayesianNetworkDatasetSource
 
@@ -156,6 +156,84 @@ def test_conditional_pmf__binary():
 
 
 
+def test_pmf_summing_over_variable():
+    V0 = Variable([0, 1, 1, 1, 0, 1, 0, 1])
+    V1 = Variable([0, 0, 1, 1, 0, 1, 1, 1])
+    V2 = Variable([0, 0, 0, 0, 1, 0, 1, 1])
+    V3 = Variable([0, 0, 0, 0, 0, 0, 1, 1])
+
+    V0.ID = 1000
+    V1.ID = 1111
+    V2.ID = 1222
+    V3.ID = 1333
+
+    Pr = PMF(JointVariables(V0, V1, V2, V3))
+    assert Pr.IDs() == (1000, 1111, 1222, 1333)
+
+    assert Pr.p((0, 0, 0, 0)) == 1 / 8
+    assert Pr.p((1, 0, 0, 0)) == 1 / 8
+    assert Pr.p((1, 1, 0, 0)) == 3 / 8
+    assert Pr.p((0, 0, 1, 0)) == 1 / 8
+    assert Pr.p((0, 1, 1, 1)) == 1 / 8
+    assert Pr.p((1, 1, 1, 1)) == 1 / 8
+
+    Pr = Pr.sum_over(V2.ID)
+    assert sum(Pr.probabilities.values()) == 1
+
+    assert Pr.p((0, 0, 0)) == 2 / 8
+    assert Pr.p((1, 0, 0)) == 1 / 8
+    assert Pr.p((1, 1, 0)) == 3 / 8
+    assert Pr.p((0, 1, 1)) == 1 / 8
+    assert Pr.p((1, 1, 1)) == 1 / 8
+    assert Pr.IDs() == (V0.ID, V1.ID, V3.ID)
+
+    Pr = Pr.sum_over(V1.ID)
+    assert sum(Pr.probabilities.values()) == 1
+
+    assert Pr.p((0, 0)) == 2 / 8
+    assert Pr.p((1, 0)) == 4 / 8
+    assert Pr.p((0, 1)) == 1 / 8
+    assert Pr.p((1, 1)) == 1 / 8
+    assert Pr.IDs() == (V0.ID, V3.ID)
+
+    Pr = Pr.sum_over(V0.ID)
+    assert sum(Pr.probabilities.values()) == 1
+
+    print(Pr.probabilities)
+
+    assert Pr.p(0) == 6 / 8
+    assert Pr.p(1) == 2 / 8
+    assert Pr.IDs() == (V3.ID,)
+
+
+
+def test_pmf_remove_from_key() -> None:
+    pmf = PMF(None)
+    assert pmf.remove_from_key(('A', 'B', 'C', 'D'), 2) == ('A', 'B', 'D')
+    assert pmf.remove_from_key(('A', 'B', 'C', 'D'), 0) == ('B', 'C', 'D')
+    assert pmf.remove_from_key(('A', 'B', 'C', 'D'), 3) == ('A', 'B', 'C')
+    assert pmf.remove_from_key(('A', 'B'), 0) == ('B',)
+    assert pmf.remove_from_key(('A', 'B'), 1) == ('A',)
+    assert pmf.remove_from_key(('A',), 0) == tuple()
+
+
+
+def test_make_cpmf_PrXcZ_variant_1() -> None:
+    V0 = Variable([0, 1, 1, 1, 0, 1, 0, 1])
+    V1 = Variable([0, 0, 1, 1, 0, 1, 1, 1])
+
+    PrXZ = PMF(JointVariables(V0, V1))
+    PrXZ.IDs(1000, 1111)
+
+    assert PrXZ.IDs() == (1000, 1111)
+
+    assert PrXZ.p((0, 0)) == 2 / 8
+    assert PrXZ.p((0, 1)) == 1 / 8
+    assert PrXZ.p((1, 0)) == 1 / 8
+    assert PrXZ.p((1, 1)) == 4 / 8
+
+
+
 def test_conditional_pmf__multiple_values():
     sizes = Variable(['small', 'small', 'large', 'small', 'normal', 'small'])
     sizes.ID = 1
@@ -228,7 +306,7 @@ def test_conditional_pmf__from_bayesian_network():
     configuration['values_as_indices'] = False
     configuration['objectives'] = ['R', 'TRN']
 
-    bayesian_network = util.read_bif_file(configuration['sourcepath'], use_cache=False)
+    bayesian_network = BayesianNetwork.from_bif_file(configuration['sourcepath'], use_cache=False)
     bayesian_network.finalize()
 
     sbnds = SampledBayesianNetworkDatasetSource(configuration)

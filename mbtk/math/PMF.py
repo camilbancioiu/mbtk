@@ -1,10 +1,18 @@
+from __future__ import annotations
+
 import itertools
+from typing import cast
 from collections import Counter
+
+from mbtk.math.Variable import Variable
 from mbtk.utilities import functions as util
 import numpy
 
 
 class PMF:
+    tolerance_pdiff: float
+    variable: Variable
+    variableIDs: tuple[int]
 
     def __init__(self, variable):
         self.tolerance_pdiff = 1e-10
@@ -13,10 +21,12 @@ class PMF:
             self.total_count = len(self.variable)
             self.value_counts = self.count_values()
             self.probabilities = self.normalize_counts()
+            self.variableIDs = tuple(variable.IDs())
         else:
             self.value_counts = dict()
             self.probabilities = dict()
             self.total_count = 0
+            self.variableIDs = tuple()
 
 
     def __str__(self):
@@ -74,6 +84,36 @@ class PMF:
             return 0.0
 
 
+    def IDs(self, *varIDs: int) -> tuple[int]:
+        if len(varIDs) == 0:
+            return self.variableIDs
+        self.variableIDs = cast(tuple[int], tuple(varIDs))
+        return self.variableIDs
+
+
+    def sum_over(self, ID: int) -> PMF:
+        index = self.variableIDs.index(ID)
+        new_probabilities: dict[tuple[int, ...], float]
+        new_probabilities = dict()
+
+        for key, value in self.probabilities.items():
+            new_key = process_pmf_key(self.remove_from_key(key, index))
+            try:
+                new_probabilities[new_key] += value
+            except KeyError:
+                new_probabilities[new_key] = value
+
+        new_pmf = PMF(None)
+        new_pmf.probabilities = new_probabilities
+        new_pmf.variableIDs = self.remove_from_key(self.variableIDs, index)
+
+        return new_pmf
+
+
+    def remove_from_key(self, key, index):
+        return tuple(key[:index] + key[index + 1:])
+
+
     def count_values(self):
         instances = self.variable.instances()
         if isinstance(instances, numpy.ndarray):
@@ -126,6 +166,39 @@ class PMF:
         return instances
 
 
+    def condition_on(self, cond_pmf: PMF) -> CPMF:
+        cond_vars = cond_pmf.IDs()
+
+        if len(cond_vars) == 0:
+            raise ValueError('empty conditioning set')
+
+        cpmf = CPMF(None, None)
+
+        joint_IDs = self.IDs()
+        joint_index = {var: joint_IDs.index(var) for var in joint_IDs}
+        non_cond_vars = [ID for ID in joint_IDs if ID not in cond_vars]
+
+        for joint_key, joint_p in self.items():
+            cond_key = tuple(joint_key[joint_index[cvID]] for cvID in cond_vars)
+            if len(cond_key) == 1:
+                cond_key = cond_key[0]
+
+            non_cond_key = tuple([joint_key[joint_index[ncvID]] for ncvID in non_cond_vars])
+
+            try:
+                pmf = cpmf.conditional_probabilities[cond_key]
+            except KeyError:
+                pmf = PMF(None)
+                cpmf.conditional_probabilities[cond_key] = pmf
+
+            try:
+                pmf.probabilities[non_cond_key] = joint_p / cond_pmf.p(cond_key)
+            except ZeroDivisionError:
+                pass
+
+        return cpmf
+
+
     def __eq__(self, other):
         selfkeyset = set(self.probabilities.keys())
         otherkeyset = set(other.probabilities.keys())
@@ -149,6 +222,7 @@ class CPMF(PMF):
         else:
             self.tolerance_pdiff = 1e-10
             self.variable = variable
+        self.probabilities = None
         self.conditional_probabilities = dict()
         self.tolerance_pdiff = 1e-10
 
@@ -215,7 +289,8 @@ class CPMF(PMF):
             pmf.normalize_counts(update_probabilities=True)
 
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
+        assert isinstance(other, CPMF)
         selfkeyset = set(self.conditional_probabilities.keys())
         otherkeyset = set(other.conditional_probabilities.keys())
         keys_equal = (selfkeyset == otherkeyset)
@@ -227,6 +302,22 @@ class CPMF(PMF):
             if selfpmf != otherpmf:
                 return False
         return True
+
+
+
+class OmegaPMF(PMF):
+
+    def __init__(self):
+        super().__init__(None)
+        self.probabilities[1] = 1.0
+
+
+
+class OmegaCPMF(CPMF):
+
+    def __init__(self, pmf: PMF):
+        super().__init__(None, None)
+        self.conditional_probabilities[1] = pmf
 
 
 

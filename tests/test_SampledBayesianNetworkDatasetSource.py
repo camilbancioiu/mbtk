@@ -4,8 +4,8 @@ import pytest
 
 import tests.utilities as testutil
 
+from mbtk.structures.BayesianNetwork import BayesianNetwork
 from mbtk.dataset.sources.SampledBayesianNetworkDatasetSource import SampledBayesianNetworkDatasetSource
-import mbtk.utilities.functions as util
 
 
 @pytest.mark.slow
@@ -15,7 +15,7 @@ def test_sampling_bayesian_network_as_dataset_source__random():
     sample_count = configuration['sample_count']
 
     random.seed(configuration['random_seed'])
-    bayesian_network = util.read_bif_file(configuration['sourcepath'], use_cache=False)
+    bayesian_network = BayesianNetwork.from_bif_file(configuration['sourcepath'], use_cache=False)
     bayesian_network.finalize()
     sample_matrix = bayesian_network.sample_matrix(configuration['sample_count'])
 
@@ -45,7 +45,7 @@ def test_sampling_bayesian_network_as_dataset_source__exact():
     configuration['method'] = 'exact'
     sample_count = configuration['sample_count']
 
-    bayesian_network = util.read_bif_file(configuration['sourcepath'], use_cache=False)
+    bayesian_network = BayesianNetwork.from_bif_file(configuration['sourcepath'], use_cache=False)
     bayesian_network.finalize()
     joint_pmf = bayesian_network.create_joint_pmf()
     instances = joint_pmf.create_instances_list(sample_count)

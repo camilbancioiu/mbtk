@@ -6,7 +6,6 @@ import pytest
 from mbtk.algorithms.mb.ipcmb import AlgorithmIPCMB
 import mbtk.math.G_test__unoptimized
 import mbtk.math.G_test__with_AD_tree
-import mbtk.math.debug.G_test__with_AD_tree__debug
 import mbtk.structures.ADTree
 import mbtk.structures.DynamicADTree
 import mbtk.math.G_test__with_dcMI
@@ -31,6 +30,28 @@ def testfolders():
 
     folders['root'] = root
     return folders
+
+
+
+@pytest.mark.slow
+def test_ipcmb_timing__unoptimized(ds_alarm_5e2):
+    ds = ds_alarm_5e2
+    parameters = make_parameters__unoptimized(DoFCalculators.StructuralDoF)
+    parameters_dsep = make_parameters__dsep()
+
+    print()
+
+    total_mb_errors = 0
+
+    targets = range(ds.datasetmatrix.get_column_count('X'))
+    for target in targets:
+        mb, _, _ = run_IPCMB(ds, target, parameters)
+        mb_dsep, _, _ = run_IPCMB(ds, target, parameters_dsep)
+        mb_error = set(mb).symmetric_difference(mb_dsep)
+        print('mb error', f'({len(mb_error)})', mb_error)
+        total_mb_errors += len(mb_error)
+
+    print('Total MB errors', total_mb_errors)
 
 
 
@@ -181,7 +202,6 @@ def test_dof_across_Gtest_optimizations__UnadjustedDoF(ds_survey_2e3, adtree_sur
     parameters = dict()
     parameters['G_test__unoptimized'] = make_parameters__unoptimized(dof)
     parameters['G_test__with_AD_tree'] = make_parameters__adtree(dof, LLT, adtree)
-    parameters['G_test__with_dcMI'] = make_parameters__dcmi(dof)
 
     targets = range(ds.datasetmatrix.get_column_count('X'))
     for target in targets:
@@ -235,7 +255,7 @@ def validate_IPCMB_across_Gtest_implementations(ds, target, parameters_for_imple
 
     if validate_mb:
         ipcmb_dsep = make_IPCMB(ds, target, make_parameters__dsep())
-        mb_dsep = ipcmb_dsep.select_features()
+        mb_dsep = ipcmb_dsep.discover_mb()
         for implementation, result in results.items():
             mb = result[0]
             assert mb == mb_dsep
@@ -255,7 +275,7 @@ def validate_IPCMB_across_Gtest_implementations(ds, target, parameters_for_imple
 
 def run_IPCMB(ds, target, parameters):
     ipcmb = make_IPCMB(ds, target, parameters)
-    mb = ipcmb.select_features()
+    mb = ipcmb.discover_mb()
     ci_tests = ipcmb.CITest.ci_test_results
     return (mb, ci_tests, ipcmb)
 

@@ -2,6 +2,10 @@ import pickle
 from mbtk.math.CITestResult import CITestResult
 
 
+DSEP_CI_AsTest = 0
+DSEP_CI_ASHeuristic = 1
+
+
 class DSeparationCITest:
 
     def __init__(self, datasetmatrix, parameters):
@@ -12,6 +16,12 @@ class DSeparationCITest:
 
 
     def conditionally_independent(self, X, Y, Z):
+        result = self.conditionally_independent_result(X, Y, Z)
+        result.extra_info = DSEP_CI_AsTest
+        return result.independent
+
+
+    def conditionally_independent_result(self, X, Y, Z):
         result = CITestResult()
         result.start_timing()
         independent = self.source_bn.conditionally_independent(X, Y, Z)
@@ -28,7 +38,7 @@ class DSeparationCITest:
 
         if self.debug: print(result)
 
-        return result.independent
+        return result
 
 
     def end(self):
@@ -36,3 +46,23 @@ class DSeparationCITest:
         if save_path is not None:
             with save_path.open('wb') as f:
                 pickle.dump(self.ci_test_results, f)
+
+
+
+class DSeparationAsCorrelationHeuristic(DSeparationCITest):
+
+    def compute(self, X, Y, Z):
+        result = self.conditionally_independent_result(X, Y, Z)
+        result.extra_info = DSEP_CI_ASHeuristic
+
+        if result.independent:
+            return 0.0
+        else:
+            return 1.0
+
+
+    def end(self):
+        save_path = self.parameters.get('heuristic_results_path__save', None)
+        if save_path is not None:
+            with save_path.open('wb') as f:
+                pickle.dump(self.heuristic_results, f)

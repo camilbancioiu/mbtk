@@ -52,12 +52,11 @@ class ExperimentalSetup:
 
     def update_paths(self):
         self.Paths.Experiment = self.ExperimentDef.path
-        self.Paths.ExDs = self.ExDsDef.path
 
-
-    def filter_algruns(self):
-        # Allow subclasses to implement arbitrary filtering in this method.
-        pass
+        try:
+            self.Paths.ExDs = self.ExDsDef.path
+        except AttributeError:
+            pass
 
 
     def filter_algruns_by_tag(self, tag):
@@ -134,7 +133,11 @@ def configure_objects_subparser__datapoints(subparsers):
 def handle_command(arguments, experimental_setup):
     command_handled = False
     command_object = experimental_setup.Arguments.object
-    command_verb = experimental_setup.Arguments.verb
+
+    try:
+        command_verb = experimental_setup.Arguments.verb
+    except AttributeError:
+        command_verb = ''
 
     if command_object == 'paths':
         if command_verb == 'show':

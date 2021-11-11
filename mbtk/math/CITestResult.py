@@ -1,14 +1,23 @@
 import time
 
 import mbtk.utilities.colors as col
+from mbtk.math.Variable import Variable, JointVariables, Omega
 
 
 class CITestResult:
+    independent: bool
+    dependent: bool
+    X: int
+    Y: int
+    Z: list[int]
+    statistic: str
+    statistic_value: float
+    p_value: float
 
     def __init__(self):
         self.index = -1
-        self.independent = None
-        self.dependent = None
+        self.independent = False
+        self.dependent = False
         self.insufficient_samples = None
         self.X = None
         self.Y = None
@@ -123,23 +132,41 @@ class CITestResult:
         if variable is None:
             return '∅'
 
-        if type(variable) == int:
+        if isinstance(variable, JointVariables):
+            return self.get_variable_representation(variable.IDs())
+
+        if isinstance(variable, Omega):
+            return 'Ω'
+
+        if isinstance(variable, Variable):
+            if variable.ID == -1024:
+                return 'Ω'
+
+            return str(variable.ID)
+
+        if isinstance(variable, int):
             if variable == -1:
                 return 'unnamed'
 
             if variable == -1024:
                 return 'Ω'
 
-            return variable
+            return str(variable)
 
         if isinstance(variable, set) or isinstance(variable, list):
             if len(variable) == 0:
                 return 'Ω'
 
-        try:
-            return variable.simple_representation()
-        except AttributeError:
-            return str(variable)
+            if len(variable) == 1:
+                return str(list(variable)[0])
+
+            return self.get_multiple_variables_representation(variable)
+
+        return str(variable)
+
+
+    def get_multiple_variables_representation(self, variables):
+        return '{' + ', '.join([str(var) for var in variables]) + '}'
 
 
     def set_statistic(self, name, value, params):

@@ -1,11 +1,17 @@
+from __future__ import annotations
+
 import itertools
+import functools
 import operator
 import random
 import copy
+import pickle
 
 import numpy
 
 from collections import OrderedDict
+from pathlib import Path
+from typing import cast
 
 from mbtk.math.PMF import PMF
 from mbtk.structures.Exceptions import BayesianNetworkNotFinalizedError
@@ -26,19 +32,34 @@ class BayesianNetwork:
     def __init__(self, name):
         self.name = name
         self.variable_nodes = {}
+        self.variable_nodes_by_ID = {}
+        self.variable_IDs = []
         self.properties = {}
         self.variable_nodes__sampling_order = []
         self.variable_node_names__sampling_order = []
+        self.joint_pmf_size = 0
         self.graph = None
         self.finalized = False
 
 
+    @staticmethod
+    def from_bif_file(sourcepath: Path, use_cache=True) -> BayesianNetwork:
+        return read_bif_file(sourcepath, use_cache)
+
+
+    @functools.cache
     def variable_node_names(self):
         return list(sorted(self.variable_nodes.keys()))
 
 
+    @functools.cache
     def variable_nodes_index(self, varname):
         return self.variable_node_names().index(varname)
+
+
+    @functools.cache
+    def variable_nodes_name(self, ID):
+        return self.variable_nodes_by_ID[ID].name
 
 
     def __len__(self):
@@ -119,11 +140,22 @@ class BayesianNetwork:
         return sample_with_indices
 
 
+    def calculate_joint_pmf_size(self) -> int:
+        size = 1
+        for variable in self.variable_nodes.values():
+            size = size * len(variable.values)
+        return size
+
+
+
+    @functools.cache
     @finalization_required
-    def create_joint_pmf(self, values_as_indices=True):
+    def create_joint_pmf(self, values_as_indices=True) -> PMF:
         pmf = PMF(None)
         pmf.probabilities = self.joint_values_and_probabilities(values_as_indices=values_as_indices)
+        pmf.IDs(*self.variable_IDs)
         return pmf
+
 
 
     @finalization_required
@@ -155,6 +187,86 @@ class BayesianNetwork:
         return joint_vp
 
 
+    @functools.cache
+    @finalization_required
+    def create_partial_joint_pmf(self, variables: tuple[int]) -> PMF:
+        subnetwork = self.get_subnetwork(variables)
+
+        joint_pmf: PMF = subnetwork.create_joint_pmf()
+
+        variables_to_sum_over = set(joint_pmf.IDs()) - set(variables)
+        for variable in variables_to_sum_over:
+            joint_pmf = joint_pmf.sum_over(variable)
+
+        return joint_pmf
+
+
+    @functools.cache
+    @finalization_required
+    def get_subnetwork(self, variables: tuple[int]) -> BayesianNetwork:
+        subnetwork_nodes = self.get_nodes_by_ID(list(variables))
+        subnetwork_nodes = self.get_subnetwork_nodes(subnetwork_nodes)
+
+        bayesian_network = BayesianNetwork(self.name + '_subnet')
+        for node in subnetwork_nodes.values():
+            bayesian_network.variable_nodes[node.name] = node
+
+        bayesian_network.finalize()
+        return bayesian_network
+
+
+    @finalization_required
+    def get_subnetwork_nodes(self, nodes: dict[int, VariableNode]) -> dict[int, VariableNode]:
+        node_IDs = tuple(nodes.keys())
+        subnetwork_node_IDs = self.get_subnetwork_node_IDs(node_IDs)
+
+        subnetwork_nodes: dict[int, VariableNode] = dict()
+        for node_ID in subnetwork_node_IDs:
+            node = self.variable_nodes_by_ID[node_ID]
+            subnetwork_nodes[node_ID] = copy.copy(node)
+
+        return subnetwork_nodes
+
+
+    @functools.cache
+    @finalization_required
+    def get_subnetwork_node_IDs(self, node_IDs: tuple[int]) -> tuple[int]:
+        parents: set[int] = set()
+        for node_ID in node_IDs:
+            node = self.variable_nodes_by_ID[node_ID]
+            parent_names = node.probdist.conditioning_variable_nodes.keys()
+            for parent_name in parent_names:
+                parent_ID = self.variable_nodes_index(parent_name)
+                parents.add(parent_ID)
+
+        if len(parents) > 0:
+            ancestors: tuple[int] = self.get_subnetwork_node_IDs(tuple(parents))
+            parents = parents | set(ancestors)
+
+        new_node_IDs = tuple(set(node_IDs) | set(parents))
+        node_IDs = cast(tuple[int], new_node_IDs)
+        return node_IDs
+
+
+    def get_nodes_by_name(self, node_names: list[str]) -> dict[int, VariableNode]:
+        nodes = dict()
+        for name in node_names:
+            node = self.variable_nodes[name]
+            nodes[node.ID] = node
+
+        return nodes
+
+
+    @finalization_required
+    def get_nodes_by_ID(self, node_IDs: list[int]) -> dict[int, VariableNode]:
+        nodes = dict()
+        for ID in node_IDs:
+            node = self.variable_nodes_by_ID[ID]
+            nodes[node.ID] = node
+
+        return nodes
+
+
     def total_possible_values_count(self):
         count = 1
         for varnode in self.variable_nodes.values():
@@ -172,13 +284,20 @@ class BayesianNetwork:
         for varname in self.variable_node_names__sampling_order:
             self.variable_nodes__sampling_order.append(self.variable_nodes[varname])
 
-        for ID, varname in enumerate(self.variable_node_names()):
-            self.variable_nodes[varname].ID = ID
+        for index, varname in enumerate(self.variable_node_names()):
+            node = self.variable_nodes[varname]
+            if node.ID == -1:
+                node.ID = index
+            self.variable_nodes_by_ID[node.ID] = node
+            self.variable_IDs.append(node.ID)
 
         self.graph_d = self.as_directed_graph()
         self.graph_u = self.as_undirected_graph()
 
+        self.joint_pmf_size = self.calculate_joint_pmf_size()
+
         self.finalized = True
+
 
 
     def detect_optimal_variable_sampling_order(self):
@@ -328,7 +447,8 @@ class BayesianNetwork:
 
 
     def find_all_undirected_paths(self, start, end):
-        return self.find_all_paths(self.graph_u, start, end)
+        self.explored_graph = self.graph_u
+        return self.find_all_paths_recursive_cached(start, end)
 
 
     def find_all_paths(self, graph, start, end):
@@ -353,8 +473,27 @@ class BayesianNetwork:
         return paths
 
 
-    # Implementation from https://stackoverflow.com/a/35531270/583574
+    @functools.cache
+    def find_all_paths_recursive_cached(self, start, end, path=None):
+        if path is None:
+            path = tuple()
+
+        path = path + (start,)
+        if start == end:
+            return [path]
+        if start not in self.explored_graph:
+            return []
+        paths = []
+        for node in self.explored_graph[start]:
+            if node not in path:
+                newpaths = self.find_all_paths_recursive_cached(node, end, path)
+                for newpath in newpaths:
+                    paths.append(newpath)
+        return paths
+
+
     def find_all_paths_nonrecursive(self, graph, start, end):
+        """Implementation from https://stackoverflow.com/a/35531270/583574"""
         visited = set()
         visited.add(start)
 
@@ -383,11 +522,10 @@ class BayesianNetwork:
             else:
                 # push current node and index onto stacks, switch to neighbor
                 nodestack.append(current)
-                indexstack.append(i+1)
+                indexstack.append(i + 1)
                 visited.add(neighbors[i])
                 current = neighbors[i]
                 i = 0
-
 
 
 
@@ -469,6 +607,7 @@ class VariableNode:
         return partial_sample
 
 
+    @functools.cache
     def probability_of_value(self, value, conditioning_values):
         value_index = self.values.index(value)
         value_probability = self.probdist.probabilities[conditioning_values][value_index]
@@ -608,3 +747,39 @@ class ProbabilityDistributionOfVariableNode:
             return "ProbabilityMassDistribution for variable {}, unconditioned".format(self.variable_name)
         else:
             return "ProbabilityMassDistribution for variable {}, conditioned on {}".format(self.variable_name, self.conditioning_variable_names)
+
+
+
+def read_bif_file(sourcepath: Path, use_cache=True) -> BayesianNetwork:
+    bayesian_network = None
+
+    # BIF files might be large, so we read them from source and then we pickle
+    # them to files. If a pickle-file is found, read it instead of the
+    # requested BIF file.
+    cachefile = sourcepath.with_suffix('.pickle')
+    if use_cache:
+        if cachefile.exists():
+            with cachefile.open('rb') as f:
+                bayesian_network = pickle.load(f)
+
+            assert isinstance(bayesian_network, BayesianNetwork)
+            return bayesian_network
+
+    bayesian_network = parse_bif_file(sourcepath)
+    with cachefile.open('wb') as f:
+        pickle.dump(bayesian_network, f)
+
+    assert isinstance(bayesian_network, BayesianNetwork)
+    return bayesian_network
+
+
+
+def parse_bif_file(path):
+    from lark import Lark
+    from mbtk.utilities.bif.Grammar import bif_grammar
+    from mbtk.utilities.bif.Transformers import get_transformer_chain
+    parser = Lark(bif_grammar)
+    tree = parser.parse(path.read_text())
+
+    bayesian_network = get_transformer_chain().transform(tree)
+    return bayesian_network

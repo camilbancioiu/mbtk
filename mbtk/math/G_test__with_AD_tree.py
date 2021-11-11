@@ -1,11 +1,11 @@
 import time
 import pickle
 
-from mbtk.math.CITestResult import CITestResult
-from mbtk.math.PMF import PMF, CPMF
+from mbtk.math.PMF import PMF, CPMF, OmegaPMF, OmegaCPMF
 
 import mbtk.math.infotheory as infotheory
 import mbtk.math.G_test__unoptimized
+from mbtk.math.CITestResult import CITestResult
 
 import mbtk.structures.ADTree
 
@@ -133,10 +133,10 @@ class G_test(mbtk.math.G_test__unoptimized.G_test):
 
             PrX = self.AD_tree.make_pmf([X])
             PrY = self.AD_tree.make_pmf([Y])
-            PrXYcZ = self.make_omega_cpmf_from_pmf(PrXY)
-            PrXcZ = self.make_omega_cpmf_from_pmf(PrX)
-            PrYcZ = self.make_omega_cpmf_from_pmf(PrY)
-            PrZ = self.make_omega_pmf()
+            PrXYcZ = OmegaCPMF(PrXY)
+            PrXcZ = OmegaCPMF(PrX)
+            PrYcZ = OmegaCPMF(PrY)
+            PrZ = OmegaPMF()
 
             if self.DoF_calculator.requires_pmfs:
                 self.DoF_calculator.set_context_pmfs(PrXY, PrX, PrY, None)

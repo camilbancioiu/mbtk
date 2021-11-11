@@ -23,7 +23,7 @@ def test_experiment_run__simple():
     experiments_folder = testutil.ensure_empty_tmp_subfolder('test_experiment_repository__experiment_run')
 
     # Prepare the ExDs.
-    exds_definition = default_exds_definition(exds_folder, 'test_exds_experimentrun')
+    exds_definition = default_exds_definition(exds_folder, 'test_exds_experiment_run')
     exds = exds_definition.create_exds()
     exds.build()
 
@@ -45,7 +45,7 @@ def test_experiment_run__simple():
     experiment_run.run()
 
     # Test whether the experiment run has generated the expected log files (one for each AlgorithmRun)
-    log_folder = experiments_folder / 'test_experiment_run/algorithm_run_logs'
+    log_folder = experiments_folder / 'test_experiment_run' / 'algorithm_run_logs' / 'main'
     assert Path(log_folder).exists() is True
     expected_log_files = [
         '0__test_AlgorithmIGt_BernoulliNB__Q2_Obj0.log',
@@ -57,7 +57,7 @@ def test_experiment_run__simple():
     assert expected_log_files == created_log_files
 
     # Test whether the experiment run has generated the expected pickle files (one for each AlgorithmRunDatapoint)
-    datapoints_folder = experiments_folder / 'test_experiment_run' / 'algorithm_run_datapoints'
+    datapoints_folder = experiments_folder / 'test_experiment_run' / 'algorithm_run_datapoints' / 'main'
     assert datapoints_folder.exists() is True
     expected_datapoints_files = [
         '0__test_AlgorithmIGt_BernoulliNB__Q2_Obj0.pickle',

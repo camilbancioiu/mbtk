@@ -98,7 +98,7 @@ def make_IPCMB(ds, target, extra_parameters=None):
 
 def run_IPCMB(ds, target, parameters):
     ipcmb = make_IPCMB(ds, target, parameters)
-    mb = ipcmb.select_features()
+    mb = ipcmb.discover_mb()
     ci_tests = ipcmb.CITest.ci_test_results
     return (mb, ci_tests)
 

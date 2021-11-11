@@ -1,13 +1,14 @@
 import pytest
 from pathlib import Path
 import tests.utilities as testutil
+from mbtk.structures.BayesianNetwork import BayesianNetwork
 from mbtk.structures.ADTree import ADTree
-import mbtk.utilities.functions as util
 
 
 @pytest.fixture(scope='session')
-def bn_alarm():
-    bn = util.read_bif_file(Path(testutil.bif_folder, 'alarm.bif'), use_cache=False)
+def bn_alarm() -> BayesianNetwork:
+    path = Path(testutil.bif_folder, 'alarm.bif')
+    bn = BayesianNetwork.from_bif_file(path, use_cache=False)
     bn.finalize()
     return bn
 
