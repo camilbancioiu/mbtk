@@ -1,0 +1,31 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: The Markov Boundary Toolkit (MBTK)
+message: >-
+  If you use MBTK as-is or if you use components of
+  MBTK in your work, please cite as below.
+type: software
+authors:
+  - given-names: Camil
+    family-names: Băncioiu
+    email: ioa.camil.bancioiu@gmail.com
+    orcid: 'https://orcid.org/0000-0003-2900-4251'
+identifiers:
+  - type: doi
+    value: 10.3390/e23111501
+    description: >-
+      Article describing computation methods
+      implemented in MBTK.
+repository-code: 'https://github.com/camilbancioiu/mbtk.git'
+url: 'https://github.com/camilbancioiu/MBTK'
+keywords:
+  - markov boundary
+  - markov blanket
+  - bayesian network
+  - conditional mutual information
+  - G-test
+  - AD-tree
+  - optimization
+license: GPL-3.0
