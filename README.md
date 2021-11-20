@@ -2,7 +2,9 @@
 
 MBTK is a library that assists in the research and development of Markov boundary discovery algorithms. It contains helpful tools, such as a Bayesian network sampler, data set generators and various components used to configure and run various experiments.
 
-The MBTK itself was already used to build successful experiments. Most notably, the `experiments/experiment_dcmi` folder in MBTK contains the configuration and customizations needed to evaluate the `dcMI` optimization for the computation of the G-test, as part of a comparative experiment involving the IPC-MB algorithm ([published at MDPI Entropy](https://www.mdpi.com/1099-4300/23/11/1501), DOI https://doi.org/10.3390/e23111501 ). A previous iteration of MBTK (see [MBFF](https://github.com/camilbancioiu/MBFF)) was used to build an experiment that evaluated 4 individual optimizations for the older KS algorithm ([published at ROMJIST](https://www.romjist.ro/abstract-620.html), an open-access journal).
+The MBTK itself was already used to build successful experiments. Most notably, the `experiments/experiment_dcmi` folder in MBTK contains the configuration and customizations needed to evaluate the `dcMI` optimization for the computation of the G-test, as part of a comparative experiment involving the IPC-MB algorithm ([published at MDPI Entropy](https://www.mdpi.com/1099-4300/23/11/1501)). If you rely on MBTK in your work in any way, consider citing the article itself (DOI https://doi.org/10.3390/e23111501) and/or this repository (see the CITATION.cff file in the root of the repository).
+
+A previous iteration of MBTK (see [MBFF](https://github.com/camilbancioiu/MBFF)) was used to build an experiment that evaluated 4 individual optimizations for the older KS algorithm ([published at ROMJIST](https://www.romjist.ro/abstract-620.html), an open-access journal).
 
 For a demonstration of MBTK, see [below](#demonstration).
 
