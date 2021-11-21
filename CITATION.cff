@@ -2,7 +2,7 @@
 # Visit https://bit.ly/cffinit to generate yours today!
 
 cff-version: 1.2.0
-title: The Markov Boundary Toolkit (MBTK)
+title: Markov Boundary Toolkit (MBTK)
 message: >-
   If you use MBTK as-is or if you use components of
   MBTK in your work, please cite as below.
