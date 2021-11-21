@@ -18,7 +18,7 @@ identifiers:
     description: >-
       Article describing computation methods
       implemented in MBTK.
-repository-code: 'https://github.com/camilbancioiu/mbtk.git'
+repository-code: 'https://github.com/camilbancioiu/MBTK'
 url: 'https://github.com/camilbancioiu/MBTK'
 keywords:
   - markov boundary
