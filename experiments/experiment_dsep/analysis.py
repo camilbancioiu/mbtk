@@ -19,6 +19,7 @@ def create_citr_analysis(experimental_setup):
     total_distance = 0
     total_precision = 0
     total_recall = 0
+    total_duration = 0
     for algrun in algruns:
         target = algrun['target']
 
@@ -33,6 +34,7 @@ def create_citr_analysis(experimental_setup):
 
         total_citr_count += citr_analysis[f'T{target}_citr_count']
         total_accurate_citr_count += citr_analysis[f'T{target}_accurate_citr_count']
+        total_duration += citr_analysis[f'T{target}_duration']
         try:
             total_mb_errors += mb_analysis[f'T{target}_mb_error_count']
             total_precision += mb_analysis[f'T{target}_precision']
@@ -53,6 +55,7 @@ def create_citr_analysis(experimental_setup):
     analysis['Avg. precision'] = total_precision / len(algruns)
     analysis['Avg. recall'] = total_recall / len(algruns)
     analysis['Avg. distance'] = total_distance / len(algruns)
+    analysis['Duration'] = total_duration
     return analysis
 
 
@@ -65,6 +68,9 @@ def create_algrun_citr_analysis(arguments, algrun):
     accurate_count = sum(map(int, map(CITestResult.accurate, results)))
     analysis[f'T{target}_citr_count'] = len(results)
     analysis[f'T{target}_accurate_citr_count'] = accurate_count
+
+    duration = sum(map(operator.attrgetter('duration'), results))
+    analysis[f'T{target}_duration'] = duration
 
     condset_size_counter = create_condset_size_counter(results)
     if arguments.target_condset_histogram:
